@@ -7,16 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [1.1.0] - 2019-02-15
 
-### Added
 
-- 
 
 
 ## [0.0.1] - 2020-01-29
 
 ### Changed
 
-- The Unity Plugin files are now a Unity Package
-- Playmode and Edit mode tests are sitting in their own folder Assets/Tests
+- The Unity Plugin files are now a Unity Package, they follow the Unity Package Layout Convention
+- The package does not include the Poly and PolyToolkit files
+- All namespaces are updated to reflect the proper com.<PackageName>.<Feature> format
+- DLL names are now in the format of com.RealityFlow.<ScriptArea>
