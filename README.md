@@ -29,6 +29,3 @@ using RealityFlow.Plugin.Scripts.Events;
 using RealityFlow.Plugin.Tests;
 ```
 
-
-hello
-
