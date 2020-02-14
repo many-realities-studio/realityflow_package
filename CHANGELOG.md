@@ -17,5 +17,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - The Unity Plugin files are now a Unity Package, they follow the Unity Package Layout Convention
 - The package does not include the Poly and PolyToolkit files
-- All namespaces are updated to reflect the proper com.<PackageName>.<Feature> format
-- DLL names are now in the format of com.RealityFlow.<ScriptArea>
+- All namespaces are updated to reflect the proper com.[PackageName].[Feature] format
+- DLL names are now in the format of com.RealityFlow.[ScriptArea]
