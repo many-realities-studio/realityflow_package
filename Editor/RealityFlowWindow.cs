@@ -460,7 +460,7 @@ namespace RealityFlow.Plugin.Editor
             //          from the server
 
             // Specify the path of where the project is saved
-            string path = "Assets/resources/projects/test.txt";
+            string path = "Packages/com.RealityFlow/Resources/projects/test.txt";
 
             StreamReader reader = new StreamReader(path);
             List<string> jsonList = new List<string>();
