@@ -6,7 +6,7 @@
 ```json
 {
   "dependencies": {
-    "com.realityflow": "https://github.com/nyashafrank/realityflow_package.git"
+    "com.realityflow": "https://github.com/lucidbard/realityflow_package.git"
 }
 ```
 
