@@ -9,6 +9,6 @@ namespace RealityFlow.Plugin.Scripts
     {
         public string __v;
         public string _id;
-        public string id;
+        public string flowId;
     }
 }
