@@ -3,7 +3,7 @@ using UnityEngine.UI;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using RealityFlow.Plugin.Scripts.Events;
+//using RealityFlow.Plugin.Scripts.Events;
 
 
 namespace RealityFlow.Plugin.Scripts
@@ -48,19 +48,19 @@ namespace RealityFlow.Plugin.Scripts
 
         public static void initializeRecieveEvents()
         {
-            // Object Events
-            recieveEvents.Add(ObjectUpdateEvent.scmd, ObjectUpdateEvent.Receive);
-            recieveEvents.Add(ObjectCreationEvent.scmd, ObjectCreationEvent.Receive);
-            recieveEvents.Add(ObjectDeleteEvent.scmd, ObjectDeleteEvent.Receive);
+            //// Object Events
+            //recieveEvents.Add(ObjectUpdateEvent.scmd, ObjectUpdateEvent.Receive);
+            //recieveEvents.Add(ObjectCreationEvent.scmd, ObjectCreationEvent.Receive);
+            //recieveEvents.Add(ObjectDeleteEvent.scmd, ObjectDeleteEvent.Receive);
 
-            // Project Events
-            recieveEvents.Add(ProjectCreateEvent.scmd, ProjectCreateEvent.Receive);
-            recieveEvents.Add(ProjectFetchEvent.scmd, ProjectFetchEvent.Receive);
-            recieveEvents.Add(ProjectInviteEvent.scmd, ProjectInviteEvent.Receive);
+            //// Project Events
+            //recieveEvents.Add(ProjectCreateEvent.scmd, ProjectCreateEvent.Receive);
+            //recieveEvents.Add(ProjectFetchEvent.scmd, ProjectFetchEvent.Receive);
+            //recieveEvents.Add(ProjectInviteEvent.scmd, ProjectInviteEvent.Receive);
 
-            // User Events
-            recieveEvents.Add(UserLoginEvent.scmd, UserLoginEvent.Receive);
-            recieveEvents.Add(UserRegisterEvent.scmd, UserRegisterEvent.Receive);
+            //// User Events
+            //recieveEvents.Add(UserLoginEvent.scmd, UserLoginEvent.Receive);
+            //recieveEvents.Add(UserRegisterEvent.scmd, UserRegisterEvent.Receive);
         }
 
         public static int counter = 0;

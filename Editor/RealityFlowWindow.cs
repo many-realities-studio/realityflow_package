@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 using RealityFlow.Plugin.Scripts;
-using RealityFlow.Plugin.Scripts.Events;
+//using RealityFlow.Plugin.Scripts.Events;
 using System.IO;
 
 namespace RealityFlow.Plugin.Editor
@@ -180,8 +180,8 @@ namespace RealityFlow.Plugin.Editor
                 }
 
                 // Send login event to the server
-                UserLoginEvent login = new UserLoginEvent();
-                login.Send(uName, pWord, FlowClient.CLIENT_EDITOR);
+                //UserLoginEvent login = new UserLoginEvent(uName, pWord);
+                //login.Send(uName, pWord, FlowClient.CLIENT_EDITOR);
             }
 
             // Create "Register" Button and define onClick action
@@ -204,8 +204,8 @@ namespace RealityFlow.Plugin.Editor
                 }
 
                 // Send register event to the server with the entered user name and password
-                UserRegisterEvent register = new UserRegisterEvent();
-                register.Send(uName, pWord, FlowClient.CLIENT_EDITOR);
+                //UserRegisterEvent register = new UserRegisterEvent();
+                //register.Send(uName, pWord, FlowClient.CLIENT_EDITOR);
             }
 
             // Create "Import" Button and define onClick action
@@ -222,9 +222,9 @@ namespace RealityFlow.Plugin.Editor
             // Create "Logout" Button and define onClick action
             if (GUILayout.Button("Logout", GUILayout.Height(20)))
             {
-                // Send logout event to the server
-                UserLogoutEvent logout = new UserLogoutEvent();
-                logout.Send();
+                //// Send logout event to the server
+                //UserLogoutEvent logout = new UserLogoutEvent();
+                //logout.Send();
 
                 // Set logged (global) state to false
                 loggedIn = false;
@@ -348,15 +348,15 @@ namespace RealityFlow.Plugin.Editor
                 foreach (FlowProject project in Config.projectList)
                 {
                     // Add a button whose name is the name of the project and define the onClick event
-                    if (GUILayout.Button(project.projectName, GUILayout.Height(30)))
+                    if (GUILayout.Button(project.ProjectName, GUILayout.Height(30)))
                     {
-                        // Set the current project to the selected project
-                        Config.projectId = project._id;
-                        FlowProject.activeProject.projectName = project.projectName;
+                        //// Set the current project to the selected project
+                        //Config.projectId = project._id;
+                        //FlowProject.activeProject.projectName = project.projectName;
 
-                        // Send a request to the server to fetch the desired project
-                        ProjectFetchEvent fetch = new ProjectFetchEvent();
-                        fetch.Send(); /// TODO: Refactor to be more explicit about which project is getting fetched
+                        //// Send a request to the server to fetch the desired project
+                        //ProjectFetchEvent fetch = new ProjectFetchEvent();
+                        //fetch.Send(); /// TODO: Refactor to be more explicit about which project is getting fetched
 
                         // Send the user to the Project Hub screen
                         window = EWindowView.PROJECT_HUB;
@@ -393,9 +393,9 @@ namespace RealityFlow.Plugin.Editor
                 // Create "Create Project" Button and define onClick action
                 if (GUILayout.Button("Create Project", GUILayout.Height(40)))
                 {
-                    // Send ProjectCreate event to the server
-                    ProjectCreateEvent create = new ProjectCreateEvent();
-                    create.Send(projectName);
+                    //// Send ProjectCreate event to the server
+                    //ProjectCreateEvent create = new ProjectCreateEvent();
+                    //create.Send(projectName);
 
                     // Send the user to the Project Hub screen
                     window = EWindowView.PROJECT_HUB;
@@ -434,8 +434,8 @@ namespace RealityFlow.Plugin.Editor
                 if (GUILayout.Button("Invite", GUILayout.Height(40)))
                 {
                     // Send Project Invite event to the server
-                    ProjectInviteEvent invite = new ProjectInviteEvent();
-                    invite.send(userToInvite);
+                    //ProjectInviteEvent invite = new ProjectInviteEvent();
+                    //invite.send(userToInvite);
 
                     // Send the user to the Project Hub screen
                     window = EWindowView.PROJECT_HUB;
@@ -476,62 +476,62 @@ namespace RealityFlow.Plugin.Editor
             foreach (string json in jsonList)
             {
                 //TODO: What does this do?
-                ProjectFetchEvent log = new ProjectFetchEvent();
-                JsonUtility.FromJsonOverwrite(json, log);
-                string date = new System.DateTime(log.timestamp).ToString();
+                //ProjectFetchEvent log = new ProjectFetchEvent();
+                //JsonUtility.FromJsonOverwrite(json, log);
+                //string date = new System.DateTime(log.timestamp).ToString();
 
                 // Create Project Button Button and define onClick action
-                if (GUILayout.Button(log.project.projectName + "   " + date, GUILayout.Height(30)))
-                {
-                    // gather the list of objects in the previous imported project
-                    GameObject[] gameObjectList = GameObject.FindGameObjectsWithTag("imported");
+                //if (GUILayout.Button(log.project.projectName + "   " + date, GUILayout.Height(30)))
+                //{
+                //    // gather the list of objects in the previous imported project
+                //    GameObject[] gameObjectList = GameObject.FindGameObjectsWithTag("imported");
 
-                    // clear any previous imported objects
-                    foreach (GameObject gameObject in gameObjectList)
-                    {
-                        DestroyImmediate(gameObject);
-                    }
+                //    // clear any previous imported objects
+                //    foreach (GameObject gameObject in gameObjectList)
+                //    {
+                //        DestroyImmediate(gameObject);
+                //    }
 
-                    // TODO: refactor name of log.objs to be more clear as to what that field is
-                    foreach (FlowTObject currentFlowTObject in log.objs)
-                    {
-                        // this piece of code doesn't have textures implemented
-                        // for an example on how to add the textures look at the commented
-                        // code in the SaveObjectData function
+                //    // TODO: refactor name of log.objs to be more clear as to what that field is
+                //    foreach (FlowTObject currentFlowTObject in log.objs)
+                //    {
+                //        // this piece of code doesn't have textures implemented
+                //        // for an example on how to add the textures look at the commented
+                //        // code in the SaveObjectData function
 
-                        Debug.Log("creating object: " + currentFlowTObject.name);
-                        GameObject newObj = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                //        Debug.Log("creating object: " + currentFlowTObject.name);
+                //        GameObject newObj = GameObject.CreatePrimitive(PrimitiveType.Cube);
 
-                        // Create the mesh of the object
-                        Mesh objMesh = newObj.GetComponent<MeshFilter>().mesh;
-                        objMesh.vertices = currentFlowTObject.vertices;
-                        objMesh.uv = currentFlowTObject.uv;
-                        objMesh.triangles = currentFlowTObject.triangles;
-                        objMesh.RecalculateBounds();
-                        objMesh.RecalculateNormals();
+                //        // Create the mesh of the object
+                //        Mesh objMesh = newObj.GetComponent<MeshFilter>().mesh;
+                //        objMesh.vertices = currentFlowTObject.vertices;
+                //        objMesh.uv = currentFlowTObject.uv;
+                //        objMesh.triangles = currentFlowTObject.triangles;
+                //        objMesh.RecalculateBounds();
+                //        objMesh.RecalculateNormals();
 
-                        // Set the position and orientation of the object
-                        newObj.transform.localPosition = new Vector3(currentFlowTObject.x, currentFlowTObject.y, currentFlowTObject.z);
-                        newObj.transform.localRotation = Quaternion.Euler(new Vector4(currentFlowTObject.q_x, currentFlowTObject.q_y, currentFlowTObject.q_z, currentFlowTObject.q_w));
-                        newObj.transform.localScale = new Vector3(currentFlowTObject.s_x, currentFlowTObject.s_y, currentFlowTObject.s_z);
+                //        // Set the position and orientation of the object
+                //        newObj.transform.localPosition = new Vector3(currentFlowTObject.x, currentFlowTObject.y, currentFlowTObject.z);
+                //        newObj.transform.localRotation = Quaternion.Euler(new Vector4(currentFlowTObject.q_x, currentFlowTObject.q_y, currentFlowTObject.q_z, currentFlowTObject.q_w));
+                //        newObj.transform.localScale = new Vector3(currentFlowTObject.s_x, currentFlowTObject.s_y, currentFlowTObject.s_z);
 
-                        // Destory the collider associated with the object (this is from the cube primitive
-                        MonoBehaviour.DestroyImmediate(newObj.GetComponent<Collider>(), true);
+                //        // Destory the collider associated with the object (this is from the cube primitive
+                //        MonoBehaviour.DestroyImmediate(newObj.GetComponent<Collider>(), true);
 
-                        newObj.AddComponent<BoxCollider>(); // Why do we destroy the collider just to add it back in?
+                //        newObj.AddComponent<BoxCollider>(); // Why do we destroy the collider just to add it back in?
 
-                        newObj.name = currentFlowTObject.name;
-                        newObj.tag = "imported";
+                //        newObj.name = currentFlowTObject.name;
+                //        newObj.tag = "imported";
 
-                        // Set the color of the object
-                        Material mat = newObj.GetComponent<MeshRenderer>().material;
-                        mat.color = currentFlowTObject.color;
-                    }
+                //        // Set the color of the object
+                //        Material mat = newObj.GetComponent<MeshRenderer>().material;
+                //        mat.color = currentFlowTObject.color;
+                //    }
 
-                    // Send the user to the login screen
-                    window = EWindowView.LOGIN;
-                    DrawBody();
-                }
+                //    // Send the user to the login screen
+                //    window = EWindowView.LOGIN;
+                //    DrawBody();
+                //}
             }
         }
 
@@ -586,8 +586,8 @@ namespace RealityFlow.Plugin.Editor
         /// <param name="gameObjectToBeDeleted"></param>
         public void DeleteObject(GameObject gameObjectToBeDeleted)
         {
-            ObjectDeleteEvent delete = new ObjectDeleteEvent();
-            delete.Send(gameObjectToBeDeleted.GetComponent<FlowObject>().ft._id);
+            //ObjectDeleteEvent delete = new ObjectDeleteEvent();
+            //delete.Send(gameObjectToBeDeleted.GetComponent<FlowObject>().ft._id);
         }
 
         public void ExitProject()
@@ -605,8 +605,8 @@ namespace RealityFlow.Plugin.Editor
                 }
 
                 // Reset transform lists
-                FlowProject.activeProject.transformsById = new Dictionary<string, FlowTObject>();
-                FlowProject.activeProject.transforms = new List<FlowTObject>();
+                //FlowProject.activeProject.transformsById = new Dictionary<string, FlowTObject>();
+                //FlowProject.activeProject.transforms = new List<FlowTObject>();
             }
         }
 

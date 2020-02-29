@@ -1,4 +1,4 @@
-﻿using RealityFlow.Plugin.Scripts.Events;
+﻿//using RealityFlow.Plugin.Scripts.Events;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -73,7 +73,7 @@ namespace RealityFlow.Plugin.Editor
                 if (GUILayout.Button("Create", GUILayout.Height(30)))
                 {
                     SetupObjectManager();
-                    SaveObjectData(objData);
+                    //SaveObjectData(objData);
                     window.Close();
                 }
             }
@@ -107,45 +107,45 @@ namespace RealityFlow.Plugin.Editor
             }
         }
 
-        public static void SaveObjectData(ObjectData objectData)
-        {
+        //public static void SaveObjectData(ObjectData objectData)
+        //{
 
-            FlowTObject obj = new FlowTObject();
+        //    FlowTObject obj = new FlowTObject();
 
-            obj.vertices = objectData.mesh.vertices;
-            obj.uv = objectData.mesh.uv;
-            obj.triangles = objectData.mesh.triangles;
-            obj.x = objectData.position.x;
-            obj.y = objectData.position.y;
-            obj.z = objectData.position.z;
+        //    obj.vertices = objectData.mesh.vertices;
+        //    obj.uv = objectData.mesh.uv;
+        //    obj.triangles = objectData.mesh.triangles;
+        //    obj.x = objectData.position.x;
+        //    obj.y = objectData.position.y;
+        //    obj.z = objectData.position.z;
 
 
-            Quaternion rot = Quaternion.Euler(objectData.rotation);
-            obj.q_x = rot.x;
-            obj.q_y = rot.y;
-            obj.q_z = rot.z;
-            obj.q_w = rot.w;
+        //    Quaternion rot = Quaternion.Euler(objectData.rotation);
+        //    obj.q_x = rot.x;
+        //    obj.q_y = rot.y;
+        //    obj.q_z = rot.z;
+        //    obj.q_w = rot.w;
 
-            obj.s_x = objectData.scale.x;
-            obj.s_y = objectData.scale.y;
-            obj.s_z = objectData.scale.z;
+        //    obj.s_x = objectData.scale.x;
+        //    obj.s_y = objectData.scale.y;
+        //    obj.s_z = objectData.scale.z;
 
-            obj.type = "BoxCollider";
-            obj.name = objectData.objectName;
-            obj.color = objectData.color;
+        //    obj.type = "BoxCollider";
+        //    obj.name = objectData.objectName;
+        //    obj.color = objectData.color;
 
-            // Textures are currently not supported on the live server due to lag
-            //-------------------------------------------------------------------------
-            // obj.texture = RealityFlowWindow.ObjectInfo.texture.GetRawTextureData();
-            // obj.textureHeight = RealityFlowWindow.ObjectInfo.texture.height;
-            // obj.textureWidth = RealityFlowWindow.ObjectInfo.texture.width;
-            // obj.textureFormat = (int)RealityFlowWindow.ObjectInfo.texture.format;
-            // obj.mipmapCount = RealityFlowWindow.ObjectInfo.texture.mipmapCount;
-            //-------------------------------------------------------------------------
+        //    // Textures are currently not supported on the live server due to lag
+        //    //-------------------------------------------------------------------------
+        //    // obj.texture = RealityFlowWindow.ObjectInfo.texture.GetRawTextureData();
+        //    // obj.textureHeight = RealityFlowWindow.ObjectInfo.texture.height;
+        //    // obj.textureWidth = RealityFlowWindow.ObjectInfo.texture.width;
+        //    // obj.textureFormat = (int)RealityFlowWindow.ObjectInfo.texture.format;
+        //    // obj.mipmapCount = RealityFlowWindow.ObjectInfo.texture.mipmapCount;
+        //    //-------------------------------------------------------------------------
 
-            ObjectCreationEvent createObject = new ObjectCreationEvent();
-            createObject.Send(obj);
-        }
+        //    ObjectCreationEvent createObject = new ObjectCreationEvent();
+        //    createObject.Send(obj);
+        //}
     }
 }
 

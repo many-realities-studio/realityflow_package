@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System;
 using UnityEngine.UI;
 using System.Runtime.InteropServices;
-using RealityFlow.Plugin.Scripts.Events;
+//using RealityFlow.Plugin.Scripts.Events;
 
 namespace RealityFlow.Plugin.Scripts
 {
@@ -218,7 +218,7 @@ namespace RealityFlow.Plugin.Scripts
         {
             _debug = debug;
             testProject = new FlowProject();
-            testProject.initialize();
+            //testProject.initialize();
 
             CommandProcessor.initializeRecieveEvents();
 
@@ -540,8 +540,8 @@ namespace RealityFlow.Plugin.Scripts
 
         public void OnApplicationQuit()
         {
-            UserLogoutEvent logout = new UserLogoutEvent();
-            logout.Send();
+            //UserLogoutEvent logout = new UserLogoutEvent();
+            //logout.Send();
 
             FlowEvent closeEvent = new FlowEvent();
             closeEvent.command = -1;

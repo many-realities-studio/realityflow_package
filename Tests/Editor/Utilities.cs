@@ -60,33 +60,33 @@ namespace RealityFlow.Plugin.Tests
         }
 
 
-        /// <summary>
-        /// This function sets the member variables of a FlowTObject instance
-        /// </summary>
-        /// <param name="obj">An empty FlowTObject instance</param>
-        public static void FillObjectWithData(FlowTObject obj)
-        {
-            Vector2[] uvVectors = new Vector2[] { new Vector2(xUV_1, yUV_1), new Vector2(xUV_2, yUV_2) };
-            Vector3[] verticesVectors = new Vector3[] { new Vector3(xVertex_1, yVertex_1, zVertex_1), new Vector3(xVertex_2, yVertex_2, zVertex_2) };
-            Quaternion rotation = Quaternion.Euler(xQuaternion, yQuaternion, zQuaternion);
+        ///// <summary>
+        ///// This function sets the member variables of a FlowTObject instance
+        ///// </summary>
+        ///// <param name="obj">An empty FlowTObject instance</param>
+        //public static void FillObjectWithData(FlowTObject obj)
+        //{
+        //    Vector2[] uvVectors = new Vector2[] { new Vector2(xUV_1, yUV_1), new Vector2(xUV_2, yUV_2) };
+        //    Vector3[] verticesVectors = new Vector3[] { new Vector3(xVertex_1, yVertex_1, zVertex_1), new Vector3(xVertex_2, yVertex_2, zVertex_2) };
+        //    Quaternion rotation = Quaternion.Euler(xQuaternion, yQuaternion, zQuaternion);
 
-            obj.triangles = new int[] { 1, 0, 1 };
-            obj.vertices = verticesVectors;
-            obj.uv = uvVectors;
-            obj.x = xPosition;
-            obj.y = yPosition;
-            obj.z = zPosition;
-            obj.q_x = rotation.x;
-            obj.q_y = rotation.y;
-            obj.q_z = rotation.z;
-            obj.q_w = rotation.w;
-            obj.s_x = xScale;
-            obj.s_y = yScale;
-            obj.s_z = zScale;
-            obj.type = objectType;
-            obj.name = objectName;
-            obj.color = currentColor;
-        }
+        //    obj.triangles = new int[] { 1, 0, 1 };
+        //    obj.vertices = verticesVectors;
+        //    obj.uv = uvVectors;
+        //    obj.x = xPosition;
+        //    obj.y = yPosition;
+        //    obj.z = zPosition;
+        //    obj.q_x = rotation.x;
+        //    obj.q_y = rotation.y;
+        //    obj.q_z = rotation.z;
+        //    obj.q_w = rotation.w;
+        //    obj.s_x = xScale;
+        //    obj.s_y = yScale;
+        //    obj.s_z = zScale;
+        //    obj.type = objectType;
+        //    obj.name = objectName;
+        //    obj.color = currentColor;
+        //}
 
 
         /// <summary>
