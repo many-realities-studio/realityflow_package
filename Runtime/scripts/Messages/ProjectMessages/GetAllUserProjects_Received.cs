@@ -25,18 +25,14 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.ProjectMessages
         {
             add
             {
-                lock (_ReceivedEvent)
+                if (_ReceivedEvent == null || !_ReceivedEvent.GetInvocationList().Contains(value))
                 {
-                    _ReceivedEvent -= value;
                     _ReceivedEvent += value;
                 }
             }
             remove
             {
-                lock (_ReceivedEvent)
-                {
-                    _ReceivedEvent -= value;
-                }
+                _ReceivedEvent -= value;
             }
         }
 

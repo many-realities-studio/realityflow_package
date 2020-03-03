@@ -9,12 +9,12 @@ using System.Threading.Tasks;
 namespace Packages.realityflow_package.Runtime.scripts.Messages.ObjectMessages
 {
     [DataContract]
-    public class CreateObject_ReceiveFromServer : ReceivedMessage
+    public class CreateObject_Received : ReceivedMessage
     {
         [DataMember]
         public FlowTObject flowObject { get; set; }
 
-        // Definition of event type (What gets sent to the subscribers
+        // Definition of event type (What gets sent to the subscribers)
         public delegate void CreateObjectReceived_EventHandler(object sender, CreateObjectMessageEventArgs eventArgs);
 
         // The object that handles publishing/subscribing
@@ -23,18 +23,14 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.ObjectMessages
         {
             add
             {
-                lock (_ReceivedEvent)
+                if (_ReceivedEvent == null || !_ReceivedEvent.GetInvocationList().Contains(value))
                 {
-                    _ReceivedEvent -= value;
                     _ReceivedEvent += value;
                 }
             }
             remove
             {
-                lock (_ReceivedEvent)
-                {
-                    _ReceivedEvent -= value;
-                }
+                _ReceivedEvent -= value;
             }
         }
 
@@ -44,7 +40,7 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.ObjectMessages
         /// <param name="message">The message to be parsed</param>
         public static void ReceiveMessage(string message)
         {
-            CreateObject_ReceiveFromServer response = UnityEngine.JsonUtility.FromJson<CreateObject_ReceiveFromServer>(message);
+            CreateObject_Received response = UnityEngine.JsonUtility.FromJson<CreateObject_Received>(message);
             response.RaiseEvent();
         }
 
@@ -62,9 +58,9 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.ObjectMessages
 
     public class CreateObjectMessageEventArgs : EventArgs
     {
-        public CreateObject_ReceiveFromServer message { get; set; }
+        public CreateObject_Received message { get; set; }
 
-        public CreateObjectMessageEventArgs(CreateObject_ReceiveFromServer message)
+        public CreateObjectMessageEventArgs(CreateObject_Received message)
         {
             this.message = message;
         }

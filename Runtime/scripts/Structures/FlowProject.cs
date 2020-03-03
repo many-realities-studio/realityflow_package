@@ -1,17 +1,25 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 using UnityEngine;
 
 namespace RealityFlow.Plugin.Scripts
 {
-    [System.Serializable]
+    [DataContract]
     public class FlowProject : FlowValue
     {
-        public string Id;
-        public string Description;
-        public int DateModified;
-        public string ProjectName;
-        public FlowTObject[] _ObjectList;
+        [DataMember]
+        public string FlowId { get; set; }
+        [DataMember]
+        public string Id { get; set; }
+        [DataMember]
+        public string Description { get; set; }
+        [DataMember]
+        public int DateModified { get; set; }
+        [DataMember]
+        public string ProjectName { get; set; }
+        [DataMember]
+        public FlowTObject[] _ObjectList { get; set; }
 
         //public int _uid;
         //public string description;

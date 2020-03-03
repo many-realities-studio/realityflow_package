@@ -9,10 +9,10 @@ using System.Threading.Tasks;
 namespace Packages.realityflow_package.Runtime.scripts.Messages.ObjectMessages
 {
     [DataContract]
-    public class DeleteObject_ReceiveFromServer : ConfirmationMessage_Received
+    public class DeleteObject_ReceiveFromServer : ReceivedMessage
     {
         [DataMember]
-        public FlowTObject FlowId { get; set; } // Id of the deleted object
+        public FlowTObject DeletedObject { get; set; } // The deleted object
 
         // Definition of event type (What gets sent to the subscribers
         public delegate void DeleteObjectReceived_EventHandler(object sender, DeleteObjectMessageEventArgs eventArgs);
@@ -23,18 +23,14 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.ObjectMessages
         {
             add
             {
-                lock (_ReceivedEvent)
+                if (_ReceivedEvent == null || !_ReceivedEvent.GetInvocationList().Contains(value))
                 {
-                    _ReceivedEvent -= value;
                     _ReceivedEvent += value;
                 }
             }
             remove
             {
-                lock (_ReceivedEvent)
-                {
-                    _ReceivedEvent -= value;
-                }
+                _ReceivedEvent -= value;
             }
         }
 

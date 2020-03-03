@@ -1,42 +1,200 @@
 using UnityEngine;
 using RealityFlow.Plugin.Scripts;
+using System.Runtime.Serialization;
+using System.Reflection;
+using Packages.realityflow_package.Runtime.scripts;
+using Packages.realityflow_package.Runtime.scripts.Managers;
+using System.Collections.Generic;
+using System;
 
 namespace RealityFlow.Plugin.Scripts
 {
     [System.Serializable]
+    [DataContract]
     public class FlowTObject : FlowValue
     {
+        public static Dictionary<string, GameObject> idToGameObjectMapping = new Dictionary<string, GameObject>();
         //public int[] Triangles;
-        public string FlowId;
-        public float X;
-        public float Y;
-        public float Z;
-        public float Q_x;
-        public float Q_y;
-        public float Q_z;
-        public float Q_w;
-        public float S_x;
-        public float S_y;
-        public float S_z;
-        public string Name;
+        //private string flowId;
+        //private float _x;
+        //private float _y;
+        //private float _z;
+        //private float _q_x;
+        //private float _q_y;
+        //private float _q_z;
+        //private float _q_w;
+        //private float _s_x;
+        //private float _s_y;
+        //private float _s_z;
+        //private string name;
         //public Vector2[] Uv;
         //public byte[] Texture;
         //public int TextureHeight;
         //public int TextureWidth;
         //public int TextureFormat;
         //public int MipmapCount;
-        public Color Color; // Not serializable - look at old v1 code to find how
 
-        [System.NonSerialized]
-        public static int idCount = 0;
-        [System.NonSerialized]
-        public Transform transform;
-        [System.NonSerialized]
-        public Mesh mesh;
+        //[System.NonSerialized]
+        //public static int idCount = 0;
+        //[System.NonSerialized]
+        //public Transform transform;
+        //[System.NonSerialized]
+        //public Mesh mesh;
 
-        public FlowTObject()
+        [DataMember]
+        public string FlowId { get; set; }
+
+        private GameObject _AttachedGameObject = null;
+        public GameObject AttachedGameObject
         {
+            get
+            {
+                if(_AttachedGameObject == null)
+                {
+                    // The game object already exists
+                    if(idToGameObjectMapping.ContainsKey(FlowId))
+                    {
+                        _AttachedGameObject = idToGameObjectMapping[FlowId];
+                    }
 
+                    // The game object doesn't exist, but it should by this point 
+                    // Can happen when a client receives a create object request when another user created an object
+                    else
+                    {
+                        _AttachedGameObject = new GameObject();
+                    }
+                }
+
+                return _AttachedGameObject;
+            }
+            set { _AttachedGameObject = value; }
+        }
+
+
+        public Color Color; // Not serializable - look at old v1 code to find how
+        [DataMember]
+        public float X
+        {
+            get => AttachedGameObject.transform.localPosition.x;
+            set => AttachedGameObject.transform.localPosition = new Vector3(value, Y, Z);
+        }
+        [DataMember]
+        public float Y 
+        { 
+            get => AttachedGameObject.transform.localPosition.y;
+            set => AttachedGameObject.transform.localPosition = new Vector3(X, value, Z); 
+        } 
+        [DataMember]
+        public float Z 
+        {
+            get => AttachedGameObject.transform.localPosition.z;
+            set => AttachedGameObject.transform.localPosition = new Vector3(X, Y, value);
+        }
+        [DataMember]
+        public float Q_x 
+        {
+            get => AttachedGameObject.transform.localRotation.x;
+            set => AttachedGameObject.transform.localRotation = new Quaternion(value, Q_y, Q_z, Q_w);
+        }
+        [DataMember]
+        public float Q_y 
+        { 
+            get => AttachedGameObject.transform.localRotation.y;
+            set => AttachedGameObject.transform.localRotation = new Quaternion(Q_x, value, Q_z, Q_w);
+        }
+        [DataMember]
+        public float Q_z 
+        { 
+            get => AttachedGameObject.transform.localRotation.z;
+            set => AttachedGameObject.transform.localRotation = new Quaternion(Q_x, Q_y, value, Q_w);
+        }
+        [DataMember]
+        public float Q_w 
+        {
+            get => AttachedGameObject.transform.localRotation.w;
+            set => AttachedGameObject.transform.localRotation = new Quaternion(Q_x, Q_y, Q_z, value);
+        }
+        [DataMember]
+        public float S_x 
+        {
+            get => AttachedGameObject.transform.localScale.x;
+            set => AttachedGameObject.transform.localScale = new Vector3(value, S_y, S_z);
+        }
+        [DataMember]
+        public float S_y 
+        { 
+            get => AttachedGameObject.transform.localScale.y; 
+            set => AttachedGameObject.transform.localScale = new Vector3(S_x, value, S_z); 
+        }
+        [DataMember]
+        public float S_z 
+        { 
+            get => AttachedGameObject.transform.localScale.z; 
+            set => AttachedGameObject.transform.localScale = new Vector3(S_x, S_y, value); 
+        }
+        [DataMember]
+        public string Name { get; set; }
+
+        #region Static functions
+        public static void DestroyObject(string idOfObjectToDestroy)
+        {
+            try
+            {
+                GameObject objectToDestroy = idToGameObjectMapping[idOfObjectToDestroy];
+                idToGameObjectMapping.Remove(idOfObjectToDestroy);
+                UnityEngine.Object.Destroy(objectToDestroy);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError(e.ToString());
+            }
+        }
+
+        private static GameObject CreateObjectInUnity(string FlowId, string name)
+        {
+            GameObject newGameObject = new GameObject(name);
+            idToGameObjectMapping.Add(FlowId, newGameObject);
+
+            return newGameObject;
+        }
+
+        #endregion // Static functions
+
+        public FlowTObject(Color color, string flowId, float x, float y, float z, float q_x, float q_y, float q_z, float q_w, float s_x, float s_y, float s_z, string name)
+        {
+            try
+            {
+                AttachedGameObject = CreateObjectInUnity(flowId, name);
+                Color = color;
+                FlowId = flowId;
+                X = x;
+                Y = y;
+                Z = z;
+                Q_x = q_x;
+                Q_y = q_y;
+                Q_z = q_z;
+                Q_w = q_w;
+                S_x = s_x;
+                S_y = s_y;
+                S_z = s_z;
+
+                //_x = x;
+                //_y = y;
+                //_z = z;
+                //_q_x = q_x;
+                //_q_y = q_y;
+                //_q_z = q_z;
+                //_q_w = q_w;
+                //_s_x = s_x;
+                //_s_y = s_y;
+                //_s_z = s_z;
+                Name = name;
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError(e.ToString());
+                UnityEngine.Object.Destroy(AttachedGameObject);
+            }
         }
 
         /// <summary>
@@ -51,99 +209,14 @@ namespace RealityFlow.Plugin.Scripts
             gameObject.gameObject.transform.localScale = new Vector3(S_x, S_y, S_z);
         }
 
-        public FlowTObject(GameObject obj)
+        /// <summary>
+        /// Copy all new values into this object
+        /// </summary>
+        /// <param name="newValues">The values that should be copied over into this object</param>
+        public void UpdateObject(FlowTObject newValues)
         {
-            transform = obj.transform;
-            X = transform.localPosition.x;
-            Y = transform.localPosition.y;
-            Z = transform.localPosition.z;
-            Q_x = transform.localRotation.x;
-            Q_y = transform.localRotation.y;
-            Q_z = transform.localRotation.z;
-            Q_w = transform.localRotation.w;
-            S_x = transform.localScale.x;
-            S_y = transform.localScale.y;
-            S_z = transform.localScale.z;
-            // mesh = 
-            //triangles = mesh.triangles;
-            //uv = mesh.uv;
-            //vertices = mesh.vertices;
-            //name = obj.name;
-            //material = obj.GetComponent<MeshRenderer>().material;
-            //color = material.color;
-
-
-            // if (material.mainTexture != null)
-            // {
-            //     texture = ((Texture2D)material.mainTexture).GetRawTextureData();
-            //     textureHeight = ((Texture2D)material.mainTexture).height;
-            //     textureWidth = ((Texture2D)material.mainTexture).width;
-            //     textureFormat = (int)((Texture2D)material.mainTexture).format;
-            //     mipmapCount = ((Texture2D)material.mainTexture).mipmapCount;
-            // }
-            //type = "BoxCollider";
+            PropertyCopier<FlowTObject, FlowTObject>.Copy(newValues, this);
         }
-        public void Read()
-        {
-            Y = transform.localPosition.y;
-            X = transform.localPosition.x;
-            Z = transform.localPosition.z;
-            Q_x = transform.localRotation.x;
-            Q_y = transform.localRotation.y;
-            Q_z = transform.localRotation.z;
-            Q_w = transform.localRotation.w;
-            S_x = transform.localScale.x;
-            S_y = transform.localScale.y;
-            S_z = transform.localScale.z;
-            //color = material.color;
-            //vertices = mesh.vertices;
-            //uv = mesh.uv;
-            //triangles = mesh.triangles;
-        }
-
-        //public void Read(GameObject go)
-        //{
-        //    x = go.transform.localPosition.x;
-        //    y = go.transform.localPosition.y;
-        //    z = go.transform.localPosition.z;
-        //    q_x = go.transform.localRotation.x;
-        //    q_y = go.transform.localRotation.y;
-        //    q_z = go.transform.localRotation.z;
-        //    q_w = go.transform.localRotation.w;
-        //    s_x = go.transform.localScale.x;
-        //    s_y = go.transform.localScale.y;
-        //    s_z = go.transform.localScale.z;
-        //    material = go.GetComponent<MeshRenderer>().material;
-        //    color = material.color;
-        //    //Mesh newMesh = go.GetComponent<MeshFilter>().mesh;
-        //    //vertices = newMesh.vertices;
-        //    //uv = newMesh.uv;
-        //    //triangles = newMesh.triangles;
-        //    //name = go.name;
-        //    //type = "BoxCollider";
-
-        //}
-
-        //public void Copy(FlowTObject source)
-        //{
-        //    x = source.x;
-        //    y = source.y;
-        //    z = source.z;
-        //    q_x = source.q_x;
-        //    q_y = source.q_y;
-        //    q_z = source.q_z;
-        //    q_w = source.q_w;
-        //    s_x = source.s_x;
-        //    s_y = source.s_y;
-        //    s_z = source.s_z;
-        //    _id = source._id;
-        //    color = source.color;
-        //    //vertices = source.mesh.vertices;
-        //    //uv = source.mesh.uv;
-        //    //triangles = source.mesh.triangles;
-        //    //name = source.name;
-        //    //type = "BoxCollider";
-        //}
 
         //public bool Equals(FlowTObject fo)
         //{
@@ -156,58 +229,9 @@ namespace RealityFlow.Plugin.Scripts
         //    return true;
         //}
 
-        public void Update()
-        {
-            //Vector3 newPos = new Vector3(x, y, z);
-            //transform.localPosition = newPos;
-            //Quaternion newRot = new Quaternion(q_x, q_y, q_z, q_w);
-            //transform.localRotation = newRot;
-            //Vector3 newScale = new Vector3(s_x, s_y, s_z);
-            //transform.localScale = newScale;
-            //material.color = color;
-            //mesh.vertices = vertices;
-            //mesh.uv = uv;
-            //mesh.triangles = triangles;
-            //mesh.RecalculateBounds();
-            //mesh.RecalculateNormals();
-        }
-
         public void RegisterTransform()
         {
             //FlowProject.activeProject.transformsById.Add(_id, this);
         }
-
-        public FlowTObject(string _id)
-        {
-            flowId = _id;
-            if (_id == null)
-            {
-                _id = idCount.ToString() + "t";
-            }
-        }
-
-        //public FlowTObject(float _q_x, float _q_y, float _q_z, float _q_w)
-        //{
-        //    q_x = _q_x;
-        //    q_y = _q_y;
-        //    q_z = _q_z;
-        //    q_w = _q_w;
-        //}
-
-        //public FlowTObject(float _x, float _y, float _z, string _id)
-        //{
-        //    x = _x;
-        //    y = _y;
-        //    z = _z;
-        //}
-
-        //public FlowTObject(float _s_x, float _s_y, float _s_z)
-        //{
-        //    s_x = _s_x;
-        //    s_y = _s_y;
-        //    s_z = _s_z;
-        //}
-
-
     }
 }

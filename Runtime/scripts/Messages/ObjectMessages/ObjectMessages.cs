@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace Packages.realityflow_package.Runtime.scripts.Messages.ObjectMessages
 {
     /// <summary>
-    /// Response: <see cref="CreateObject_ReceiveFromServer"/>
+    /// Response: <see cref="CreateObject_Received"/>
     /// </summary>
     [DataContract]
     public class CreateObject_SendToServer : BaseMessage
@@ -20,6 +20,13 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.ObjectMessages
         public FlowUser flowUser { get; set; }
         [DataMember]
         public string projectId { get; set; }
+
+        public CreateObject_SendToServer(FlowTObject flowObject, FlowUser flowUser, string projectId)
+        {
+            this.flowObject = flowObject;
+            this.flowUser = flowUser;
+            this.projectId = projectId;
+        }
     }
 
     /// <summary>
@@ -34,6 +41,13 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.ObjectMessages
         public FlowUser flowUser { get; set; }
         [DataMember]
         public string projectId { get; set; }
+
+        public UpdateObject_SendToServer(FlowTObject flowObject, FlowUser flowUser, string projectId)
+        {
+            this.flowObject = flowObject;
+            this.flowUser = flowUser;
+            this.projectId = projectId;
+        }
     }
 
     /// <summary>
@@ -44,6 +58,11 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.ObjectMessages
     {
         [DataMember]
         public string FlowId{ get; set; } // Id of the deleted object
+
+        public DeleteObject_SendToServer(string flowId)
+        {
+            FlowId = flowId;
+        }
     }
 
     /// <summary>
@@ -58,5 +77,12 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.ObjectMessages
         public FlowUser flowUser { get; set; }
         [DataMember]
         public string projectId { get; set; }
+
+        public FinalizedUpdateObject_SendToServer(FlowTObject flowObject, FlowUser flowUser, string projectId)
+        {
+            this.flowObject = flowObject;
+            this.flowUser = flowUser;
+            this.projectId = projectId;
+        }
     }
 }

@@ -1,13 +1,18 @@
-using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
+//using UnityEngine;
+//using System.Collections;
+//using System.Collections.Generic;
+//using System.Runtime.Serialization;
 
-namespace RealityFlow.Plugin.Scripts
-{
-    [System.Serializable]
-    public class FlowTextValue : FlowValue
-    {
-        public string content;
-        public int length;
-    }
-}
+//namespace RealityFlow.Plugin.Scripts
+//{
+//    [DataContract]
+//    public class FlowTextValue : FlowValue
+//    {
+//        [DataMember]
+//        public string FlowId{ get; set; }
+//        [DataMember]
+//        public string content { get; set; }
+//        [DataMember]
+//        public int length { get; set; }
+//    }
+//}

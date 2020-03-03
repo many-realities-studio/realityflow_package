@@ -1,11 +1,13 @@
-using System;
-using System.Collections.Generic;
+//using System;
+//using System.Collections.Generic;
+//using System.Runtime.Serialization;
 
-namespace RealityFlow.Plugin.Scripts
-{
-    [System.Serializable]
-    public class FlowClientPayload : FlowPayload
-    {
-        public new FlowClient data;
-    }
-}
+//namespace RealityFlow.Plugin.Scripts
+//{
+//    [DataContract]
+//    public class FlowClientPayload : FlowPayload
+//    {
+//        [DataMember]
+//        public new FlowClient data;
+//    }
+//}

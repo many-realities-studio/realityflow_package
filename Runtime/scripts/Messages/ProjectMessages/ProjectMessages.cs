@@ -19,6 +19,12 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.ProjectMessages
         FlowProject flowProject { get; set; }
         [DataMember]
         FlowUser flowUser { get; set; }
+
+        public CreateProject_SendToServer(FlowProject flowProject, FlowUser flowUser)
+        {
+            this.flowProject = flowProject;
+            this.flowUser = flowUser;
+        }
     }
 
     /// <summary>
@@ -32,6 +38,12 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.ProjectMessages
         FlowProject flowProject { get; set; }
         [DataMember]
         FlowUser flowUser { get; set; }
+
+        public DeleteProject_SendToServer(FlowProject flowProject, FlowUser flowUser)
+        {
+            this.flowProject = flowProject;
+            this.flowUser = flowUser;
+        }
     }
 
     /// <summary>
@@ -45,6 +57,12 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.ProjectMessages
         string projectId { get; set; }
         [DataMember]
         FlowUser flowUser { get; set; }
+
+        public OpenProject_SendToServer(string projectId, FlowUser flowUser)
+        {
+            this.projectId = projectId;
+            this.flowUser = flowUser;
+        }
     }
 
     /// <summary>
@@ -56,5 +74,10 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.ProjectMessages
     {
         [DataMember]
         FlowUser flowUser { get; set; }
+
+        public GetAllUserProjects_SendToServer(FlowUser flowUser)
+        {
+            this.flowUser = flowUser;
+        }
     }
 }
