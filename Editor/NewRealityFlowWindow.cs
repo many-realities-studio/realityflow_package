@@ -9,6 +9,7 @@ using RealityFlow.Plugin.Editor;
 using Packages.realityflow_package.Runtime.scripts;
 using Packages.realityflow_package.Runtime.scripts.Managers;
 using Packages.realityflow_package.Runtime.scripts.Messages;
+using Packages.realityflow_package.Runtime.scripts.Messages.ObjectMessages;
 
 [CustomEditor(typeof(FlowNetworkManager))]
 public class FlowNetworkManagerEditor : EditorWindow
@@ -72,7 +73,6 @@ public class FlowNetworkManagerEditor : EditorWindow
         _ViewDictionary.Add(EWindowView.PROJECT_IMPORT, _CreateProjectImportView);
     }
 
-
     public void OnGUI()
     {
         _ViewDictionary[window]();
@@ -80,23 +80,23 @@ public class FlowNetworkManagerEditor : EditorWindow
         if (GUILayout.Button("Create", GUILayout.Height(20)))
         {
             //GameObject go = GameObject.CreatePrimitive(PrimitiveType.Capsule);
-            FlowTObject newObject = new FlowTObject();
+            FlowTObject newObject = new FlowTObject(new Color(0,0,0,0), "TestFlowId",0,0,0,0,0,0,0,0,0,0,"TestObject");
+            FlowUser newUser = new FlowUser("testUsername", "TestPassword");
 
-            newObject.flowId = 2.ToString();
-            NewObjectManager.CreateObjectInUnity(newObject);
+            Operations.CreateObject(newObject, newUser, "TestProjectId", CreateObjectCallbackTest);
         }
 
-        if (GUILayout.Button("Edit", GUILayout.Height(20)))
-        {
-            if(NewObjectManager.Sphere == null)
-            {
-                NewObjectManager.Sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            }
-            FlowTObject newObject = new FlowTObject(NewObjectManager.Sphere);
-            newObject.flowId = 2.ToString();
+        // if (GUILayout.Button("Edit", GUILayout.Height(20)))
+        // {
+        //     if(NewObjectManager.Sphere == null)
+        //     {
+        //         NewObjectManager.Sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+        //     }
+        //     FlowTObject newObject = new FlowTObject(NewObjectManager.Sphere);
+        //     newObject.flowId = 2.ToString();
 
-            NewObjectManager.EditObject(newObject);
-        }
+        //     NewObjectManager.EditObject(newObject);
+        // }
 
         ////FlowNetworkManager myTarget = (FlowNetworkManager) target;
         //if (GUILayout.Button("Connect to server"))
@@ -122,6 +122,11 @@ public class FlowNetworkManagerEditor : EditorWindow
         //{
         //    GameObject.CreatePrimitive(PrimitiveType.Cube);
         //}
+    }
+
+    private void CreateObjectCallbackTest(object sender, CreateObjectMessageEventArgs eventArgs)
+    {
+        Debug.Log("Final: " + eventArgs.message.ToString());
     }
 
     public void Update()
@@ -169,11 +174,6 @@ public class FlowNetworkManagerEditor : EditorWindow
         GUILayout.EndArea();
     }
 
-    public void loginCallback(object sender, ConfirmationMessageEventArgs eventArgs)
-    {
-        Debug.Log("login callback: " + eventArgs.message.WasSuccessful.ToString());
-    }
-
     private void _CreateLoginView()
     {
         // Create UserName entry field
@@ -192,7 +192,7 @@ public class FlowNetworkManagerEditor : EditorWindow
         if (GUILayout.Button("Log in", GUILayout.Height(40)))
         {
             // Send login event to the server
-            Operations.Login(uName, pWord, loginCallback);
+            Operations.Login(uName, pWord, Login_Callback);
         }
 
         // Create "Register" Button and define onClick action
@@ -457,66 +457,33 @@ public class FlowNetworkManagerEditor : EditorWindow
             jsonList.Add(reader.ReadLine());
         }
         reader.Close();
+    }
 
-        // 
-        //foreach (string json in jsonList)
-        //{
-        //    //TODO: What does this do?
-        //    //ProjectFetchEvent log = new ProjectFetchEvent();
-        //    JsonUtility.FromJsonOverwrite(json, log);
-        //    string date = new System.DateTime(log.timestamp).ToString();
+    public void Login_Callback(object sender, ConfirmationMessageEventArgs eventArgs)
+    {
+        Debug.Log("login callback: " + eventArgs.message.WasSuccessful.ToString());
 
-        //    // Create Project Button Button and define onClick action
-        //    if (GUILayout.Button(log.project.projectName + "   " + date, GUILayout.Height(30)))
-        //    {
-        //        // gather the list of objects in the previous imported project
-        //        GameObject[] gameObjectList = GameObject.FindGameObjectsWithTag("imported");
+        if(eventArgs.message.WasSuccessful == true)
+        {
+            window = EWindowView.USER_HUB;
+        }
+        else
+        {
+            // TODO: Display that login failed
+        }
+    }
 
-        //        // clear any previous imported objects
-        //        foreach (GameObject gameObject in gameObjectList)
-        //        {
-        //            DestroyImmediate(gameObject);
-        //        }
+    public void Register_Callback(object sender, ConfirmationMessageEventArgs eventArgs)
+    {
+        Debug.Log("register callback: " + eventArgs.message.WasSuccessful.ToString());
 
-        //        // TODO: refactor name of log.objs to be more clear as to what that field is
-        //        foreach (FlowTObject currentFlowTObject in log.objs)
-        //        {
-        //            // this piece of code doesn't have textures implemented
-        //            // for an example on how to add the textures look at the commented
-        //            // code in the SaveObjectData function
-
-        //            Debug.Log("creating object: " + currentFlowTObject.name);
-        //            GameObject newObj = GameObject.CreatePrimitive(PrimitiveType.Cube);
-
-        //            // Create the mesh of the object
-        //            Mesh objMesh = newObj.GetComponent<MeshFilter>().mesh;
-        //            objMesh.vertices = currentFlowTObject.vertices;
-        //            objMesh.uv = currentFlowTObject.uv;
-        //            objMesh.triangles = currentFlowTObject.triangles;
-        //            objMesh.RecalculateBounds();
-        //            objMesh.RecalculateNormals();
-
-        //            // Set the position and orientation of the object
-        //            newObj.transform.localPosition = new Vector3(currentFlowTObject.x, currentFlowTObject.y, currentFlowTObject.z);
-        //            newObj.transform.localRotation = Quaternion.Euler(new Vector4(currentFlowTObject.q_x, currentFlowTObject.q_y, currentFlowTObject.q_z, currentFlowTObject.q_w));
-        //            newObj.transform.localScale = new Vector3(currentFlowTObject.s_x, currentFlowTObject.s_y, currentFlowTObject.s_z);
-
-        //            // Destory the collider associated with the object (this is from the cube primitive
-        //            MonoBehaviour.DestroyImmediate(newObj.GetComponent<Collider>(), true);
-
-        //            newObj.AddComponent<BoxCollider>(); // Why do we destroy the collider just to add it back in?
-
-        //            newObj.name = currentFlowTObject.name;
-        //            newObj.tag = "imported";
-
-        //            // Set the color of the object
-        //            Material mat = newObj.GetComponent<MeshRenderer>().material;
-        //            mat.color = currentFlowTObject.color;
-        //        }
-
-        //        // Send the user to the login screen
-        //        window = EWindowView.LOGIN;
-        //    }
-        //}
+        if(eventArgs.message.WasSuccessful == true)
+        {
+            window = EWindowView.USER_HUB;
+        }
+        else
+        {
+            // TODO: Display that register failed
+        }
     }
 }
