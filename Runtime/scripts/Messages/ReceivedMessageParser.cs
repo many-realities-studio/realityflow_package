@@ -34,7 +34,7 @@ namespace Packages.realityflow_package.Runtime.scripts
             var p2 = MessageSerializer.DesearializeObject<BaseMessage>(messageToConvert);
 
             Debug.Log("Getting message type: " + p2.MessageType);
-            
+
             return p2.MessageType;
         }
     }
