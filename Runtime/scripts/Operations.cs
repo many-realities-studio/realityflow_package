@@ -25,32 +25,45 @@ namespace Packages.realityflow_package.Runtime.scripts
 
         static Operations()
         {
-            // Set up Object updates
-            //DeleteObject_ReceiveFromServer.ReceivedEvent += _DeleteObject;
-        }
+            // Set up default behavior response to events
 
-        //private static void _DeleteObject(object sender, DeleteObjectMessageEventArgs eventArgs)
-        //{
-        //    // Delete object in unity
-        //    NewObjectManager.DestroyObject(eventArgs.message.DeletedObject.FlowId);
-        //}
+            // Set up Object updates
+            CreateObject_Received.ReceivedEvent += _CreateObject;
+            DeleteObject_Received.ReceivedEvent += _DeleteObject;
+            UpdateObject_Received.ReceivedEvent += _UpdateObject;
+            FinalizedUpdateObject_Received.ReceivedEvent += _FinalizedupdateObject;
+
+            // Set up Project updates
+            CreateProject_Received.ReceivedEvent += _CreateProject;
+            DeleteProject_Received.ReceivedEvent += _DeleteProject;
+            GetAllUserProjects_Received.ReceivedEvent += _GetAllUserProjects;
+            OpenProject_Received.ReceivedEvent += _OpenProject;
+
+            // Set up Room updates
+            JoinRoom_Received.ReceivedEvent += _JoinRoom;
+
+            // Set up User updates
+            LoginUser_Received.ReceivedEvent += _LoginUser;
+            LogoutUser_Received.ReceivedEvent += _LogoutUser;
+            RegisterUser_Received.ReceivedEvent += _RegisterUser;
+        }
 
         #region UserOperations
 
-        public static void Login(string username, string password, Login_Recieved.LoginReceived_EventHandler callbackFunction)
+        public static void Login(string username, string password, LoginUser_Received.LoginReceived_EventHandler callbackFunction)
         {
             Login_SendToServer loginMessage = new Login_SendToServer(username, password);
             FlowWebsocket.SendMessage(loginMessage);
 
-            Login_Recieved.ReceivedEvent += callbackFunction;
+            LoginUser_Received.ReceivedEvent += callbackFunction;
         }
         
-        public static void Logout(Logout_Received.LogoutReceived_EventHandler callbackFunction)
+        public static void Logout(LogoutUser_Received.LogoutReceived_EventHandler callbackFunction)
         {
             Logout_SendToServer logoutMessage = new Logout_SendToServer();
             FlowWebsocket.SendMessage(logoutMessage);
 
-            Logout_Received.ReceivedEvent += callbackFunction;
+            LogoutUser_Received.ReceivedEvent += callbackFunction;
         }
 
         public static void Register(string username, string password, RegisterUser_Received.RegisterUserReceived_EventHandler callbackFunction)
@@ -73,12 +86,28 @@ namespace Packages.realityflow_package.Runtime.scripts
             CreateObject_Received.ReceivedEvent += callbackFunction;
         }
 
-        public static void DeleteObject(string idOfObjectToDelete, DeleteObject_ReceiveFromServer.DeleteObjectReceived_EventHandler callbackFunction)
+        public static void UpdateObject(FlowTObject flowObject, FlowUser flowUser, string projectId, UpdateObject_Received.UpdateObjectReceived_EventHandler callbackFunction)
+        {
+            UpdateObject_SendToServer updateObject = new UpdateObject_SendToServer(flowObject, flowUser, projectId);
+            FlowWebsocket.SendMessage(updateObject);
+
+            UpdateObject_Received.ReceivedEvent += callbackFunction;
+        }
+
+        public static void FinalizedUpdateObject(FlowTObject flowObject, FlowUser flowUser, string projectId, FinalizedUpdateObject_Received.OpenProjectReceived_EventHandler callbackFunction)
+        {
+            FinalizedUpdateObject_SendToServer finalUpdateObject = new FinalizedUpdateObject_SendToServer(flowObject, flowUser, projectId);
+            FlowWebsocket.SendMessage(finalUpdateObject);
+
+            FinalizedUpdateObject_Received.ReceivedEvent += callbackFunction;
+        }
+
+        public static void DeleteObject(string idOfObjectToDelete, DeleteObject_Received.DeleteObjectReceived_EventHandler callbackFunction)
         {
             DeleteObject_SendToServer deleteObject = new DeleteObject_SendToServer(idOfObjectToDelete);
             FlowWebsocket.SendMessage(deleteObject);
 
-            DeleteObject_ReceiveFromServer.ReceivedEvent += callbackFunction;
+            DeleteObject_Received.ReceivedEvent += callbackFunction;
         }
 
         #endregion // ObjectOperations
@@ -92,12 +121,12 @@ namespace Packages.realityflow_package.Runtime.scripts
             CreateProject_Received.ReceivedEvent += callbackFunction;
         }
 
-        public static void DeleteProject(FlowProject flowProject, FlowUser flowUser, DeleteObject_ReceiveFromServer.DeleteObjectReceived_EventHandler callbackFunction)
+        public static void DeleteProject(FlowProject flowProject, FlowUser flowUser, DeleteProject_Received.DeleteProjectReceived_EventHandler callbackFunction)
         {
             DeleteProject_SendToServer deleteProject = new DeleteProject_SendToServer(flowProject, flowUser);
             FlowWebsocket.SendMessage(deleteProject);
 
-            DeleteObject_ReceiveFromServer.ReceivedEvent += callbackFunction;
+            DeleteProject_Received.ReceivedEvent += callbackFunction;
         }
 
         public static void OpenProject(string projectId, FlowUser flowUser, OpenProject_Received.OpenProjectReceived_EventHandler callbackFunction)
@@ -120,12 +149,12 @@ namespace Packages.realityflow_package.Runtime.scripts
 
         #region RoomMessages
 
-        public static void JoinRoom(string projectId, FlowUser flowUser, JoinRoom_ReceivedFromServer.JoinRoomReceived_EventHandler callbackFunction)
+        public static void JoinRoom(string projectId, FlowUser flowUser, JoinRoom_Received.JoinRoomReceived_EventHandler callbackFunction)
         {
             JoinRoom_SendToServer joinRoom = new JoinRoom_SendToServer(projectId, flowUser);
             FlowWebsocket.SendMessage(joinRoom);
 
-            JoinRoom_ReceivedFromServer.ReceivedEvent += callbackFunction;
+            JoinRoom_Received.ReceivedEvent += callbackFunction;
         }
 
         #endregion // Room Messages
@@ -145,5 +174,83 @@ namespace Packages.realityflow_package.Runtime.scripts
         //    // Handle what the GUI needs to update on every frame
         //    functionCalledOnUpdate();
         //}
+
+        // TODO: Fill out default behavior
+        #region Default actions taken after receiving messages (These happen no matter what the user does)
+
+            #region Object messages received 
+
+            private static void _CreateObject(object sender, CreateObjectMessageEventArgs eventArgs)
+            {
+
+            }
+
+            private static void _DeleteObject(object sender, DeleteObjectMessageEventArgs eventArgs)
+            {
+                // Delete object in unity
+                NewObjectManager.DestroyObject(eventArgs.message.DeletedObject.FlowId);
+            }
+
+            private static void _UpdateObject(object sender, UpdateObjectMessageEventArgs eventArgs)
+            {
+
+            }
+
+            private static void _FinalizedupdateObject(object sender, FinalizedUpdateObjectMessageEventArgs eventArgs)
+            {
+
+            }
+
+            #endregion Object messages received 
+
+            #region Project messages received
+
+            private static void _CreateProject(object sender, ConfirmationMessageEventArgs eventArgs)
+            {
+                
+            }
+
+            private static void _DeleteProject(object sender, ConfirmationMessageEventArgs eventArgs)
+            {
+                
+            }
+
+            private static void _GetAllUserProjects(object sender, GetAllUserProjectsMessageEventArgs eventArgs)
+            {
+                
+            }
+
+            private static void _OpenProject(object sender, OpenProjectMessageEventArgs eventArgs)
+            {
+                
+            }
+
+            #endregion Project messages received
+
+            #region Room messages received
+            private static void _JoinRoom(object sender, JoinRoomMessageEventArgs eventArgs)
+            {
+                
+            }
+            #endregion Room messages received
+
+            #region User messages received
+            private static void _LoginUser(object sender, ConfirmationMessageEventArgs eventArgs)
+            {
+                
+            }
+
+            private static void _LogoutUser(object sender, ConfirmationMessageEventArgs eventArgs)
+            {
+                
+            }
+
+            private static void _RegisterUser(object sender, ConfirmationMessageEventArgs eventArgs)
+            {
+                
+            }
+        #endregion User messages received
+
+        #endregion Default actions taken after receiving messages (These happen no matter what the user does)
     }
 }
