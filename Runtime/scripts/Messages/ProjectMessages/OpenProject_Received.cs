@@ -23,6 +23,12 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.ProjectMessages
 
         // The object that handles publishing/subscribing
         private static OpenProjectReceived_EventHandler _ReceivedEvent;
+
+        public OpenProject_Received(FlowProject flowProject)
+        {
+            this.flowProject = flowProject;
+        }
+
         public static event OpenProjectReceived_EventHandler ReceivedEvent
         {
             add

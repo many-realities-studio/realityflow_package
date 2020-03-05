@@ -1,25 +1,29 @@
-﻿using RealityFlow.Plugin.Scripts;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Packages.realityflow_package.Runtime.scripts.Messages.RoomMessages
+namespace Packages.realityflow_package.Runtime.scripts.Messages.UserMessages
 {
     [DataContract]
-    public class JoinRoom_ReceivedFromServer : ReceivedMessage
+    public class LogoutUser_Received : ConfirmationMessage_Received
     {
-        [DataMember]
-        public FlowProject flowProject { get; set; }
-
         // Definition of event type (What gets sent to the subscribers
-        public delegate void JoinRoomReceived_EventHandler(object sender, JoinRoomMessageEventArgs eventArgs);
+        public delegate void LogoutReceived_EventHandler(object sender, ConfirmationMessageEventArgs eventArgs);
 
         // The object that handles publishing/subscribing
-        private static JoinRoomReceived_EventHandler _ReceivedEvent;
-        public static event JoinRoomReceived_EventHandler ReceivedEvent
+        private static LogoutReceived_EventHandler _ReceivedEvent;
+
+        public LogoutUser_Received(string message, bool wasSuccessful)
+        {
+            this.Message = message;
+            this.MessageType = "Logout";
+            this.WasSuccessful = wasSuccessful;
+        }
+
+        public static event LogoutReceived_EventHandler ReceivedEvent
         {
             add
             {
@@ -40,7 +44,7 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.RoomMessages
         /// <param name="message">The message to be parsed</param>
         public static void ReceiveMessage(string message)
         {
-            JoinRoom_ReceivedFromServer response = UnityEngine.JsonUtility.FromJson<JoinRoom_ReceivedFromServer>(message);
+            ConfirmationMessage_Received response = UnityEngine.JsonUtility.FromJson<ConfirmationMessage_Received>(message);
             response.RaiseEvent();
         }
 
@@ -52,18 +56,8 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.RoomMessages
             // Raise the event in a thread-safe manner using the ?. operator.
             if (_ReceivedEvent != null)
             {
-                _ReceivedEvent.Invoke(this, new JoinRoomMessageEventArgs(this));
+                _ReceivedEvent.Invoke(this, new ConfirmationMessageEventArgs(this));
             }
-        }
-    }
-
-    public class JoinRoomMessageEventArgs : EventArgs
-    {
-        public JoinRoom_ReceivedFromServer message { get; set; }
-
-        public JoinRoomMessageEventArgs(JoinRoom_ReceivedFromServer message)
-        {
-            this.message = message;
         }
     }
 }

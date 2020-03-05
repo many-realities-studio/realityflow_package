@@ -9,17 +9,24 @@ using System.Threading.Tasks;
 namespace Packages.realityflow_package.Runtime.scripts.Messages.ObjectMessages
 {
     [DataContract]
-    public class FinalizedUpdateObject_ReceiveFromServer : ReceivedMessage
+    public class CreateObject_Received : ReceivedMessage
     {
         [DataMember]
         public FlowTObject flowObject { get; set; }
-        
-        // Definition of event type (What gets sent to the subscribers
-        public delegate void OpenProjectReceived_EventHandler(object sender, FinalizedUpdateObjectMessageEventArgs eventArgs);
+
+        // Definition of event type (What gets sent to the subscribers)
+        public delegate void CreateObjectReceived_EventHandler(object sender, CreateObjectMessageEventArgs eventArgs);
 
         // The object that handles publishing/subscribing
-        private static OpenProjectReceived_EventHandler _ReceivedEvent;
-        public static event OpenProjectReceived_EventHandler ReceivedEvent
+        private static CreateObjectReceived_EventHandler _ReceivedEvent;
+
+        public CreateObject_Received(FlowTObject flowObject)
+        {
+            this.flowObject = flowObject;
+            this.MessageType = "CreateObject";
+        }
+
+        public static event CreateObjectReceived_EventHandler ReceivedEvent
         {
             add
             {
@@ -40,7 +47,7 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.ObjectMessages
         /// <param name="message">The message to be parsed</param>
         public static void ReceiveMessage(string message)
         {
-            FinalizedUpdateObject_ReceiveFromServer response = UnityEngine.JsonUtility.FromJson<FinalizedUpdateObject_ReceiveFromServer>(message);
+            CreateObject_Received response = UnityEngine.JsonUtility.FromJson<CreateObject_Received>(message);
             response.RaiseEvent();
         }
 
@@ -49,19 +56,18 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.ObjectMessages
         /// </summary>
         public override void RaiseEvent()
         {
-            // Raise the event in a thread-safe manner using the ?. operator.
             if (_ReceivedEvent != null)
             {
-                _ReceivedEvent.Invoke(this, new FinalizedUpdateObjectMessageEventArgs(this));
+                _ReceivedEvent.Invoke(this, new CreateObjectMessageEventArgs(this));
             }
         }
     }
 
-    public class FinalizedUpdateObjectMessageEventArgs : EventArgs
+    public class CreateObjectMessageEventArgs : EventArgs
     {
-        public FinalizedUpdateObject_ReceiveFromServer message { get; set; }
+        public CreateObject_Received message { get; set; }
 
-        public FinalizedUpdateObjectMessageEventArgs(FinalizedUpdateObject_ReceiveFromServer message)
+        public CreateObjectMessageEventArgs(CreateObject_Received message)
         {
             this.message = message;
         }

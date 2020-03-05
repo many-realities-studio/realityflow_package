@@ -21,6 +21,12 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.ProjectMessages
 
         // The object that handles publishing/subscribing
         private static GetAllUserProjects_EventHandler _ReceivedEvent;
+
+        public GetAllUserProjects_Received(Tuple<string, string>[] projectList)
+        {
+            this.projectList = projectList;
+        }
+
         public static event GetAllUserProjects_EventHandler ReceivedEvent
         {
             add

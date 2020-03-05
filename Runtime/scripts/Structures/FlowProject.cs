@@ -21,6 +21,16 @@ namespace RealityFlow.Plugin.Scripts
         [DataMember]
         public FlowTObject[] _ObjectList { get; set; }
 
+        public FlowProject(string flowId, string id, string description, int dateModified, string projectName, FlowTObject[] ObjectList)
+        {
+            FlowId = flowId;
+            Id = id;
+            Description = description;
+            DateModified = dateModified;
+            ProjectName = projectName;
+            _ObjectList = ObjectList;
+        }
+
         //public int _uid;
         //public string description;
         //public int created;

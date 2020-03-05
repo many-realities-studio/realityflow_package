@@ -10,7 +10,7 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.UserMessages
 {
     /// <summary>
     /// Send a login request message format
-    /// Response: <see cref="Login_Recieved"/>
+    /// Response: <see cref="LoginUser_Received"/>
     /// </summary>
     [DataContract]
     public class Login_SendToServer : BaseMessage
@@ -30,7 +30,7 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.UserMessages
 
     /// <summary>
     /// logout request message format 
-    /// Response: <see cref="Logout_Received"/>
+    /// Response: <see cref="LogoutUser_Received"/>
     /// </summary>
     public class Logout_SendToServer : BaseMessage
     {

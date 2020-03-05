@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace Packages.realityflow_package.Runtime.scripts.Messages.RoomMessages
 {
     /// <summary>
-    /// Receive: <see cref="JoinRoom_ReceivedFromServer"/>
+    /// Receive: <see cref="JoinRoom_Received"/>
     /// </summary>
     [DataContract]
     public class JoinRoom_SendToServer : BaseMessage

@@ -9,17 +9,23 @@ using System.Threading.Tasks;
 namespace Packages.realityflow_package.Runtime.scripts.Messages.ObjectMessages
 {
     [DataContract]
-    public class CreateObject_Received : ReceivedMessage
-    {
+    public class FinalizedUpdateObject_Received : ReceivedMessage
+    { 
         [DataMember]
         public FlowTObject flowObject { get; set; }
-
-        // Definition of event type (What gets sent to the subscribers)
-        public delegate void CreateObjectReceived_EventHandler(object sender, CreateObjectMessageEventArgs eventArgs);
+        
+        // Definition of event type (What gets sent to the subscribers
+        public delegate void OpenProjectReceived_EventHandler(object sender, FinalizedUpdateObjectMessageEventArgs eventArgs);
 
         // The object that handles publishing/subscribing
-        private static CreateObjectReceived_EventHandler _ReceivedEvent;
-        public static event CreateObjectReceived_EventHandler ReceivedEvent
+        private static OpenProjectReceived_EventHandler _ReceivedEvent;
+
+        public FinalizedUpdateObject_Received(FlowTObject flowObject)
+        {
+            this.flowObject = flowObject;
+        }
+
+        public static event OpenProjectReceived_EventHandler ReceivedEvent
         {
             add
             {
@@ -40,7 +46,7 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.ObjectMessages
         /// <param name="message">The message to be parsed</param>
         public static void ReceiveMessage(string message)
         {
-            CreateObject_Received response = UnityEngine.JsonUtility.FromJson<CreateObject_Received>(message);
+            FinalizedUpdateObject_Received response = UnityEngine.JsonUtility.FromJson<FinalizedUpdateObject_Received>(message);
             response.RaiseEvent();
         }
 
@@ -49,18 +55,19 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.ObjectMessages
         /// </summary>
         public override void RaiseEvent()
         {
+            // Raise the event in a thread-safe manner using the ?. operator.
             if (_ReceivedEvent != null)
             {
-                _ReceivedEvent.Invoke(this, new CreateObjectMessageEventArgs(this));
+                _ReceivedEvent.Invoke(this, new FinalizedUpdateObjectMessageEventArgs(this));
             }
         }
     }
 
-    public class CreateObjectMessageEventArgs : EventArgs
+    public class FinalizedUpdateObjectMessageEventArgs : EventArgs
     {
-        public CreateObject_Received message { get; set; }
+        public FinalizedUpdateObject_Received message { get; set; }
 
-        public CreateObjectMessageEventArgs(CreateObject_Received message)
+        public FinalizedUpdateObjectMessageEventArgs(FinalizedUpdateObject_Received message)
         {
             this.message = message;
         }

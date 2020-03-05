@@ -26,11 +26,13 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.ObjectMessages
             this.flowObject = flowObject;
             this.flowUser = flowUser;
             this.projectId = projectId;
+
+            this.MessageType = "CreateObject";
         }
     }
 
     /// <summary>
-    /// Response: <see cref="UpdateObject_ReceiveFromServer"/>
+    /// Response: <see cref="UpdateObject_Received"/>
     /// </summary>
     [DataContract]
     public class UpdateObject_SendToServer : BaseMessage
@@ -47,11 +49,13 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.ObjectMessages
             this.flowObject = flowObject;
             this.flowUser = flowUser;
             this.projectId = projectId;
+
+            this.MessageType = "UpdateObject";
         }
     }
 
     /// <summary>
-    /// Response: <see cref="DeleteObject_ReceiveFromServer"/>
+    /// Response: <see cref="DeleteObject_Received"/>
     /// </summary>
     [DataContract]
     public class DeleteObject_SendToServer : BaseMessage
@@ -62,11 +66,13 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.ObjectMessages
         public DeleteObject_SendToServer(string flowId)
         {
             FlowId = flowId;
+
+            this.MessageType = "DeleteObject";
         }
     }
 
     /// <summary>
-    /// Response: <see cref="FinalizedUpdateObject_ReceiveFromServer"/>
+    /// Response: <see cref="FinalizedUpdateObject_Received"/>
     /// </summary>
     [DataContract]
     public class FinalizedUpdateObject_SendToServer : BaseMessage
@@ -83,6 +89,8 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.ObjectMessages
             this.flowObject = flowObject;
             this.flowUser = flowUser;
             this.projectId = projectId;
+
+            this.MessageType = "FinalizedUpdateObject";
         }
     }
 }

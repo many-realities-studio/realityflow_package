@@ -1,14 +1,17 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 using UnityEngine;
 
 namespace RealityFlow.Plugin.Scripts
 {
-    [System.Serializable]
+    [DataContract]
     public class FlowUser
     {
-        public string Username;
-        public string Password;
+        [DataMember]
+        public string Username { get; set; }
+        [DataMember]
+        public string Password { get; set; }
 
         public FlowUser(string username, string password)
         {

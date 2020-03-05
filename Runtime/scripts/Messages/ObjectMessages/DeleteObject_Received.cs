@@ -9,17 +9,23 @@ using System.Threading.Tasks;
 namespace Packages.realityflow_package.Runtime.scripts.Messages.ObjectMessages
 {
     [DataContract]
-    public class UpdateObject_ReceiveFromServer : ReceivedMessage
+    public class DeleteObject_Received : ReceivedMessage
     {
         [DataMember]
-        public FlowTObject flowObject { get; set; }
+        public FlowTObject DeletedObject { get; set; } // The deleted object
 
         // Definition of event type (What gets sent to the subscribers
-        public delegate void UpdateObjectReceived_EventHandler(object sender, UpdateObjectMessageEventArgs eventArgs);
+        public delegate void DeleteObjectReceived_EventHandler(object sender, DeleteObjectMessageEventArgs eventArgs);
 
         // The object that handles publishing/subscribing
-        private static UpdateObjectReceived_EventHandler _ReceivedEvent;
-        public static event UpdateObjectReceived_EventHandler ReceivedEvent
+        private static DeleteObjectReceived_EventHandler _ReceivedEvent;
+
+        public DeleteObject_Received(FlowTObject deletedObject)
+        {
+            DeletedObject = deletedObject;
+        }
+
+        public static event DeleteObjectReceived_EventHandler ReceivedEvent
         {
             add
             {
@@ -40,7 +46,7 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.ObjectMessages
         /// <param name="message">The message to be parsed</param>
         public static void ReceiveMessage(string message)
         {
-            UpdateObject_ReceiveFromServer response = UnityEngine.JsonUtility.FromJson<UpdateObject_ReceiveFromServer>(message);
+            DeleteObject_Received response = UnityEngine.JsonUtility.FromJson<DeleteObject_Received>(message);
             response.RaiseEvent();
         }
 
@@ -51,16 +57,16 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.ObjectMessages
         {
             if (_ReceivedEvent != null)
             {
-                _ReceivedEvent.Invoke(this, new UpdateObjectMessageEventArgs(this));
+                _ReceivedEvent.Invoke(this, new DeleteObjectMessageEventArgs(this));
             }
         }
     }
 
-    public class UpdateObjectMessageEventArgs : EventArgs
+    public class DeleteObjectMessageEventArgs : EventArgs
     {
-        public UpdateObject_ReceiveFromServer message { get; set; }
+        public DeleteObject_Received message { get; set; }
 
-        public UpdateObjectMessageEventArgs(UpdateObject_ReceiveFromServer message)
+        public DeleteObjectMessageEventArgs(DeleteObject_Received message)
         {
             this.message = message;
         }

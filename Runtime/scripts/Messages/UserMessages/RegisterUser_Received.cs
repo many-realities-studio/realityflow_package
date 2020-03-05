@@ -1,13 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Packages.realityflow_package.Runtime.scripts.Messages.UserMessages
 {
+    [DataContract]
     public class RegisterUser_Received : ConfirmationMessage_Received
     {
+
+        public RegisterUser_Received(string message, bool wasSuccessful)
+        {
+            this.Message = message;
+            this.MessageType = "Register";
+            this.WasSuccessful = wasSuccessful;
+        }
+
         // Definition of event type (What gets sent to the subscribers
         public delegate void RegisterUserReceived_EventHandler(object sender, ConfirmationMessageEventArgs eventArgs);
 

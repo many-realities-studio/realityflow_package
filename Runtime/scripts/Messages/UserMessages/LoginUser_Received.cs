@@ -14,13 +14,22 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.UserMessages
     /// Handle parsing and relaying message information
     /// https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/event
     /// </summary>
-    public class Login_Recieved : ConfirmationMessage_Received
+    [DataContract]
+    public class LoginUser_Received : ConfirmationMessage_Received
     {
         // Definition of event type (What gets sent to the subscribers
         public delegate void LoginReceived_EventHandler(object sender, ConfirmationMessageEventArgs eventArgs);
 
         // The object that handles publishing/subscribing
         private static LoginReceived_EventHandler _ReceivedEvent;
+
+        public LoginUser_Received(string message, bool wasSuccessful)
+        {
+            this.Message = message;
+            this.MessageType = "Login";
+            this.WasSuccessful = wasSuccessful;
+        }
+
         public static event LoginReceived_EventHandler ReceivedEvent
         {
             add
