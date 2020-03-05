@@ -27,7 +27,7 @@ namespace RealityFlow.Plugin.Editor
 
         private void OnGUI()
         {
-            DrawSettings((ObjectData)RealityFlowWindow.ObjectInfo);
+            //DrawSettings((ObjectData)RealityFlowWindow.ObjectInfo);
         }
 
         void DrawSettings(ObjectData objData)
@@ -100,9 +100,9 @@ namespace RealityFlow.Plugin.Editor
             if (managerExists == false)
             {
                 manager.AddComponent(typeof(ObjectManager));
-                manager.AddComponent(typeof(FlowNetworkManager));
-                manager.GetComponent<FlowNetworkManager>().LocalServer = Config.LOCAL_HOST;
-                manager.GetComponent<FlowNetworkManager>().mainGameCamera = GameObject.FindGameObjectWithTag("MainCamera");
+                //manager.AddComponent(typeof(FlowNetworkManager));
+                //manager.GetComponent<FlowNetworkManager>().LocalServer = Config.LOCAL_HOST;
+                //manager.GetComponent<FlowNetworkManager>().mainGameCamera = GameObject.FindGameObjectWithTag("MainCamera");
                 manager.AddComponent(typeof(DoOnMainThread));
             }
         }
