@@ -11,7 +11,7 @@ using Packages.realityflow_package.Runtime.scripts.Managers;
 using Packages.realityflow_package.Runtime.scripts.Messages;
 using Packages.realityflow_package.Runtime.scripts.Messages.ObjectMessages;
 
-[CustomEditor(typeof(FlowNetworkManager))]
+[CustomEditor(typeof(FlowWebsocket))]
 public class FlowNetworkManagerEditor : EditorWindow
 {
     // View parameters
@@ -30,6 +30,9 @@ public class FlowNetworkManagerEditor : EditorWindow
 
     private Dictionary<EWindowView, ChangeView> _ViewDictionary = new Dictionary<EWindowView, ChangeView>();
     private delegate void ChangeView();
+
+    FlowTObject newObject = null;// = new FlowTObject(new Color(0, 0, 0, 0), "TestFlowId", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "TestObject");
+    FlowUser newUser = null;// = new FlowUser("testUsername", "TestPassword");
 
     enum EWindowView
     {
@@ -58,6 +61,11 @@ public class FlowNetworkManagerEditor : EditorWindow
     /// </summary>
     private void OnEnable()
     {
+        if(newObject == null)
+            newObject = new FlowTObject(new Color(0, 0, 0, 0), "TestFlowId", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "TestObject");
+        if(newUser == null)
+            newUser = new FlowUser("testUsername", "TestPassword");
+
         Operations.ConnectToServer("ws://echo.websocket.org");
 
         InitTextures();
@@ -80,10 +88,22 @@ public class FlowNetworkManagerEditor : EditorWindow
         if (GUILayout.Button("Create", GUILayout.Height(20)))
         {
             //GameObject go = GameObject.CreatePrimitive(PrimitiveType.Capsule);
-            FlowTObject newObject = new FlowTObject(new Color(0,0,0,0), "TestFlowId",0,0,0,0,0,0,0,0,0,0,"TestObject");
-            FlowUser newUser = new FlowUser("testUsername", "TestPassword");
+
+            if(newUser == null)
+            {
+                newUser = new FlowUser("user", "pass");
+            }
 
             Operations.CreateObject(newObject, newUser, "TestProjectId", CreateObjectCallbackTest);
+
+            //UpdateObject_SendToServer updateObject = new UpdateObject_SendToServer(newObject, newUser, "ProjectId");
+            //Operations.FlowWebsocket.SendMessage(updateObject);
+            
+            //Operations.DeleteObject("TestProjectId", DeleteObjectCallback);
+
+
+            //FinalizedUpdateObject_SendToServer finalizedUpdateObject = new FinalizedUpdateObject_SendToServer(newObject, newUser, "ProjectId");
+            //Operations.FlowWebsocket.SendMessage(finalizedUpdateObject);
         }
 
         // if (GUILayout.Button("Edit", GUILayout.Height(20)))
@@ -122,6 +142,11 @@ public class FlowNetworkManagerEditor : EditorWindow
         //{
         //    GameObject.CreatePrimitive(PrimitiveType.Cube);
         //}
+    }
+
+    private void DeleteObjectCallback(object sender, DeleteObjectMessageEventArgs eventArgs)
+    {
+        throw new NotImplementedException();
     }
 
     private void CreateObjectCallbackTest(object sender, CreateObjectMessageEventArgs eventArgs)
