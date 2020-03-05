@@ -10,7 +10,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace Packages.realityflow_package.Tests.Editor
+namespace RealityFlow.Plugin.Tests
 {
     public class RoomMessageTests
     {
