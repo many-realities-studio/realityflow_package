@@ -1,4 +1,5 @@
 ﻿using Packages.realityflow_package.Runtime.scripts.Messages;
+using Packages.realityflow_package.Runtime.scripts.Messages.ObjectMessages;
 using Packages.realityflow_package.Runtime.scripts.Messages.UserMessages;
 using RealityFlow.Plugin.Scripts;
 using System;
@@ -66,28 +67,21 @@ namespace Packages.realityflow_package.Runtime.scripts
 
             websocket.Send(sentMessage);
 
-            //System.IO.File.WriteAllText(@"C:\Users\Matthew Kurtz\Desktop\FlowTests\SentCommands\" + typeof(T).ToString() +  ".json", sentMessage);
+            System.IO.File.WriteAllText(@"C:\Users\Matthew Kurtz\Desktop\FlowTests\SentCommands\" + typeof(T).ToString() + ".json", sentMessage);
 
             // Deserialization
+            //CreateObject_SendToServer response = MessageSerializer.DesearializeObject<CreateObject_SendToServer>(sentMessage);
 
-            //memoryStream.Position = 0;
-            //var p2 = (RegisterUser_SendToServer) serializer.ReadObject(memoryStream);
-
-            //Debug.Log("Type is " + p2.ToString());
-
-            //Debug.Log($"Deserialized: messageType = {p2.MessageType}, username = {p2.Username}, password = {p2.Password}");
-
-            //websocket.Send(messageToSend);
-            //websocket.Send()
+            //Debug.Log(response.ToString());
         }
 
-        public void SendMessage(FlowEvent flowEvent)
-        {
-            string messageToSend = JsonUtility.ToJson(flowEvent);
+        //public void SendMessage(FlowEvent flowEvent)
+        //{
+        //    string messageToSend = JsonUtility.ToJson(flowEvent);
 
-            Debug.Log("Sending message: " + messageToSend);
-            websocket.Send(messageToSend);
-        }
+        //    Debug.Log("Sending message: " + messageToSend);
+        //    websocket.Send(messageToSend);
+        //}
 
         private void ActionOnReceiveMessage(string message)
         {
