@@ -12,11 +12,15 @@ namespace RealityFlow.Plugin.Tests
     public class UserMessageTests
     {
         const int messageTimeout = 3000; // Timeout for a response from the server in milliseconds
+        FlowUser testUser; 
+
         [OneTimeSetUp]
         public void Setup()
         {
             string url = "ws://echo.websocket.org";
             Operations.ConnectToServer(url);
+
+            testUser = new FlowUser("user", "pass");
         }
 
 
@@ -59,7 +63,7 @@ namespace RealityFlow.Plugin.Tests
 
             // Act (and assert)
             ConfirmationMessage_Received actual = null;
-            Operations.Login("user", "pass", (sender, e) =>
+            Operations.Login(testUser, (sender, e) =>
             {
                 Debug.Log("Received message: " + e.message.ToString());
                 actual = e.message;
@@ -83,7 +87,7 @@ namespace RealityFlow.Plugin.Tests
 
             // Act (and assert)
             ConfirmationMessage_Received actual = null;
-            Operations.Login("user", "pass", (sender, e) =>
+            Operations.Login(testUser, (sender, e) =>
             {
                 Debug.Log("Received message: " + e.message.ToString());
                 actual = e.message;
