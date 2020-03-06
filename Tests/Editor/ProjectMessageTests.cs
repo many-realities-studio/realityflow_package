@@ -27,7 +27,7 @@ namespace RealityFlow.Plugin.Tests
             Operations.ConnectToServer(url);
 
             testObject = new FlowTObject(new Color(0, 0, 0), "FlowId", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "name");
-            testProject = new FlowProject("flowId", "id", "description", 0, "projectName", new FlowTObject[]
+            testProject = new FlowProject("flowId", "description", 0, "projectName", new FlowTObject[]
             {
                 testObject
             });
