@@ -49,10 +49,10 @@ namespace RealityFlow.Plugin.Scripts
         {
             get
             {
-                if(_AttachedGameObject == null)
+                if (_AttachedGameObject == null)
                 {
                     // The game object already exists
-                    if(idToGameObjectMapping.ContainsKey(FlowId))
+                    if (idToGameObjectMapping.ContainsKey(FlowId))
                     {
                         _AttachedGameObject = idToGameObjectMapping[FlowId];
                     }
@@ -79,61 +79,83 @@ namespace RealityFlow.Plugin.Scripts
             set => AttachedGameObject.transform.localPosition = new Vector3(value, Y, Z);
         }
         [DataMember]
-        public float Y 
-        { 
+        public float Y
+        {
             get => AttachedGameObject.transform.localPosition.y;
-            set => AttachedGameObject.transform.localPosition = new Vector3(X, value, Z); 
-        } 
+            set => AttachedGameObject.transform.localPosition = new Vector3(X, value, Z);
+        }
         [DataMember]
-        public float Z 
+        public float Z
         {
             get => AttachedGameObject.transform.localPosition.z;
             set => AttachedGameObject.transform.localPosition = new Vector3(X, Y, value);
         }
         [DataMember]
-        public float Q_x 
+        public float Q_x
         {
             get => AttachedGameObject.transform.localRotation.x;
             set => AttachedGameObject.transform.localRotation = new Quaternion(value, Q_y, Q_z, Q_w);
         }
         [DataMember]
-        public float Q_y 
-        { 
+        public float Q_y
+        {
             get => AttachedGameObject.transform.localRotation.y;
             set => AttachedGameObject.transform.localRotation = new Quaternion(Q_x, value, Q_z, Q_w);
         }
         [DataMember]
-        public float Q_z 
-        { 
+        public float Q_z
+        {
             get => AttachedGameObject.transform.localRotation.z;
             set => AttachedGameObject.transform.localRotation = new Quaternion(Q_x, Q_y, value, Q_w);
         }
         [DataMember]
-        public float Q_w 
+        public float Q_w
         {
             get => AttachedGameObject.transform.localRotation.w;
             set => AttachedGameObject.transform.localRotation = new Quaternion(Q_x, Q_y, Q_z, value);
         }
         [DataMember]
-        public float S_x 
+        public float S_x
         {
             get => AttachedGameObject.transform.localScale.x;
             set => AttachedGameObject.transform.localScale = new Vector3(value, S_y, S_z);
         }
         [DataMember]
-        public float S_y 
-        { 
-            get => AttachedGameObject.transform.localScale.y; 
-            set => AttachedGameObject.transform.localScale = new Vector3(S_x, value, S_z); 
+        public float S_y
+        {
+            get => AttachedGameObject.transform.localScale.y;
+            set => AttachedGameObject.transform.localScale = new Vector3(S_x, value, S_z);
         }
         [DataMember]
-        public float S_z 
-        { 
-            get => AttachedGameObject.transform.localScale.z; 
-            set => AttachedGameObject.transform.localScale = new Vector3(S_x, S_y, value); 
+        public float S_z
+        {
+            get => AttachedGameObject.transform.localScale.z;
+            set => AttachedGameObject.transform.localScale = new Vector3(S_x, S_y, value);
         }
         [DataMember]
         public string Name { get; set; }
+
+        public Vector3 Position
+        {
+            get => new Vector3(X, Y, Z);
+            set
+            {
+                X = value.x;
+                Y = value.y;
+                Z = value.z;
+            }
+        }
+        public Vector3 Scale
+        {
+            get => new Vector3(S_x, S_y, S_z);
+            set
+            {
+                S_x = value.x;
+                S_y = value.y;
+                S_z = value.z;
+            }
+        }
+        public Quaternion Rotation { get; set; }
 
         #region Static functions
         public static void DestroyObject(string idOfObjectToDestroy)
@@ -150,7 +172,7 @@ namespace RealityFlow.Plugin.Scripts
             }
         }
 
-        private static GameObject CreateObjectInUnity(string FlowId, string name)
+        public static GameObject CreateObjectInUnity(string FlowId, string name)
         {
             GameObject newGameObject = new GameObject(name);
             idToGameObjectMapping.Add(FlowId, newGameObject);
@@ -160,13 +182,15 @@ namespace RealityFlow.Plugin.Scripts
 
         #endregion // Static functions
 
+        public FlowTObject() { }
+
         public FlowTObject(Color color, string flowId, float x, float y, float z, float q_x, float q_y, float q_z, float q_w, float s_x, float s_y, float s_z, string name)
         {
             try
             {
+                FlowId = flowId;
                 AttachedGameObject = CreateObjectInUnity(flowId, name);
                 Color = color;
-                FlowId = flowId;
                 X = x;
                 Y = y;
                 Z = z;
