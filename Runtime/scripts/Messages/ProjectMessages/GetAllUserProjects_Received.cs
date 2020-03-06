@@ -14,7 +14,10 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.ProjectMessages
     public class GetAllUserProjects_Received : ReceivedMessage
     {
         [DataMember]
-        Tuple<string, string>[] projectList { get; set; } // in the format of <ProjectId, Name>
+        /// <summary>
+        /// in the format of (ProjectId, Name)
+        /// </summary>
+        public Tuple<string, string>[] ProjectList { get; set; } 
 
         // Definition of event type (What gets sent to the subscribers
         public delegate void GetAllUserProjects_EventHandler(object sender, GetAllUserProjectsMessageEventArgs eventArgs);
@@ -24,7 +27,7 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.ProjectMessages
 
         public GetAllUserProjects_Received(Tuple<string, string>[] projectList)
         {
-            this.projectList = projectList;
+            this.ProjectList = projectList;
         }
 
         public static event GetAllUserProjects_EventHandler ReceivedEvent
