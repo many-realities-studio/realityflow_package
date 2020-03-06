@@ -50,17 +50,17 @@ namespace Packages.realityflow_package.Runtime.scripts
 
         #region UserOperations
 
-        public static void Login(string username, string password, LoginUser_Received.LoginReceived_EventHandler callbackFunction)
+        public static void Login(FlowUser flowUser, LoginUser_Received.LoginReceived_EventHandler callbackFunction)
         {
-            Login_SendToServer loginMessage = new Login_SendToServer(username, password);
+            Login_SendToServer loginMessage = new Login_SendToServer(flowUser);
             FlowWebsocket.SendMessage(loginMessage);
 
             LoginUser_Received.ReceivedEvent += callbackFunction;
         }
         
-        public static void Logout(LogoutUser_Received.LogoutReceived_EventHandler callbackFunction)
+        public static void Logout(FlowUser flowUser, LogoutUser_Received.LogoutReceived_EventHandler callbackFunction)
         {
-            Logout_SendToServer logoutMessage = new Logout_SendToServer();
+            Logout_SendToServer logoutMessage = new Logout_SendToServer(flowUser);
             FlowWebsocket.SendMessage(logoutMessage);
 
             LogoutUser_Received.ReceivedEvent += callbackFunction;

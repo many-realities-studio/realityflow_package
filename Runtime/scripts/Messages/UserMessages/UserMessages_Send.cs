@@ -16,14 +16,12 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.UserMessages
     public class Login_SendToServer : BaseMessage
     {
         [DataMember]
-        public string Username { get; set; }
-        [DataMember]
-        public string Password { get; set; }
+        public FlowUser flowUser { get; set; }
 
-        public Login_SendToServer(string username, string password)
+
+        public Login_SendToServer(FlowUser flowUser)
         {
-            this.Username = username;
-            this.Password = password;
+            this.flowUser = flowUser;
             this.MessageType = "Login";
         }
     }
@@ -32,9 +30,16 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.UserMessages
     /// logout request message format 
     /// Response: <see cref="LogoutUser_Received"/>
     /// </summary>
+    [DataContract]
     public class Logout_SendToServer : BaseMessage
     {
-        FlowProject flowProject { get; set; }
+        [DataMember]
+        FlowUser flowUser { get; set; }
+
+        public Logout_SendToServer(FlowUser flowUser)
+        {
+            this.flowUser = flowUser;
+        }
     }
 
     /// <summary>
