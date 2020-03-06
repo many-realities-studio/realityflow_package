@@ -5,26 +5,29 @@ using UnityEngine;
 
 namespace RealityFlow.Plugin.Scripts
 {
+    /// <summary>
+    /// The purpose of this class is to hold all the information that is necessary to define a project.
+    /// The information from this class gets serialized and sent to the server.
+    /// Anything marked with a [DataMember] annotation is marked to be serialized and
+    /// sent to the server.
+    /// </summary>
     [DataContract]
     public class FlowProject : FlowValue
     {
         [DataMember]
-        public string FlowId { get; set; }
+        public string FlowId { get; set; } // The unique ID of the project
         [DataMember]
-        public string Id { get; set; }
+        public string Description { get; set; } // Description of the project
         [DataMember]
-        public string Description { get; set; }
+        public int DateModified { get; set; } // The last time this project was modified
         [DataMember]
-        public int DateModified { get; set; }
+        public string ProjectName { get; set; } // Name of the project
         [DataMember]
-        public string ProjectName { get; set; }
-        [DataMember]
-        public FlowTObject[] _ObjectList { get; set; }
+        public IEnumerable<FlowTObject> _ObjectList { get; set; }
 
-        public FlowProject(string flowId, string id, string description, int dateModified, string projectName, FlowTObject[] ObjectList)
+        public FlowProject(string flowId, string description, int dateModified, string projectName, IEnumerable<FlowTObject> ObjectList)
         {
             FlowId = flowId;
-            Id = id;
             Description = description;
             DateModified = dateModified;
             ProjectName = projectName;

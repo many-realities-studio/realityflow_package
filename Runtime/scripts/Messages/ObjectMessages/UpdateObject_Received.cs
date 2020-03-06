@@ -11,8 +11,6 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.ObjectMessages
     [DataContract]
     public class UpdateObject_Received : ReceivedMessage
     {
-
-
         [DataMember]
         public FlowTObject flowObject { get; set; }
 

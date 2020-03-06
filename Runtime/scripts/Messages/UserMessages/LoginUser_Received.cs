@@ -17,6 +17,12 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.UserMessages
     [DataContract]
     public class LoginUser_Received : ConfirmationMessage_Received
     {
+        [DataMember]
+        /// <summary>
+        /// in the format of (ProjectId, Name)
+        /// </summary>
+        public Tuple<string, string>[] ProjectList { get; set; }
+
         // Definition of event type (What gets sent to the subscribers
         public delegate void LoginReceived_EventHandler(object sender, ConfirmationMessageEventArgs eventArgs);
 

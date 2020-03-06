@@ -18,6 +18,9 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages
         public bool WasSuccessful { get; set; }
     }
 
+    /// <summary>
+    /// The event arguments that get passed back to the callback functions as the second parameter
+    /// </summary>
     public class ConfirmationMessageEventArgs : EventArgs
     {
         public ConfirmationMessage_Received message { get; set; }
