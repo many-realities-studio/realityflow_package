@@ -57,5 +57,16 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages
 
             return (T)JsonSerializer.ReadObject(memoryStream);
         }
+
+        public static string ConvertToString<T>(T messageToSerialize) where T : BaseMessage
+        {
+            MemoryStream memoryStream = SerializeMessage<T>(messageToSerialize);
+
+            memoryStream.Position = 0;
+            var sr = new StreamReader(memoryStream);
+            string sentMessage = sr.ReadToEnd();
+
+            return sentMessage;
+        }
     }
 }
