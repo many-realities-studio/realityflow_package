@@ -122,33 +122,33 @@ public class FlowNetworkManagerEditor : EditorWindow
             }
 
             // User messages
-            System.IO.File.WriteAllText(@"C:\Users\Matthew Kurtz\Desktop\FlowTests\SentCommands\UserMessages\" + typeof(LoginUser_Received).ToString() + ".json", MessageSerializer.ConvertToString( new LoginUser_Received("message", true)));
+            System.IO.File.WriteAllText(@"C:\Users\Matthew Kurtz\Desktop\FlowTests\SentCommands\UserMessages\" + typeof(Login_SendToServer).ToString() + ".json", MessageSerializer.ConvertToString( new Login_SendToServer(testUser)));
 
-            System.IO.File.WriteAllText(@"C:\Users\Matthew Kurtz\Desktop\FlowTests\SentCommands\UserMessages\" + typeof(RegisterUser_Received).ToString() + ".json", MessageSerializer.ConvertToString(new RegisterUser_Received("message", true)));
+            System.IO.File.WriteAllText(@"C:\Users\Matthew Kurtz\Desktop\FlowTests\SentCommands\UserMessages\" + typeof(RegisterUser_SendToServer).ToString() + ".json", MessageSerializer.ConvertToString(new RegisterUser_SendToServer(testUser)));
 
-            System.IO.File.WriteAllText(@"C:\Users\Matthew Kurtz\Desktop\FlowTests\SentCommands\UserMessages\" + typeof(LogoutUser_Received).ToString() + ".json", MessageSerializer.ConvertToString(new LogoutUser_Received("message", true)));
+            System.IO.File.WriteAllText(@"C:\Users\Matthew Kurtz\Desktop\FlowTests\SentCommands\UserMessages\" + typeof(Logout_SendToServer).ToString() + ".json", MessageSerializer.ConvertToString(new Logout_SendToServer(testUser)));
 
             // Object messages
-            System.IO.File.WriteAllText(@"C:\Users\Matthew Kurtz\Desktop\FlowTests\SentCommands\ObjectMessages\" + typeof(CreateObject_Received).ToString() + ".json", MessageSerializer.ConvertToString(new CreateObject_Received(testObject)));
+            System.IO.File.WriteAllText(@"C:\Users\Matthew Kurtz\Desktop\FlowTests\SentCommands\ObjectMessages\" + typeof(CreateObject_SendToServer).ToString() + ".json", MessageSerializer.ConvertToString(new CreateObject_SendToServer(testObject, testUser, testProject.FlowId)));
 
-            System.IO.File.WriteAllText(@"C:\Users\Matthew Kurtz\Desktop\FlowTests\SentCommands\ObjectMessages\" + typeof(DeleteObject_Received).ToString() + ".json", MessageSerializer.ConvertToString(new DeleteObject_Received(testObject)));
+            System.IO.File.WriteAllText(@"C:\Users\Matthew Kurtz\Desktop\FlowTests\SentCommands\ObjectMessages\" + typeof(DeleteObject_SendToServer).ToString() + ".json", MessageSerializer.ConvertToString(new DeleteObject_SendToServer(testObject.FlowId)));
 
-            System.IO.File.WriteAllText(@"C:\Users\Matthew Kurtz\Desktop\FlowTests\SentCommands\ObjectMessages\" + typeof(UpdateObject_Received).ToString() + ".json", MessageSerializer.ConvertToString(new UpdateObject_Received(testObject)));
+            System.IO.File.WriteAllText(@"C:\Users\Matthew Kurtz\Desktop\FlowTests\SentCommands\ObjectMessages\" + typeof(UpdateObject_SendToServer).ToString() + ".json", MessageSerializer.ConvertToString(new UpdateObject_SendToServer(testObject, testUser, testProject.FlowId)));
 
-            System.IO.File.WriteAllText(@"C:\Users\Matthew Kurtz\Desktop\FlowTests\SentCommands\ObjectMessages\" + typeof(FinalizedUpdateObject_Received).ToString() + ".json", MessageSerializer.ConvertToString(new FinalizedUpdateObject_Received(testObject)));
+            System.IO.File.WriteAllText(@"C:\Users\Matthew Kurtz\Desktop\FlowTests\SentCommands\ObjectMessages\" + typeof(FinalizedUpdateObject_SendToServer).ToString() + ".json", MessageSerializer.ConvertToString(new FinalizedUpdateObject_SendToServer(testObject, testUser, testProject.FlowId)));
 
             // Project messages
             System.IO.File.WriteAllText(@"C:\Users\Matthew Kurtz\Desktop\FlowTests\SentCommands\ProjectMessages\" + typeof(CreateProject_Received).ToString() + ".json", MessageSerializer.ConvertToString(new CreateProject_Received("message", true)));
 
-            System.IO.File.WriteAllText(@"C:\Users\Matthew Kurtz\Desktop\FlowTests\SentCommands\ProjectMessages\" + typeof(DeleteProject_Received).ToString() + ".json", MessageSerializer.ConvertToString(new DeleteProject_Received("message", true)));
+            System.IO.File.WriteAllText(@"C:\Users\Matthew Kurtz\Desktop\FlowTests\SentCommands\ProjectMessages\" + typeof(DeleteProject_SendToServer).ToString() + ".json", MessageSerializer.ConvertToString(new DeleteProject_SendToServer(testProject, testUser)));
 
             Tuple<string, string>[] testList = { new Tuple<string, string>(testProject.FlowId, testProject.ProjectName) };
-            System.IO.File.WriteAllText(@"C:\Users\Matthew Kurtz\Desktop\FlowTests\SentCommands\ProjectMessages\" + typeof(GetAllUserProjects_Received).ToString() + ".json", MessageSerializer.ConvertToString(new GetAllUserProjects_Received(testList)));
+            System.IO.File.WriteAllText(@"C:\Users\Matthew Kurtz\Desktop\FlowTests\SentCommands\ProjectMessages\" + typeof(GetAllUserProjects_SendToServer).ToString() + ".json", MessageSerializer.ConvertToString(new GetAllUserProjects_SendToServer(testUser)));
 
-            System.IO.File.WriteAllText(@"C:\Users\Matthew Kurtz\Desktop\FlowTests\SentCommands\ProjectMessages\" + typeof(OpenProject_Received).ToString() + ".json", MessageSerializer.ConvertToString(new OpenProject_Received(testProject)));
+            System.IO.File.WriteAllText(@"C:\Users\Matthew Kurtz\Desktop\FlowTests\SentCommands\ProjectMessages\" + typeof(OpenProject_SendToServer).ToString() + ".json", MessageSerializer.ConvertToString(new OpenProject_SendToServer(testProject.FlowId, testUser)));
 
             // Room messages
-            System.IO.File.WriteAllText(@"C:\Users\Matthew Kurtz\Desktop\FlowTests\SentCommands\RoomMessages\" + typeof(JoinRoom_Received).ToString() + ".json", MessageSerializer.ConvertToString(new JoinRoom_Received(testProject)));
+            System.IO.File.WriteAllText(@"C:\Users\Matthew Kurtz\Desktop\FlowTests\SentCommands\RoomMessages\" + typeof(JoinRoom_SendToServer).ToString() + ".json", MessageSerializer.ConvertToString(new JoinRoom_SendToServer(testProject.FlowId, testUser)));
 
             //Operations.CreateObject(newObject, newUser, "TestProjectId", CreateObjectCallbackTest);
 
