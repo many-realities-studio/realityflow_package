@@ -68,7 +68,7 @@ namespace Packages.realityflow_package.Runtime.scripts
 
         public static void Register(string username, string password, RegisterUser_Received.RegisterUserReceived_EventHandler callbackFunction)
         {
-            RegisterUser_SendToServer register = new RegisterUser_SendToServer(username, password);
+            RegisterUser_SendToServer register = new RegisterUser_SendToServer(new FlowUser(username, password));
             FlowWebsocket.SendMessage(register);
 
             RegisterUser_Received.ReceivedEvent += callbackFunction;

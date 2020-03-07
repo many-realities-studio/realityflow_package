@@ -50,14 +50,11 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.UserMessages
     public class RegisterUser_SendToServer : BaseMessage
     {
         [DataMember]
-        public string Username { get; set; }
-        [DataMember]
-        public string Password { get; set; }
+        FlowUser flowUser { get; set; }
 
-        public RegisterUser_SendToServer(string username, string password)
+        public RegisterUser_SendToServer(FlowUser flowUser)
         {
-            Username = username;
-            Password = password;
+            this.flowUser = flowUser;
         }
     }
 }
