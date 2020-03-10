@@ -1,14 +1,13 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 
 namespace RealityFlow.Plugin.Scripts
 {
-    [System.Serializable]
-    public class FlowValue
+    public interface FlowValue
     {
-        public string __v;
-        public string _id;
-        public string id;
+        [DataMember]
+        string FlowId { get; set; }
     }
 }

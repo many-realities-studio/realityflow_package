@@ -1,4 +1,4 @@
-using RealityFlow.Plugin.Scripts.Events;
+//using RealityFlow.Plugin.Scripts.Events;
 using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
@@ -32,22 +32,22 @@ namespace RealityFlow.Plugin.Editor
             EditorGUILayout.BeginHorizontal();
             if (GUILayout.Button("Confirm", GUILayout.Height(20)))
             {
-                ProjectFetchEvent project = new ProjectFetchEvent();
-                project.project = new FlowProject(Config.projectId);
-                project.objs = new List<FlowTObject>();
-                project.project.projectName = FlowProject.activeProject.projectName;
-                project.timestamp = System.DateTime.Now.Ticks;
+                //ProjectFetchEvent project = new ProjectFetchEvent();
+                //project.project = new FlowProject(Config.projectId);
+                //project.objs = new List<FlowTObject>();
+                //project.project.projectName = FlowProject.activeProject.projectName;
+                //project.timestamp = System.DateTime.Now.Ticks;
 
-                foreach (FlowTObject obj in FlowProject.activeProject.transformsById.Values)
-                {
-                    obj.Read();
-                    project.objs.Add(obj);
-                }
+                //foreach (FlowTObject obj in FlowProject.activeProject.transformsById.Values)
+                //{
+                //    obj.Read();
+                //    project.objs.Add(obj);
+                //}
 
                 string path2 = "Assets/resources/projects/test.txt";
 
                 StreamWriter writer = new StreamWriter(path2, true);
-                writer.WriteLine(JsonUtility.ToJson(project));
+                //writer.WriteLine(JsonUtility.ToJson(project));
                 writer.Close();
 
                 window.Close();

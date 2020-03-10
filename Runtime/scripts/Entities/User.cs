@@ -1,21 +1,26 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 using UnityEngine;
 
 
 namespace RealityFlow.Plugin.Scripts
 {
-    [System.Serializable]
+    [DataContract]
     public class User : FlowValue
     {
-        public string userId;
-        public string username;
-        public string password;
+        [DataMember]
+        public string Username { get; set; }
+        [DataMember]
+        public string Password { get; set; }
+        [DataMember]
+        public string FlowId { get; set; }
 
         public User(string username, string password)
         {
-            this.username = username;
-            this.password = password;
+            this.Username = username;
+            this.Password = password;
         }
+
     }
 }

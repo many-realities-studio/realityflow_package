@@ -1,11 +1,11 @@
-using System.Collections.Generic;
+//using System.Collections.Generic;
 
-namespace RealityFlow.Plugin.Scripts
-{
-    public class ObjectDataList
-    {
+//namespace RealityFlow.Plugin.Scripts
+//{
+//    public class ObjectDataList
+//    {
 
-        public List<ObjectData> objects;
-    }
+//        public List<ObjectData> objects;
+//    }
 
-}
+//}
