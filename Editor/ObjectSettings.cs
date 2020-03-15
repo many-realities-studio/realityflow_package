@@ -88,7 +88,7 @@ namespace RealityFlow.Plugin.Editor
                 if (GUILayout.Button("Create", GUILayout.Height(30)))
                 {
                     createdGameObject.AttachedGameObject = new GameObject(createdGameObject.Name);
-                    Operations.CreateObject(createdGameObject, FlowNetworkManagerEditor.currentUser, FlowNetworkManagerEditor.currentProject.FlowId, (_, e) => Debug.Log(e.message));
+                    Operations.CreateObject(createdGameObject, /*FlowNetworkManagerEditor.currentUser,*/ FlowNetworkManagerEditor.currentProject.FlowId, (_, e) => Debug.Log(e.message));
                     //SetupObjectManager();
                     //SaveObjectData(objData);
                     window.Close();

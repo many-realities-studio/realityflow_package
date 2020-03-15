@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 
 namespace Packages.realityflow_package.Runtime.scripts.Messages.ProjectMessages
 {
-    [DataContract]
     public class DeleteProject_Received : ConfirmationMessage_Received
     {
         // Definition of event type (What gets sent to the subscribers
@@ -30,9 +29,8 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.ProjectMessages
             }
         }
 
-        public DeleteProject_Received(string message, bool wasSuccessful)
+        public DeleteProject_Received(bool wasSuccessful)
         {
-            this.Message = message;
             this.WasSuccessful = wasSuccessful;
         }
 

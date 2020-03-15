@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -7,14 +8,11 @@ using System.Threading.Tasks;
 
 namespace Packages.realityflow_package.Runtime.scripts.Messages.UserMessages
 {
-    [DataContract]
     public class RegisterUser_Received : ConfirmationMessage_Received
     {
-
         public RegisterUser_Received(string message, bool wasSuccessful)
         {
-            this.Message = message;
-            this.MessageType = "Register";
+            this.MessageType = "CreateUser";
             this.WasSuccessful = wasSuccessful;
         }
 
@@ -44,7 +42,7 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.UserMessages
         /// <param name="message">The message to be parsed</param>
         public static void ReceiveMessage(string message)
         {
-            ConfirmationMessage_Received response = UnityEngine.JsonUtility.FromJson<ConfirmationMessage_Received>(message);
+            ConfirmationMessage_Received response = MessageSerializer.DesearializeObject<RegisterUser_Received> (message);
             response.RaiseEvent();
         }
 

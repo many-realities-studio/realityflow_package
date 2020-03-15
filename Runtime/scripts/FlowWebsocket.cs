@@ -79,20 +79,15 @@ namespace Packages.realityflow_package.Runtime.scripts
         /// <param name="message">The message object that should be sent</param>
         public void SendMessage<T>(T message) where T : BaseMessage
         {
-            MemoryStream memoryStream = MessageSerializer.SerializeMessage<T>(message);
-            //websocket.Send(memoryStream, (int)memoryStream.Length);
-            //string messageToSend = JsonUtility.ToJson(message);
+            string sentMessage = MessageSerializer.SerializeMessage(message);
 
-            memoryStream.Position = 0;
-            var sr = new StreamReader(memoryStream);
-            string sentMessage = sr.ReadToEnd();
             Debug.Log("Sending message: " + sentMessage);
 
             websocket.Send(sentMessage);
 
             //System.IO.File.WriteAllText(@"C:\Users\Matthew Kurtz\Desktop\FlowTests\SentCommands\" + typeof(T).ToString() + ".json", sentMessage);
 
-            // Deserialization
+            // Deserialization (for debbugging purposes)
             //CreateObject_SendToServer response = MessageSerializer.DesearializeObject<CreateObject_SendToServer>(sentMessage);
 
             //Debug.Log(response.ToString());

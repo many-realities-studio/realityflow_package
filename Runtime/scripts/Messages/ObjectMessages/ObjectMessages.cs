@@ -1,4 +1,5 @@
-﻿using RealityFlow.Plugin.Scripts;
+﻿using Newtonsoft.Json;
+using RealityFlow.Plugin.Scripts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,20 +12,21 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.ObjectMessages
     /// <summary>
     /// Response: <see cref="CreateObject_Received"/>
     /// </summary>
-    [DataContract]
     public class CreateObject_SendToServer : BaseMessage
     {
-        [DataMember]
+        [JsonProperty("flowObject")]
         public FlowTObject flowObject { get; set; }
-        [DataMember]
-        public FlowUser flowUser { get; set; }
-        [DataMember]
+
+        //[JsonProperty("")]
+        //public FlowUser flowUser { get; set; }
+
+        [JsonProperty("ProjectId")]
         public string projectId { get; set; }
 
-        public CreateObject_SendToServer(FlowTObject flowObject, FlowUser flowUser, string projectId)
+        public CreateObject_SendToServer(FlowTObject flowObject, /*FlowUser flowUser,*/ string projectId)
         {
             this.flowObject = flowObject;
-            this.flowUser = flowUser;
+            //this.flowUser = flowUser;
             this.projectId = projectId;
 
             this.MessageType = "CreateObject";
@@ -34,20 +36,18 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.ObjectMessages
     /// <summary>
     /// Response: <see cref="UpdateObject_Received"/>
     /// </summary>
-    [DataContract]
+    
     public class UpdateObject_SendToServer : BaseMessage
     {
-        [DataMember]
+        [JsonProperty("flowObject")]
         public FlowTObject flowObject { get; set; }
-        [DataMember]
-        public FlowUser flowUser { get; set; }
-        [DataMember]
+
+        [JsonProperty("ProjectId")]
         public string projectId { get; set; }
 
-        public UpdateObject_SendToServer(FlowTObject flowObject, FlowUser flowUser, string projectId)
+        public UpdateObject_SendToServer(FlowTObject flowObject, /*FlowUser flowUser,*/ string projectId)
         {
             this.flowObject = flowObject;
-            this.flowUser = flowUser;
             this.projectId = projectId;
 
             this.MessageType = "UpdateObject";
@@ -57,15 +57,18 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.ObjectMessages
     /// <summary>
     /// Response: <see cref="DeleteObject_Received"/>
     /// </summary>
-    [DataContract]
     public class DeleteObject_SendToServer : BaseMessage
     {
-        [DataMember]
-        public string FlowId{ get; set; } // Id of the deleted object
+        [JsonProperty("flowObject")]
+        public FlowTObject FlowObjectToDelete { get; set; } // Id of the deleted object
 
-        public DeleteObject_SendToServer(string flowId)
+        [JsonProperty("ProjectId")]
+        public string ProjectId { get; set; }
+
+        public DeleteObject_SendToServer(FlowTObject flowObjectToDelete, string projectId)
         {
-            FlowId = flowId;
+            FlowObjectToDelete = flowObjectToDelete;
+            ProjectId = projectId;
 
             this.MessageType = "DeleteObject";
         }
@@ -74,14 +77,15 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.ObjectMessages
     /// <summary>
     /// Response: <see cref="FinalizedUpdateObject_Received"/>
     /// </summary>
-    [DataContract]
     public class FinalizedUpdateObject_SendToServer : BaseMessage
     {
-        [DataMember]
+        [JsonProperty("flowObject")]
         public FlowTObject flowObject { get; set; }
-        [DataMember]
+
+        [JsonProperty("flowUser")]
         public FlowUser flowUser { get; set; }
-        [DataMember]
+
+        [JsonProperty("projectId")]
         public string projectId { get; set; }
 
         public FinalizedUpdateObject_SendToServer(FlowTObject flowObject, FlowUser flowUser, string projectId)

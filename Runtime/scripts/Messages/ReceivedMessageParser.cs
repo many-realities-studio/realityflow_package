@@ -47,9 +47,9 @@ namespace Packages.realityflow_package.Runtime.scripts
             messageRouter.Add("JoinRoom", JoinRoom_Received.ReceiveMessage);
 
             // User Messages
-            messageRouter.Add("Login", LoginUser_Received.ReceiveMessage);
-            messageRouter.Add("Logout", LogoutUser_Received.ReceiveMessage);
-            messageRouter.Add("RegisterUser", RegisterUser_Received.ReceiveMessage);
+            messageRouter.Add("LoginUser", LoginUser_Received.ReceiveMessage);
+            messageRouter.Add("LogoutU*ser", LogoutUser_Received.ReceiveMessage);
+            messageRouter.Add("CreateUser", RegisterUser_Received.ReceiveMessage);
         }
 
         /// <summary>
@@ -69,11 +69,11 @@ namespace Packages.realityflow_package.Runtime.scripts
         /// <returns></returns>
         public static string GetMessageType(string messageToConvert)
         {
-            var p2 = MessageSerializer.DesearializeObject<BaseMessage>(messageToConvert);
+            var deserializedObject = MessageSerializer.DesearializeObject<BaseMessage>(messageToConvert);
 
-            Debug.Log("Getting message type: " + p2.MessageType);
+            Debug.Log("Getting message type: " + deserializedObject.MessageType);
 
-            return p2.MessageType;
+            return deserializedObject.MessageType;
         }
     }
 }

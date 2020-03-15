@@ -1,3 +1,4 @@
+using Newtonsoft.Json;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
@@ -5,12 +6,12 @@ using UnityEngine;
 
 namespace RealityFlow.Plugin.Scripts
 {
-    [DataContract]
     public class FlowUser
     {
-        [DataMember]
+        [JsonProperty("Username")]
         public string Username { get; set; }
-        [DataMember]
+
+        [JsonProperty("Password")]
         public string Password { get; set; }
 
         public FlowUser(string username, string password)

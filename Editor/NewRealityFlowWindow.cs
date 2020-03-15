@@ -82,10 +82,10 @@ public class FlowNetworkManagerEditor : EditorWindow
         }
         if(testProject == null)
         {
-            testProject = new FlowProject("flowId", "description", 0, "projectName", new FlowTObject[]
+            testProject = new FlowProject("flowId", "description", 0, "projectName"/*, new FlowTObject[]
             {
                  testObject
-            });
+            }*/);
         }
 
         if(newObject == null)
@@ -93,7 +93,8 @@ public class FlowNetworkManagerEditor : EditorWindow
         if(newUser == null)
             newUser = new FlowUser("testUsername", "TestPassword");
 
-        Operations.ConnectToServer("ws://echo.websocket.org");
+        //Operations.ConnectToServer("ws://echo.websocket.org");
+        Operations.ConnectToServer("ws://localhost:8999/");
 
         InitTextures();
         //InitData();
@@ -129,11 +130,11 @@ public class FlowNetworkManagerEditor : EditorWindow
             System.IO.File.WriteAllText(@"C:\Users\Matthew Kurtz\Desktop\FlowTests\SentCommands\UserMessages\" + typeof(Logout_SendToServer).ToString() + ".json", MessageSerializer.ConvertToString(new Logout_SendToServer(testUser)));
 
             // Object messages
-            System.IO.File.WriteAllText(@"C:\Users\Matthew Kurtz\Desktop\FlowTests\SentCommands\ObjectMessages\" + typeof(CreateObject_SendToServer).ToString() + ".json", MessageSerializer.ConvertToString(new CreateObject_SendToServer(testObject, testUser, testProject.FlowId)));
+            System.IO.File.WriteAllText(@"C:\Users\Matthew Kurtz\Desktop\FlowTests\SentCommands\ObjectMessages\" + typeof(CreateObject_SendToServer).ToString() + ".json", MessageSerializer.ConvertToString(new CreateObject_SendToServer(testObject, /*testUser,*/ testProject.FlowId)));
 
-            System.IO.File.WriteAllText(@"C:\Users\Matthew Kurtz\Desktop\FlowTests\SentCommands\ObjectMessages\" + typeof(DeleteObject_SendToServer).ToString() + ".json", MessageSerializer.ConvertToString(new DeleteObject_SendToServer(testObject.FlowId)));
+            System.IO.File.WriteAllText(@"C:\Users\Matthew Kurtz\Desktop\FlowTests\SentCommands\ObjectMessages\" + typeof(DeleteObject_SendToServer).ToString() + ".json", MessageSerializer.ConvertToString(new DeleteObject_SendToServer(testObject, testProject.FlowId)));
 
-            System.IO.File.WriteAllText(@"C:\Users\Matthew Kurtz\Desktop\FlowTests\SentCommands\ObjectMessages\" + typeof(UpdateObject_SendToServer).ToString() + ".json", MessageSerializer.ConvertToString(new UpdateObject_SendToServer(testObject, testUser, testProject.FlowId)));
+            System.IO.File.WriteAllText(@"C:\Users\Matthew Kurtz\Desktop\FlowTests\SentCommands\ObjectMessages\" + typeof(UpdateObject_SendToServer).ToString() + ".json", MessageSerializer.ConvertToString(new UpdateObject_SendToServer(testObject, /*testUser,*/ testProject.FlowId)));
 
             System.IO.File.WriteAllText(@"C:\Users\Matthew Kurtz\Desktop\FlowTests\SentCommands\ObjectMessages\" + typeof(FinalizedUpdateObject_SendToServer).ToString() + ".json", MessageSerializer.ConvertToString(new FinalizedUpdateObject_SendToServer(testObject, testUser, testProject.FlowId)));
 
@@ -390,7 +391,7 @@ public class FlowNetworkManagerEditor : EditorWindow
             if(GUILayout.Button(FlowTObject.idToGameObjectMapping[FlowId].name, GUILayout.Height(30)))
             {
                 //TODO: make sure this deletes the object
-                Operations.DeleteObject(FlowId, (_, e) => Debug.Log(e.message));
+                //Operations.DeleteObject([FlowId], currentProject.FlowId, (_, e) => Debug.Log(e.message));
             }
         }
 
@@ -499,7 +500,7 @@ public class FlowNetworkManagerEditor : EditorWindow
             // Create "Create Project" Button and define onClick action
             if (GUILayout.Button("Create Project", GUILayout.Height(40)))
             {
-                currentProject = new FlowProject("GUID", "", 0, "", new List<FlowTObject>());
+                currentProject = new FlowProject("GUID", "", 0, ""/*, new List<FlowTObject>()*/);
                 // TODO: Generate guid
                 Operations.CreateProject(currentProject, currentUser, (_, e) =>
                 {
@@ -571,9 +572,9 @@ public class FlowNetworkManagerEditor : EditorWindow
     /// Sends a Delete event to the server to delete the desired game object
     /// </summary>
     /// <param name="objectToBeDeleted"></param>
-    public void DeleteObject(FlowTObject objectToBeDeleted)
+    public void DeleteObject(FlowTObject objectToBeDeleted, string projectId)
     {
-        Operations.DeleteObject(objectToBeDeleted.FlowId, (_, e) => { Debug.Log(e.message); });
+        Operations.DeleteObject(objectToBeDeleted, projectId, (_, e) => { Debug.Log(e.message); });
     }
 
     private void _CreateProjectImportView()

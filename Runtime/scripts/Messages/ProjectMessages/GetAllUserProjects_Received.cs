@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -10,13 +11,13 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.ProjectMessages
     /// <summary>
     /// Message format of a response from the server upon a request of a list of all projects that a user has
     /// </summary>
-    [DataContract]
     public class GetAllUserProjects_Received : ReceivedMessage
     {
-        [DataMember]
+        
         /// <summary>
         /// in the format of (ProjectId, Name)
         /// </summary>
+        [JsonProperty("ProjectList")]
         public Tuple<string, string>[] ProjectList { get; set; } 
 
         // Definition of event type (What gets sent to the subscribers

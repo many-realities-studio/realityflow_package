@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -11,10 +12,9 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages
     /// <summary>
     /// Received message format for pass/fail requests
     /// </summary>
-    [DataContract]
     public abstract class ConfirmationMessage_Received : ReceivedMessage
     {
-        [DataMember]
+        [JsonProperty("WasSuccessful")]
         public bool WasSuccessful { get; set; }
     }
 

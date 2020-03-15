@@ -14,6 +14,7 @@ namespace RealityFlow.Plugin.Tests
         const int messageTimeout = 3000; // Timeout for a response from the server in milliseconds
         FlowTObject testObject;
         FlowUser testUser;
+        FlowProject testProject;
 
         [OneTimeSetUp]
         public void Setup()
@@ -23,6 +24,7 @@ namespace RealityFlow.Plugin.Tests
 
             testObject = new FlowTObject(new Color(0, 0, 0), "FlowId", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "name");
             testUser = new FlowUser("user", "pass");
+            testProject = new FlowProject("FlowProjectId", "Description", 0, "TestProject");
         }
 
 
@@ -38,7 +40,7 @@ namespace RealityFlow.Plugin.Tests
 
             // Act (and assert)
             CreateObject_Received actual = null;
-            Operations.CreateObject(testObject, testUser, "projectId", (sender, e) =>
+            Operations.CreateObject(testObject, /*testUser,*/ "projectId", (sender, e) =>
             {
                 Debug.Log("Received message: " + e.message.ToString());
                 actual = e.message;
@@ -82,7 +84,7 @@ namespace RealityFlow.Plugin.Tests
 
             // Act (and assert)
             DeleteObject_Received actual = null;
-            Operations.DeleteObject(testObject.FlowId, (sender, e) =>
+            Operations.DeleteObject(testObject, testProject.FlowId, (sender, e) =>
             {
                 Debug.Log("Received message: " + e.message.ToString());
                 actual = e.message;

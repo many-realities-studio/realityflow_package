@@ -1,4 +1,5 @@
-﻿using RealityFlow.Plugin.Scripts;
+﻿using Newtonsoft.Json;
+using RealityFlow.Plugin.Scripts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,10 +13,9 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.ProjectMessages
     /// <summary>
     /// Open project received message format 
     /// </summary>
-    [DataContract]
     public class OpenProject_Received : ReceivedMessage
     {
-        [DataMember]
+        [JsonProperty("flowProject")]
         FlowProject flowProject { get; set; }
 
         // Definition of event type (What gets sent to the subscribers

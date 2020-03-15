@@ -1,4 +1,5 @@
-﻿using RealityFlow.Plugin.Scripts;
+﻿using Newtonsoft.Json;
+using RealityFlow.Plugin.Scripts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,10 +9,9 @@ using System.Threading.Tasks;
 
 namespace Packages.realityflow_package.Runtime.scripts.Messages.ObjectMessages
 {
-    [DataContract]
     public class DeleteObject_Received : ReceivedMessage
     {
-        [DataMember]
+        [JsonProperty("flowObject")]
         public FlowTObject DeletedObject { get; set; } // The deleted object
 
         // Definition of event type (What gets sent to the subscribers

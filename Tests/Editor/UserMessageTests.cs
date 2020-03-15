@@ -57,7 +57,7 @@ namespace RealityFlow.Plugin.Tests
             // Arrange
             AutoResetEvent autoResetEvent = new AutoResetEvent(false);
 
-            LoginUser_Received expected = new LoginUser_Received(null, true);
+            LoginUser_Received expected = new LoginUser_Received(true);
             expected.MessageType = "Login";
             expected.WasSuccessful = true;
 
@@ -82,7 +82,7 @@ namespace RealityFlow.Plugin.Tests
             // Arrange
             AutoResetEvent autoResetEvent = new AutoResetEvent(false);
 
-            LogoutUser_Received expected = new LogoutUser_Received(null, true);
+            LogoutUser_Received expected = new LogoutUser_Received(true);
             expected.WasSuccessful = true;
 
             // Act (and assert)

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -14,13 +15,12 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.UserMessages
     /// Handle parsing and relaying message information
     /// https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/event
     /// </summary>
-    [DataContract]
     public class LoginUser_Received : ConfirmationMessage_Received
     {
-        [DataMember]
         /// <summary>
         /// in the format of (ProjectId, Name)
         /// </summary>
+        [JsonProperty("ProjectList")]
         public Tuple<string, string>[] ProjectList { get; set; }
 
         // Definition of event type (What gets sent to the subscribers
@@ -29,9 +29,8 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.UserMessages
         // The object that handles publishing/subscribing
         private static LoginReceived_EventHandler _ReceivedEvent;
 
-        public LoginUser_Received(string message, bool wasSuccessful)
+        public LoginUser_Received(bool wasSuccessful)
         {
-            this.Message = message;
             this.MessageType = "Login";
             this.WasSuccessful = wasSuccessful;
         }
@@ -57,17 +56,10 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.UserMessages
         /// <param name="message">The message to be parsed</param>
         public static void ReceiveMessage(string message)
         {
-            DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(Login_SendToServer));
-
-            MemoryStream memoryStream = new MemoryStream(Encoding.UTF8.GetBytes(message));
-            //serializer.WriteObject(memoryStream, message);
-            memoryStream.Position = 0;
-
-            var p2 = (Login_SendToServer)serializer.ReadObject(memoryStream);
+            var p2 = MessageSerializer.DesearializeObject<LoginUser_Received>(message);
 
             Debug.Log("Message received: " + p2.ToString());
             //ConfirmationMessage_Received response = JsonUtility.FromJson<ConfirmationMessage_Received>(message);
-
             
             //response?.RaiseEvent();
         }

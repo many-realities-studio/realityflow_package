@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 
 namespace Packages.realityflow_package.Runtime.scripts.Messages.UserMessages
 {
-    [DataContract]
     public class LogoutUser_Received : ConfirmationMessage_Received
     {
         // Definition of event type (What gets sent to the subscribers
@@ -16,9 +15,8 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.UserMessages
         // The object that handles publishing/subscribing
         private static LogoutReceived_EventHandler _ReceivedEvent;
 
-        public LogoutUser_Received(string message, bool wasSuccessful)
+        public LogoutUser_Received(bool wasSuccessful)
         {
-            this.Message = message;
             this.MessageType = "Logout";
             this.WasSuccessful = wasSuccessful;
         }

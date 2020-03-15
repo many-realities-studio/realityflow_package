@@ -27,10 +27,10 @@ namespace RealityFlow.Plugin.Tests
             Operations.ConnectToServer(url);
 
             testObject = new FlowTObject(new Color(0, 0, 0), "FlowId", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "name");
-            testProject = new FlowProject("flowId", "description", 0, "projectName", new FlowTObject[]
+            testProject = new FlowProject("flowId", "description", 0, "projectName"/*, new FlowTObject[]
             {
                 testObject
-            });
+            }*/);
 
             testUser = new FlowUser("user", "pass");
         }
@@ -62,7 +62,7 @@ namespace RealityFlow.Plugin.Tests
         {
             // Arrange
             AutoResetEvent autoResetEvent = new AutoResetEvent(false);
-            DeleteProject_Received expected = new DeleteProject_Received(null, true);
+            DeleteProject_Received expected = new DeleteProject_Received(true);
 
             // Act (and assert)
             ConfirmationMessage_Received actual = null;

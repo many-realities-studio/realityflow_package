@@ -6,11 +6,10 @@ using Packages.realityflow_package.Runtime.scripts;
 using Packages.realityflow_package.Runtime.scripts.Managers;
 using System.Collections.Generic;
 using System;
+using Newtonsoft.Json;
 
 namespace RealityFlow.Plugin.Scripts
 {
-    [System.Serializable]
-    [DataContract]
     public class FlowTObject : FlowValue
     {
         public static Dictionary<string, GameObject> idToGameObjectMapping = new Dictionary<string, GameObject>();
@@ -41,7 +40,7 @@ namespace RealityFlow.Plugin.Scripts
         //[System.NonSerialized]
         //public Mesh mesh;
 
-        [DataMember]
+        [JsonProperty("Id")]
         public string FlowId { get; set; }
 
         private GameObject _AttachedGameObject = null;
@@ -72,67 +71,78 @@ namespace RealityFlow.Plugin.Scripts
 
 
         public Color Color; // Not serializable - look at old v1 code to find how
-        [DataMember]
+
+        [JsonProperty("X")]
         public float X
         {
             get => AttachedGameObject.transform.localPosition.x;
             set => AttachedGameObject.transform.localPosition = new Vector3(value, Y, Z);
         }
-        [DataMember]
+
+        [JsonProperty("Y")]
         public float Y
         {
             get => AttachedGameObject.transform.localPosition.y;
             set => AttachedGameObject.transform.localPosition = new Vector3(X, value, Z);
         }
-        [DataMember]
+
+        [JsonProperty("Z")]
         public float Z
         {
             get => AttachedGameObject.transform.localPosition.z;
             set => AttachedGameObject.transform.localPosition = new Vector3(X, Y, value);
         }
-        [DataMember]
+
+        [JsonProperty("Q_x")]
         public float Q_x
         {
             get => AttachedGameObject.transform.localRotation.x;
             set => AttachedGameObject.transform.localRotation = new Quaternion(value, Q_y, Q_z, Q_w);
         }
-        [DataMember]
+
+        [JsonProperty("Q_y")]
         public float Q_y
         {
             get => AttachedGameObject.transform.localRotation.y;
             set => AttachedGameObject.transform.localRotation = new Quaternion(Q_x, value, Q_z, Q_w);
         }
-        [DataMember]
+
+        [JsonProperty("Q_z")]
         public float Q_z
         {
             get => AttachedGameObject.transform.localRotation.z;
             set => AttachedGameObject.transform.localRotation = new Quaternion(Q_x, Q_y, value, Q_w);
         }
-        [DataMember]
+
+        [JsonProperty("Q_w")]
         public float Q_w
         {
             get => AttachedGameObject.transform.localRotation.w;
             set => AttachedGameObject.transform.localRotation = new Quaternion(Q_x, Q_y, Q_z, value);
         }
-        [DataMember]
+
+        [JsonProperty("S_x")]
         public float S_x
         {
             get => AttachedGameObject.transform.localScale.x;
             set => AttachedGameObject.transform.localScale = new Vector3(value, S_y, S_z);
         }
-        [DataMember]
+
+        [JsonProperty("S_y")]
         public float S_y
         {
             get => AttachedGameObject.transform.localScale.y;
             set => AttachedGameObject.transform.localScale = new Vector3(S_x, value, S_z);
         }
-        [DataMember]
+
+        [JsonProperty("S_z")]
         public float S_z
         {
             get => AttachedGameObject.transform.localScale.z;
             set => AttachedGameObject.transform.localScale = new Vector3(S_x, S_y, value);
         }
-        [DataMember]
+
+        [JsonProperty("Name")]
         public string Name { get; set; }
 
         public Vector3 Position
