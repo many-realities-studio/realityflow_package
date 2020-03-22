@@ -20,8 +20,7 @@ namespace Packages.realityflow_package.Runtime.scripts
     /// </summary>
     public static class Operations
     {
-        private static FlowWebsocket _flowWebsocket;
-        public static FlowWebsocket FlowWebsocket { get => _flowWebsocket; }
+        public static FlowWebsocket FlowWebsocket { get; private set; }
 
         static Operations()
         {
@@ -55,15 +54,17 @@ namespace Packages.realityflow_package.Runtime.scripts
             Login_SendToServer loginMessage = new Login_SendToServer(flowUser);
             FlowWebsocket.SendMessage(loginMessage);
 
+            ConfigurationSingleton.CurrentUser = flowUser;
+
             LoginUser_Received.ReceivedEvent += callbackFunction;
         }
         
         public static void Logout(FlowUser flowUser, LogoutUser_Received.LogoutReceived_EventHandler callbackFunction)
         {
-            Logout_SendToServer logoutMessage = new Logout_SendToServer(flowUser);
-            FlowWebsocket.SendMessage(logoutMessage);
+            //Logout_SendToServer logoutMessage = new Logout_SendToServer(flowUser);
+            //FlowWebsocket.SendMessage(logoutMessage);
 
-            LogoutUser_Received.ReceivedEvent += callbackFunction;
+            //LogoutUser_Received.ReceivedEvent += callbackFunction;
         }
 
         public static void Register(string username, string password, RegisterUser_Received.RegisterUserReceived_EventHandler callbackFunction)
@@ -96,15 +97,15 @@ namespace Packages.realityflow_package.Runtime.scripts
 
         public static void FinalizedUpdateObject(FlowTObject flowObject, FlowUser flowUser, string projectId, FinalizedUpdateObject_Received.OpenProjectReceived_EventHandler callbackFunction)
         {
-            FinalizedUpdateObject_SendToServer finalUpdateObject = new FinalizedUpdateObject_SendToServer(flowObject, flowUser, projectId);
+            FinalizedUpdateObject_SendToServer finalUpdateObject = new FinalizedUpdateObject_SendToServer(flowObject, projectId);
             FlowWebsocket.SendMessage(finalUpdateObject);
 
             FinalizedUpdateObject_Received.ReceivedEvent += callbackFunction;
         }
 
-        public static void DeleteObject(FlowTObject objectToDelete, string projectId, DeleteObject_Received.DeleteObjectReceived_EventHandler callbackFunction)
+        public static void DeleteObject(string idOfObjectToDelete, string projectId, DeleteObject_Received.DeleteObjectReceived_EventHandler callbackFunction)
         {
-            DeleteObject_SendToServer deleteObject = new DeleteObject_SendToServer(objectToDelete, projectId);
+            DeleteObject_SendToServer deleteObject = new DeleteObject_SendToServer(projectId, idOfObjectToDelete);
             FlowWebsocket.SendMessage(deleteObject);
 
             DeleteObject_Received.ReceivedEvent += callbackFunction;
@@ -133,7 +134,7 @@ namespace Packages.realityflow_package.Runtime.scripts
         {
             OpenProject_SendToServer openProject = new OpenProject_SendToServer(projectId, flowUser);
             FlowWebsocket.SendMessage(openProject);
-
+            
             OpenProject_Received.ReceivedEvent += callbackFunction;
         }
 
@@ -165,7 +166,7 @@ namespace Packages.realityflow_package.Runtime.scripts
         /// <param name="url"></param>
         public static void ConnectToServer(string url)
         {
-            _flowWebsocket = new FlowWebsocket(url);
+            FlowWebsocket = new FlowWebsocket(url);
         }
 
         //public delegate void functionCalledOnUpdate();
@@ -188,7 +189,7 @@ namespace Packages.realityflow_package.Runtime.scripts
             private static void _DeleteObject(object sender, DeleteObjectMessageEventArgs eventArgs)
             {
                 // Delete object in unity
-                NewObjectManager.DestroyObject(eventArgs.message.DeletedObject.FlowId);
+                NewObjectManager.DestroyObject(eventArgs.message.DeletedObject.Id);
             }
 
             private static void _UpdateObject(object sender, UpdateObjectMessageEventArgs eventArgs)
@@ -222,7 +223,7 @@ namespace Packages.realityflow_package.Runtime.scripts
 
             private static void _OpenProject(object sender, OpenProjectMessageEventArgs eventArgs)
             {
-                
+                ConfigurationSingleton.CurrentProject = eventArgs.message.flowProject;
             }
 
             #endregion Project messages received
@@ -235,7 +236,7 @@ namespace Packages.realityflow_package.Runtime.scripts
             #endregion Room messages received
 
             #region User messages received
-            private static void _LoginUser(object sender, ConfirmationMessageEventArgs eventArgs)
+            private static void _LoginUser(object sender, LoginUserMessageEventArgs eventArgs)
             {
                 
             }
