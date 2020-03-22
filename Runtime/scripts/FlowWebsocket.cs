@@ -23,7 +23,7 @@ namespace Packages.realityflow_package.Runtime.scripts
     /// a message is received over a websocket connection)
     /// </summary>
     [ExecuteAlways]
-    public class FlowWebsocket : MonoBehaviour
+    public class FlowWebsocket
     {
         /// <summary>
         /// A message parser is the part of the program that interprets and brings

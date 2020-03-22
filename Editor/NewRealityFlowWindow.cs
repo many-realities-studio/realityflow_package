@@ -13,6 +13,8 @@ using Packages.realityflow_package.Runtime.scripts.Messages.ObjectMessages;
 using Packages.realityflow_package.Runtime.scripts.Messages.UserMessages;
 using Packages.realityflow_package.Runtime.scripts.Messages.ProjectMessages;
 using Packages.realityflow_package.Runtime.scripts.Messages.RoomMessages;
+using Behaviours;
+
 
 [CustomEditor(typeof(FlowWebsocket))]
 public class FlowNetworkManagerEditor : EditorWindow
@@ -41,6 +43,7 @@ public class FlowNetworkManagerEditor : EditorWindow
 
     public static FlowUser currentUser = null;
     public static FlowProject currentProject = null;
+        
 
     enum EWindowView
     {
@@ -72,29 +75,29 @@ public class FlowNetworkManagerEditor : EditorWindow
     /// </summary>
     private void OnEnable()
     {
-        if(testObject == null)
+        if (testObject == null)
         {
-             testObject= new FlowTObject(new Color(0, 0, 0), "FlowId", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "name");
+            testObject = new FlowTObject(new Color(0, 0, 0), "FlowId", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "name");
         }
         if (testUser == null)
         {
-             testUser = new FlowUser("user", "pass"); ;
+            testUser = new FlowUser("user", "pass"); ;
         }
-        if(testProject == null)
+        if (testProject == null)
         {
             testProject = new FlowProject("flowId", "description", 0, "projectName"/*, new FlowTObject[]
-            {
-                 testObject
-            }*/);
+        {
+                testObject
+        }*/);
         }
 
-        if(newObject == null)
+        if (newObject == null)
             newObject = new FlowTObject(new Color(0, 0, 0, 0), "TestFlowId", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "TestObject");
-        if(newUser == null)
+        if (newUser == null)
             newUser = new FlowUser("testUsername", "TestPassword");
 
-        //Operations.ConnectToServer("ws://echo.websocket.org");
-        Operations.ConnectToServer("ws://localhost:8999/");
+        Operations.ConnectToServer("ws://echo.websocket.org");
+        //Operations.ConnectToServer("ws://localhost:8999/");
 
         InitTextures();
         //InitData();
@@ -117,13 +120,13 @@ public class FlowNetworkManagerEditor : EditorWindow
         {
             //GameObject go = GameObject.CreatePrimitive(PrimitiveType.Capsule);
 
-            if(newUser == null)
+            if (newUser == null)
             {
                 newUser = new FlowUser("user", "pass");
             }
 
             // User messages
-            System.IO.File.WriteAllText(@"C:\Users\Matthew Kurtz\Desktop\FlowTests\SentCommands\UserMessages\" + typeof(Login_SendToServer).ToString() + ".json", MessageSerializer.ConvertToString( new Login_SendToServer(testUser)));
+            System.IO.File.WriteAllText(@"C:\Users\Matthew Kurtz\Desktop\FlowTests\SentCommands\UserMessages\" + typeof(Login_SendToServer).ToString() + ".json", MessageSerializer.ConvertToString(new Login_SendToServer(testUser)));
 
             System.IO.File.WriteAllText(@"C:\Users\Matthew Kurtz\Desktop\FlowTests\SentCommands\UserMessages\" + typeof(RegisterUser_SendToServer).ToString() + ".json", MessageSerializer.ConvertToString(new RegisterUser_SendToServer(testUser)));
 
@@ -213,7 +216,7 @@ public class FlowNetworkManagerEditor : EditorWindow
 
     public void Update()
     {
-        Unity.EditorCoroutines.Editor.EditorCoroutineUtility.StartCoroutine (Operations.FlowWebsocket.ReceiveMessage(), Operations.FlowWebsocket);
+        Unity.EditorCoroutines.Editor.EditorCoroutineUtility.StartCoroutine(Operations.FlowWebsocket.ReceiveMessage(), Operations.FlowWebsocket);
     }
 
     // Initializes the texture2d values
@@ -270,6 +273,50 @@ public class FlowNetworkManagerEditor : EditorWindow
         pWord = EditorGUILayout.PasswordField(pWord);
         EditorGUILayout.EndHorizontal();
 
+
+        if (GUILayout.Button("Create Behaviour", GUILayout.Height(40)))
+        {
+            currentUser = new FlowUser(uName, pWord);
+            string projectId = "1h23u-23jnr-24nrk";
+            string objectId = "jn23-32n4-njrf8-kj";
+
+            FlowBehaviour b = new FlowBehaviour("teleport", "", "jn23-32n4-njrf8-kj", "ewiu3-44", null);
+
+
+            Operations.CreateBehaviour(b, currentUser, projectId, objectId, (_, e) =>
+            {
+
+                if (e.message.flowBehaviour != null)
+                {
+                    Debug.Log(e.message);
+
+
+                }
+                else
+                {
+                    currentProject = null;
+                // TODO: display to the user that create project failed
+            }
+            });
+
+        }
+
+        // Create "New Project" Button and define onClick action
+        if (GUILayout.Button("Start Behaviour", GUILayout.Height(40)))
+        {
+            if(BehaviourEventManager.blist.Count > 0)
+            {
+                Debug.Log("Event inside");
+                BehaviourEventManager.blist[0].EventTrigger();
+            }
+            
+
+
+        }
+       
+
+
+
         // Create "Log in" Button and define onClick action
         if (GUILayout.Button("Log in", GUILayout.Height(40)))
         {
@@ -285,8 +332,8 @@ public class FlowNetworkManagerEditor : EditorWindow
                 else
                 {
                     currentUser = null;
-                    // TODO: Display that login failed
-                }
+                // TODO: Display that login failed
+            }
             });
         }
 
@@ -311,7 +358,7 @@ public class FlowNetworkManagerEditor : EditorWindow
         if (GUILayout.Button("Logout", GUILayout.Height(20)))
         {
             // Send logout event to the server
-            if(currentUser != null)
+            if (currentUser != null)
             {
                 Operations.Logout(currentUser, (sender, e) => { Debug.Log(e.message); });
             }
@@ -386,9 +433,9 @@ public class FlowNetworkManagerEditor : EditorWindow
         EditorGUILayout.EndHorizontal();
         Dictionary<string, GameObject>.KeyCollection gameObjectList = FlowTObject.idToGameObjectMapping.Keys;
 
-        foreach(string FlowId in gameObjectList)
+        foreach (string FlowId in gameObjectList)
         {
-            if(GUILayout.Button(FlowTObject.idToGameObjectMapping[FlowId].name, GUILayout.Height(30)))
+            if (GUILayout.Button(FlowTObject.idToGameObjectMapping[FlowId].name, GUILayout.Height(30)))
             {
                 //TODO: make sure this deletes the object
                 //Operations.DeleteObject([FlowId], currentProject.FlowId, (_, e) => Debug.Log(e.message));
@@ -415,7 +462,7 @@ public class FlowNetworkManagerEditor : EditorWindow
     private bool _RefreshProjectList = true;
     private void _CreateLoadProjectView()
     {
-        if(_RefreshProjectList == true)
+        if (_RefreshProjectList == true)
         {
             Operations.GetAllUserProjects(currentUser, (_, e) =>
             {
@@ -435,7 +482,7 @@ public class FlowNetworkManagerEditor : EditorWindow
         }
         EditorGUILayout.EndHorizontal();
 
-        if(_ProjectList != null)
+        if (_ProjectList != null)
         {
             foreach (Tuple<string, string> project in _ProjectList)
             {
@@ -504,7 +551,7 @@ public class FlowNetworkManagerEditor : EditorWindow
                 // TODO: Generate guid
                 Operations.CreateProject(currentProject, currentUser, (_, e) =>
                 {
-                    if(e.message.WasSuccessful == true)
+                    if (e.message.WasSuccessful == true)
                     {
                         window = EWindowView.PROJECT_HUB;
                         Debug.Log(e.message);
@@ -512,8 +559,8 @@ public class FlowNetworkManagerEditor : EditorWindow
                     else
                     {
                         currentProject = null;
-                        // TODO: display to the user that create project failed
-                    }
+                    // TODO: display to the user that create project failed
+                }
                 });
                 //// Send ProjectCreate event to the server
                 //ProjectCreateEvent create = new ProjectCreateEvent();
@@ -605,3 +652,4 @@ public class FlowNetworkManagerEditor : EditorWindow
         reader.Close();
     }
 }
+

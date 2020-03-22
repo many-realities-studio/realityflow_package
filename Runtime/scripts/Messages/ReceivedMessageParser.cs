@@ -14,6 +14,7 @@ using UnityEngine;
 using Packages.realityflow_package.Runtime.scripts.Messages.ObjectMessages;
 using Packages.realityflow_package.Runtime.scripts.Messages.ProjectMessages;
 using Packages.realityflow_package.Runtime.scripts.Messages.RoomMessages;
+using Packages.realityflow_package.Runtime.scripts.Messages.BehaviourMessages;
 
 namespace Packages.realityflow_package.Runtime.scripts
 {
@@ -48,8 +49,13 @@ namespace Packages.realityflow_package.Runtime.scripts
 
             // User Messages
             messageRouter.Add("LoginUser", LoginUser_Received.ReceiveMessage);
-            messageRouter.Add("LogoutU*ser", LogoutUser_Received.ReceiveMessage);
+            messageRouter.Add("LogoutUser", LogoutUser_Received.ReceiveMessage);
             messageRouter.Add("CreateUser", RegisterUser_Received.ReceiveMessage);
+
+            // Behaviour Messages
+            messageRouter.Add("CreateBehaviour", CreateBehaviour_Received.ReceiveMessage);
+
+            
         }
 
         /// <summary>

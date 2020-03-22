@@ -4,7 +4,14 @@ using Packages.realityflow_package.Runtime.scripts.Messages.ObjectMessages;
 using Packages.realityflow_package.Runtime.scripts.Messages.ProjectMessages;
 using Packages.realityflow_package.Runtime.scripts.Messages.RoomMessages;
 using Packages.realityflow_package.Runtime.scripts.Messages.UserMessages;
+using Packages.realityflow_package.Runtime.scripts.Messages.BehaviourMessages;
 using RealityFlow.Plugin.Scripts;
+using Behaviours;
+using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEditor;
+using UnityEngine.UIElements;
+
 //using RealityFlow.Plugin.Scripts.Events;
 using System;
 using System.Collections.Generic;
@@ -46,6 +53,10 @@ namespace Packages.realityflow_package.Runtime.scripts
             LoginUser_Received.ReceivedEvent += _LoginUser;
             LogoutUser_Received.ReceivedEvent += _LogoutUser;
             RegisterUser_Received.ReceivedEvent += _RegisterUser;
+
+            CreateBehaviour_Received.ReceivedEvent += _CreateBehaviour;
+            // Set up Behaviour updates
+
         }
 
         #region UserOperations
@@ -111,6 +122,19 @@ namespace Packages.realityflow_package.Runtime.scripts
         }
 
         #endregion // ObjectOperations
+        #region BehaviourOperations
+
+        public static void CreateBehaviour(FlowBehaviour behaviour, FlowUser flowUser, string projectId, string objectId, CreateBehaviour_Received.CreateBehaviourReceived_EventHandler callbackFunction)
+        {
+            CreateBehaviour_SendToServer createBehaviour = new CreateBehaviour_SendToServer(behaviour, flowUser, projectId, objectId);
+            FlowWebsocket.SendMessage(createBehaviour);
+
+            CreateBehaviour_Received.ReceivedEvent += callbackFunction;
+        }
+
+        #endregion
+
+
 
         #region ProjectOperations
         public static void CreateProject(FlowProject flowProject, FlowUser flowUser, CreateProject_Received.CreateProjectReceived_EventHandler callbackFunction)
@@ -182,7 +206,7 @@ namespace Packages.realityflow_package.Runtime.scripts
 
             private static void _CreateObject(object sender, CreateObjectMessageEventArgs eventArgs)
             {
-
+                
             }
 
             private static void _DeleteObject(object sender, DeleteObjectMessageEventArgs eventArgs)
@@ -201,11 +225,73 @@ namespace Packages.realityflow_package.Runtime.scripts
 
             }
 
-            #endregion Object messages received 
+        #endregion Object messages received 
 
-            #region Project messages received
+        #region Behaviour messages received
+        private static void _CreateBehaviour(object sender, CreateBehaviourEventArgs eventArgs)
+        {
+            // this is where things happen after a createBehaviour  message is received
 
-            private static void _CreateProject(object sender, ConfirmationMessageEventArgs eventArgs)
+             BehaviourEventManager bem = UnityEngine.Object.FindObjectOfType<EventSystem>().GetComponent<BehaviourEventManager>();
+            //
+
+            // attach the bem to the event system if not already on
+
+
+
+            GameObject go1 = GameObject.FindGameObjectWithTag("Cubey");
+            Debug.Log(go1);
+            GameObject go2 = GameObject.FindGameObjectWithTag("Sphere");
+            Debug.Log(go2);
+
+            TeleportCoordinates tc = go2.GetComponent<TeleportCoordinates>();
+            if (tc == null)
+                tc = go2.AddComponent<TeleportCoordinates>();
+
+            tc.SetCoordinates(go2.transform.position);
+
+           
+            Guid g1 = bem.MakeObjectInteractable(go1);
+            Guid g2 = bem.MakeObjectInteractable(go2);
+
+
+            BehaviourEvent b = bem.CreateNewBehaviourEvent("Teleport", g1, g2, null);
+            //b.CallBehaviourEvent();
+
+            GameObject go = GameObject.FindGameObjectWithTag("other");
+            Debug.Log(go);
+
+            Guid goi = bem.MakeObjectInteractable(go);
+            BehaviourEvent t = bem.CreateNewBehaviourEvent("Click", goi, goi, b);
+
+            BehaviourEventManager.blist.Add(t);
+
+
+            Debug.Log("hola");
+            /*
+            Transform[] transforms = Selection.GetTransforms(SelectionMode.Deep |
+             SelectionMode.ExcludePrefab | SelectionMode.Editable);
+
+            string placeOnSurfaceDialogDecisionKey = "Example.PlaceOnSurfaceDecision";
+            if (
+                EditorUtility.DisplayDialog("Start behavior?",
+                    "Teleport to Cube", "ok", "no"))
+            {
+                Debug.Log(b);
+                Debug.Log("THE SECOND OBJECT");
+                Debug.Log(b.secondObject);
+                t.EventTrigger();
+            }
+            */
+
+        }
+
+
+        #endregion
+
+        #region Project messages received
+
+        private static void _CreateProject(object sender, ConfirmationMessageEventArgs eventArgs)
             {
                 
             }
