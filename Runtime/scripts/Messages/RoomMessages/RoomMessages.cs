@@ -24,6 +24,7 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.RoomMessages
         {
             this.projectId = projectId;
             this.flowUser = flowUser;
+            this.MessageType = "JoinRoom";
         }
     }
 }

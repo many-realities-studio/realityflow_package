@@ -17,7 +17,7 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.UserMessages
 
         public LogoutUser_Received(bool wasSuccessful)
         {
-            this.MessageType = "Logout";
+            this.MessageType = "LogoutUser";
             this.WasSuccessful = wasSuccessful;
         }
 
@@ -42,7 +42,7 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.UserMessages
         /// <param name="message">The message to be parsed</param>
         public static void ReceiveMessage(string message)
         {
-            ConfirmationMessage_Received response = UnityEngine.JsonUtility.FromJson<ConfirmationMessage_Received>(message);
+            LogoutUser_Received response = MessageSerializer.DesearializeObject<LogoutUser_Received>(message);
             response.RaiseEvent();
         }
 

@@ -12,38 +12,14 @@ namespace RealityFlow.Plugin.Scripts
 {
     public class FlowTObject : FlowValue
     {
-        public static Dictionary<string, GameObject> idToGameObjectMapping = new Dictionary<string, GameObject>();
-        //public int[] Triangles;
-        //private string flowId;
-        //private float _x;
-        //private float _y;
-        //private float _z;
-        //private float _q_x;
-        //private float _q_y;
-        //private float _q_z;
-        //private float _q_w;
-        //private float _s_x;
-        //private float _s_y;
-        //private float _s_z;
-        //private string name;
-        //public Vector2[] Uv;
-        //public byte[] Texture;
-        //public int TextureHeight;
-        //public int TextureWidth;
-        //public int TextureFormat;
-        //public int MipmapCount;
-
-        //[System.NonSerialized]
-        //public static int idCount = 0;
-        //[System.NonSerialized]
-        //public Transform transform;
-        //[System.NonSerialized]
-        //public Mesh mesh;
+        public static Dictionary<string, FlowTObject> idToGameObjectMapping = new Dictionary<string, FlowTObject>();
 
         [JsonProperty("Id")]
-        public string FlowId { get; set; }
+        public string Id { get; set; } = Guid.NewGuid().ToString();
 
+        [JsonIgnore]
         private GameObject _AttachedGameObject = null;
+        [JsonIgnore]
         public GameObject AttachedGameObject
         {
             get
@@ -51,9 +27,9 @@ namespace RealityFlow.Plugin.Scripts
                 if (_AttachedGameObject == null)
                 {
                     // The game object already exists
-                    if (idToGameObjectMapping.ContainsKey(FlowId))
+                    if (idToGameObjectMapping.ContainsKey(Id))
                     {
-                        _AttachedGameObject = idToGameObjectMapping[FlowId];
+                        _AttachedGameObject = idToGameObjectMapping[Id]._AttachedGameObject;
                     }
 
                     // The game object doesn't exist, but it should by this point 
@@ -63,19 +39,30 @@ namespace RealityFlow.Plugin.Scripts
                         _AttachedGameObject = new GameObject();
                     }
                 }
-
                 return _AttachedGameObject;
             }
             set { _AttachedGameObject = value; }
         }
 
-
-        public Color Color; // Not serializable - look at old v1 code to find how
+        private Color _ObjectColor;
+        [JsonIgnore]
+        public Color ObjectColor
+        {
+            get => _ObjectColor;
+            set
+            {
+                _ObjectColor = new Color(value.r, value.g, value.b, value.a);
+                R = value.r;
+                G = value.g;
+                B = value.b;
+                A = value.a;
+            }
+        } 
 
         [JsonProperty("X")]
         public float X
         {
-            get => AttachedGameObject.transform.localPosition.x;
+            get => AttachedGameObject.transform.localPosition.x; 
             set => AttachedGameObject.transform.localPosition = new Vector3(value, Y, Z);
         }
 
@@ -142,9 +129,58 @@ namespace RealityFlow.Plugin.Scripts
             set => AttachedGameObject.transform.localScale = new Vector3(S_x, S_y, value);
         }
 
+        [JsonProperty("R")]
+        public float R
+        {
+            get => ObjectColor.r;
+            set
+            {
+                if (_ObjectColor == null)
+                    _ObjectColor = new Color();
+                _ObjectColor.r = value;
+            }
+        }
+
+        [JsonProperty("G")]
+        public float G
+        {
+            get => ObjectColor.g;
+            set
+            {
+                if (_ObjectColor == null)
+                    _ObjectColor = new Color();
+                _ObjectColor.g = value;
+            }
+        }
+
+        [JsonProperty("B")]
+        public float B
+        {
+            get => ObjectColor.b;
+            set
+            {
+                if (_ObjectColor == null)
+                    _ObjectColor = new Color();
+                _ObjectColor.b = value;
+            }
+        }
+
+        [JsonProperty("A")]
+        public float A
+        {
+            get => ObjectColor.a;
+            set
+            {
+                if (_ObjectColor == null)
+                    _ObjectColor = new Color();
+                _ObjectColor.a = value;
+            }
+        }
+
         [JsonProperty("Name")]
         public string Name { get; set; }
 
+        [JsonIgnore]
         public Vector3 Position
         {
             get => new Vector3(X, Y, Z);
@@ -155,6 +191,7 @@ namespace RealityFlow.Plugin.Scripts
                 Z = value.z;
             }
         }
+        [JsonIgnore]
         public Vector3 Scale
         {
             get => new Vector3(S_x, S_y, S_z);
@@ -165,14 +202,25 @@ namespace RealityFlow.Plugin.Scripts
                 S_z = value.z;
             }
         }
-        public Quaternion Rotation { get; set; }
 
-        #region Static functions
+        [JsonIgnore]
+        public Quaternion Rotation
+        {
+            get => new Quaternion(Q_x, Q_y, Q_z, Q_w);
+            set
+            {
+                Q_x = value.x;
+                Q_y = value.y;
+                Q_z = value.z;
+                Q_w = value.w;
+            }
+        }
+
         public static void DestroyObject(string idOfObjectToDestroy)
         {
             try
             {
-                GameObject objectToDestroy = idToGameObjectMapping[idOfObjectToDestroy];
+                GameObject objectToDestroy = idToGameObjectMapping[idOfObjectToDestroy].AttachedGameObject;
                 idToGameObjectMapping.Remove(idOfObjectToDestroy);
                 UnityEngine.Object.Destroy(objectToDestroy);
             }
@@ -182,53 +230,57 @@ namespace RealityFlow.Plugin.Scripts
             }
         }
 
-        public static GameObject CreateObjectInUnity(string FlowId, string name)
-        {
-            GameObject newGameObject = new GameObject(name);
-            idToGameObjectMapping.Add(FlowId, newGameObject);
+        //private void OnValidate()
+        //{
+        //   Transform t;
+        //   this.TryGetComponent<Transform>(out t);
+           
+        //    if(t.hasChanged == true)
+        //    {
+        //        Position = t.position;
+        //        Rotation = t.rotation;
+        //        Scale = t.localScale;
+        //    }
 
-            return newGameObject;
+        //    Operations.UpdateObject(this, ConfigurationSingleton.CurrentUser, ConfigurationSingleton.CurrentProject.Id, (_, e) => Debug.Log("Update object received"));
+        //}
+
+        public FlowTObject(string name, Vector3 position, Quaternion rotation, Vector3 scale, Color color)
+        {
+            this.Name = name;
+            this.Position = position;
+            this.Rotation = rotation;
+            this.Scale = scale;
+            this.ObjectColor = color;
+
+            idToGameObjectMapping.Add(Id, this);
+            AttachedGameObject.transform.hasChanged = false;
+            AttachedGameObject.name = name;
         }
 
-        #endregion // Static functions
-
-        public FlowTObject() { }
-
-        public FlowTObject(Color color, string flowId, float x, float y, float z, float q_x, float q_y, float q_z, float q_w, float s_x, float s_y, float s_z, string name)
+        [JsonConstructor]
+        public FlowTObject(string id, float x, float y, float z, float q_x, float q_y, float q_z, float q_w, float s_x, float s_y, float s_z, float r, float g, float b, float a, string name)
         {
-            try
-            {
-                FlowId = flowId;
-                AttachedGameObject = CreateObjectInUnity(flowId, name);
-                Color = color;
-                X = x;
-                Y = y;
-                Z = z;
-                Q_x = q_x;
-                Q_y = q_y;
-                Q_z = q_z;
-                Q_w = q_w;
-                S_x = s_x;
-                S_y = s_y;
-                S_z = s_z;
+            Id = id;
+            X = x;
+            Y = y;
+            Z = z;
+            Q_x = q_x;
+            Q_y = q_y;
+            Q_z = q_z;
+            Q_w = q_w;
+            S_x = s_x;
+            S_y = s_y;
+            S_z = s_z;
+            R = r;
+            G = g;
+            B = b;
+            A = a;
+            Name = name;
 
-                //_x = x;
-                //_y = y;
-                //_z = z;
-                //_q_x = q_x;
-                //_q_y = q_y;
-                //_q_z = q_z;
-                //_q_w = q_w;
-                //_s_x = s_x;
-                //_s_y = s_y;
-                //_s_z = s_z;
-                Name = name;
-            }
-            catch (System.Exception e)
-            {
-                Debug.LogError(e.ToString());
-                UnityEngine.Object.Destroy(AttachedGameObject);
-            }
+            idToGameObjectMapping.Add(Id, this);
+            AttachedGameObject.transform.hasChanged = false;
+            AttachedGameObject.name = name;
         }
 
         /// <summary>

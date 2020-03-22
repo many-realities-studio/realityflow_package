@@ -25,6 +25,7 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.ProjectMessages
         {
             this.flowProject = flowProject;
             this.flowUser = flowUser;
+            this.MessageType = "CreateProject";
         }
     }
 
@@ -44,6 +45,7 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.ProjectMessages
         {
             this.flowProject = flowProject;
             this.flowUser = flowUser;
+            this.MessageType = "DeleteProject";
         }
     }
 
@@ -53,7 +55,7 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.ProjectMessages
     /// </summary>
     public class OpenProject_SendToServer : BaseMessage
     {
-        [JsonProperty("")]
+        [JsonProperty("ProjectId")]
         string projectId { get; set; }
 
         [JsonProperty("FlowUser")]
@@ -63,6 +65,7 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.ProjectMessages
         {
             this.projectId = projectId;
             this.flowUser = flowUser;
+            this.MessageType = "OpenProject";
         }
     }
 
@@ -78,6 +81,7 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.ProjectMessages
         public GetAllUserProjects_SendToServer(FlowUser flowUser)
         {
             this.flowUser = flowUser;
+            this.MessageType = "FetchProjects";
         }
     }
 }

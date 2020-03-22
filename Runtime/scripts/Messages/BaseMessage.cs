@@ -18,5 +18,8 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages
 
         [JsonProperty("MessageType")]
         public string MessageType { get; set; } // Type of message being sent
+
+        //[JsonProperty("Message")]
+        //public string Message { get; set; }
     }
 }

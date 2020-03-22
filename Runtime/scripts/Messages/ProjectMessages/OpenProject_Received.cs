@@ -13,10 +13,10 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.ProjectMessages
     /// <summary>
     /// Open project received message format 
     /// </summary>
-    public class OpenProject_Received : ReceivedMessage
+    public class OpenProject_Received : ConfirmationMessage_Received
     {
-        [JsonProperty("flowProject")]
-        FlowProject flowProject { get; set; }
+        [JsonProperty("FlowProject")]
+        public FlowProject flowProject { get; set; }
 
         // Definition of event type (What gets sent to the subscribers
         public delegate void OpenProjectReceived_EventHandler(object sender, OpenProjectMessageEventArgs eventArgs);
@@ -27,6 +27,7 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.ProjectMessages
         public OpenProject_Received(FlowProject flowProject)
         {
             this.flowProject = flowProject;
+            this.MessageType = "OpenProject";
         }
 
         public static event OpenProjectReceived_EventHandler ReceivedEvent
@@ -50,7 +51,7 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.ProjectMessages
         /// <param name="message">The message to be parsed</param>
         public static void ReceiveMessage(string message)
         {
-            OpenProject_Received response = JsonUtility.FromJson<OpenProject_Received>(message);
+            OpenProject_Received response = MessageSerializer.DesearializeObject<OpenProject_Received>(message);
             response.RaiseEvent();
         }
 

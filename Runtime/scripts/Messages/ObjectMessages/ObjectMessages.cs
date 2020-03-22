@@ -14,7 +14,7 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.ObjectMessages
     /// </summary>
     public class CreateObject_SendToServer : BaseMessage
     {
-        [JsonProperty("flowObject")]
+        [JsonProperty("FlowObject")]
         public FlowTObject flowObject { get; set; }
 
         //[JsonProperty("")]
@@ -59,17 +59,16 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.ObjectMessages
     /// </summary>
     public class DeleteObject_SendToServer : BaseMessage
     {
-        [JsonProperty("flowObject")]
-        public FlowTObject FlowObjectToDelete { get; set; } // Id of the deleted object
+        [JsonProperty("ObjectId")]
+        public string ObjectId { get; set; } // Id of the deleted object
 
         [JsonProperty("ProjectId")]
         public string ProjectId { get; set; }
 
-        public DeleteObject_SendToServer(FlowTObject flowObjectToDelete, string projectId)
+        public DeleteObject_SendToServer(string projectId, string objectId)
         {
-            FlowObjectToDelete = flowObjectToDelete;
             ProjectId = projectId;
-
+            this.ObjectId = ObjectId;
             this.MessageType = "DeleteObject";
         }
     }
@@ -82,16 +81,12 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.ObjectMessages
         [JsonProperty("flowObject")]
         public FlowTObject flowObject { get; set; }
 
-        [JsonProperty("flowUser")]
-        public FlowUser flowUser { get; set; }
-
         [JsonProperty("projectId")]
         public string projectId { get; set; }
 
-        public FinalizedUpdateObject_SendToServer(FlowTObject flowObject, FlowUser flowUser, string projectId)
+        public FinalizedUpdateObject_SendToServer(FlowTObject flowObject, string projectId)
         {
             this.flowObject = flowObject;
-            this.flowUser = flowUser;
             this.projectId = projectId;
 
             this.MessageType = "FinalizedUpdateObject";
