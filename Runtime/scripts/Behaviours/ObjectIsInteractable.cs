@@ -22,6 +22,8 @@ namespace Behaviours
 
         private Guid objectId;
 
+
+
         #region Monobehaviour Methods
 
         /// <summary>
@@ -35,20 +37,18 @@ namespace Behaviours
         /// <summary>
         /// Initializes private variables
         /// </summary>
-        public void Start()
+        public void Awake()
         {
             objectId = Guid.NewGuid();
             interactableWith = new Dictionary<Guid, bool>();
             interactableEvents = new Dictionary<BehaviourEvent, string>();
-            interactableScript = new Interactable();
+            interactableScript = gameObject.AddComponent<Interactable>();
 
+            //interactableScript.Profiles[0].Target = gameObject;
+            //interactableScript.Profiles[0].Themes.Add(new Theme());
             interactableScript.IsEnabled = true;
-            interactableScript.CurrentDimension = 2;
-            interactableScript.CanSelect = interactableScript.CanDeselect = true;
-
-            InteractableOnToggleReceiver rec = interactableScript.AddReceiver<InteractableOnToggleReceiver>();
-            rec.OnSelect.AddListener(OnSelect);
-            rec.OnDeselect.AddListener(OnDeselect);
+            interactableScript.States = FindObjectOfType<BehaviourEventManager>().DefaultInteractableStates;
+            interactableScript.OnClick.AddListener(() => OnSelect());
         }
 
         #endregion // Monobehaviour Methods
@@ -58,19 +58,18 @@ namespace Behaviours
         /// <summary>
         /// Determines logic based on user's click
         /// </summary>
-        private void OnSelect()
+        public void OnSelect()
         {
+            Debug.Log("clicked");
             if (interactableEvents.ContainsValue("Click"))
             {
                 SetEventTrigger.Invoke();
             }
         }
 
-        /// <summary>
-        /// Determines logic based on user's click
-        /// </summary>
-        private void OnDeselect()
+        private void OnMouseDown()
         {
+            Debug.Log("clicked");
             if (interactableEvents.ContainsValue("Click"))
             {
                 SetEventTrigger.Invoke();
@@ -87,15 +86,15 @@ namespace Behaviours
             {
                 return;
             }
-            if (interactableEvents.ContainsValue("Teleport") && transform.GetComponent<Camera>())
+            if (interactableEvents.ContainsValue("Teleport"))
             {
                 SetEventTrigger.Invoke();
                 CurrentEvent = "Teleport";
             }
-            if (interactableEvents.ContainsValue("Snap Zone"))
+            else if (interactableEvents.ContainsValue("SnapZone"))
             {
                 SetEventTrigger.Invoke();
-                CurrentEvent = "Snap Zone";
+                CurrentEvent = "SnapZone";
             }
         }
 
@@ -129,7 +128,7 @@ namespace Behaviours
         /// Adds Interactable Events to dictionary of events interactable with current GameObject
         /// </summary>
         /// <param name="events"></param>
-        public void InteractableEvents(List<BehaviourEvent> events)
+        public void AddInteractableEvents(List<BehaviourEvent> events)
         {
             for (int i = 0; i < events.Count; i++)
             {
@@ -138,6 +137,16 @@ namespace Behaviours
                     SetEventTrigger += events[i].EventTrigger;
                     interactableEvents.Add(events[i], events[i].GetName());
                 }
+            }
+        }
+
+
+        public void AddInteractableEvent(BehaviourEvent e)
+        {
+            if (!interactableEvents.ContainsKey(e))
+            {
+                SetEventTrigger += e.EventTrigger;
+                interactableEvents.Add(e, e.GetName());
             }
         }
 
