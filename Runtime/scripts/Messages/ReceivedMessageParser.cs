@@ -40,17 +40,23 @@ namespace Packages.realityflow_package.Runtime.scripts
             // Project Messages
             messageRouter.Add("CreateProject", CreateProject_Received.ReceiveMessage);
             messageRouter.Add("DeleteProject", DeleteProject_Received.ReceiveMessage);
-            messageRouter.Add("GetAllUserProject", GetAllUserProjects_Received.ReceiveMessage);
+            messageRouter.Add("FetchProjects", GetAllUserProjects_Received.ReceiveMessage);
             messageRouter.Add("OpenProject", OpenProject_Received.ReceiveMessage);
 
             // Room Messages
             messageRouter.Add("JoinRoom", JoinRoom_Received.ReceiveMessage);
+            messageRouter.Add("UserJoinedRoom", DoNothing);
 
             // User Messages
             messageRouter.Add("LoginUser", LoginUser_Received.ReceiveMessage);
-            messageRouter.Add("LogoutU*ser", LogoutUser_Received.ReceiveMessage);
+            messageRouter.Add("LogoutUser", LogoutUser_Received.ReceiveMessage);
             messageRouter.Add("CreateUser", RegisterUser_Received.ReceiveMessage);
         }
+        public static void DoNothing(string message)
+        {
+
+        }
+
 
         /// <summary>
         /// Request to parse a message from a server into its respective c# representation
