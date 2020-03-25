@@ -272,50 +272,7 @@ public class FlowNetworkManagerEditor : EditorWindow
         GUILayout.Label("Password: ");
         pWord = EditorGUILayout.PasswordField(pWord);
         EditorGUILayout.EndHorizontal();
-
-
-        if (GUILayout.Button("Create Behaviour", GUILayout.Height(40)))
-        {
-            currentUser = new FlowUser(uName, pWord);
-            string projectId = "1h23u-23jnr-24nrk";
-            string objectId = "jn23-32n4-njrf8-kj";
-
-            FlowBehaviour b = new FlowBehaviour("teleport", "", "jn23-32n4-njrf8-kj", "ewiu3-44", null);
-
-
-            Operations.CreateBehaviour(b, currentUser, projectId, objectId, (_, e) =>
-            {
-
-                if (e.message.flowBehaviour != null)
-                {
-                    Debug.Log(e.message);
-
-
-                }
-                else
-                {
-                    currentProject = null;
-                // TODO: display to the user that create project failed
-            }
-            });
-
-        }
-
-        // Create "New Project" Button and define onClick action
-        if (GUILayout.Button("Start Behaviour", GUILayout.Height(40)))
-        {
-            if(BehaviourEventManager.blist.Count > 0)
-            {
-                Debug.Log("Event inside");
-                BehaviourEventManager.blist[0].EventTrigger();
-            }
-            
-
-
-        }
-       
-
-
+   
 
         // Create "Log in" Button and define onClick action
         if (GUILayout.Button("Log in", GUILayout.Height(40)))

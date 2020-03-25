@@ -230,59 +230,9 @@ namespace Packages.realityflow_package.Runtime.scripts
         #region Behaviour messages received
         private static void _CreateBehaviour(object sender, CreateBehaviourEventArgs eventArgs)
         {
-            // this is where things happen after a createBehaviour  message is received
-
-             BehaviourEventManager bem = UnityEngine.Object.FindObjectOfType<EventSystem>().GetComponent<BehaviourEventManager>();
-            //
-
-            // attach the bem to the event system if not already on
+            // this is where things happen after a createBehaviour message is deserialized
 
 
-
-            GameObject go1 = GameObject.FindGameObjectWithTag("Cubey");
-            Debug.Log(go1);
-            GameObject go2 = GameObject.FindGameObjectWithTag("Sphere");
-            Debug.Log(go2);
-
-            TeleportCoordinates tc = go2.GetComponent<TeleportCoordinates>();
-            if (tc == null)
-                tc = go2.AddComponent<TeleportCoordinates>();
-
-            tc.SetCoordinates(go2.transform.position);
-
-           
-            Guid g1 = bem.MakeObjectInteractable(go1);
-            Guid g2 = bem.MakeObjectInteractable(go2);
-
-
-            BehaviourEvent b = bem.CreateNewBehaviourEvent("Teleport", g1, g2, null);
-            //b.CallBehaviourEvent();
-
-            GameObject go = GameObject.FindGameObjectWithTag("other");
-            Debug.Log(go);
-
-            Guid goi = bem.MakeObjectInteractable(go);
-            BehaviourEvent t = bem.CreateNewBehaviourEvent("Click", goi, goi, b);
-
-            BehaviourEventManager.blist.Add(t);
-
-
-            Debug.Log("hola");
-            /*
-            Transform[] transforms = Selection.GetTransforms(SelectionMode.Deep |
-             SelectionMode.ExcludePrefab | SelectionMode.Editable);
-
-            string placeOnSurfaceDialogDecisionKey = "Example.PlaceOnSurfaceDecision";
-            if (
-                EditorUtility.DisplayDialog("Start behavior?",
-                    "Teleport to Cube", "ok", "no"))
-            {
-                Debug.Log(b);
-                Debug.Log("THE SECOND OBJECT");
-                Debug.Log(b.secondObject);
-                t.EventTrigger();
-            }
-            */
 
         }
 
