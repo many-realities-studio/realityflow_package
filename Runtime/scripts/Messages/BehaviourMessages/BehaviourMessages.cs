@@ -17,23 +17,16 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.BehaviourMessage
     public class CreateBehaviour_SendToServer : BaseMessage
     {
         [JsonProperty("FlowBehaviour")]
-        FlowBehaviour flowBehaviour { get; set; }
-
-        [JsonProperty("FlowUser")]
-        FlowUser flowUser { get; set; }
+        FlowBehaviour FlowBehaviour { get; set; }
 
         [JsonProperty("ProjectId")]
-        string projectId { get; set; }
+        string ProjectId { get; set; }
 
-        [JsonProperty("ObjectId")]
-        string objectId { get; set; }
 
-        public CreateBehaviour_SendToServer(FlowBehaviour behaviour, FlowUser flowUser, string projectId, string objectId)
+        public CreateBehaviour_SendToServer(FlowBehaviour behaviour, string projectId)
         {
-            this.flowBehaviour = behaviour;
-            this.flowUser = flowUser;
-            this.projectId = projectId;
-            this.objectId = objectId;
+            this.FlowBehaviour = behaviour;
+            this.ProjectId = projectId;
 
             this.MessageType = "CreateBehaviour";
         }
@@ -41,41 +34,25 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.BehaviourMessage
 
     /// <summary>
     /// Delete project request message format 
-    /// Receive: <see cref="DeleteProject_Received"/>
+    /// Receive: <see cref="DeleteBehaviour_Received"/>
     /// </summary>
     public class DeleteBehaviour_SendToServer : BaseMessage
     {
-        [JsonProperty("FlowProject")]
-        FlowProject flowProject { get; set; }
+        [JsonProperty("ProjectId")]
+        string ProjectId { get; set; }
 
-        [JsonProperty("FlowUser")]
-        FlowUser flowUser { get; set; }
+        [JsonProperty("BehaviourId")]
+        string BehaviourId { get; set; }
 
-        public DeleteBehaviour_SendToServer(FlowProject flowProject, FlowUser flowUser)
+        [JsonProperty("FlowBehaviour")]
+        FlowBehaviour FlowBehaviour { get; set; }
+
+
+        public DeleteBehaviour_SendToServer(FlowBehaviour flowBehaviour, string behaviourId, string projectId)
         {
-            this.flowProject = flowProject;
-            this.flowUser = flowUser;
+            this.ProjectId = projectId;
+            this.BehaviourId = behaviourId;
+            this.FlowBehaviour = flowBehaviour;
         }
-    }
-
-    /// <summary>
-    /// Open Behaviour request message format 
-    /// <see cref="OpenBehaviour_Received"/>
-    /// </summary>
-    public class OpenBehaviour_SendToServer : BaseMessage
-    {
-        [JsonProperty("")]
-        string projectId { get; set; }
-
-        [JsonProperty("FlowUser")]
-        FlowUser flowUser { get; set; }
-
-        public OpenBehaviour_SendToServer(string projectId, FlowUser flowUser)
-        {
-            this.projectId = projectId;
-            this.flowUser = flowUser;
-        }
-    }
-
-  
+    } 
 }

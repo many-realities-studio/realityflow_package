@@ -27,14 +27,18 @@ namespace RealityFlow.Plugin.Scripts
         [JsonProperty("BehaviourChain")]
         public FlowBehaviour BehaviourChain { get; set; } // Name of the project
 
+        [JsonProperty("ChainOwner")]
+        public string ChainOwner { get; set; } // Name of the project
 
-        public FlowBehaviour(string name, string id, string firstObject, string secondObject, FlowBehaviour chain)
+
+        public FlowBehaviour(string name, string id, string firstObject, string secondObject, FlowBehaviour chain, string chainOwner)
         {
             Name = name;
             Id = id;
             FirstObject = firstObject;
             SecondObject = secondObject;
             BehaviourChain = chain;
+            ChainOwner = chainOwner;
         }
   
     }

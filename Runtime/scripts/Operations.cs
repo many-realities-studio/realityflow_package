@@ -54,8 +54,9 @@ namespace Packages.realityflow_package.Runtime.scripts
             LogoutUser_Received.ReceivedEvent += _LogoutUser;
             RegisterUser_Received.ReceivedEvent += _RegisterUser;
 
-            CreateBehaviour_Received.ReceivedEvent += _CreateBehaviour;
             // Set up Behaviour updates
+            CreateBehaviour_Received.ReceivedEvent += _CreateBehaviour;
+            DeleteBehaviour_Received.ReceivedEvent += _DeleteBehaviour;
 
         }
 
@@ -124,12 +125,20 @@ namespace Packages.realityflow_package.Runtime.scripts
         #endregion // ObjectOperations
         #region BehaviourOperations
 
-        public static void CreateBehaviour(FlowBehaviour behaviour, FlowUser flowUser, string projectId, string objectId, CreateBehaviour_Received.CreateBehaviourReceived_EventHandler callbackFunction)
+        public static void CreateBehaviour(FlowBehaviour behaviour, string projectId, CreateBehaviour_Received.CreateBehaviourReceived_EventHandler callbackFunction)
         {
-            CreateBehaviour_SendToServer createBehaviour = new CreateBehaviour_SendToServer(behaviour, flowUser, projectId, objectId);
+            CreateBehaviour_SendToServer createBehaviour = new CreateBehaviour_SendToServer(behaviour, projectId);
             FlowWebsocket.SendMessage(createBehaviour);
 
             CreateBehaviour_Received.ReceivedEvent += callbackFunction;
+        }
+
+        public static void DeleteBehaviour(FlowBehaviour behaviour, string behaviourId, string projectId, DeleteBehaviour_Received.DeleteBehaviourReceived_EventHandler callbackFunction)
+        {
+            DeleteBehaviour_SendToServer deleteBehaviour = new DeleteBehaviour_SendToServer(behaviour, behaviourId, projectId);
+            FlowWebsocket.SendMessage(deleteBehaviour);
+
+            DeleteBehaviour_Received.ReceivedEvent += callbackFunction;
         }
 
         #endregion
@@ -231,6 +240,14 @@ namespace Packages.realityflow_package.Runtime.scripts
         private static void _CreateBehaviour(object sender, CreateBehaviourEventArgs eventArgs)
         {
             // this is where things happen after a createBehaviour message is deserialized
+
+
+
+        }
+
+        private static void _DeleteBehaviour(object sender, DeleteBehaviourEventArgs eventArgs)
+        {
+            // this is where things happen after a DeleteBehaviour message is deserialized
 
 
 
