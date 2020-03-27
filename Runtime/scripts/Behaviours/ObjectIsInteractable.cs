@@ -20,7 +20,7 @@ namespace Behaviours
 
         private string CurrentEvent = null;
 
-        public Guid objectId;
+        private Guid objectId;
 
         #region Monobehaviour Methods
 

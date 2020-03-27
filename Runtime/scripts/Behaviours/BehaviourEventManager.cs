@@ -7,8 +7,7 @@ namespace Behaviours
     public class BehaviourEventManager : MonoBehaviour
     {
         public event Action<string> SendEventDown;
-        public Dictionary<Guid, GameObject> GoIds=new Dictionary<Guid, GameObject>();
-        public static List<BehaviourEvent> blist = new List<BehaviourEvent>();
+        public Dictionary<Guid, GameObject> GoIds;
 
         void Start()
         {
@@ -18,14 +17,9 @@ namespace Behaviours
         public BehaviourEvent CreateNewBehaviourEvent(string name, Guid go1, Guid go2, BehaviourEvent chain)
         {
             GameObject g1 = GetGoFromGuid(go1);
-            BehaviourEvent bEvent = g1.GetComponent<BehaviourEvent>();
-
-            if(bEvent == null)
-                bEvent = g1?.AddComponent<BehaviourEvent>();
-
+            BehaviourEvent bEvent = g1?.AddComponent<BehaviourEvent>();
             if (bEvent)
             {
-                bEvent.SetfirstObject(go1);
                 bEvent.SetName(name);
                 bEvent.SetSecondObject(go2);
                 bEvent.SetChain(chain);
@@ -58,19 +52,12 @@ namespace Behaviours
             // sends updated coordinates
         }
 
-        public Guid MakeObjectInteractable(GameObject go)
+        public void MakeObjectInteractable(GameObject go)
         {
-            ObjectIsInteractable oisI = go.GetComponent<ObjectIsInteractable>();
-
-            if(oisI == null)
-                oisI = go.AddComponent<ObjectIsInteractable>();
-
-            oisI.objectId = Guid.NewGuid();
+            ObjectIsInteractable oisI = go.AddComponent<ObjectIsInteractable>();
             Guid temp = oisI.GetGuid();
-            Debug.Log(go);
-            Debug.Log(temp);
+
             GoIds.Add(temp, go);
-            return temp;
         }
 
         public GameObject GetGoFromGuid(Guid guid)

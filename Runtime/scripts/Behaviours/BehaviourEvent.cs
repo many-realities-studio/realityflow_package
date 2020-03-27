@@ -1,7 +1,6 @@
 ﻿using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using Newtonsoft.Json;
 
 namespace Behaviours
 {
@@ -11,14 +10,10 @@ namespace Behaviours
     public class BehaviourEvent : MonoBehaviour
     {
         private BehaviourEventManager BEM;
-
-        public string behaviourName = "default";
-
-        public Guid firstObject;
-
-        public Guid secondObject;
-
-        public BehaviourEvent chainedEvent;
+        private string behaviourName = "default";
+        private Guid firstObject;
+        private Guid secondObject;
+        private BehaviourEvent chainedEvent;
 
         public event Action<string, Guid, Guid, BehaviourEvent> EventCalled;
 
@@ -64,10 +59,7 @@ namespace Behaviours
             if (scriptName != behaviourName)
                 return;
 
-           // if (BEM.GetGoFromGuid(secondObject) == null)
             GameObject obj = BEM.GetGoFromGuid(secondObject);
-            Debug.Log("HELLO");
-            Debug.Log(obj);
 
             CallBehaviourEvent();
 
@@ -135,15 +127,7 @@ namespace Behaviours
         {
             return secondObject;
         }
-        public void SetfirstObject(Guid go2)
-        {
-            firstObject = go2;
-        }
 
-        public Guid GetFirstObject()
-        {
-            return firstObject;
-        }
         public void SetChain(BehaviourEvent chain)
         {
             chainedEvent = chain;
