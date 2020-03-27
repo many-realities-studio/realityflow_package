@@ -29,7 +29,7 @@ public class FlowNetworkManagerEditor : EditorWindow
     Color bodySectionColor = new Color(150 / 255f, 150 / 255f, 150 / 255f, 1f);
     private string uName;
     private string pWord;
-    private EWindowView window = EWindowView.LOGIN;
+    private EWindowView window = EWindowView.PROJECT_HUB;
     private string projectName;
     private string userToInvite;
 
@@ -43,7 +43,14 @@ public class FlowNetworkManagerEditor : EditorWindow
 
     public static FlowUser currentUser = null;
     public static FlowProject currentProject = null;
-        
+
+    public string[] objectOptions = new string[] { "sphere1", "cube", "sphere2", "enemy1" };
+    public Dictionary<string, string> objectIds = new Dictionary<string, string>();
+    public Boolean addingChain = false;
+    public int selectedTrigger = 0;
+    public int selectedTarget = 0;
+    public FlowBehaviour headBehaviour = null;
+
 
     enum EWindowView
     {
@@ -54,7 +61,13 @@ public class FlowNetworkManagerEditor : EditorWindow
         LOAD_PROJECT = 4,
         PROJECT_CREATION = 5,
         INVITE_USER = 6,
-        PROJECT_IMPORT = 7
+        PROJECT_IMPORT = 7,
+        CREATE_BEHAVIOUR = 8,
+        CREATE_TELEPORT = 9,
+        CREATE_CLICK = 10,
+        CREATE_SNAPZONE = 11,
+        CREATE_ENABLE = 12,
+        CREATE_DISABLE = 13
     }
 
 
@@ -96,7 +109,7 @@ public class FlowNetworkManagerEditor : EditorWindow
         if (newUser == null)
             newUser = new FlowUser("testUsername", "TestPassword");
 
-        Operations.ConnectToServer("ws://echo.websocket.org");
+         Operations.ConnectToServer("ws://echo.websocket.org");
         //Operations.ConnectToServer("ws://localhost:8999/");
 
         InitTextures();
@@ -110,61 +123,72 @@ public class FlowNetworkManagerEditor : EditorWindow
         _ViewDictionary.Add(EWindowView.PROJECT_CREATION, _CreateProjectCreationView);
         _ViewDictionary.Add(EWindowView.INVITE_USER, _CreateInviteUserView); // not implementec
         _ViewDictionary.Add(EWindowView.PROJECT_IMPORT, _CreateProjectImportView);
+        _ViewDictionary.Add(EWindowView.CREATE_BEHAVIOUR, _CreateBehaviourView);
+        _ViewDictionary.Add(EWindowView.CREATE_TELEPORT, _CreateTeleportView);
+        _ViewDictionary.Add(EWindowView.CREATE_CLICK, _CreateClickView);
+        _ViewDictionary.Add(EWindowView.CREATE_ENABLE, _CreateEnableView);
+        _ViewDictionary.Add(EWindowView.CREATE_DISABLE, _CreateDisableView);
+
+
+        foreach (string objectName in objectOptions)
+        {
+            objectIds.Add(objectName, objectName);
+        }
     }
 
     public void OnGUI()
     {
         _ViewDictionary[window]();
 
-        if (GUILayout.Button("Create", GUILayout.Height(20)))
-        {
-            //GameObject go = GameObject.CreatePrimitive(PrimitiveType.Capsule);
+       // if (GUILayout.Button("Create", GUILayout.Height(20)))
+       // {
+       //     //GameObject go = GameObject.CreatePrimitive(PrimitiveType.Capsule);
 
-            if (newUser == null)
-            {
-                newUser = new FlowUser("user", "pass");
-            }
+       //     if (newUser == null)
+       //     {
+       //         newUser = new FlowUser("user", "pass");
+       //     }
 
-            // User messages
-            System.IO.File.WriteAllText(@"C:\Users\Matthew Kurtz\Desktop\FlowTests\SentCommands\UserMessages\" + typeof(Login_SendToServer).ToString() + ".json", MessageSerializer.ConvertToString(new Login_SendToServer(testUser)));
+       //     // User messages
+       //     System.IO.File.WriteAllText(@"C:\Users\Matthew Kurtz\Desktop\FlowTests\SentCommands\UserMessages\" + typeof(Login_SendToServer).ToString() + ".json", MessageSerializer.ConvertToString(new Login_SendToServer(testUser)));
 
-            System.IO.File.WriteAllText(@"C:\Users\Matthew Kurtz\Desktop\FlowTests\SentCommands\UserMessages\" + typeof(RegisterUser_SendToServer).ToString() + ".json", MessageSerializer.ConvertToString(new RegisterUser_SendToServer(testUser)));
+       //     System.IO.File.WriteAllText(@"C:\Users\Matthew Kurtz\Desktop\FlowTests\SentCommands\UserMessages\" + typeof(RegisterUser_SendToServer).ToString() + ".json", MessageSerializer.ConvertToString(new RegisterUser_SendToServer(testUser)));
 
-            System.IO.File.WriteAllText(@"C:\Users\Matthew Kurtz\Desktop\FlowTests\SentCommands\UserMessages\" + typeof(Logout_SendToServer).ToString() + ".json", MessageSerializer.ConvertToString(new Logout_SendToServer(testUser)));
+       //     System.IO.File.WriteAllText(@"C:\Users\Matthew Kurtz\Desktop\FlowTests\SentCommands\UserMessages\" + typeof(Logout_SendToServer).ToString() + ".json", MessageSerializer.ConvertToString(new Logout_SendToServer(testUser)));
 
-            // Object messages
-            System.IO.File.WriteAllText(@"C:\Users\Matthew Kurtz\Desktop\FlowTests\SentCommands\ObjectMessages\" + typeof(CreateObject_SendToServer).ToString() + ".json", MessageSerializer.ConvertToString(new CreateObject_SendToServer(testObject, /*testUser,*/ testProject.FlowId)));
+       //     // Object messages
+       //     System.IO.File.WriteAllText(@"C:\Users\Matthew Kurtz\Desktop\FlowTests\SentCommands\ObjectMessages\" + typeof(CreateObject_SendToServer).ToString() + ".json", MessageSerializer.ConvertToString(new CreateObject_SendToServer(testObject, /*testUser,*/ testProject.FlowId)));
 
-            System.IO.File.WriteAllText(@"C:\Users\Matthew Kurtz\Desktop\FlowTests\SentCommands\ObjectMessages\" + typeof(DeleteObject_SendToServer).ToString() + ".json", MessageSerializer.ConvertToString(new DeleteObject_SendToServer(testObject, testProject.FlowId)));
+       //     System.IO.File.WriteAllText(@"C:\Users\Matthew Kurtz\Desktop\FlowTests\SentCommands\ObjectMessages\" + typeof(DeleteObject_SendToServer).ToString() + ".json", MessageSerializer.ConvertToString(new DeleteObject_SendToServer(testObject, testProject.FlowId)));
 
-            System.IO.File.WriteAllText(@"C:\Users\Matthew Kurtz\Desktop\FlowTests\SentCommands\ObjectMessages\" + typeof(UpdateObject_SendToServer).ToString() + ".json", MessageSerializer.ConvertToString(new UpdateObject_SendToServer(testObject, /*testUser,*/ testProject.FlowId)));
+       //     System.IO.File.WriteAllText(@"C:\Users\Matthew Kurtz\Desktop\FlowTests\SentCommands\ObjectMessages\" + typeof(UpdateObject_SendToServer).ToString() + ".json", MessageSerializer.ConvertToString(new UpdateObject_SendToServer(testObject, /*testUser,*/ testProject.FlowId)));
 
-            System.IO.File.WriteAllText(@"C:\Users\Matthew Kurtz\Desktop\FlowTests\SentCommands\ObjectMessages\" + typeof(FinalizedUpdateObject_SendToServer).ToString() + ".json", MessageSerializer.ConvertToString(new FinalizedUpdateObject_SendToServer(testObject, testUser, testProject.FlowId)));
+       //     System.IO.File.WriteAllText(@"C:\Users\Matthew Kurtz\Desktop\FlowTests\SentCommands\ObjectMessages\" + typeof(FinalizedUpdateObject_SendToServer).ToString() + ".json", MessageSerializer.ConvertToString(new FinalizedUpdateObject_SendToServer(testObject, testUser, testProject.FlowId)));
+       ///
+       //     // Project messages
+       //     System.IO.File.WriteAllText(@"C:\Users\Matthew Kurtz\Desktop\FlowTests\SentCommands\ProjectMessages\" + typeof(CreateProject_Received).ToString() + ".json", MessageSerializer.ConvertToString(new CreateProject_Received("message", true)));
 
-            // Project messages
-            System.IO.File.WriteAllText(@"C:\Users\Matthew Kurtz\Desktop\FlowTests\SentCommands\ProjectMessages\" + typeof(CreateProject_Received).ToString() + ".json", MessageSerializer.ConvertToString(new CreateProject_Received("message", true)));
+       //     System.IO.File.WriteAllText(@"C:\Users\Matthew Kurtz\Desktop\FlowTests\SentCommands\ProjectMessages\" + typeof(DeleteProject_SendToServer).ToString() + ".json", MessageSerializer.ConvertToString(new DeleteProject_SendToServer(testProject, testUser)));
 
-            System.IO.File.WriteAllText(@"C:\Users\Matthew Kurtz\Desktop\FlowTests\SentCommands\ProjectMessages\" + typeof(DeleteProject_SendToServer).ToString() + ".json", MessageSerializer.ConvertToString(new DeleteProject_SendToServer(testProject, testUser)));
+       //     Tuple<string, string>[] testList = { new Tuple<string, string>(testProject.FlowId, testProject.ProjectName) };
+       //     System.IO.File.WriteAllText(@"C:\Users\Matthew Kurtz\Desktop\FlowTests\SentCommands\ProjectMessages\" + typeof(GetAllUserProjects_SendToServer).ToString() + ".json", MessageSerializer.ConvertToString(new GetAllUserProjects_SendToServer(testUser)));
 
-            Tuple<string, string>[] testList = { new Tuple<string, string>(testProject.FlowId, testProject.ProjectName) };
-            System.IO.File.WriteAllText(@"C:\Users\Matthew Kurtz\Desktop\FlowTests\SentCommands\ProjectMessages\" + typeof(GetAllUserProjects_SendToServer).ToString() + ".json", MessageSerializer.ConvertToString(new GetAllUserProjects_SendToServer(testUser)));
+       //     System.IO.File.WriteAllText(@"C:\Users\Matthew Kurtz\Desktop\FlowTests\SentCommands\ProjectMessages\" + typeof(OpenProject_SendToServer).ToString() + ".json", MessageSerializer.ConvertToString(new OpenProject_SendToServer(testProject.FlowId, testUser)));
 
-            System.IO.File.WriteAllText(@"C:\Users\Matthew Kurtz\Desktop\FlowTests\SentCommands\ProjectMessages\" + typeof(OpenProject_SendToServer).ToString() + ".json", MessageSerializer.ConvertToString(new OpenProject_SendToServer(testProject.FlowId, testUser)));
+       //     // Room messages
+       //     System.IO.File.WriteAllText(@"C:\Users\Matthew Kurtz\Desktop\FlowTests\SentCommands\RoomMessages\" + typeof(JoinRoom_SendToServer).ToString() + ".json", MessageSerializer.ConvertToString(new JoinRoom_SendToServer(testProject.FlowId, testUser)));
 
-            // Room messages
-            System.IO.File.WriteAllText(@"C:\Users\Matthew Kurtz\Desktop\FlowTests\SentCommands\RoomMessages\" + typeof(JoinRoom_SendToServer).ToString() + ".json", MessageSerializer.ConvertToString(new JoinRoom_SendToServer(testProject.FlowId, testUser)));
+       //     //Operations.CreateObject(newObject, newUser, "TestProjectId", CreateObjectCallbackTest);
 
-            //Operations.CreateObject(newObject, newUser, "TestProjectId", CreateObjectCallbackTest);
+       //     //UpdateObject_SendToServer updateObject = new UpdateObject_SendToServer(newObject, newUser, "ProjectId");
+       //     //Operations.FlowWebsocket.SendMessage(updateObject);
 
-            //UpdateObject_SendToServer updateObject = new UpdateObject_SendToServer(newObject, newUser, "ProjectId");
-            //Operations.FlowWebsocket.SendMessage(updateObject);
-
-            //Operations.DeleteObject("TestProjectId", DeleteObjectCallback);
+       //     //Operations.DeleteObject("TestProjectId", DeleteObjectCallback);
 
 
-            //FinalizedUpdateObject_SendToServer finalizedUpdateObject = new FinalizedUpdateObject_SendToServer(newObject, newUser, "ProjectId");
-            //Operations.FlowWebsocket.SendMessage(finalizedUpdateObject);
-        }
+       //     //FinalizedUpdateObject_SendToServer finalizedUpdateObject = new FinalizedUpdateObject_SendToServer(newObject, newUser, "ProjectId");
+       //     //Operations.FlowWebsocket.SendMessage(finalizedUpdateObject);
+       // }
 
         // if (GUILayout.Button("Edit", GUILayout.Height(20)))
         // {
@@ -272,7 +296,7 @@ public class FlowNetworkManagerEditor : EditorWindow
         GUILayout.Label("Password: ");
         pWord = EditorGUILayout.PasswordField(pWord);
         EditorGUILayout.EndHorizontal();
-   
+
 
         // Create "Log in" Button and define onClick action
         if (GUILayout.Button("Log in", GUILayout.Height(40)))
@@ -289,8 +313,8 @@ public class FlowNetworkManagerEditor : EditorWindow
                 else
                 {
                     currentUser = null;
-                // TODO: Display that login failed
-            }
+                    // TODO: Display that login failed
+                }
             });
         }
 
@@ -369,6 +393,13 @@ public class FlowNetworkManagerEditor : EditorWindow
             window = EWindowView.DELETE_OBJECT;
         }
 
+        if (GUILayout.Button("Add Interaction", GUILayout.Height(40)))
+        {
+            // Send user to Create Behaviour Screen
+            addingChain = false;
+            window = EWindowView.CREATE_BEHAVIOUR;
+        }
+
         // Create "Export" Button and define onClick action
         if (GUILayout.Button("Export", GUILayout.Height(20)))
         {
@@ -417,6 +448,7 @@ public class FlowNetworkManagerEditor : EditorWindow
     }
 
     private bool _RefreshProjectList = true;
+
     private void _CreateLoadProjectView()
     {
         if (_RefreshProjectList == true)
@@ -516,8 +548,8 @@ public class FlowNetworkManagerEditor : EditorWindow
                     else
                     {
                         currentProject = null;
-                    // TODO: display to the user that create project failed
-                }
+                        // TODO: display to the user that create project failed
+                    }
                 });
                 //// Send ProjectCreate event to the server
                 //ProjectCreateEvent create = new ProjectCreateEvent();
@@ -607,6 +639,266 @@ public class FlowNetworkManagerEditor : EditorWindow
             jsonList.Add(reader.ReadLine());
         }
         reader.Close();
+    }
+
+
+    private void _CreateBehaviourView()
+    {       
+        if (GUILayout.Button("Back", GUILayout.Height(30), GUILayout.Width(40)))
+        {
+            headBehaviour = null;
+            addingChain = false;
+            window = EWindowView.PROJECT_HUB;
+        }
+
+        GUILayout.Space(10f);
+        EditorGUILayout.LabelField("Choose one of the behaviours below.");
+        EditorGUILayout.BeginHorizontal();
+
+        if (GUILayout.Button("Teleport", GUILayout.Height(75), GUILayout.Width(92)))
+        {
+            window = EWindowView.CREATE_TELEPORT;
+        }
+
+        // Create "Logout" Button and define onClick action
+        if (GUILayout.Button("Click", GUILayout.Height(75), GUILayout.Width(92)))
+        {
+            window = EWindowView.CREATE_CLICK;
+        }
+
+        // Create "Logout" Button and define onClick action
+        if (GUILayout.Button("Snapzone", GUILayout.Height(75), GUILayout.Width(92)))
+        {
+
+        }
+        EditorGUILayout.EndHorizontal();
+
+        if (addingChain)
+        {
+            EditorGUILayout.BeginHorizontal();
+            // Create "Logout" Button and define onClick action
+            if (GUILayout.Button("Enable", GUILayout.Height(75), GUILayout.Width(92)))
+            {
+                window = EWindowView.CREATE_ENABLE;
+            }
+
+            if (GUILayout.Button("Disable", GUILayout.Height(75), GUILayout.Width(92)))
+            {
+                window = EWindowView.CREATE_DISABLE;
+            }
+            EditorGUILayout.EndHorizontal();
+        }
+    }
+
+
+    private void _CreateTeleportView()
+    {
+        GUILayout.BeginVertical();
+
+        if (GUILayout.Button("Back", GUILayout.Height(30), GUILayout.Width(40)))
+        {
+            window = EWindowView.CREATE_BEHAVIOUR;
+        }
+
+        GUILayout.Space(10f);
+        EditorGUILayout.LabelField("Teleport");
+        GUILayout.Space(30f);
+
+        selectedTrigger = EditorGUI.Popup(new Rect(0, 100, position.width, 30), "TriggerObject:", selectedTrigger, objectOptions);
+        selectedTarget = EditorGUI.Popup(new Rect(0, 150, position.width, 30), "TargetObject:", selectedTarget, objectOptions);
+
+        GUILayout.Space(120f);
+        GUILayout.Label("Add another interaction?");
+        GUILayout.BeginHorizontal();
+   
+        if (GUILayout.Button("Yes", GUILayout.Height(30), GUILayout.Width(40)))
+        {
+            objectIds.TryGetValue(objectOptions[selectedTrigger], out string firstObject);
+            objectIds.TryGetValue(objectOptions[selectedTarget], out string secondObject);
+
+            addingChain = true;
+
+            FlowBehaviour fb = new FlowBehaviour("Teleport", "1", firstObject, secondObject, null, firstObject);
+            AddBehaviour(fb);
+
+            window = EWindowView.CREATE_BEHAVIOUR;
+        }
+
+        if (GUILayout.Button("No", GUILayout.Height(30), GUILayout.Width(40)))
+        {
+            objectIds.TryGetValue(objectOptions[selectedTrigger], out string firstObject);
+            objectIds.TryGetValue(objectOptions[selectedTarget], out string secondObject);
+
+            addingChain = false;
+
+            FlowBehaviour fb = new FlowBehaviour("Teleport", "1", firstObject, secondObject, null, firstObject);
+            AddBehaviour(fb);
+
+            window = EWindowView.PROJECT_HUB;
+        }
+
+        GUILayout.EndHorizontal();
+        GUILayout.EndVertical();
+    }
+
+    private void _CreateClickView()
+    {
+        GUILayout.BeginVertical();
+
+        if (GUILayout.Button("Back", GUILayout.Height(30), GUILayout.Width(40)))
+        {
+            window = EWindowView.CREATE_BEHAVIOUR;
+        }
+
+        GUILayout.Space(10f);
+        EditorGUILayout.LabelField("On Click");
+        GUILayout.Space(30f);
+
+        selectedTrigger = EditorGUI.Popup(new Rect(0, 100, position.width, 30), "Object trigger:", selectedTrigger, objectOptions);
+
+        GUILayout.Space(120f);
+
+        GUILayout.Label("Press OK to setup the event that will be triggered when the above object is clicked.");
+        GUILayout.BeginHorizontal();
+
+        if (GUILayout.Button("OK", GUILayout.Height(30), GUILayout.Width(40)))
+        {
+            objectIds.TryGetValue(objectOptions[selectedTrigger], out string firstObject);
+
+            addingChain = true;
+
+            FlowBehaviour fb = new FlowBehaviour("Click", "1", firstObject, firstObject, null, firstObject);
+            AddBehaviour(fb);
+
+            window = EWindowView.CREATE_BEHAVIOUR;
+        }
+
+        GUILayout.EndHorizontal();
+        GUILayout.EndVertical();
+    }
+
+    private void _CreateEnableView()
+    {
+        GUILayout.BeginVertical();
+
+        if (GUILayout.Button("Back", GUILayout.Height(30), GUILayout.Width(40)))
+        {
+            window = EWindowView.CREATE_BEHAVIOUR;
+        }
+
+        GUILayout.Space(10f);
+        EditorGUILayout.LabelField("Enable Object");
+        GUILayout.Space(30f);
+
+        selectedTrigger = EditorGUI.Popup(new Rect(0, 100, position.width, 30), "Object to Enable:", selectedTrigger, objectOptions);
+
+        GUILayout.Space(120f);
+
+        GUILayout.Label("Add another Interaction?");
+        GUILayout.BeginHorizontal();
+
+        if (GUILayout.Button("Yes", GUILayout.Height(30), GUILayout.Width(40)))
+        {
+            objectIds.TryGetValue(objectOptions[selectedTrigger], out string firstObject);
+            addingChain = true;
+
+            FlowBehaviour fb = new FlowBehaviour("Enable", "1", firstObject, firstObject, null, firstObject);
+            AddBehaviour(fb);
+
+            window = EWindowView.CREATE_BEHAVIOUR;
+        }
+
+        if (GUILayout.Button("No", GUILayout.Height(30), GUILayout.Width(40)))
+        {
+            objectIds.TryGetValue(objectOptions[selectedTrigger], out string firstObject);
+            addingChain = false;
+
+            FlowBehaviour fb = new FlowBehaviour("Enable", "1", firstObject, firstObject, null, firstObject);
+            AddBehaviour(fb);
+
+            window = EWindowView.PROJECT_HUB;
+        }
+
+        GUILayout.EndHorizontal();
+        GUILayout.EndVertical();
+    }
+
+    private void _CreateDisableView()
+    {
+        GUILayout.BeginVertical();
+
+        if (GUILayout.Button("Back", GUILayout.Height(30), GUILayout.Width(40)))
+        {
+            window = EWindowView.CREATE_BEHAVIOUR;
+        }
+
+        GUILayout.Space(10f);
+        EditorGUILayout.LabelField("Disable Object");
+        GUILayout.Space(30f);
+
+        selectedTrigger = EditorGUI.Popup(new Rect(0, 100, position.width, 30), "Object to Disable:", selectedTrigger, objectOptions);
+
+        GUILayout.Space(120f);
+        GUILayout.Label("Add another Interaction?");
+        GUILayout.BeginHorizontal();
+
+        if (GUILayout.Button("Yes", GUILayout.Height(30), GUILayout.Width(40)))
+        {
+            objectIds.TryGetValue(objectOptions[selectedTrigger], out string firstObject);
+            addingChain = true;
+
+            FlowBehaviour fb = new FlowBehaviour("Disable", "1", firstObject, firstObject, null, firstObject);
+            AddBehaviour(fb);
+
+            window = EWindowView.CREATE_BEHAVIOUR;
+        }
+
+        if (GUILayout.Button("No", GUILayout.Height(30), GUILayout.Width(40)))
+        {
+            objectIds.TryGetValue(objectOptions[selectedTrigger], out string firstObject);
+            addingChain = false;
+
+            FlowBehaviour fb = new FlowBehaviour("Disable", "1", firstObject, firstObject, null, firstObject);
+            AddBehaviour(fb);
+
+            window = EWindowView.PROJECT_HUB;
+        }
+
+        GUILayout.EndHorizontal();
+        GUILayout.EndVertical();
+    }
+
+    /// <summary>
+    /// If not adding on to the behaviour chain, then sends a CreateBehaviour request to server.
+    /// If adding on to the behaviour chain, then adds the flowBehaviour to the end of the current chain
+    /// </summary>
+    /// <param name="flowbehaviour"></param>
+    private void AddBehaviour(FlowBehaviour flowbehaviour)
+    {
+        if(headBehaviour == null)
+        {
+            headBehaviour = flowbehaviour;
+            Debug.Log("Making " + flowbehaviour.Name + " the head behaviour");
+        }
+        else
+        {
+            FlowBehaviour head = headBehaviour;
+
+            while(head.BehaviourChain != null)
+            {
+                head = head.BehaviourChain;
+            }
+
+            head.BehaviourChain = flowbehaviour;
+            Debug.Log("making " + flowbehaviour.Name + "the chain behaviour");
+        }
+
+        if (!addingChain)
+        {
+            Operations.CreateBehaviour(headBehaviour, "currentprojectid", (_, e) =>
+            {
+            });
+        }
     }
 }
 
