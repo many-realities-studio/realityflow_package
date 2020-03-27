@@ -13,33 +13,32 @@ namespace RealityFlow.Plugin.Scripts
     public class FlowBehaviour
     {
         [JsonProperty("Name")]
-        public string Name { get; set; } // The unique ID of the project
+        public string Name { get; set; } // The behaviour type
 
         [JsonProperty("Id")]
-        public string Id { get; set; } // Description of the project
+        public string Id { get; set; } // The ID of this behaviour
 
         [JsonProperty("TriggerObjectID")]
-        public string FirstObject { get; set; } // The last time this project was modified
+        public string FirstObject { get; set; } // The first object ID - typically the trigger object
 
         [JsonProperty("TargetObjectID")]
-        public string SecondObject { get; set; } // Name of the project
+        public string SecondObject { get; set; } // The second object ID - typically the target object
 
         [JsonProperty("BehaviourChain")]
-        public FlowBehaviour BehaviourChain { get; set; } // Name of the project
+        public FlowBehaviour BehaviourChain { get; set; } // The chain behaviour
 
         [JsonProperty("ChainOwner")]
-        public string ChainOwner { get; set; } // Name of the project
+        public string ChainOwner { get; set; } // The object that owns this behaviour
 
 
-        public FlowBehaviour(string name, string id, string firstObject, string secondObject, FlowBehaviour chain, string chainOwner)
+        public FlowBehaviour(string name, string id, string firstObject, string secondObject, FlowBehaviour behaviourChain, string chainOwner)
         {
             Name = name;
             Id = id;
             FirstObject = firstObject;
             SecondObject = secondObject;
-            BehaviourChain = chain;
+            BehaviourChain = behaviourChain;
             ChainOwner = chainOwner;
         }
-  
     }
 }
