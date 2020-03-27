@@ -42,7 +42,10 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages
         /// <returns></returns>
         public static string SerializeMessage<T>(T messageToSerialize) where T : BaseMessage
         {
-            return JsonConvert.SerializeObject(messageToSerialize);
+            return JsonConvert.SerializeObject(messageToSerialize, new JsonSerializerSettings()
+            {
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+            });
 
             //MemoryStream memoryStream = new MemoryStream();
 

@@ -22,7 +22,7 @@ namespace RealityFlow.Plugin.Tests
             string url = "ws://echo.websocket.org";
             Operations.ConnectToServer(url);
 
-            testObject = new FlowTObject(new Color(0, 0, 0), "FlowId", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "name");
+            testObject = new FlowTObject("id", 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, "name");
             testUser = new FlowUser("user", "pass");
             testProject = new FlowProject("FlowProjectId", "Description", 0, "TestProject");
         }
@@ -84,7 +84,7 @@ namespace RealityFlow.Plugin.Tests
 
             // Act (and assert)
             DeleteObject_Received actual = null;
-            Operations.DeleteObject(testObject, testProject.FlowId, (sender, e) =>
+            Operations.DeleteObject(testObject.Id, testProject.Id, (sender, e) =>
             {
                 Debug.Log("Received message: " + e.message.ToString());
                 actual = e.message;

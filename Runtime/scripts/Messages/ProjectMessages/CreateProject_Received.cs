@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using RealityFlow.Plugin.Scripts;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -9,11 +11,23 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.ProjectMessages
 {
     public class CreateProject_Received : ConfirmationMessage_Received
     {
+
+        [JsonProperty("FlowProject")]
+        FlowProject flowProject { get; set; }
+
         // Definition of event type (What gets sent to the subscribers
         public delegate void CreateProjectReceived_EventHandler(object sender, ConfirmationMessageEventArgs eventArgs);
 
         // The object that handles publishing/subscribing
         private static CreateProjectReceived_EventHandler _ReceivedEvent;
+
+        public CreateProject_Received(FlowProject flowProject, bool wasSuccessful)
+        {
+            this.flowProject = flowProject;
+            this.MessageType = "CreateProject";
+            this.WasSuccessful = wasSuccessful;
+        }
+
         public static event CreateProjectReceived_EventHandler ReceivedEvent
         {
             add
@@ -29,19 +43,13 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.ProjectMessages
             }
         }
 
-        public CreateProject_Received(string message, bool wasSuccessful)
-        {
-            this.MessageType = "CreateProject";
-            this.WasSuccessful = wasSuccessful;
-        }
-
         /// <summary>
         /// Parse message and convert it to the appropriate data type
         /// </summary>
         /// <param name="message">The message to be parsed</param>
         public static void ReceiveMessage(string message)
         {
-            ConfirmationMessage_Received response = UnityEngine.JsonUtility.FromJson<ConfirmationMessage_Received>(message);
+            ConfirmationMessage_Received response = MessageSerializer.DesearializeObject<CreateProject_Received>(message);
             response.RaiseEvent();
         }
 

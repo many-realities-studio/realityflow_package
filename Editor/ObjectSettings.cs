@@ -18,7 +18,10 @@ namespace RealityFlow.Plugin.Editor
     {
         static ObjectSettings window;
 
-        public FlowTObject createdGameObject { get; set; } = null;
+        public string ObjectName { get; private set; }
+        public Vector3 ObjectPosition { get; private set; }
+        public Vector3 ObjectScale { get; private set; }
+
         // TODO: What does this do?
         public static void OpenWindow()
         {
@@ -29,11 +32,7 @@ namespace RealityFlow.Plugin.Editor
 
         private void OnGUI()
         {
-            if (createdGameObject == null)
-            {
-                createdGameObject = new FlowTObject(); 
-            }
-            //DrawSettings
+            DrawSettings();
             //DrawSettings((ObjectData)RealityFlowWindow.ObjectInfo);
         }
 
@@ -41,7 +40,7 @@ namespace RealityFlow.Plugin.Editor
         {
             EditorGUILayout.BeginHorizontal();
             GUILayout.Label("Name");
-            createdGameObject.Name = EditorGUILayout.TextField(createdGameObject.Name);
+            ObjectName = EditorGUILayout.TextField(ObjectName);
             EditorGUILayout.EndHorizontal();
 
             EditorGUILayout.BeginHorizontal();
@@ -65,12 +64,15 @@ namespace RealityFlow.Plugin.Editor
             // EditorGUILayout.EndHorizontal();
             //-----------------------------------------------------------------------------------------------------
 
-            createdGameObject.Position = EditorGUILayout.Vector3Field("Position", createdGameObject.Position);
+            EditorGUILayout.BeginHorizontal();
+            ObjectPosition = EditorGUILayout.Vector3Field("Position", ObjectPosition);
+            EditorGUILayout.EndHorizontal();
 
             //createdGameObject.transform.rotation = EditorGUILayout.Vector3Field("Rotation", createdGameObject.transform.rotation);
 
-
-            createdGameObject.Scale = EditorGUILayout.Vector3Field("Scale", createdGameObject.Scale);
+            EditorGUILayout.BeginHorizontal();
+            ObjectScale = EditorGUILayout.Vector3Field("Scale", ObjectScale);
+            EditorGUILayout.EndHorizontal();
 
             //objData.color = EditorGUILayout.ColorField("Color", objData.color);
 
@@ -78,7 +80,8 @@ namespace RealityFlow.Plugin.Editor
             //{
             //    EditorGUILayout.HelpBox("This object needs a [Mesh] before it can be created.", MessageType.Warning);
             //}
-            /*else*/ if (createdGameObject.Name == null || createdGameObject.Name.Equals(""))
+            /*else*/
+            if (ObjectName == null)
             {
                 EditorGUILayout.HelpBox("This object needs a [Name] before it can be created.", MessageType.Warning);
             }
@@ -87,8 +90,8 @@ namespace RealityFlow.Plugin.Editor
             {
                 if (GUILayout.Button("Create", GUILayout.Height(30)))
                 {
-                    createdGameObject.AttachedGameObject = new GameObject(createdGameObject.Name);
-                    Operations.CreateObject(createdGameObject, /*FlowNetworkManagerEditor.currentUser,*/ FlowNetworkManagerEditor.currentProject.FlowId, (_, e) => Debug.Log(e.message));
+                    FlowTObject createdGameObject = new FlowTObject(ObjectName, ObjectPosition, new Quaternion(), ObjectScale, new Color());
+                    Operations.CreateObject(createdGameObject, /*FlowNetworkManagerEditor.currentUser,*/ FlowNetworkManagerEditor.currentProject.Id, (_, e) => Debug.Log(e.message));
                     //SetupObjectManager();
                     //SaveObjectData(objData);
                     window.Close();

@@ -32,6 +32,7 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.ProjectMessages
         public DeleteProject_Received(bool wasSuccessful)
         {
             this.WasSuccessful = wasSuccessful;
+            this.MessageType = "DeleteProject";
         }
 
         /// <summary>

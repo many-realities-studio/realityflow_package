@@ -8,6 +8,6 @@ namespace RealityFlow.Plugin.Scripts
     public interface FlowValue
     {
         [DataMember]
-        string FlowId { get; set; }
+        string Id { get; set; }
     }
 }

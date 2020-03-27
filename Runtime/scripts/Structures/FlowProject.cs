@@ -15,7 +15,7 @@ namespace RealityFlow.Plugin.Scripts
     public class FlowProject : FlowValue
     {
         [JsonProperty("Id")]
-        public string FlowId { get; set; } // The unique ID of the project
+        public string Id { get; set; } // The unique ID of the project
 
         [JsonProperty("Description")]
         public string Description { get; set; } // Description of the project
@@ -26,12 +26,12 @@ namespace RealityFlow.Plugin.Scripts
         [JsonProperty("ProjectName")]
         public string ProjectName { get; set; } // Name of the project
 
-        //[JsonProperty("")]
-        //public IEnumerable<FlowTObject> _ObjectList { get; set; }
+        [JsonProperty("_ObjectList")]
+        public IEnumerable<FlowTObject> _ObjectList { get; set; }
 
         public FlowProject(string flowId, string description, int dateModified, string projectName/*, IEnumerable<FlowTObject> ObjectList*/)
         {
-            FlowId = flowId;
+            Id = flowId;
             Description = description;
             DateModified = dateModified;
             ProjectName = projectName;

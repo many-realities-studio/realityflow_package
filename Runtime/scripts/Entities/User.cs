@@ -14,7 +14,7 @@ namespace RealityFlow.Plugin.Scripts
         [DataMember]
         public string Password { get; set; }
         [DataMember]
-        public string FlowId { get; set; }
+        public string Id { get; set; }
 
         public User(string username, string password)
         {

@@ -17,7 +17,7 @@ namespace RealityFlow.Plugin.Tests
         [OneTimeSetUp]
         public void Setup()
         {
-            string url = "ws://echo.websocket.org";
+            string url = "ws://localhost:8999";
             Operations.ConnectToServer(url);
 
             testUser = new FlowUser("user", "pass");
@@ -33,12 +33,12 @@ namespace RealityFlow.Plugin.Tests
             // Arrange
             AutoResetEvent autoResetEvent = new AutoResetEvent(false);
 
-            RegisterUser_Received expected = new RegisterUser_Received(null, true);
+            RegisterUser_Received expected = new RegisterUser_Received(true);
             expected.WasSuccessful = true;
 
             // Act (and assert)
             ConfirmationMessage_Received actual = null;
-            Operations.Register("user", "pass", (sender, e) => 
+            Operations.Register(testUser.Username, testUser.Password, (sender, e) => 
             {
                 Debug.Log("Received message: " + e.message.ToString());
                 actual = e.message;
