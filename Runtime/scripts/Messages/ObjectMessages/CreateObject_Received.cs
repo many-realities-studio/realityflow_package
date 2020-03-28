@@ -47,7 +47,7 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.ObjectMessages
         /// <param name="message">The message to be parsed</param>
         public static void ReceiveMessage(string message)
         {
-            CreateObject_Received response = UnityEngine.JsonUtility.FromJson<CreateObject_Received>(message);
+            CreateObject_Received response = MessageSerializer.DesearializeObject<CreateObject_Received>(message);
             response.RaiseEvent();
         }
 
