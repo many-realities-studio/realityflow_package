@@ -18,7 +18,7 @@ using Packages.realityflow_package.Runtime.scripts.Messages.RoomMessages;
 public class FlowNetworkManagerEditor : EditorWindow
 {
     private const string Url = "ws://localhost:8999/";
-    //private const string Url = "plato.mrl.ai:8999";
+    //private const string Url = "ws://plato.mrl.ai:8999";
 
     // View parameters
     private Rect headerSection;
@@ -276,7 +276,10 @@ public class FlowNetworkManagerEditor : EditorWindow
 
     public void Update()
     {
-        Unity.EditorCoroutines.Editor.EditorCoroutineUtility.StartCoroutine(Operations.FlowWebsocket.ReceiveMessage(), Operations.FlowWebsocket);
+        //if(Operations.FlowWebsocket != null)
+        //{
+            Unity.EditorCoroutines.Editor.EditorCoroutineUtility.StartCoroutine(Operations.FlowWebsocket.ReceiveMessage(), Operations.FlowWebsocket);
+        //}
 
         //foreach(string flowObjectId in FlowTObject.idToGameObjectMapping.Keys)
         //{
