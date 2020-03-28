@@ -15,7 +15,7 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.ProjectMessages
     /// </summary>
     public class CreateProject_SendToServer : BaseMessage
     {
-        [JsonProperty("Project")]
+        [JsonProperty("FlowProject")]
         FlowProject flowProject { get; set; }
 
         [JsonProperty("FlowUser")]
