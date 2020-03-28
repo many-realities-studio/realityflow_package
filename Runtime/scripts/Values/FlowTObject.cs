@@ -342,7 +342,9 @@ namespace RealityFlow.Plugin.Scripts
         {
             if (AttachedGameObject.transform.hasChanged == true)
             {
+                bool tempCanBeModified = this.CanBeModified;
                 PropertyCopier<FlowTObject, FlowTObject>.Copy(newValues, this);
+                this.CanBeModified = tempCanBeModified;
 
                 if (CanBeModified == true)
                 {
@@ -355,7 +357,9 @@ namespace RealityFlow.Plugin.Scripts
 
         private void UpdateObjectLocally(FlowTObject newValues)
         {
+            bool tempCanBeModified = this.CanBeModified;
             PropertyCopier<FlowTObject, FlowTObject>.Copy(newValues, this);
+            this.CanBeModified = tempCanBeModified;
         }
 
         public void CheckIn()
