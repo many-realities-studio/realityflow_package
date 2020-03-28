@@ -54,12 +54,19 @@ namespace Packages.realityflow_package.Runtime.scripts
         {
             //string url = "ws://echo.websocket.org";
             Debug.Log("Establishing websocket connection to " + url);
-            websocket = new WebSocketSharp.WebSocket(url);
-            //websocket.OnMessage += (sender, e) => Debug.Log("Received message: " + e.Data.ToString());
-            websocket.OnMessage += (sender, e) => ActionOnReceiveMessage(e.Data.ToString());
-            websocket.Connect();
+            try
+            {
+                websocket = new WebSocketSharp.WebSocket(url);
+                //websocket.OnMessage += (sender, e) => Debug.Log("Received message: " + e.Data.ToString());
+                websocket.OnMessage += (sender, e) => ActionOnReceiveMessage(e.Data.ToString());
+                websocket.Connect();
 
-            Debug.Log("Connection established with " + url);
+                Debug.Log("Connection established with " + url);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError("Failed to establish connection to: " + url + ", " + e);
+            }
         }
 
         /// <summary>
