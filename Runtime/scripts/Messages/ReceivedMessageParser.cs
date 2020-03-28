@@ -15,6 +15,7 @@ using Packages.realityflow_package.Runtime.scripts.Messages.ObjectMessages;
 using Packages.realityflow_package.Runtime.scripts.Messages.ProjectMessages;
 using Packages.realityflow_package.Runtime.scripts.Messages.RoomMessages;
 using Packages.realityflow_package.Runtime.scripts.Messages.BehaviourMessages;
+using Packages.realityflow_package.Runtime.scripts.Messages.CheckoutMessages;
 
 namespace Packages.realityflow_package.Runtime.scripts
 {
@@ -55,9 +56,12 @@ namespace Packages.realityflow_package.Runtime.scripts
 
             // Behaviour Messages
             messageRouter.Add("CreateBehaviour", CreateBehaviour_Received.ReceiveMessage);
-
-            
+          
+            // Checkout system messages
+            messageRouter.Add("CheckinObject", CheckinObject_Received.ReceiveMessage);
+            messageRouter.Add("CheckoutObject", CheckoutObject_Received.ReceiveMessage);
         }
+
         public static void DoNothing(string message)
         {
 

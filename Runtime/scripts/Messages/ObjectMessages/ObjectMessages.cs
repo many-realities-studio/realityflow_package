@@ -39,7 +39,7 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.ObjectMessages
     
     public class UpdateObject_SendToServer : BaseMessage
     {
-        [JsonProperty("flowObject")]
+        [JsonProperty("FlowObject")]
         public FlowTObject flowObject { get; set; }
 
         [JsonProperty("ProjectId")]
@@ -68,7 +68,7 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.ObjectMessages
         public DeleteObject_SendToServer(string projectId, string objectId)
         {
             ProjectId = projectId;
-            this.ObjectId = ObjectId;
+            this.ObjectId = objectId;
             this.MessageType = "DeleteObject";
         }
     }

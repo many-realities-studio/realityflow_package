@@ -47,7 +47,7 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.RoomMessages
         /// <param name="message">The message to be parsed</param>
         public static void ReceiveMessage(string message)
         {
-            JoinRoom_Received response = UnityEngine.JsonUtility.FromJson<JoinRoom_Received>(message);
+            JoinRoom_Received response = MessageSerializer.DesearializeObject<JoinRoom_Received>(message);
             response.RaiseEvent();
         }
 

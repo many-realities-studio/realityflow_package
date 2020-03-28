@@ -3,19 +3,22 @@ using RealityFlow.Plugin.Scripts;
 using System.Runtime.Serialization;
 using System.Reflection;
 using Packages.realityflow_package.Runtime.scripts;
-using Packages.realityflow_package.Runtime.scripts.Managers;
+//using Packages.realityflow_package.Runtime.scripts.Managers;
 using System.Collections.Generic;
 using System;
 using Newtonsoft.Json;
 
 namespace RealityFlow.Plugin.Scripts
 {
+    [System.Serializable]
     public class FlowTObject : FlowValue
     {
         public static Dictionary<string, FlowTObject> idToGameObjectMapping = new Dictionary<string, FlowTObject>();
 
+        public bool CanBeModified { get => _canBeModified; set => _canBeModified = value; }
+
         [JsonProperty("Id")]
-        public string Id { get; set; } = Guid.NewGuid().ToString();
+        public string Id { get => _id; set => _id = value; }
 
         [JsonIgnore]
         private GameObject _AttachedGameObject = null;
@@ -41,10 +44,16 @@ namespace RealityFlow.Plugin.Scripts
                 }
                 return _AttachedGameObject;
             }
+
             set { _AttachedGameObject = value; }
         }
 
         private Color _ObjectColor;
+        private bool _outgoingRequest;
+
+        [SerializeField]
+        private string _id = Guid.NewGuid().ToString();
+
         [JsonIgnore]
         public Color ObjectColor
         {
@@ -57,13 +66,27 @@ namespace RealityFlow.Plugin.Scripts
                 B = value.b;
                 A = value.a;
             }
-        } 
+        }
+
+        [SerializeField]
+        private float _X;
+
+        [SerializeField]
+        private bool _canBeModified;
 
         [JsonProperty("X")]
         public float X
         {
-            get => AttachedGameObject.transform.localPosition.x; 
-            set => AttachedGameObject.transform.localPosition = new Vector3(value, Y, Z);
+            get
+            {
+                _X = AttachedGameObject.transform.localPosition.x;
+                return _X;
+            }
+            set
+            {
+                _X = value;
+                AttachedGameObject.transform.localPosition = new Vector3(value, Y, Z);
+            }
         }
 
         [JsonProperty("Y")]
@@ -234,7 +257,7 @@ namespace RealityFlow.Plugin.Scripts
         //{
         //   Transform t;
         //   this.TryGetComponent<Transform>(out t);
-           
+
         //    if(t.hasChanged == true)
         //    {
         //        Position = t.position;
@@ -256,6 +279,11 @@ namespace RealityFlow.Plugin.Scripts
             idToGameObjectMapping.Add(Id, this);
             AttachedGameObject.transform.hasChanged = false;
             AttachedGameObject.name = name;
+
+            AttachedGameObject.AddComponent<FlowObject_Monobehaviour>();
+            var monoBehaviour = AttachedGameObject.GetComponent<FlowObject_Monobehaviour>();
+
+            monoBehaviour.underlyingFlowObject = this;
         }
 
         [JsonConstructor]
@@ -278,9 +306,20 @@ namespace RealityFlow.Plugin.Scripts
             A = a;
             Name = name;
 
-            idToGameObjectMapping.Add(Id, this);
-            AttachedGameObject.transform.hasChanged = false;
-            AttachedGameObject.name = name;
+            if(idToGameObjectMapping.ContainsKey(id))
+            {
+                idToGameObjectMapping[id].UpdateObjectLocally(this);
+            }
+            else // Create game object if it doesn't exist
+            {
+                idToGameObjectMapping.Add(Id, this);
+                AttachedGameObject.name = name;
+                AttachedGameObject.AddComponent<FlowObject_Monobehaviour>();
+                AttachedGameObject.transform.hasChanged = false;
+
+                var monoBehaviour = AttachedGameObject.GetComponent<FlowObject_Monobehaviour>();
+                monoBehaviour.underlyingFlowObject = this;
+            }
         }
 
         /// <summary>
@@ -299,9 +338,79 @@ namespace RealityFlow.Plugin.Scripts
         /// Copy all new values into this object
         /// </summary>
         /// <param name="newValues">The values that should be copied over into this object</param>
-        public void UpdateObject(FlowTObject newValues)
+        public void UpdateObjectGlobally(FlowTObject newValues)
+        {
+            if (AttachedGameObject.transform.hasChanged == true)
+            {
+                PropertyCopier<FlowTObject, FlowTObject>.Copy(newValues, this);
+
+                if (CanBeModified == true)
+                {
+                    Operations.UpdateObject(this, ConfigurationSingleton.CurrentUser, ConfigurationSingleton.CurrentProject.Id, (_, e) => { Debug.Log(e.message); });
+                }
+
+                AttachedGameObject.transform.hasChanged = false;
+            }
+        }
+
+        private void UpdateObjectLocally(FlowTObject newValues)
         {
             PropertyCopier<FlowTObject, FlowTObject>.Copy(newValues, this);
+        }
+
+        public void CheckIn()
+        {
+            if (CanBeModified == true)
+            {
+                Operations.CheckinObject(Id, ConfigurationSingleton.CurrentProject.Id, (_, e) =>
+                {
+                    // On successful checkin
+                    if (e.message.WasSuccessful == true)
+                    {
+                        _canBeModified = false;
+                        Debug.Log("Setting to false");
+                    }
+                    else
+                    {
+                        _canBeModified = true;
+                        Debug.Log("Setting to true");
+                    }
+                    Debug.Log(e.message.WasSuccessful);
+                    Debug.Log("Can be modified2 = " + CanBeModified);
+                });
+            }
+        }
+
+        public void CheckOut()
+        {
+            if (CanBeModified == false)
+            {
+                Operations.CheckoutObject(Id, ConfigurationSingleton.CurrentProject.Id, (_, e) =>
+                    {
+                // On successful checkout
+                if (e.message.WasSuccessful == true)
+                        {
+                            _canBeModified = true;
+                            Debug.Log("Setting to true");
+                        }
+                        else
+                        {
+                            _canBeModified = false;
+                            Debug.Log("Setting to false");
+                        }
+                        Debug.Log(e.message.WasSuccessful);
+                        Debug.Log("Can be modified1 = " + _canBeModified);
+                    }); 
+            }
+        }
+        
+        public static void RemoveAllObjectsFromScene()
+        {
+            foreach (FlowTObject flowObject in idToGameObjectMapping.Values)
+            {
+                UnityEngine.Object.DestroyImmediate(flowObject.AttachedGameObject);
+                FlowTObject.idToGameObjectMapping = new Dictionary<string, FlowTObject>();
+            }
         }
 
         //public bool Equals(FlowTObject fo)

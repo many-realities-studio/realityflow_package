@@ -15,17 +15,17 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.ObjectMessages
         public FlowTObject flowObject { get; set; }
         
         // Definition of event type (What gets sent to the subscribers
-        public delegate void OpenProjectReceived_EventHandler(object sender, FinalizedUpdateObjectMessageEventArgs eventArgs);
+        public delegate void FinalizedUpdateObjectRecieved_EventHandler(object sender, FinalizedUpdateObjectMessageEventArgs eventArgs);
 
         // The object that handles publishing/subscribing
-        private static OpenProjectReceived_EventHandler _ReceivedEvent;
+        private static FinalizedUpdateObjectRecieved_EventHandler _ReceivedEvent;
 
         public FinalizedUpdateObject_Received(FlowTObject flowObject)
         {
             this.flowObject = flowObject;
         }
 
-        public static event OpenProjectReceived_EventHandler ReceivedEvent
+        public static event FinalizedUpdateObjectRecieved_EventHandler ReceivedEvent
         {
             add
             {
@@ -46,7 +46,7 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.ObjectMessages
         /// <param name="message">The message to be parsed</param>
         public static void ReceiveMessage(string message)
         {
-            FinalizedUpdateObject_Received response = UnityEngine.JsonUtility.FromJson<FinalizedUpdateObject_Received>(message);
+            FinalizedUpdateObject_Received response = MessageSerializer.DesearializeObject<FinalizedUpdateObject_Received>(message);
             response.RaiseEvent();
         }
 

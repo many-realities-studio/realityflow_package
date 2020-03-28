@@ -75,28 +75,28 @@ namespace RealityFlow.Plugin.Tests
             Assert.AreEqual(expected, actual);
         }
 
-        [Test]
-        public void DeleteObjectTest()
-        {
-            // Arrange
-            AutoResetEvent autoResetEvent = new AutoResetEvent(false);
-            DeleteObject_Received expected = new DeleteObject_Received(testObject);
+        //[Test]
+        //public void DeleteObjectTest()
+        //{
+        //    // Arrange
+        //    AutoResetEvent autoResetEvent = new AutoResetEvent(false);
+        //    DeleteObject_Received expected = new DeleteObject_Received();
 
-            // Act (and assert)
-            DeleteObject_Received actual = null;
-            Operations.DeleteObject(testObject.Id, testProject.Id, (sender, e) =>
-            {
-                Debug.Log("Received message: " + e.message.ToString());
-                actual = e.message;
+        //    // Act (and assert)
+        //    DeleteObject_Received actual = null;
+        //    Operations.DeleteObject(testObject.Id, testProject.Id, (sender, e) =>
+        //    {
+        //        Debug.Log("Received message: " + e.message.ToString());
+        //        actual = e.message;
 
-                autoResetEvent.Set();
-            });
+        //        autoResetEvent.Set();
+        //    });
 
-            // Wait for 3 seconds for a response
-            Assert.IsTrue(autoResetEvent.WaitOne(messageTimeout));
-            Debug.Log("actual = " + actual?.ToString());
-            Assert.AreEqual(expected, actual);
-        }
+        //    // Wait for 3 seconds for a response
+        //    Assert.IsTrue(autoResetEvent.WaitOne(messageTimeout));
+        //    Debug.Log("actual = " + actual?.ToString());
+        //    Assert.AreEqual(expected, actual);
+        //}
 
         [Test]
         public void FinalizedUpdateObjectTest()
