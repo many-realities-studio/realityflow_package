@@ -14,13 +14,13 @@ using Packages.realityflow_package.Runtime.scripts.Messages.UserMessages;
 using Packages.realityflow_package.Runtime.scripts.Messages.ProjectMessages;
 using Packages.realityflow_package.Runtime.scripts.Messages.RoomMessages;
 using Behaviours;
-
+using System.Collections;
 
 [CustomEditor(typeof(FlowWebsocket))]
 public class FlowNetworkManagerEditor : EditorWindow
 {
-    private const string Url = "ws://localhost:8999/";
-    //private const string Url = "plato.mrl.ai:8999";
+    //private const string Url = "ws://localhost:8999/";
+    private const string Url = "ws://plato.mrl.ai:8999";
 
     // View parameters
     private Rect headerSection;
@@ -32,7 +32,7 @@ public class FlowNetworkManagerEditor : EditorWindow
     Color bodySectionColor = new Color(150 / 255f, 150 / 255f, 150 / 255f, 1f);
     private string uName;
     private string pWord;
-    private EWindowView window = EWindowView.PROJECT_HUB;
+    private EWindowView window = EWindowView.LOGIN;
     private string projectName;
     private string userToInvite;
 
@@ -44,8 +44,9 @@ public class FlowNetworkManagerEditor : EditorWindow
     //FlowTObject newObject = null;// = new FlowTObject(new Color(0, 0, 0, 0), "TestFlowId", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "TestObject");
     //FlowUser newUser = null;// = new FlowUser("testUsername", "TestPassword");
 
-    public string[] objectOptions = new string[] { "sphere1", "cube", "sphere2", "enemy1" };
-    public Dictionary<string, string> objectIds = new Dictionary<string, string>();
+    public string[] objectOptions;
+    public ArrayList objectNames = new ArrayList();
+    public ArrayList objectIds = new ArrayList();
     public Boolean addingChain = false;
     public int selectedTrigger = 0;
     public int selectedTarget = 0;
@@ -130,10 +131,6 @@ public class FlowNetworkManagerEditor : EditorWindow
         _ViewDictionary.Add(EWindowView.CREATE_DISABLE, _CreateDisableView);
 
 
-        foreach (string objectName in objectOptions)
-        {
-            objectIds.Add(objectName, objectName);
-        }
     }
 
     public void OnGUI()
@@ -482,6 +479,20 @@ public class FlowNetworkManagerEditor : EditorWindow
 
         if (GUILayout.Button("Add Interaction", GUILayout.Height(40)))
         {
+            objectNames.Clear();
+            objectIds.Clear();
+
+            Dictionary<string, FlowTObject>.ValueCollection  values = FlowTObject.idToGameObjectMapping.Values;
+
+            foreach(FlowTObject obj in values)
+            {
+                objectNames.Add(obj.Name);
+                objectIds.Add(obj.Id);
+            }
+
+            objectOptions = (string[])objectNames.ToArray(typeof(string));
+
+
             // Send user to Create Behaviour Screen
             addingChain = false;
             window = EWindowView.CREATE_BEHAVIOUR;
@@ -796,8 +807,8 @@ public class FlowNetworkManagerEditor : EditorWindow
    
         if (GUILayout.Button("Yes", GUILayout.Height(30), GUILayout.Width(40)))
         {
-            objectIds.TryGetValue(objectOptions[selectedTrigger], out string firstObject);
-            objectIds.TryGetValue(objectOptions[selectedTarget], out string secondObject);
+            string firstObject = objectIds[selectedTrigger].ToString();
+            string secondObject = objectOptions[selectedTarget].ToString();
 
             addingChain = true;
 
@@ -809,8 +820,8 @@ public class FlowNetworkManagerEditor : EditorWindow
 
         if (GUILayout.Button("No", GUILayout.Height(30), GUILayout.Width(40)))
         {
-            objectIds.TryGetValue(objectOptions[selectedTrigger], out string firstObject);
-            objectIds.TryGetValue(objectOptions[selectedTarget], out string secondObject);
+            string firstObject = objectIds[selectedTrigger].ToString();
+            string secondObject = objectOptions[selectedTarget].ToString();
 
             addingChain = false;
 
@@ -846,7 +857,7 @@ public class FlowNetworkManagerEditor : EditorWindow
 
         if (GUILayout.Button("OK", GUILayout.Height(30), GUILayout.Width(40)))
         {
-            objectIds.TryGetValue(objectOptions[selectedTrigger], out string firstObject);
+            string firstObject = objectIds[selectedTrigger].ToString();
 
             addingChain = true;
 
@@ -882,8 +893,7 @@ public class FlowNetworkManagerEditor : EditorWindow
 
         if (GUILayout.Button("Yes", GUILayout.Height(30), GUILayout.Width(40)))
         {
-            objectIds.TryGetValue(objectOptions[selectedTrigger], out string firstObject);
-            addingChain = true;
+            string firstObject = objectIds[selectedTrigger].ToString();
 
             FlowBehaviour fb = new FlowBehaviour("Enable", "1", firstObject, firstObject, null, firstObject);
             AddBehaviour(fb);
@@ -893,7 +903,7 @@ public class FlowNetworkManagerEditor : EditorWindow
 
         if (GUILayout.Button("No", GUILayout.Height(30), GUILayout.Width(40)))
         {
-            objectIds.TryGetValue(objectOptions[selectedTrigger], out string firstObject);
+            string firstObject = objectIds[selectedTrigger].ToString();
             addingChain = false;
 
             FlowBehaviour fb = new FlowBehaviour("Enable", "1", firstObject, firstObject, null, firstObject);
@@ -927,7 +937,7 @@ public class FlowNetworkManagerEditor : EditorWindow
 
         if (GUILayout.Button("Yes", GUILayout.Height(30), GUILayout.Width(40)))
         {
-            objectIds.TryGetValue(objectOptions[selectedTrigger], out string firstObject);
+            string firstObject = objectIds[selectedTrigger].ToString();
             addingChain = true;
 
             FlowBehaviour fb = new FlowBehaviour("Disable", "1", firstObject, firstObject, null, firstObject);
@@ -938,7 +948,7 @@ public class FlowNetworkManagerEditor : EditorWindow
 
         if (GUILayout.Button("No", GUILayout.Height(30), GUILayout.Width(40)))
         {
-            objectIds.TryGetValue(objectOptions[selectedTrigger], out string firstObject);
+            string firstObject = objectIds[selectedTrigger].ToString();
             addingChain = false;
 
             FlowBehaviour fb = new FlowBehaviour("Disable", "1", firstObject, firstObject, null, firstObject);
@@ -978,7 +988,7 @@ public class FlowNetworkManagerEditor : EditorWindow
 
         if (!addingChain)
         {
-            Operations.CreateBehaviour(headBehaviour, "currentprojectid", (_, e) =>
+            Operations.CreateBehaviour(headBehaviour, ConfigurationSingleton.CurrentProject.Id, (_, e) =>
             {
             });
         }

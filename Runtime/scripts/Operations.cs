@@ -137,6 +137,8 @@ namespace Packages.realityflow_package.Runtime.scripts
             CreateBehaviour_Received.ReceivedEvent += callbackFunction;
         }
 
+        
+
         public static void DeleteBehaviour(FlowBehaviour behaviour, string behaviourId, string projectId, DeleteBehaviour_Received.DeleteBehaviourReceived_EventHandler callbackFunction)
         {
             DeleteBehaviour_SendToServer deleteBehaviour = new DeleteBehaviour_SendToServer(behaviour, behaviourId, projectId);
@@ -288,7 +290,43 @@ namespace Packages.realityflow_package.Runtime.scripts
         private static void _CreateBehaviour(object sender, CreateBehaviourEventArgs eventArgs)
         {
             // this is where things happen after a createBehaviour message is deserialized
+
+            BehaviourEventManager bem = GameObject.Find("BehaviourEventManager").GetComponent<BehaviourEventManager>();
+           // FlowBehaviour[] fbs = eventArgs.message.FlowBehaviour;
         }
+
+       /* public static BehaviourEvent SetBehaviour(BehaviourEventManager bem, FlowBehaviour fb, BehaviourEvent be)
+        {
+           
+            // this is where things happen after a createBehaviour message is deserialized
+
+
+            FlowTObject.idToGameObjectMapping.TryGetValue(fb.FirstObject, out FlowTObject firstobject);
+            FlowTObject.idToGameObjectMapping.TryGetValue(fb.SecondObject, out FlowTObject secondobject);
+
+            GameObject firstObj = firstobject.AttachedGameObject;
+            GameObject secondObj = secondobject.AttachedGameObject;
+
+            ObjectIsInteractable oIsIFirst = firstObj.GetComponent<ObjectIsInteractable>();
+            ObjectIsInteractable oIsISecond = secondObj.GetComponent<ObjectIsInteractable>();
+
+            if (oIsIFirst == null)
+            {
+                oIsIFirst = bem.MakeObjectInteractable(firstObj);
+            }
+            if (oIsISecond == null)
+            {
+                oIsISecond = bem.MakeObjectInteractable(secondObj);
+            }
+
+            //BehaviourEvent be = bem.CreateNewBehaviourEvent(fb.Name, oIsIFirst.GetGuid(), oIsISecond.GetGuid(), null);
+/*
+            Debug.Log("Behaviour Created!");
+            Debug.Log(be.GetName());
+            Debug.Log(be.GetSecondObject());
+
+            return be;
+        }*/
 
         private static void _DeleteBehaviour(object sender, DeleteBehaviourEventArgs eventArgs)
         {

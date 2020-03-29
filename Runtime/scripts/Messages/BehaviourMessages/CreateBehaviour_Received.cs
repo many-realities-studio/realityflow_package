@@ -18,7 +18,7 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.BehaviourMessage
     {
 
         [JsonProperty("FlowBehaviour")]
-        public FlowBehaviour flowBehaviour { get; set; }
+        public FlowBehaviour[] flowBehaviour { get; set; }
 
         [JsonProperty("ObjectId")]
         public String objectId { get; set; }

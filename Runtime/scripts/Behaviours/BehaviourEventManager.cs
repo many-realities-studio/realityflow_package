@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Microsoft.MixedReality.Toolkit.UI;
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -8,8 +10,9 @@ namespace Behaviours
     {
         public event Action<string> SendEventDown;
         public Dictionary<Guid, GameObject> GoIds;
+        public States DefaultInteractableStates;
 
-        void Start()
+        void Awake()
         {
             GoIds = new Dictionary<Guid, GameObject>();
         }
@@ -17,15 +20,35 @@ namespace Behaviours
         public BehaviourEvent CreateNewBehaviourEvent(string name, Guid go1, Guid go2, BehaviourEvent chain)
         {
             GameObject g1 = GetGoFromGuid(go1);
-            BehaviourEvent bEvent = g1?.AddComponent<BehaviourEvent>();
-            if (bEvent)
+            if (g1)
             {
-                bEvent.SetName(name);
-                bEvent.SetSecondObject(go2);
-                bEvent.SetChain(chain);
+                BehaviourEvent bEvent = g1.AddComponent<BehaviourEvent>();
+                if (bEvent)
+                {
+                    bEvent.SetName(name);
+                    bEvent.SetSecondObject(go2);
+                    bEvent.SetChain(chain);
+                }
+
+                g1.GetComponent<ObjectIsInteractable>().AddInteractableEvent(bEvent);
+                GetGoFromGuid(go2).GetComponent<ObjectIsInteractable>().AddInteractableEvent(bEvent);
+
+                return bEvent;
+            }
+            return null;
+        }
+
+        public BehaviourEvent AddChain(BehaviourEvent b1, BehaviourEvent b2)
+        {
+            BehaviourEvent temp = b1;
+
+            while (temp.chainedEvent != null)
+            {
+                temp = temp.chainedEvent;
             }
 
-            return bEvent;
+            temp.SetChain(b2);
+            return b1;
         }
 
         // needs to check second gameobject
@@ -52,12 +75,15 @@ namespace Behaviours
             // sends updated coordinates
         }
 
-        public void MakeObjectInteractable(GameObject go)
+        public ObjectIsInteractable MakeObjectInteractable(GameObject go)
         {
             ObjectIsInteractable oisI = go.AddComponent<ObjectIsInteractable>();
+
             Guid temp = oisI.GetGuid();
 
             GoIds.Add(temp, go);
+
+            return oisI;
         }
 
         public GameObject GetGoFromGuid(Guid guid)
@@ -65,6 +91,8 @@ namespace Behaviours
             GameObject temp;
 
             GoIds.TryGetValue(guid, out temp);
+
+            Debug.Log(temp);
             return temp;
         }
 

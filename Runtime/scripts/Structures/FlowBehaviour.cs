@@ -18,10 +18,10 @@ namespace RealityFlow.Plugin.Scripts
         [JsonProperty("Id")]
         public string Id { get; set; } // The ID of this behaviour
 
-        [JsonProperty("TriggerObjectID")]
+        [JsonProperty("Trigger")]
         public string FirstObject { get; set; } // The first object ID - typically the trigger object
 
-        [JsonProperty("TargetObjectID")]
+        [JsonProperty("Target")]
         public string SecondObject { get; set; } // The second object ID - typically the target object
 
         [JsonProperty("BehaviourChain")]
