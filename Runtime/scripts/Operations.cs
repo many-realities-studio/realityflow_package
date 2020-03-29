@@ -304,6 +304,7 @@ namespace Packages.realityflow_package.Runtime.scripts
 
                 current = be;
                 Debug.Log(be.GetName());
+                index--;
             }
 
         }
@@ -317,10 +318,7 @@ namespace Packages.realityflow_package.Runtime.scripts
             FlowTObject.idToGameObjectMapping.TryGetValue(fb.FirstObject, out FlowTObject firstobject);
             FlowTObject.idToGameObjectMapping.TryGetValue(fb.SecondObject, out FlowTObject secondobject);
 
-            if(firstobject == null || secondobject == null)
-            {
-                Debug.Log("WHAT THEY DOIN????!?!");
-            }
+         
             GameObject firstObj = firstobject.AttachedGameObject;
             GameObject secondObj = secondobject.AttachedGameObject;
 
