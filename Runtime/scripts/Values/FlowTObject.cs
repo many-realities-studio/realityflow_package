@@ -278,14 +278,14 @@ namespace RealityFlow.Plugin.Scripts
         //    Operations.UpdateObject(this, ConfigurationSingleton.CurrentUser, ConfigurationSingleton.CurrentProject.Id, (_, e) => Debug.Log("Update object received"));
         //}
 
-        public FlowTObject(string name, Vector3 position, Quaternion rotation, Vector3 scale, Color color)
+        public FlowTObject(string name, Vector3 position, Quaternion rotation, Vector3 scale, Color color, string ObjectPrefab)
         {
             this.Name = name;
             this.Position = position;
             this.Rotation = rotation;
             this.Scale = scale;
             this.ObjectColor = color;
-            this.Prefab = "cube";
+            this.Prefab = ObjectPrefab;
 
             idToGameObjectMapping.Add(Id, this);
             AttachedGameObject.transform.hasChanged = false;
@@ -298,7 +298,7 @@ namespace RealityFlow.Plugin.Scripts
         }
 
         [JsonConstructor]
-        public FlowTObject(string id, float x, float y, float z, float q_x, float q_y, float q_z, float q_w, float s_x, float s_y, float s_z, float r, float g, float b, float a, string name)
+        public FlowTObject(string id, float x, float y, float z, float q_x, float q_y, float q_z, float q_w, float s_x, float s_y, float s_z, float r, float g, float b, float a, string name, string prefab)
         {
             Id = id;
             X = x;
@@ -317,7 +317,7 @@ namespace RealityFlow.Plugin.Scripts
             A = a;
             Name = name;
 
-            this.Prefab = "cube";
+            this.Prefab = prefab;
 
             if(idToGameObjectMapping.ContainsKey(id))
             {
