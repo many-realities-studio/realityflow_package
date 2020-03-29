@@ -291,57 +291,58 @@ namespace Packages.realityflow_package.Runtime.scripts
         {
             // this is where things happen after a createBehaviour message is deserialized
 
+            FlowBehaviour[] flowBehaviours = eventArgs.message.flowBehaviour;
             BehaviourEventManager bem = GameObject.Find("BehaviourEventManager").GetComponent<BehaviourEventManager>();
 
-            int index = eventArgs.message.flowBehaviour.Length - 1;
+            int index = flowBehaviours.Length - 1;
             BehaviourEvent current = null;
 
            // FlowBehaviour fb = eventArgs.message.flowBehaviour[index];
 
             while(index > -1)
             {
-                FlowBehaviour fb = eventArgs.message.flowBehaviour[index];
+                FlowBehaviour fb = flowBehaviours[index];
                 BehaviourEvent be = SetBehaviour(bem, fb, current);
 
                 current = be;
                 Debug.Log(be.GetName());
                 index--;
             }
-
         }
 
-        public static BehaviourEvent SetBehaviour(BehaviourEventManager bem, FlowBehaviour fb, BehaviourEvent be)
+        public static BehaviourEvent SetBehaviour(BehaviourEventManager bem, FlowBehaviour fb, BehaviourEvent chainedBehaviour)
         {
-           
             // this is where things happen after a createBehaviour message is deserialized
-
 
             FlowTObject.idToGameObjectMapping.TryGetValue(fb.FirstObject, out FlowTObject firstobject);
             FlowTObject.idToGameObjectMapping.TryGetValue(fb.SecondObject, out FlowTObject secondobject);
 
-         
-            GameObject firstObj = firstobject.AttachedGameObject;
-            GameObject secondObj = secondobject.AttachedGameObject;
+            Debug.Log("FIRSTOBJECT");
+            Debug.Log(fb.FirstObject);
 
-            ObjectIsInteractable oIsIFirst = firstObj.GetComponent<ObjectIsInteractable>();
-            ObjectIsInteractable oIsISecond = secondObj.GetComponent<ObjectIsInteractable>();
+            GameObject firstGameObject = firstobject.AttachedGameObject;
+            GameObject secondGameObject = secondobject.AttachedGameObject;
 
-            if (oIsIFirst == null)
-            {
-                oIsIFirst = bem.MakeObjectInteractable(firstObj);
-            }
-            if (oIsISecond == null)
-            {
-                oIsISecond = bem.MakeObjectInteractable(secondObj);
-            }
+            //ObjectIsInteractable oIsIFirst = firstObj.GetComponent<ObjectIsInteractable>();
+            //ObjectIsInteractable oIsISecond = secondObj.GetComponent<ObjectIsInteractable>();
 
-            //BehaviourEvent be = bem.CreateNewBehaviourEvent(fb.Name, oIsIFirst.GetGuid(), oIsISecond.GetGuid(), null);
+            //if (oIsIFirst == null)
+            //{
+
+            ObjectIsInteractable oIsIFirst = bem.MakeObjectInteractable(firstGameObject, fb.FirstObject);
+            ObjectIsInteractable oIsISecond = bem.MakeObjectInteractable(secondGameObject, fb.SecondObject);
+            
+            //Debug.Log("GUID IS");
+            //Debug.Log(oIsIFirst.GetGuid().ToString());
+
+
+            BehaviourEvent newBehaviour = bem.CreateNewBehaviourEvent(fb.Name, oIsIFirst.GetGuid(), oIsISecond.GetGuid(), chainedBehaviour);
 
             Debug.Log("Behaviour Created!");
-            Debug.Log(be.GetName());
-            Debug.Log(be.GetSecondObject());
+            Debug.Log(newBehaviour.GetName());
+            Debug.Log(newBehaviour.GetSecondObject());
 
-            return be;
+            return newBehaviour;
         }
 
         private static void _DeleteBehaviour(object sender, DeleteBehaviourEventArgs eventArgs)

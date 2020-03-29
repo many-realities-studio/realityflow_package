@@ -9,15 +9,24 @@ namespace Behaviours
     public class BehaviourEventManager : MonoBehaviour
     {
         public event Action<string> SendEventDown;
-        public Dictionary<Guid, GameObject> GoIds;
+        public Dictionary<string, GameObject> GoIds = null;
         public States DefaultInteractableStates;
 
         void Awake()
         {
-            GoIds = new Dictionary<Guid, GameObject>();
+            if(GoIds == null)
+            {
+                GoIds = new Dictionary<string, GameObject>();
+            }
+            
         }
 
-        public BehaviourEvent CreateNewBehaviourEvent(string name, Guid go1, Guid go2, BehaviourEvent chain)
+        public void Initialize()
+        {
+            GoIds = new Dictionary<string, GameObject>();
+        }
+
+        public BehaviourEvent CreateNewBehaviourEvent(string name, string go1, string go2, BehaviourEvent chain)
         {
             GameObject g1 = GetGoFromGuid(go1);
             if (g1)
@@ -52,7 +61,7 @@ namespace Behaviours
         }
 
         // needs to check second gameobject
-        public void DeleteBehaviourEvent(Guid go1, Guid go2, BehaviourEvent bEvent)
+        public void DeleteBehaviourEvent(string  go1, string go2, BehaviourEvent bEvent)
         {
             GameObject g1 = GetGoFromGuid(go1);
             ObjectIsInteractable interactScript = g1.GetComponent<ObjectIsInteractable>();
@@ -70,25 +79,40 @@ namespace Behaviours
         /// <param name="go1"></param>
         /// <param name="go2"></param>
         /// <param name="chain"></param>
-        public void ListenToEvents(string eventName, Guid go1, Guid go2, BehaviourEvent chain)
+        public void ListenToEvents(string eventName, string go1, string go2, BehaviourEvent chain)
         {
             // sends updated coordinates
         }
 
-        public ObjectIsInteractable MakeObjectInteractable(GameObject go)
+        public ObjectIsInteractable MakeObjectInteractable(GameObject go, string objectId)
         {
-            ObjectIsInteractable oisI = go.AddComponent<ObjectIsInteractable>();
+            ObjectIsInteractable oisI = go.GetComponent<ObjectIsInteractable>();
+    
+            if(oisI == null)
+            {
+                oisI = go.AddComponent<ObjectIsInteractable>();
+                oisI.Initialize(objectId);
+            }
+            
+            string temp = oisI.GetGuid();
 
-            Guid temp = oisI.GetGuid();
-
-            GoIds.Add(temp, go);
-
+            if (!GoIds.ContainsKey(temp))
+            {
+                GoIds.Add(temp, go);
+            }
+            
             return oisI;
         }
 
-        public GameObject GetGoFromGuid(Guid guid)
+        public GameObject GetGoFromGuid(string guid)
         {
             GameObject temp;
+
+            if(GoIds == null)
+            {
+                GoIds = new Dictionary<string, GameObject>();
+            }
+            
 
             GoIds.TryGetValue(guid, out temp);
 

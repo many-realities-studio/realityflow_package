@@ -808,7 +808,7 @@ public class FlowNetworkManagerEditor : EditorWindow
         if (GUILayout.Button("Yes", GUILayout.Height(30), GUILayout.Width(40)))
         {
             string firstObject = objectIds[selectedTrigger].ToString();
-            string secondObject = objectOptions[selectedTarget].ToString();
+            string secondObject = objectIds[selectedTarget].ToString();
 
             addingChain = true;
 
@@ -821,7 +821,7 @@ public class FlowNetworkManagerEditor : EditorWindow
         if (GUILayout.Button("No", GUILayout.Height(30), GUILayout.Width(40)))
         {
             string firstObject = objectIds[selectedTrigger].ToString();
-            string secondObject = objectOptions[selectedTarget].ToString();
+            string secondObject = objectIds[selectedTarget].ToString();
 
             addingChain = false;
 
@@ -990,6 +990,11 @@ public class FlowNetworkManagerEditor : EditorWindow
         {
             Operations.CreateBehaviour(headBehaviour, ConfigurationSingleton.CurrentProject.Id, (_, e) =>
             {
+                if(e.message.WasSuccessful == true)
+                {
+                    Debug.Log("it twas successful");
+                    Debug.Log(e.message.flowBehaviour[0]);
+                }
             });
         }
     }
