@@ -11,6 +11,10 @@ public class TeleportCoordinates : MonoBehaviour
     [SerializeField]
     private bool isSZone = false;
 
+    /// <summary>
+    /// Global coordinates for Teleport, local for SnapZone
+    /// </summary>
+    /// <returns></returns>
     public Vector3 GetCoordinates()
     {
         return coordinates;
@@ -29,6 +33,12 @@ public class TeleportCoordinates : MonoBehaviour
     public bool IsSnapZone()
     {
         return isSZone;
+    }
+
+
+    public void SetSnapZone(bool tf)
+    {
+        isSZone = tf;
     }
 
     public void SetCoordinates(Vector3 newCoordinates)
