@@ -292,10 +292,23 @@ namespace Packages.realityflow_package.Runtime.scripts
             // this is where things happen after a createBehaviour message is deserialized
 
             BehaviourEventManager bem = GameObject.Find("BehaviourEventManager").GetComponent<BehaviourEventManager>();
-           // FlowBehaviour[] fbs = eventArgs.message.FlowBehaviour;
+
+            int index = eventArgs.message.flowBehaviour.Length - 1;
+            BehaviourEvent current = null;
+
+            FlowBehaviour fb = eventArgs.message.flowBehaviour[index];
+
+            while(index > -1)
+            {
+                BehaviourEvent be = SetBehaviour(bem, fb, current);
+
+                current = be;
+                Debug.Log(be.GetName());
+            }
+
         }
 
-       /* public static BehaviourEvent SetBehaviour(BehaviourEventManager bem, FlowBehaviour fb, BehaviourEvent be)
+        public static BehaviourEvent SetBehaviour(BehaviourEventManager bem, FlowBehaviour fb, BehaviourEvent be)
         {
            
             // this is where things happen after a createBehaviour message is deserialized
@@ -304,6 +317,10 @@ namespace Packages.realityflow_package.Runtime.scripts
             FlowTObject.idToGameObjectMapping.TryGetValue(fb.FirstObject, out FlowTObject firstobject);
             FlowTObject.idToGameObjectMapping.TryGetValue(fb.SecondObject, out FlowTObject secondobject);
 
+            if(firstobject == null || secondobject == null)
+            {
+                Debug.Log("WHAT THEY DOIN????!?!");
+            }
             GameObject firstObj = firstobject.AttachedGameObject;
             GameObject secondObj = secondobject.AttachedGameObject;
 
@@ -320,13 +337,13 @@ namespace Packages.realityflow_package.Runtime.scripts
             }
 
             //BehaviourEvent be = bem.CreateNewBehaviourEvent(fb.Name, oIsIFirst.GetGuid(), oIsISecond.GetGuid(), null);
-/*
+
             Debug.Log("Behaviour Created!");
             Debug.Log(be.GetName());
             Debug.Log(be.GetSecondObject());
 
             return be;
-        }*/
+        }
 
         private static void _DeleteBehaviour(object sender, DeleteBehaviourEventArgs eventArgs)
         {

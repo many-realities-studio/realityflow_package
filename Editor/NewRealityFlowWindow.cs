@@ -19,8 +19,8 @@ using System.Collections;
 [CustomEditor(typeof(FlowWebsocket))]
 public class FlowNetworkManagerEditor : EditorWindow
 {
-    //private const string Url = "ws://localhost:8999/";
-    private const string Url = "ws://plato.mrl.ai:8999";
+    private const string Url = "ws://localhost:8999/";
+    //private const string Url = "ws://plato.mrl.ai:8999";
 
     // View parameters
     private Rect headerSection;
