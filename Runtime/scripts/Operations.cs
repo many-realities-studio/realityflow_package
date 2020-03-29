@@ -296,10 +296,11 @@ namespace Packages.realityflow_package.Runtime.scripts
             int index = eventArgs.message.flowBehaviour.Length - 1;
             BehaviourEvent current = null;
 
-            FlowBehaviour fb = eventArgs.message.flowBehaviour[index];
+           // FlowBehaviour fb = eventArgs.message.flowBehaviour[index];
 
             while(index > -1)
             {
+                FlowBehaviour fb = eventArgs.message.flowBehaviour[index];
                 BehaviourEvent be = SetBehaviour(bem, fb, current);
 
                 current = be;
