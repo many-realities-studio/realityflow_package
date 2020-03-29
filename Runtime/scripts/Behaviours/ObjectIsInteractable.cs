@@ -9,7 +9,7 @@ namespace Behaviours
     /// <summary>
     /// Determines whether the object is interactable and logs which objects and events it is interactable with
     /// </summary>
-    public class ObjectIsInteractable : MonoBehaviour
+    public class ObjectIsInteractable : MonoBehaviour, IPointerClickHandler
     {
         private Dictionary<Guid, bool> interactableWith;
         private Dictionary<BehaviourEvent, string> interactableEvents;
@@ -42,13 +42,24 @@ namespace Behaviours
             objectId = Guid.NewGuid();
             interactableWith = new Dictionary<Guid, bool>();
             interactableEvents = new Dictionary<BehaviourEvent, string>();
-            interactableScript = gameObject.AddComponent<Interactable>();
 
-            //interactableScript.Profiles[0].Target = gameObject;
-            //interactableScript.Profiles[0].Themes.Add(new Theme());
-            interactableScript.IsEnabled = true;
-            interactableScript.States = FindObjectOfType<BehaviourEventManager>().DefaultInteractableStates;
-            interactableScript.OnClick.AddListener(() => OnSelect());
+            if (!(SystemInfo.deviceType == DeviceType.Desktop || SystemInfo.deviceType == DeviceType.Handheld))
+            {
+                interactableScript = gameObject.AddComponent<Interactable>();
+
+                //interactableScript.Profiles[0].Target = gameObject;
+                //interactableScript.Profiles[0].Themes.Add(new Theme());
+                interactableScript.IsEnabled = true;
+                interactableScript.States = FindObjectOfType<BehaviourEventManager>().DefaultInteractableStates;
+                interactableScript.OnClick.AddListener(() => OnSelect());
+            }
+            else
+            {
+                if (Camera.main.gameObject.GetComponent<PhysicsRaycaster>() == null)
+                {
+                    Camera.main.gameObject.AddComponent<PhysicsRaycaster>();
+                }
+            }
         }
 
         #endregion // Monobehaviour Methods
@@ -67,12 +78,15 @@ namespace Behaviours
             }
         }
 
-        private void OnMouseDown()
+        public void OnPointerClick(PointerEventData eventData)
         {
-            Debug.Log("clicked");
-            if (interactableEvents.ContainsValue("Click"))
+            if (eventData.pointerPressRaycast.gameObject == gameObject)
             {
-                SetEventTrigger.Invoke();
+                Debug.Log("clicked");
+                if (interactableEvents.ContainsValue("Click"))
+                {
+                    SetEventTrigger.Invoke();
+                }
             }
         }
 
