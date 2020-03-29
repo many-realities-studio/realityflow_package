@@ -39,7 +39,9 @@ namespace RealityFlow.Plugin.Scripts
                     // Can happen when a client receives a create object request when another user created an object
                     else
                     {
-                        _AttachedGameObject = new GameObject();
+                        //UnityEngine.Object prefabReference = Resources.Load("Assets/resources/cube.prefab");
+                        //_AttachedGameObject = GameObject.Instantiate(prefabReference) as GameObject;
+                        _AttachedGameObject = GameObject.CreatePrimitive(PrimitiveType.Cube);
                     }
                 }
                 return _AttachedGameObject;
@@ -239,6 +241,15 @@ namespace RealityFlow.Plugin.Scripts
             }
         }
 
+        private string _Prefab;
+
+        public string Prefab
+        {
+            get { return _Prefab; }
+            set { _Prefab = value; }
+        }
+
+
         public static void DestroyObject(string idOfObjectToDestroy)
         {
             try
@@ -275,6 +286,7 @@ namespace RealityFlow.Plugin.Scripts
             this.Rotation = rotation;
             this.Scale = scale;
             this.ObjectColor = color;
+            this.Prefab = "Cube";
 
             idToGameObjectMapping.Add(Id, this);
             AttachedGameObject.transform.hasChanged = false;
@@ -305,6 +317,8 @@ namespace RealityFlow.Plugin.Scripts
             B = b;
             A = a;
             Name = name;
+
+            this.Prefab = "Cube";
 
             if(idToGameObjectMapping.ContainsKey(id))
             {
