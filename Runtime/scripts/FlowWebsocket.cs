@@ -126,11 +126,18 @@ namespace Packages.realityflow_package.Runtime.scripts
         /// <returns></returns>
         public IEnumerator ReceiveMessage()
         {
-            foreach (string message in ReceivedMessages)
+            try
             {
-                Debug.Log("Received message: " + message);
-                messageParser(message);
-                //GameObject.CreatePrimitive(PrimitiveType.Cube);
+                foreach (string message in ReceivedMessages)
+                {
+                    Debug.Log("Received message: " + message);
+                    messageParser(message);
+                    //GameObject.CreatePrimitive(PrimitiveType.Cube);
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogError(e);
             }
 
             ReceivedMessages.RemoveAll((o) => true); // Remove everything from the list
