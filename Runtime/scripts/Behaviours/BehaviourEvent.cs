@@ -14,13 +14,13 @@ namespace Behaviours
         private string behaviourName = "default";
 
         [SerializeField]
-        private Guid firstObject;
+        private string firstObject;
         [SerializeField]
-        private Guid secondObject;
+        private string secondObject;
         [SerializeField]
         public BehaviourEvent chainedEvent;
 
-        public event Action<string, Guid, Guid, BehaviourEvent> EventCalled;
+        public event Action<string, string, string, BehaviourEvent> EventCalled;
 
         #region Monobehaviour Functions
 
@@ -124,12 +124,12 @@ namespace Behaviours
             return behaviourName;
         }
 
-        public void SetSecondObject(Guid go2)
+        public void SetSecondObject(string go2)
         {
             secondObject = go2;
         }
 
-        public Guid GetSecondObject()
+        public string GetSecondObject()
         {
             return secondObject;
         }
