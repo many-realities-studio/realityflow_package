@@ -39,7 +39,8 @@ namespace RealityFlow.Plugin.Scripts
                     // Can happen when a client receives a create object request when another user created an object
                     else
                     {
-                        _AttachedGameObject = new GameObject();
+                        UnityEngine.Object prefabReference = Resources.Load(Prefab);
+                        _AttachedGameObject = GameObject.Instantiate(prefabReference) as GameObject;
                     }
                 }
                 return _AttachedGameObject;
@@ -239,6 +240,15 @@ namespace RealityFlow.Plugin.Scripts
             }
         }
 
+        private string _Prefab;
+
+        public string Prefab
+        {
+            get { return _Prefab; }
+            set { _Prefab = value; }
+        }
+
+
         public static void DestroyObject(string idOfObjectToDestroy)
         {
             try
@@ -268,8 +278,9 @@ namespace RealityFlow.Plugin.Scripts
         //    Operations.UpdateObject(this, ConfigurationSingleton.CurrentUser, ConfigurationSingleton.CurrentProject.Id, (_, e) => Debug.Log("Update object received"));
         //}
 
-        public FlowTObject(string name, Vector3 position, Quaternion rotation, Vector3 scale, Color color)
+        public FlowTObject(string name, Vector3 position, Quaternion rotation, Vector3 scale, Color color, string ObjectPrefab)
         {
+            this.Prefab = ObjectPrefab;
             this.Name = name;
             this.Position = position;
             this.Rotation = rotation;
@@ -287,8 +298,9 @@ namespace RealityFlow.Plugin.Scripts
         }
 
         [JsonConstructor]
-        public FlowTObject(string id, float x, float y, float z, float q_x, float q_y, float q_z, float q_w, float s_x, float s_y, float s_z, float r, float g, float b, float a, string name)
+        public FlowTObject(string id, float x, float y, float z, float q_x, float q_y, float q_z, float q_w, float s_x, float s_y, float s_z, float r, float g, float b, float a, string name, string prefab)
         {
+            this.Prefab = prefab;
             Id = id;
             X = x;
             Y = y;
@@ -305,6 +317,7 @@ namespace RealityFlow.Plugin.Scripts
             B = b;
             A = a;
             Name = name;
+
 
             if(idToGameObjectMapping.ContainsKey(id))
             {
@@ -342,7 +355,9 @@ namespace RealityFlow.Plugin.Scripts
         {
             if (AttachedGameObject.transform.hasChanged == true)
             {
+                bool tempCanBeModified = this.CanBeModified;
                 PropertyCopier<FlowTObject, FlowTObject>.Copy(newValues, this);
+                this.CanBeModified = tempCanBeModified;
 
                 if (CanBeModified == true)
                 {
@@ -355,7 +370,12 @@ namespace RealityFlow.Plugin.Scripts
 
         private void UpdateObjectLocally(FlowTObject newValues)
         {
-            PropertyCopier<FlowTObject, FlowTObject>.Copy(newValues, this);
+            if (idToGameObjectMapping[newValues.Id].CanBeModified == false)
+            {
+                bool tempCanBeModified = this.CanBeModified;
+                PropertyCopier<FlowTObject, FlowTObject>.Copy(newValues, this);
+                this.CanBeModified = tempCanBeModified;
+            }
         }
 
         public void CheckIn()

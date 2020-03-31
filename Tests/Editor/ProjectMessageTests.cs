@@ -26,7 +26,7 @@ namespace RealityFlow.Plugin.Tests
             string url = "ws://echo.websocket.org";
             Operations.ConnectToServer(url);
 
-            testObject = new FlowTObject("id", 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, "name");
+            testObject = new FlowTObject("id", 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, "name", "");
             testProject = new FlowProject("flowId", "description", 0, "projectName"/*, new FlowTObject[]
             {
                 testObject

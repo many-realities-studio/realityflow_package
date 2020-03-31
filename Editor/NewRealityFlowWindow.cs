@@ -300,7 +300,10 @@ public class FlowNetworkManagerEditor : EditorWindow
 
     public void Update()
     {
-        Unity.EditorCoroutines.Editor.EditorCoroutineUtility.StartCoroutine(Operations.FlowWebsocket.ReceiveMessage(), Operations.FlowWebsocket);
+        //if(Operations.FlowWebsocket != null)
+        //{
+            Unity.EditorCoroutines.Editor.EditorCoroutineUtility.StartCoroutine(Operations.FlowWebsocket.ReceiveMessage(), Operations.FlowWebsocket);
+        //}
 
         //foreach(string flowObjectId in FlowTObject.idToGameObjectMapping.Keys)
         //{

@@ -273,7 +273,7 @@ namespace Packages.realityflow_package.Runtime.scripts
 
         private static void _UpdateObject(object sender, UpdateObjectMessageEventArgs eventArgs)
         {
-            eventArgs.message.flowObject.UpdateObjectGlobally(eventArgs.message.flowObject);
+            //eventArgs.message.flowObject.UpdateObjectGlobally(eventArgs.message.flowObject);
         }
 
         private static void _FinalizedupdateObject(object sender, FinalizedUpdateObjectMessageEventArgs eventArgs)

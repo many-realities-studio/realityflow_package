@@ -54,12 +54,19 @@ namespace Packages.realityflow_package.Runtime.scripts
         {
             //string url = "ws://echo.websocket.org";
             Debug.Log("Establishing websocket connection to " + url);
-            websocket = new WebSocketSharp.WebSocket(url);
-            //websocket.OnMessage += (sender, e) => Debug.Log("Received message: " + e.Data.ToString());
-            websocket.OnMessage += (sender, e) => ActionOnReceiveMessage(e.Data.ToString());
-            websocket.Connect();
+            try
+            {
+                websocket = new WebSocketSharp.WebSocket(url);
+                //websocket.OnMessage += (sender, e) => Debug.Log("Received message: " + e.Data.ToString());
+                websocket.OnMessage += (sender, e) => ActionOnReceiveMessage(e.Data.ToString());
+                websocket.Connect();
 
-            Debug.Log("Connection established with " + url);
+                Debug.Log("Connection established with " + url);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError("Failed to establish connection to: " + url + ", " + e);
+            }
         }
 
         /// <summary>
@@ -119,11 +126,18 @@ namespace Packages.realityflow_package.Runtime.scripts
         /// <returns></returns>
         public IEnumerator ReceiveMessage()
         {
-            foreach (string message in ReceivedMessages)
+            try
             {
-                Debug.Log("Received message: " + message);
-                messageParser(message);
-                //GameObject.CreatePrimitive(PrimitiveType.Cube);
+                foreach (string message in ReceivedMessages)
+                {
+                    Debug.Log("Received message: " + message);
+                    messageParser(message);
+                    //GameObject.CreatePrimitive(PrimitiveType.Cube);
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogError(e);
             }
 
             ReceivedMessages.RemoveAll((o) => true); // Remove everything from the list

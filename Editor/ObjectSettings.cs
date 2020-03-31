@@ -20,7 +20,9 @@ namespace RealityFlow.Plugin.Editor
 
         public string ObjectName { get; private set; }
         public Vector3 ObjectPosition { get; private set; }
-        public Vector3 ObjectScale { get; private set; }
+        public Vector3 ObjectScale { get; private set; } = new Vector3(1, 1, 1);
+        public Vector4 ObjectRotation { get; private set; } = new Vector4(0, 0, 0, 1);
+        public string ObjectPrefab { get; private set; }
 
         // TODO: What does this do?
         public static void OpenWindow()
@@ -43,7 +45,7 @@ namespace RealityFlow.Plugin.Editor
             ObjectName = EditorGUILayout.TextField(ObjectName);
             EditorGUILayout.EndHorizontal();
 
-            EditorGUILayout.BeginHorizontal();
+            //EditorGUILayout.BeginHorizontal();
             //GUILayout.Label("Mesh");
             //if(createdGameObject.TryGetComponent<MeshFilter>(out MeshFilter meshComponent))
             //{
@@ -74,6 +76,15 @@ namespace RealityFlow.Plugin.Editor
             ObjectScale = EditorGUILayout.Vector3Field("Scale", ObjectScale);
             EditorGUILayout.EndHorizontal();
 
+            EditorGUILayout.BeginHorizontal();
+            ObjectRotation = EditorGUILayout.Vector4Field("Rotation", ObjectRotation);
+            EditorGUILayout.EndHorizontal();
+
+            EditorGUILayout.BeginHorizontal();
+            ObjectPrefab = EditorGUILayout.TextField("Prefab", ObjectPrefab);
+                /*EditorGUILayout.ObjectField("Prefab to search for", ChosenPrefab, typeof(GameObject), false) as GameObject;*/
+            EditorGUILayout.EndHorizontal();
+
             //objData.color = EditorGUILayout.ColorField("Color", objData.color);
 
             //if (objData.mesh == null)
@@ -85,12 +96,16 @@ namespace RealityFlow.Plugin.Editor
             {
                 EditorGUILayout.HelpBox("This object needs a [Name] before it can be created.", MessageType.Warning);
             }
+            else if(ObjectPrefab == null)
+            {
+                EditorGUILayout.HelpBox("This object needs a [Prefab] before it can be created", MessageType.Warning);
+            }
             // TODO: Add extra else if case to check if the name already exists in the project
             else
             {
                 if (GUILayout.Button("Create", GUILayout.Height(30)))
                 {
-                    FlowTObject createdGameObject = new FlowTObject(ObjectName, ObjectPosition, new Quaternion(), ObjectScale, new Color());
+                    FlowTObject createdGameObject = new FlowTObject(ObjectName, ObjectPosition, new Quaternion(ObjectRotation.x, ObjectRotation.y, ObjectRotation.z, ObjectRotation.w), ObjectScale, new Color(), ObjectPrefab);
                     
                     Operations.CreateObject(createdGameObject, /*FlowNetworkManagerEditor.currentUser,*/ ConfigurationSingleton.CurrentProject.Id, (_, e) => Debug.Log(e.message));
                     
