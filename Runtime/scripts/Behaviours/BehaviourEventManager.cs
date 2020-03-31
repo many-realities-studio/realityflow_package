@@ -24,6 +24,7 @@ namespace Behaviours
         public void Initialize()
         {
             GoIds = new Dictionary<string, GameObject>();
+           // DefaultInteractableStates = ScriptableObject.CreateInstance<States>();
         }
 
         public BehaviourEvent CreateNewBehaviourEvent(string name, string go1, string go2, BehaviourEvent chain)

@@ -304,8 +304,13 @@ namespace Packages.realityflow_package.Runtime.scripts
                 FlowBehaviour fb = flowBehaviours[index];
                 BehaviourEvent be = SetBehaviour(bem, fb, current);
 
+                if(be == null)
+                {
+                    Debug.Log("Behaviour is null");
+                    break;
+                }
                 current = be;
-                Debug.Log(be.GetName());
+                Debug.Log(be.GetName() + " " + index);
                 index--;
             }
         }
@@ -338,9 +343,17 @@ namespace Packages.realityflow_package.Runtime.scripts
 
             BehaviourEvent newBehaviour = bem.CreateNewBehaviourEvent(fb.Name, oIsIFirst.GetGuid(), oIsISecond.GetGuid(), chainedBehaviour);
 
-            Debug.Log("Behaviour Created!");
-            Debug.Log(newBehaviour.GetName());
-            Debug.Log(newBehaviour.GetSecondObject());
+            if(newBehaviour == null)
+            {
+                Debug.Log("The behaviour is NULLLLLLLLLLLLLLLLLLLLLLLL");
+            }
+            else
+            {
+                Debug.Log("Behaviour Created!");
+                //Debug.Log(newBehaviour.GetName());
+                Debug.Log(newBehaviour.GetSecondObject());
+            }
+           
 
             return newBehaviour;
         }
@@ -375,6 +388,20 @@ namespace Packages.realityflow_package.Runtime.scripts
         private static void _OpenProject(object sender, OpenProjectMessageEventArgs eventArgs)
         {
             ConfigurationSingleton.CurrentProject = eventArgs.message.flowProject;
+
+            GameObject bemObject = GameObject.FindGameObjectWithTag("BehaviourEventManager");
+            
+            if (bemObject == null)
+            {
+                bemObject = new GameObject();
+                bemObject.AddComponent<BehaviourEventManager>();
+                bemObject.name = "BehaviourEventManager";
+                bemObject.tag = "BehaviourEventManager";
+            }
+
+            BehaviourEventManager bem = bemObject.GetComponent<BehaviourEventManager>();
+            bem.Initialize();
+
         }
 
         #endregion Project messages received

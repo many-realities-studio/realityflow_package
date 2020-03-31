@@ -29,6 +29,11 @@ namespace Behaviours
         /// </summary>
         private void Awake()
         {
+            //firstObject = gameObject.GetComponent<ObjectIsInteractable>().GetGuid();
+            //GetBehaviourEventManager();
+        }
+        public void Initialize()
+        {
             firstObject = gameObject.GetComponent<ObjectIsInteractable>().GetGuid();
             GetBehaviourEventManager();
         }

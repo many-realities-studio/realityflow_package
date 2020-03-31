@@ -24,7 +24,7 @@ namespace RealityFlow.Plugin.Scripts
         [JsonProperty("Target")]
         public string SecondObject { get; set; } // The second object ID - typically the target object
 
-        [JsonProperty("BehaviourChain")]
+        [JsonProperty("FlowBehaviour")]
         public FlowBehaviour BehaviourChain { get; set; } // The chain behaviour
 
         [JsonProperty("ChainOwner")]
