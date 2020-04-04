@@ -2,26 +2,28 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Packages.realityflow_package.Runtime.scripts.Messages.UserMessages
+namespace Packages.realityflow_package.Runtime.scripts.Messages.CheckoutMessages
 {
-    public class RegisterUser_Received : ConfirmationMessage_Received
+    public class CheckinObject_Received : ConfirmationMessage_Received
     {
-        public RegisterUser_Received(bool wasSuccessful)
+        [JsonProperty("ObjectID")]
+        public string ObjectID;
+
+        public delegate void CheckinObjectReceived_EventHandler(object sender, CheckinObjectEventArgs eventArgs);
+
+        public CheckinObject_Received(string objectID)
         {
-            this.MessageType = "CreateUser";
-            this.WasSuccessful = wasSuccessful;
+            ObjectID = objectID;
+            this.MessageType = "CheckinObject";
         }
 
-        // Definition of event type (What gets sent to the subscribers
-        public delegate void RegisterUserReceived_EventHandler(object sender, ConfirmationMessageEventArgs eventArgs);
-
         // The object that handles publishing/subscribing
-        private static RegisterUserReceived_EventHandler _ReceivedEvent;
-        public static event RegisterUserReceived_EventHandler ReceivedEvent
+        private static CheckinObjectReceived_EventHandler _ReceivedEvent;
+
+        public static event CheckinObjectReceived_EventHandler ReceivedEvent
         {
             add
             {
@@ -42,7 +44,7 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.UserMessages
         /// <param name="message">The message to be parsed</param>
         public static void ReceiveMessage(string message)
         {
-            ConfirmationMessage_Received response = MessageSerializer.DesearializeObject<RegisterUser_Received> (message);
+            CheckinObject_Received response = MessageSerializer.DesearializeObject<CheckinObject_Received>(message);
             response.RaiseEvent();
         }
 
@@ -51,11 +53,20 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.UserMessages
         /// </summary>
         public override void RaiseEvent()
         {
-            // Raise the event in a thread-safe manner using the ?. operator.
             if (_ReceivedEvent != null)
             {
-                _ReceivedEvent.Invoke(this, new ConfirmationMessageEventArgs(this));
+                _ReceivedEvent.Invoke(this, new CheckinObjectEventArgs(this));
             }
+        }
+    }
+
+    public class CheckinObjectEventArgs
+    {
+        public CheckinObject_Received message;
+
+        public CheckinObjectEventArgs(CheckinObject_Received message)
+        {
+            this.message = message;
         }
     }
 }

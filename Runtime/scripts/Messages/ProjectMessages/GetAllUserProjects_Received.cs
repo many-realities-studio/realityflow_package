@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using RealityFlow.Plugin.Scripts;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -10,14 +12,14 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.ProjectMessages
     /// <summary>
     /// Message format of a response from the server upon a request of a list of all projects that a user has
     /// </summary>
-    [DataContract]
     public class GetAllUserProjects_Received : ReceivedMessage
     {
-        [DataMember]
+        
         /// <summary>
         /// in the format of (ProjectId, Name)
         /// </summary>
-        public Tuple<string, string>[] ProjectList { get; set; } 
+        [JsonProperty("Projects")]
+        public List<FlowProject> Projects { get; set; } 
 
         // Definition of event type (What gets sent to the subscribers
         public delegate void GetAllUserProjects_EventHandler(object sender, GetAllUserProjectsMessageEventArgs eventArgs);
@@ -25,9 +27,9 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.ProjectMessages
         // The object that handles publishing/subscribing
         private static GetAllUserProjects_EventHandler _ReceivedEvent;
 
-        public GetAllUserProjects_Received(Tuple<string, string>[] projectList)
+        public GetAllUserProjects_Received(List<FlowProject> projectList)
         {
-            this.ProjectList = projectList;
+            this.Projects = projectList;
         }
 
         public static event GetAllUserProjects_EventHandler ReceivedEvent
@@ -51,7 +53,7 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.ProjectMessages
         /// <param name="message">The message to be parsed</param>
         public static void ReceiveMessage(string message)
         {
-            GetAllUserProjects_Received response = UnityEngine.JsonUtility.FromJson<GetAllUserProjects_Received>(message);
+            GetAllUserProjects_Received response = MessageSerializer.DesearializeObject<GetAllUserProjects_Received>(message);
             response.RaiseEvent();
         }
 

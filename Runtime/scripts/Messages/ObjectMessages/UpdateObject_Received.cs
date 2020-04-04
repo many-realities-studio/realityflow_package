@@ -1,4 +1,5 @@
-﻿using RealityFlow.Plugin.Scripts;
+﻿using Newtonsoft.Json;
+using RealityFlow.Plugin.Scripts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,10 +9,9 @@ using System.Threading.Tasks;
 
 namespace Packages.realityflow_package.Runtime.scripts.Messages.ObjectMessages
 {
-    [DataContract]
     public class UpdateObject_Received : ReceivedMessage
     {
-        [DataMember]
+        [JsonProperty("flowObject")]
         public FlowTObject flowObject { get; set; }
 
         // Definition of event type (What gets sent to the subscribers
@@ -46,7 +46,7 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.ObjectMessages
         /// <param name="message">The message to be parsed</param>
         public static void ReceiveMessage(string message)
         {
-            UpdateObject_Received response = UnityEngine.JsonUtility.FromJson<UpdateObject_Received>(message);
+            UpdateObject_Received response = MessageSerializer.DesearializeObject<UpdateObject_Received>(message);
             response.RaiseEvent();
         }
 

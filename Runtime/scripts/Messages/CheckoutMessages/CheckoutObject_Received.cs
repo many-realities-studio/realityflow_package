@@ -1,32 +1,30 @@
 ﻿using Newtonsoft.Json;
-using RealityFlow.Plugin.Scripts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Packages.realityflow_package.Runtime.scripts.Messages.ObjectMessages
+namespace Packages.realityflow_package.Runtime.scripts.Messages.CheckoutMessages
 {
-    public class CreateObject_Received : ReceivedMessage
+    public class CheckoutObject_Received : ConfirmationMessage_Received
     {
-        [JsonProperty("flowObject")]
-        public FlowTObject flowObject { get; set; }
+        [JsonProperty("ObjectID")]
+        public string ObjectID;
 
-        // Definition of event type (What gets sent to the subscribers)
-        public delegate void CreateObjectReceived_EventHandler(object sender, CreateObjectMessageEventArgs eventArgs);
-
-        // The object that handles publishing/subscribing
-        private static CreateObjectReceived_EventHandler _ReceivedEvent;
-
-        public CreateObject_Received(FlowTObject flowObject)
+        public CheckoutObject_Received(string objectID)
         {
-            this.flowObject = flowObject;
-            this.MessageType = "CreateObject";
+            ObjectID = objectID;
+            this.MessageType = "CheckoutObject";
         }
 
-        public static event CreateObjectReceived_EventHandler ReceivedEvent
+        // Definition of event type (What gets sent to the subscribers)
+        public delegate void CheckoutObjectReceived_EventHandler(object sender, CheckoutObjectEventArgs eventArgs);
+
+        // The object that handles publishing/subscribing
+        private static CheckoutObjectReceived_EventHandler _ReceivedEvent;
+
+        public static event CheckoutObjectReceived_EventHandler ReceivedEvent
         {
             add
             {
@@ -47,7 +45,7 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.ObjectMessages
         /// <param name="message">The message to be parsed</param>
         public static void ReceiveMessage(string message)
         {
-            CreateObject_Received response = MessageSerializer.DesearializeObject<CreateObject_Received>(message);
+            CheckoutObject_Received response = MessageSerializer.DesearializeObject<CheckoutObject_Received>(message);
             response.RaiseEvent();
         }
 
@@ -58,16 +56,16 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.ObjectMessages
         {
             if (_ReceivedEvent != null)
             {
-                _ReceivedEvent.Invoke(this, new CreateObjectMessageEventArgs(this));
+                _ReceivedEvent.Invoke(this, new CheckoutObjectEventArgs(this));
             }
         }
     }
 
-    public class CreateObjectMessageEventArgs : EventArgs
+    public class CheckoutObjectEventArgs : EventArgs
     {
-        public CreateObject_Received message { get; set; }
+        public CheckoutObject_Received message;
 
-        public CreateObjectMessageEventArgs(CreateObject_Received message)
+        public CheckoutObjectEventArgs(CheckoutObject_Received message)
         {
             this.message = message;
         }

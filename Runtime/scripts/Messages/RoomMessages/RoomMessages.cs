@@ -1,4 +1,5 @@
-﻿using RealityFlow.Plugin.Scripts;
+﻿using Newtonsoft.Json;
+using RealityFlow.Plugin.Scripts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,18 +12,19 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.RoomMessages
     /// <summary>
     /// Receive: <see cref="JoinRoom_Received"/>
     /// </summary>
-    [DataContract]
     public class JoinRoom_SendToServer : BaseMessage
     {
-        [DataMember]
+        [JsonProperty("projectId")]
         public string projectId { get; set; }
-        [DataMember]
+
+        [JsonProperty("flowUser")]
         public FlowUser flowUser { get; set; }
 
         public JoinRoom_SendToServer(string projectId, FlowUser flowUser)
         {
             this.projectId = projectId;
             this.flowUser = flowUser;
+            this.MessageType = "JoinRoom";
         }
     }
 }
