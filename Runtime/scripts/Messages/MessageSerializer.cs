@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.Serialization.Json;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace Packages.realityflow_package.Runtime.scripts.Messages
 {
@@ -39,34 +40,41 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages
         /// <typeparam name="T">The type of message you are trying to serialize</typeparam>
         /// <param name="messageToSerialize">The message object that you want to serialize</param>
         /// <returns></returns>
-        public static MemoryStream SerializeMessage<T>(T messageToSerialize) where T : BaseMessage
+        public static string SerializeMessage<T>(T messageToSerialize) where T : BaseMessage
         {
-            MemoryStream memoryStream = new MemoryStream();
+            return JsonConvert.SerializeObject(messageToSerialize, new JsonSerializerSettings()
+            {
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+            });
 
-            JsonSerializer.WriteObject(memoryStream, messageToSerialize);
+            //MemoryStream memoryStream = new MemoryStream();
 
-            memoryStream.Position = 0;
+            //JsonSerializer.WriteObject(memoryStream, messageToSerialize);
 
-            return memoryStream;
+            //memoryStream.Position = 0;
+
+            //return memoryStream;
         }
 
         public static T DesearializeObject<T>(string messageToDeserialize) where T : BaseMessage
         {
-            MemoryStream memoryStream = new MemoryStream(Encoding.UTF8.GetBytes(messageToDeserialize));
-            memoryStream.Position = 0;
+            return JsonConvert.DeserializeObject<T>(messageToDeserialize);
 
-            return (T)JsonSerializer.ReadObject(memoryStream);
+            //MemoryStream memoryStream = new MemoryStream(Encoding.UTF8.GetBytes(messageToDeserialize));
+            //memoryStream.Position = 0;
+
+            //return (T)JsonSerializer.ReadObject(memoryStream);
         }
 
         public static string ConvertToString<T>(T messageToSerialize) where T : BaseMessage
         {
-            MemoryStream memoryStream = SerializeMessage<T>(messageToSerialize);
+            //MemoryStream memoryStream = SerializeMessage<T>(messageToSerialize);
 
-            memoryStream.Position = 0;
-            var sr = new StreamReader(memoryStream);
-            string sentMessage = sr.ReadToEnd();
+            //memoryStream.Position = 0;
+            //var sr = new StreamReader(memoryStream);
+            //string sentMessage = sr.ReadToEnd();
 
-            return sentMessage;
+            return SerializeMessage(messageToSerialize);
         }
     }
 }

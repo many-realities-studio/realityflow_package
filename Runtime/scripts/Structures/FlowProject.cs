@@ -1,3 +1,4 @@
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
@@ -11,27 +12,30 @@ namespace RealityFlow.Plugin.Scripts
     /// Anything marked with a [DataMember] annotation is marked to be serialized and
     /// sent to the server.
     /// </summary>
-    [DataContract]
     public class FlowProject : FlowValue
     {
-        [DataMember]
-        public string FlowId { get; set; } // The unique ID of the project
-        [DataMember]
+        [JsonProperty("Id")]
+        public string Id { get; set; } // The unique ID of the project
+
+        [JsonProperty("Description")]
         public string Description { get; set; } // Description of the project
-        [DataMember]
+
+        [JsonProperty("DateModified")]
         public int DateModified { get; set; } // The last time this project was modified
-        [DataMember]
+
+        [JsonProperty("ProjectName")]
         public string ProjectName { get; set; } // Name of the project
-        [DataMember]
+
+        [JsonProperty("_ObjectList")]
         public IEnumerable<FlowTObject> _ObjectList { get; set; }
 
-        public FlowProject(string flowId, string description, int dateModified, string projectName, IEnumerable<FlowTObject> ObjectList)
+        public FlowProject(string flowId, string description, int dateModified, string projectName/*, IEnumerable<FlowTObject> ObjectList*/)
         {
-            FlowId = flowId;
+            Id = flowId;
             Description = description;
             DateModified = dateModified;
             ProjectName = projectName;
-            _ObjectList = ObjectList;
+            //_ObjectList = ObjectList;
         }
 
         //public int _uid;

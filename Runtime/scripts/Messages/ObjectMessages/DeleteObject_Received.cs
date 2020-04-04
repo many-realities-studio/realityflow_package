@@ -1,4 +1,5 @@
-﻿using RealityFlow.Plugin.Scripts;
+﻿using Newtonsoft.Json;
+using RealityFlow.Plugin.Scripts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,11 +9,10 @@ using System.Threading.Tasks;
 
 namespace Packages.realityflow_package.Runtime.scripts.Messages.ObjectMessages
 {
-    [DataContract]
-    public class DeleteObject_Received : ReceivedMessage
+    public class DeleteObject_Received : ConfirmationMessage_Received
     {
-        [DataMember]
-        public FlowTObject DeletedObject { get; set; } // The deleted object
+        [JsonProperty("ObjectId")]
+        public string DeletedObjectId { get; set; } // The deleted object
 
         // Definition of event type (What gets sent to the subscribers
         public delegate void DeleteObjectReceived_EventHandler(object sender, DeleteObjectMessageEventArgs eventArgs);
@@ -20,9 +20,10 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.ObjectMessages
         // The object that handles publishing/subscribing
         private static DeleteObjectReceived_EventHandler _ReceivedEvent;
 
-        public DeleteObject_Received(FlowTObject deletedObject)
+        public DeleteObject_Received(string deletedObjectId)
         {
-            DeletedObject = deletedObject;
+            DeletedObjectId = deletedObjectId;
+            this.MessageType = "DeleteObject";
         }
 
         public static event DeleteObjectReceived_EventHandler ReceivedEvent
@@ -46,7 +47,7 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.ObjectMessages
         /// <param name="message">The message to be parsed</param>
         public static void ReceiveMessage(string message)
         {
-            DeleteObject_Received response = UnityEngine.JsonUtility.FromJson<DeleteObject_Received>(message);
+            DeleteObject_Received response = MessageSerializer.DesearializeObject<DeleteObject_Received>(message);
             response.RaiseEvent();
         }
 

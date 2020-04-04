@@ -14,6 +14,7 @@ using UnityEngine;
 using Packages.realityflow_package.Runtime.scripts.Messages.ObjectMessages;
 using Packages.realityflow_package.Runtime.scripts.Messages.ProjectMessages;
 using Packages.realityflow_package.Runtime.scripts.Messages.RoomMessages;
+using Packages.realityflow_package.Runtime.scripts.Messages.CheckoutMessages;
 
 namespace Packages.realityflow_package.Runtime.scripts
 {
@@ -40,17 +41,28 @@ namespace Packages.realityflow_package.Runtime.scripts
             // Project Messages
             messageRouter.Add("CreateProject", CreateProject_Received.ReceiveMessage);
             messageRouter.Add("DeleteProject", DeleteProject_Received.ReceiveMessage);
-            messageRouter.Add("GetAllUserProject", GetAllUserProjects_Received.ReceiveMessage);
+            messageRouter.Add("FetchProjects", GetAllUserProjects_Received.ReceiveMessage);
             messageRouter.Add("OpenProject", OpenProject_Received.ReceiveMessage);
 
             // Room Messages
             messageRouter.Add("JoinRoom", JoinRoom_Received.ReceiveMessage);
+            messageRouter.Add("UserJoinedRoom", DoNothing);
 
             // User Messages
-            messageRouter.Add("Login", LoginUser_Received.ReceiveMessage);
-            messageRouter.Add("Logout", LogoutUser_Received.ReceiveMessage);
-            messageRouter.Add("RegisterUser", RegisterUser_Received.ReceiveMessage);
+            messageRouter.Add("LoginUser", LoginUser_Received.ReceiveMessage);
+            messageRouter.Add("LogoutUser", LogoutUser_Received.ReceiveMessage);
+            messageRouter.Add("CreateUser", RegisterUser_Received.ReceiveMessage);
+
+            // Checkout system messages
+            messageRouter.Add("CheckinObject", CheckinObject_Received.ReceiveMessage);
+            messageRouter.Add("CheckoutObject", CheckoutObject_Received.ReceiveMessage);
         }
+
+        public static void DoNothing(string message)
+        {
+
+        }
+
 
         /// <summary>
         /// Request to parse a message from a server into its respective c# representation
@@ -69,11 +81,11 @@ namespace Packages.realityflow_package.Runtime.scripts
         /// <returns></returns>
         public static string GetMessageType(string messageToConvert)
         {
-            var p2 = MessageSerializer.DesearializeObject<BaseMessage>(messageToConvert);
+            var deserializedObject = MessageSerializer.DesearializeObject<BaseMessage>(messageToConvert);
 
-            Debug.Log("Getting message type: " + p2.MessageType);
+            Debug.Log("Getting message type: " + deserializedObject.MessageType);
 
-            return p2.MessageType;
+            return deserializedObject.MessageType;
         }
     }
 }

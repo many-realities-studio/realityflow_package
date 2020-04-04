@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 
 namespace Packages.realityflow_package.Runtime.scripts.Messages.ProjectMessages
 {
-    [DataContract]
     public class DeleteProject_Received : ConfirmationMessage_Received
     {
         // Definition of event type (What gets sent to the subscribers
@@ -30,10 +29,10 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.ProjectMessages
             }
         }
 
-        public DeleteProject_Received(string message, bool wasSuccessful)
+        public DeleteProject_Received(bool wasSuccessful)
         {
-            this.Message = message;
             this.WasSuccessful = wasSuccessful;
+            this.MessageType = "DeleteProject";
         }
 
         /// <summary>
@@ -42,7 +41,7 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.ProjectMessages
         /// <param name="message">The message to be parsed</param>
         public static void ReceiveMessage(string message)
         {
-            ConfirmationMessage_Received response = UnityEngine.JsonUtility.FromJson<ConfirmationMessage_Received>(message);
+            ConfirmationMessage_Received response = MessageSerializer.DesearializeObject<ConfirmationMessage_Received>(message);
             response.RaiseEvent();
         }
 

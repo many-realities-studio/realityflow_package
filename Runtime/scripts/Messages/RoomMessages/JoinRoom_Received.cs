@@ -1,4 +1,5 @@
-﻿using RealityFlow.Plugin.Scripts;
+﻿using Newtonsoft.Json;
+using RealityFlow.Plugin.Scripts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,10 +9,9 @@ using System.Threading.Tasks;
 
 namespace Packages.realityflow_package.Runtime.scripts.Messages.RoomMessages
 {
-    [DataContract]
     public class JoinRoom_Received : ReceivedMessage
     {
-        [DataMember]
+        [JsonProperty("flowProject")]
         public FlowProject flowProject { get; set; }
 
         // Definition of event type (What gets sent to the subscribers
@@ -47,7 +47,7 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.RoomMessages
         /// <param name="message">The message to be parsed</param>
         public static void ReceiveMessage(string message)
         {
-            JoinRoom_Received response = UnityEngine.JsonUtility.FromJson<JoinRoom_Received>(message);
+            JoinRoom_Received response = MessageSerializer.DesearializeObject<JoinRoom_Received>(message);
             response.RaiseEvent();
         }
 

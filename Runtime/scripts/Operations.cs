@@ -1,5 +1,6 @@
-﻿using Packages.realityflow_package.Runtime.scripts.Managers;
+﻿//using Packages.realityflow_package.Runtime.scripts.Managers;
 using Packages.realityflow_package.Runtime.scripts.Messages;
+using Packages.realityflow_package.Runtime.scripts.Messages.CheckoutMessages;
 using Packages.realityflow_package.Runtime.scripts.Messages.ObjectMessages;
 using Packages.realityflow_package.Runtime.scripts.Messages.ProjectMessages;
 using Packages.realityflow_package.Runtime.scripts.Messages.RoomMessages;
@@ -11,6 +12,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEditor;
+using UnityEngine;
 
 namespace Packages.realityflow_package.Runtime.scripts
 {
@@ -20,8 +23,7 @@ namespace Packages.realityflow_package.Runtime.scripts
     /// </summary>
     public static class Operations
     {
-        private static FlowWebsocket _flowWebsocket;
-        public static FlowWebsocket FlowWebsocket { get => _flowWebsocket; }
+        public static FlowWebsocket FlowWebsocket { get; private set; }
 
         static Operations()
         {
@@ -55,6 +57,8 @@ namespace Packages.realityflow_package.Runtime.scripts
             Login_SendToServer loginMessage = new Login_SendToServer(flowUser);
             FlowWebsocket.SendMessage(loginMessage);
 
+            ConfigurationSingleton.CurrentUser = flowUser;
+
             LoginUser_Received.ReceivedEvent += callbackFunction;
         }
         
@@ -77,10 +81,10 @@ namespace Packages.realityflow_package.Runtime.scripts
         #endregion // UserOperations
 
         #region ObjectOperations
-        public static void CreateObject(FlowTObject flowObject, FlowUser flowUser, string projectId, CreateObject_Received.CreateObjectReceived_EventHandler callbackFunction)
+        public static void CreateObject(FlowTObject flowObject, /*FlowUser flowUser,*/ string projectId, CreateObject_Received.CreateObjectReceived_EventHandler callbackFunction)
         {
             CreateObject_SendToServer createObject =
-                new CreateObject_SendToServer(flowObject, flowUser, projectId);
+                new CreateObject_SendToServer(flowObject, /*flowUser,*/ projectId);
             FlowWebsocket.SendMessage(createObject);
 
             CreateObject_Received.ReceivedEvent += callbackFunction;
@@ -88,23 +92,23 @@ namespace Packages.realityflow_package.Runtime.scripts
 
         public static void UpdateObject(FlowTObject flowObject, FlowUser flowUser, string projectId, UpdateObject_Received.UpdateObjectReceived_EventHandler callbackFunction)
         {
-            UpdateObject_SendToServer updateObject = new UpdateObject_SendToServer(flowObject, flowUser, projectId);
+            UpdateObject_SendToServer updateObject = new UpdateObject_SendToServer(flowObject, /*flowUser,*/ projectId);
             FlowWebsocket.SendMessage(updateObject);
 
             UpdateObject_Received.ReceivedEvent += callbackFunction;
         }
 
-        public static void FinalizedUpdateObject(FlowTObject flowObject, FlowUser flowUser, string projectId, FinalizedUpdateObject_Received.OpenProjectReceived_EventHandler callbackFunction)
+        public static void FinalizedUpdateObject(FlowTObject flowObject, FlowUser flowUser, string projectId, FinalizedUpdateObject_Received.FinalizedUpdateObjectRecieved_EventHandler callbackFunction)
         {
-            FinalizedUpdateObject_SendToServer finalUpdateObject = new FinalizedUpdateObject_SendToServer(flowObject, flowUser, projectId);
+            FinalizedUpdateObject_SendToServer finalUpdateObject = new FinalizedUpdateObject_SendToServer(flowObject, projectId);
             FlowWebsocket.SendMessage(finalUpdateObject);
 
             FinalizedUpdateObject_Received.ReceivedEvent += callbackFunction;
         }
 
-        public static void DeleteObject(string idOfObjectToDelete, DeleteObject_Received.DeleteObjectReceived_EventHandler callbackFunction)
+        public static void DeleteObject(string idOfObjectToDelete, string projectId, DeleteObject_Received.DeleteObjectReceived_EventHandler callbackFunction)
         {
-            DeleteObject_SendToServer deleteObject = new DeleteObject_SendToServer(idOfObjectToDelete);
+            DeleteObject_SendToServer deleteObject = new DeleteObject_SendToServer(projectId, idOfObjectToDelete);
             FlowWebsocket.SendMessage(deleteObject);
 
             DeleteObject_Received.ReceivedEvent += callbackFunction;
@@ -131,10 +135,17 @@ namespace Packages.realityflow_package.Runtime.scripts
 
         public static void OpenProject(string projectId, FlowUser flowUser, OpenProject_Received.OpenProjectReceived_EventHandler callbackFunction)
         {
+            //if(GameObject.FindObjectsOfType<GameObject>().Length != 0)
+            //{
+            //    Debug.LogError("Cannot load project if there are game objects already in scene. Delete all game objects and try again");
+            //}
+            //else
+            //{
             OpenProject_SendToServer openProject = new OpenProject_SendToServer(projectId, flowUser);
             FlowWebsocket.SendMessage(openProject);
-
+            
             OpenProject_Received.ReceivedEvent += callbackFunction;
+            //}
         }
 
         public static void GetAllUserProjects(FlowUser flowUser, GetAllUserProjects_Received.GetAllUserProjects_EventHandler callbackFunction)
@@ -159,13 +170,33 @@ namespace Packages.realityflow_package.Runtime.scripts
 
         #endregion // Room Messages
 
+        #region Checkout system messages
+
+        public static void CheckoutObject(string objectID, string projectID, CheckoutObject_Received.CheckoutObjectReceived_EventHandler callbackFunction)
+        {
+            CheckoutObject_SendToServer checkoutObject = new CheckoutObject_SendToServer(objectID, projectID);
+            FlowWebsocket.SendMessage(checkoutObject);
+
+            CheckoutObject_Received.ReceivedEvent += callbackFunction;
+        }
+
+        public static void CheckinObject(string objectID, string projectID, CheckinObject_Received.CheckinObjectReceived_EventHandler callbackFunction)
+        {
+            CheckinObject_SendToServer checkinObject = new CheckinObject_SendToServer(objectID, projectID);
+            FlowWebsocket.SendMessage(checkinObject);
+
+            CheckinObject_Received.ReceivedEvent += callbackFunction;
+        }
+
+        #endregion Checkout system messages
+
         /// <summary>
         /// Establish a connection to the server
         /// </summary>
         /// <param name="url"></param>
         public static void ConnectToServer(string url)
         {
-            _flowWebsocket = new FlowWebsocket(url);
+            FlowWebsocket = new FlowWebsocket(url);
         }
 
         //public delegate void functionCalledOnUpdate();
@@ -178,78 +209,93 @@ namespace Packages.realityflow_package.Runtime.scripts
         // TODO: Fill out default behavior
         #region Default actions taken after receiving messages (These happen no matter what the user does)
 
-            #region Object messages received 
+        #region Object messages received 
 
-            private static void _CreateObject(object sender, CreateObjectMessageEventArgs eventArgs)
+        private static void _CreateObject(object sender, CreateObjectMessageEventArgs eventArgs)
+        {
+
+        }
+
+        private static void _DeleteObject(object sender, DeleteObjectMessageEventArgs eventArgs)
+        {
+            // Delete object in unity
+            //NewObjectManager.DestroyObject(eventArgs.message.DeletedObject.Id);
+
+            if(eventArgs.message.WasSuccessful == true)
             {
+                GameObject gameObject = FlowTObject.idToGameObjectMapping[eventArgs.message.DeletedObjectId].AttachedGameObject;
 
+                FlowTObject.idToGameObjectMapping.Remove(eventArgs.message.DeletedObjectId);
+
+                UnityEngine.Object.DestroyImmediate(gameObject);
             }
 
-            private static void _DeleteObject(object sender, DeleteObjectMessageEventArgs eventArgs)
-            {
-                // Delete object in unity
-                NewObjectManager.DestroyObject(eventArgs.message.DeletedObject.FlowId);
-            }
+            Debug.Log("Delete Object: " + eventArgs.message.WasSuccessful);
 
-            private static void _UpdateObject(object sender, UpdateObjectMessageEventArgs eventArgs)
-            {
-
-            }
-
-            private static void _FinalizedupdateObject(object sender, FinalizedUpdateObjectMessageEventArgs eventArgs)
-            {
-
-            }
-
-            #endregion Object messages received 
-
-            #region Project messages received
-
-            private static void _CreateProject(object sender, ConfirmationMessageEventArgs eventArgs)
-            {
                 
-            }
 
-            private static void _DeleteProject(object sender, ConfirmationMessageEventArgs eventArgs)
-            {
+        }
+
+        private static void _UpdateObject(object sender, UpdateObjectMessageEventArgs eventArgs)
+        {
+            //eventArgs.message.flowObject.UpdateObjectGlobally(eventArgs.message.flowObject);
+        }
+
+        private static void _FinalizedupdateObject(object sender, FinalizedUpdateObjectMessageEventArgs eventArgs)
+        {
+
+        }
+
+        #endregion Object messages received 
+
+        #region Project messages received
+
+        private static void _CreateProject(object sender, ConfirmationMessageEventArgs eventArgs)
+        {
                 
-            }
+        }
 
-            private static void _GetAllUserProjects(object sender, GetAllUserProjectsMessageEventArgs eventArgs)
-            {
+        private static void _DeleteProject(object sender, ConfirmationMessageEventArgs eventArgs)
+        {
                 
-            }
+        }
 
-            private static void _OpenProject(object sender, OpenProjectMessageEventArgs eventArgs)
-            {
+        private static void _GetAllUserProjects(object sender, GetAllUserProjectsMessageEventArgs eventArgs)
+        {
                 
-            }
+        }
 
-            #endregion Project messages received
+        private static void _OpenProject(object sender, OpenProjectMessageEventArgs eventArgs)
+        {
+            ConfigurationSingleton.CurrentProject = eventArgs.message.flowProject;
+        }
 
-            #region Room messages received
-            private static void _JoinRoom(object sender, JoinRoomMessageEventArgs eventArgs)
-            {
+        #endregion Project messages received
+
+        #region Room messages received
+        private static void _JoinRoom(object sender, JoinRoomMessageEventArgs eventArgs)
+        {
                 
-            }
-            #endregion Room messages received
+        }
+        #endregion Room messages received
 
-            #region User messages received
-            private static void _LoginUser(object sender, ConfirmationMessageEventArgs eventArgs)
-            {
+        #region User messages received
+        private static void _LoginUser(object sender, LoginUserMessageEventArgs eventArgs)
+        {
                 
-            }
+        }
 
-            private static void _LogoutUser(object sender, ConfirmationMessageEventArgs eventArgs)
-            {
-                
-            }
+        private static void _LogoutUser(object sender, ConfirmationMessageEventArgs eventArgs)
+        {
+            ConfigurationSingleton.CurrentProject = null;
+            ConfigurationSingleton.CurrentUser = null;
+        }
 
-            private static void _RegisterUser(object sender, ConfirmationMessageEventArgs eventArgs)
-            {
+        private static void _RegisterUser(object sender, ConfirmationMessageEventArgs eventArgs)
+        {
                 
-            }
-        #endregion User messages received
+        }
+    #endregion User messages received
 
         #endregion Default actions taken after receiving messages (These happen no matter what the user does)
     }
