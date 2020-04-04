@@ -1,4 +1,5 @@
 ﻿using Microsoft.MixedReality.Toolkit.UI;
+using Packages.realityflow_package.Runtime.scripts.Messages.BehaviourMessages;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -6,18 +7,20 @@ using UnityEngine;
 
 namespace Behaviours
 {
-    public class BehaviourEventManager : MonoBehaviour
+    public static class BehaviourEventManager
     {
-        public event Action<string> SendEventDown;
-        public Dictionary<Guid, GameObject> GoIds;
-        public States DefaultInteractableStates;
-        
-        void Awake()
+        public static event Action<string> SendEventDown;
+        public static Dictionary<Guid, GameObject> GoIds;
+        public static Dictionary<Guid, FlowBehaviour> GuidToBehaviourMapping;
+        public static States DefaultInteractableStates;
+
+        static BehaviourEventManager()
         {
             GoIds = new Dictionary<Guid, GameObject>();
+            GuidToBehaviourMapping = new Dictionary<Guid, FlowBehaviour>();
         }
 
-        public BehaviourEvent CreateNewBehaviourEvent(string name, Guid go1, Guid go2, BehaviourEvent chain)
+        public static BehaviourEvent CreateNewBehaviourEvent(string name, Guid go1, Guid go2, List<Guid> chain)
         {
             GameObject g1 = GetGoFromGuid(go1);
             if (g1)
@@ -25,9 +28,9 @@ namespace Behaviours
                 BehaviourEvent bEvent = g1.AddComponent<BehaviourEvent>();
                 if (bEvent)
                 {
-                    bEvent.SetName(name);
-                    bEvent.SetSecondObject(go2);
-                    bEvent.SetChain(chain);
+                    bEvent._FlowBehaviour.TypeOfTrigger = name;
+                    bEvent._FlowBehaviour.TargetObjectId = go2;
+                    bEvent._FlowBehaviour.NextBehaviorList = chain;
                 }
 
                 g1.GetComponent<ObjectIsInteractable>().AddInteractableEvent(bEvent);
@@ -38,21 +41,21 @@ namespace Behaviours
             return null;
         }
 
-        public BehaviourEvent AddChain(BehaviourEvent b1, BehaviourEvent b2)
-        {
-            BehaviourEvent temp = b1;
+        //public BehaviourEvent AddChain(FlowBehaviour b1, FlowBehaviour b2)
+        //{
+        //    FlowBehaviour temp = b1;
 
-            while (temp.chainedEvent != null)
-            {
-                temp = temp.chainedEvent;
-            }
+        //    while (temp.NextBehaviorList != null)
+        //    {
+        //        temp = temp.next;
+        //    }
 
-            temp.SetChain(b2);
-            return b1;
-        }
+        //    temp.SetChain(b2);
+        //    return b1;
+        //}
 
         // needs to check second gameobject
-        public void DeleteBehaviourEvent(Guid go1, Guid go2, BehaviourEvent bEvent)
+        public static void DeleteBehaviourEvent(Guid go1, Guid go2, BehaviourEvent bEvent)
         {
             GameObject g1 = GetGoFromGuid(go1);
             ObjectIsInteractable interactScript = g1.GetComponent<ObjectIsInteractable>();
@@ -70,12 +73,12 @@ namespace Behaviours
         /// <param name="go1"></param>
         /// <param name="go2"></param>
         /// <param name="chain"></param>
-        public void ListenToEvents(string eventName, Guid go1, Guid go2, BehaviourEvent chain)
+        public static void ListenToEvents(string eventName, Guid go1, Guid go2, List<Guid> chain)
         {
             // sends updated coordinates
         }
 
-        public ObjectIsInteractable MakeObjectInteractable(GameObject go)
+        public static ObjectIsInteractable MakeObjectInteractable(GameObject go)
         {
             ObjectIsInteractable oisI = go.AddComponent<ObjectIsInteractable>();
 
@@ -86,7 +89,7 @@ namespace Behaviours
             return oisI;
         }
 
-        public GameObject GetGoFromGuid(Guid guid)
+        public static GameObject GetGoFromGuid(Guid guid)
         {
             GameObject temp;
 
