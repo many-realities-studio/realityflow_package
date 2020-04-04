@@ -10,10 +10,15 @@ namespace Behaviours
     public class BehaviourEvent : MonoBehaviour
     {
         private BehaviourEventManager BEM;
+        [SerializeField]
         private string behaviourName = "default";
+
+        [SerializeField]
         private Guid firstObject;
+        [SerializeField]
         private Guid secondObject;
-        private BehaviourEvent chainedEvent;
+        [SerializeField]
+        public BehaviourEvent chainedEvent;
 
         public event Action<string, Guid, Guid, BehaviourEvent> EventCalled;
 
@@ -22,7 +27,7 @@ namespace Behaviours
         /// <summary>
         /// Calls initialization functions
         /// </summary>
-        private void Start()
+        private void Awake()
         {
             firstObject = gameObject.GetComponent<ObjectIsInteractable>().GetGuid();
             GetBehaviourEventManager();
@@ -37,7 +42,7 @@ namespace Behaviours
         /// </summary>
         private void GetBehaviourEventManager()
         {
-            BEM = FindObjectOfType<EventSystem>().GetComponent<BehaviourEventManager>();
+            BEM = FindObjectOfType<BehaviourEventManager>();
             BEM.SendEventDown += OnCallDown;
             EventCalled += BEM.ListenToEvents;
         }
@@ -56,8 +61,7 @@ namespace Behaviours
         /// <param name="scriptName"></param>
         private void OnCallDown(string scriptName)
         {
-            if (scriptName != behaviourName)
-                return;
+            Debug.Log("here!!");
 
             GameObject obj = BEM.GetGoFromGuid(secondObject);
 
@@ -76,16 +80,18 @@ namespace Behaviours
                     // if object received click input, then trigger chained event
                     if (chainedEvent)
                     {
+                        Debug.Log("execute chained event");
                         chainedEvent.EventTrigger();
                     }
                     return;
-                case "Snap Zone":
+                case "SnapZone":
                     // take in more info than teleport, but basically acts as a teleport within the other object
                     if (obj.GetComponent<TeleportCoordinates>().IsSnapZone())
                     {
-                        transform.position = obj.GetComponent<TeleportCoordinates>().GetCoordinates();
+                        transform.position = obj.transform.position + obj.GetComponent<TeleportCoordinates>().GetCoordinates();
                         transform.localScale = obj.GetComponent<TeleportCoordinates>().GetScale();
                         transform.rotation = obj.GetComponent<TeleportCoordinates>().GetRotation();
+                        // set snap zone rest until leaves snap zone
                     }
                     return;
                 case "Enable":
