@@ -10,17 +10,17 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.BehaviourMessage
     public class FlowBehaviour
     {
         public string TypeOfTrigger;
-        public Guid Id;
-        public Guid TriggerObjectId;
-        public Guid TargetObjectId;
+        public string Id;
+        public string TriggerObjectId;
+        public string TargetObjectId;
 
-        public List<Guid> NextBehaviorList;
+        public List<string> NextBehaviorList;
 
         BaseFlowAction _FlowAction;
 
-        public event Action<string, Guid, Guid, List<Guid>> EventCalled;
+        public event Action<string, string, string, List<string>> EventCalled;
 
-        public FlowBehaviour(string typeOfTrigger, Guid id, Guid triggerObjectId, Guid targetObjectId, List<Guid> nextBehavior, BaseFlowAction FlowAction)
+        public FlowBehaviour(string typeOfTrigger, string id, string triggerObjectId, string targetObjectId, List<string> nextBehavior, BaseFlowAction FlowAction)
         {
             TypeOfTrigger = typeOfTrigger;
             Id = id;
@@ -69,7 +69,7 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.BehaviourMessage
                     return;
                 case "Click":
                     // if object received click input, then trigger chained event
-                    foreach (Guid behaviourGuid in NextBehaviorList)
+                    foreach (string behaviourGuid in NextBehaviorList)
                     {
                         BehaviourEventManager.GuidToBehaviourMapping[behaviourGuid].EventTrigger();
                         Debug.Log("execute chained event");
@@ -79,7 +79,7 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.BehaviourMessage
                     // take in more info than teleport, but basically acts as a teleport within the other object
                     if (obj.GetComponent<TeleportCoordinates>().IsSnapZone())
                     {
-                        FlowTObject currentGameObject = ;
+                        FlowTObject currentGameObject = FlowTObject.idToGameObjectMapping[TargetObjectId];
                         currentGameObject.Position= obj.transform.position + obj.GetComponent<TeleportCoordinates>().GetCoordinates();
                         currentGameObject.Scale= obj.GetComponent<TeleportCoordinates>().GetScale();
                         currentGameObject.Rotation = obj.GetComponent<TeleportCoordinates>().GetRotation();

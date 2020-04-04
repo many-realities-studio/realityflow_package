@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Microsoft.MixedReality.Toolkit.UI;
 using UnityEngine.EventSystems;
+using Packages.realityflow_package.Runtime.scripts.Messages.BehaviourMessages;
 
 namespace Behaviours
 {
@@ -11,8 +12,8 @@ namespace Behaviours
     /// </summary>
     public class ObjectIsInteractable : MonoBehaviour
     {
-        private Dictionary<Guid, bool> interactableWith;
-        private Dictionary<BehaviourEvent, string> interactableEvents;
+        private Dictionary<string, bool> interactableWith;
+        private Dictionary<FlowBehaviour, string> interactableEvents;
 
         public event Action SetEventTrigger;
 
@@ -20,7 +21,7 @@ namespace Behaviours
 
         private string CurrentEvent = null;
 
-        private Guid objectId;
+        private string objectId;
 
 
 
@@ -29,7 +30,7 @@ namespace Behaviours
         /// <summary>
         /// Returns assigned guid
         /// </summary>
-        public Guid GetGuid()
+        public string GetGuid()
         {
             return objectId;
         }
@@ -39,15 +40,15 @@ namespace Behaviours
         /// </summary>
         public void Awake()
         {
-            objectId = Guid.NewGuid();
-            interactableWith = new Dictionary<Guid, bool>();
-            interactableEvents = new Dictionary<BehaviourEvent, string>();
+            objectId = Guid.NewGuid().ToString();
+            interactableWith = new Dictionary<string, bool>();
+            interactableEvents = new Dictionary<FlowBehaviour, string>();
             interactableScript = gameObject.AddComponent<Interactable>();
 
             //interactableScript.Profiles[0].Target = gameObject;
             //interactableScript.Profiles[0].Themes.Add(new Theme());
             interactableScript.IsEnabled = true;
-            interactableScript.States = FindObjectOfType<BehaviourEventManager>().DefaultInteractableStates;
+            interactableScript.States = BehaviourEventManager.DefaultInteractableStates;
             interactableScript.OnClick.AddListener(() => OnSelect());
         }
 
@@ -115,7 +116,7 @@ namespace Behaviours
         /// Adds Interactable Objects to dictionary of objects interactable with current GameObject
         /// </summary>
         /// <param name="interactables"></param>
-        public void InteractableWith(List<Guid> interactables)
+        public void InteractableWith(List<string> interactables)
         {
             for (int i = 0; i < interactables.Count; i++)
             {
@@ -128,25 +129,25 @@ namespace Behaviours
         /// Adds Interactable Events to dictionary of events interactable with current GameObject
         /// </summary>
         /// <param name="events"></param>
-        public void AddInteractableEvents(List<BehaviourEvent> events)
+        public void AddInteractableEvents(List<FlowBehaviour> events)
         {
             for (int i = 0; i < events.Count; i++)
             {
                 if (!interactableEvents.ContainsKey(events[i]))
                 {
                     SetEventTrigger += events[i].EventTrigger;
-                    interactableEvents.Add(events[i], events[i].GetName());
+                    interactableEvents.Add(events[i], events[i].TypeOfTrigger);
                 }
             }
         }
 
 
-        public void AddInteractableEvent(BehaviourEvent e)
+        public void AddInteractableEvent(FlowBehaviour e)
         {
             if (!interactableEvents.ContainsKey(e))
             {
                 SetEventTrigger += e.EventTrigger;
-                interactableEvents.Add(e, e.GetName());
+                interactableEvents.Add(e, e.TypeOfTrigger);
             }
         }
 
@@ -154,7 +155,7 @@ namespace Behaviours
         /// Remove a GameObject from the dictionary of interactable objects
         /// </summary>
         /// <param name="go"></param>
-        public void RemoveInteractableObject(Guid go)
+        public void RemoveInteractableObject(string go)
         {
             if (interactableWith.ContainsKey(go))
             {
@@ -166,7 +167,7 @@ namespace Behaviours
         /// Disables an interactable object in the dictionary
         /// </summary>
         /// <param name="go"></param>
-        public void TurnOffInteractableObject(Guid go)
+        public void TurnOffInteractableObject(string go)
         {
             if (interactableWith.ContainsKey(go))
             {
@@ -180,16 +181,16 @@ namespace Behaviours
         /// </summary>
         /// <param name="bEvent"></param>
         /// <param name="go2"></param>
-        public void RemoveInteractableEvent(BehaviourEvent bEvent, Guid go2)
+        public void RemoveInteractableEvent(FlowBehaviour bEvent, string go2)
         {
             if (interactableEvents.ContainsKey(bEvent))
             {
                 if (go2 != null)
                 {
-                    if (bEvent.GetSecondObject() == go2)
+                    if (bEvent.TargetObjectId == go2)
                     {
                         interactableEvents.Remove(bEvent);
-                        GameObject g2 = FindObjectOfType<EventSystem>().GetComponent<BehaviourEventManager>().GetGoFromGuid(go2);
+                        GameObject g2 = BehaviourEventManager.GetGoFromGuid(go2);
                         if (g2.GetComponent<ObjectIsInteractable>())
                         {
                             g2.GetComponent<ObjectIsInteractable>().RemoveInteractableEvent(bEvent);
@@ -203,7 +204,7 @@ namespace Behaviours
         /// Removes an event from the dictionary of interactable events (dependent GameObject)
         /// </summary>
         /// <param name="bEvent"></param>
-        public void RemoveInteractableEvent(BehaviourEvent bEvent)
+        public void RemoveInteractableEvent(FlowBehaviour bEvent)
         {
             if (interactableEvents.ContainsKey(bEvent))
             {
@@ -215,7 +216,7 @@ namespace Behaviours
         /// Turns off an event in the dictionary
         /// </summary>
         /// <param name="bEvent"></param>
-        public void TurnOffInteractableEvent(BehaviourEvent bEvent)
+        public void TurnOffInteractableEvent(FlowBehaviour bEvent)
         {
             if (interactableEvents.ContainsKey(bEvent))
             {
@@ -233,7 +234,7 @@ namespace Behaviours
         /// </summary>
         /// <param name="go"></param>
         /// <returns></returns>
-        public bool IsInteractableWith(Guid go)
+        public bool IsInteractableWith(string go)
         {
             if (interactableWith.ContainsKey(go))
                 return true;
@@ -246,7 +247,7 @@ namespace Behaviours
         /// </summary>
         /// <param name="bEvents"></param>
         /// <returns></returns>
-        public bool IsInteractableWithEvent(BehaviourEvent bEvents)
+        public bool IsInteractableWithEvent(FlowBehaviour bEvents)
         {
             if (interactableEvents.ContainsKey(bEvents))
                 return true;

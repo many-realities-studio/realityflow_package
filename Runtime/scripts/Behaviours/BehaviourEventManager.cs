@@ -10,17 +10,17 @@ namespace Behaviours
     public static class BehaviourEventManager
     {
         public static event Action<string> SendEventDown;
-        public static Dictionary<Guid, GameObject> GoIds;
-        public static Dictionary<Guid, FlowBehaviour> GuidToBehaviourMapping;
+        public static Dictionary<string, GameObject> GoIds;
+        public static Dictionary<string, FlowBehaviour> GuidToBehaviourMapping;
         public static States DefaultInteractableStates;
 
         static BehaviourEventManager()
         {
-            GoIds = new Dictionary<Guid, GameObject>();
-            GuidToBehaviourMapping = new Dictionary<Guid, FlowBehaviour>();
+            GoIds = new Dictionary<string, GameObject>();
+            GuidToBehaviourMapping = new Dictionary<string, FlowBehaviour>();
         }
 
-        public static BehaviourEvent CreateNewBehaviourEvent(string name, Guid go1, Guid go2, List<Guid> chain)
+        public static BehaviourEvent CreateNewBehaviourEvent(string name, string go1, string go2, List<string> chain)
         {
             GameObject g1 = GetGoFromGuid(go1);
             if (g1)
@@ -33,8 +33,8 @@ namespace Behaviours
                     bEvent._FlowBehaviour.NextBehaviorList = chain;
                 }
 
-                g1.GetComponent<ObjectIsInteractable>().AddInteractableEvent(bEvent);
-                GetGoFromGuid(go2).GetComponent<ObjectIsInteractable>().AddInteractableEvent(bEvent);
+                g1.GetComponent<ObjectIsInteractable>().AddInteractableEvent(bEvent._FlowBehaviour);
+                GetGoFromGuid(go2).GetComponent<ObjectIsInteractable>().AddInteractableEvent(bEvent._FlowBehaviour);
 
                 return bEvent;
             }
@@ -55,7 +55,7 @@ namespace Behaviours
         //}
 
         // needs to check second gameobject
-        public static void DeleteBehaviourEvent(Guid go1, Guid go2, BehaviourEvent bEvent)
+        public static void DeleteBehaviourEvent(string go1, string go2, BehaviourEvent bEvent)
         {
             GameObject g1 = GetGoFromGuid(go1);
             ObjectIsInteractable interactScript = g1.GetComponent<ObjectIsInteractable>();
@@ -63,7 +63,7 @@ namespace Behaviours
             if (interactScript == null)
                 return;
 
-            interactScript.RemoveInteractableEvent(bEvent, go2);
+            interactScript.RemoveInteractableEvent(bEvent._FlowBehaviour, go2);
         }
 
         /// <summary>
@@ -73,7 +73,7 @@ namespace Behaviours
         /// <param name="go1"></param>
         /// <param name="go2"></param>
         /// <param name="chain"></param>
-        public static void ListenToEvents(string eventName, Guid go1, Guid go2, List<Guid> chain)
+        public static void ListenToEvents(string eventName, string go1, string go2, List<string> chain)
         {
             // sends updated coordinates
         }
@@ -82,14 +82,14 @@ namespace Behaviours
         {
             ObjectIsInteractable oisI = go.AddComponent<ObjectIsInteractable>();
 
-            Guid temp = oisI.GetGuid();
+            string temp = oisI.GetGuid();
 
             GoIds.Add(temp, go);
 
             return oisI;
         }
 
-        public static GameObject GetGoFromGuid(Guid guid)
+        public static GameObject GetGoFromGuid(string guid)
         {
             GameObject temp;
 
