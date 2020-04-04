@@ -94,7 +94,7 @@ public class FlowNetworkManagerEditor : EditorWindow
         //    newUser = new FlowUser("testUsername", "TestPassword");
 
         //Operations.ConnectToServer("ws://echo.websocket.org");
-        Operations.ConnectToServer(Url);
+        //Operations.ConnectToServer(Url);
 
         InitTextures();
         //InitData();
@@ -276,10 +276,10 @@ public class FlowNetworkManagerEditor : EditorWindow
 
     public void Update()
     {
-        //if(Operations.FlowWebsocket != null)
-        //{
-            Unity.EditorCoroutines.Editor.EditorCoroutineUtility.StartCoroutine(Operations.FlowWebsocket.ReceiveMessage(), Operations.FlowWebsocket);
-        //}
+        if (Operations._FlowWebsocket != null)
+        {
+            Unity.EditorCoroutines.Editor.EditorCoroutineUtility.StartCoroutine(Operations._FlowWebsocket.ReceiveMessage(), Operations._FlowWebsocket);
+        }
 
         //foreach(string flowObjectId in FlowTObject.idToGameObjectMapping.Keys)
         //{
@@ -359,7 +359,7 @@ public class FlowNetworkManagerEditor : EditorWindow
         {
             // Send login event to the server
             ConfigurationSingleton.CurrentUser = new FlowUser(uName, pWord);
-            Operations.Login(ConfigurationSingleton.CurrentUser, (_, e) =>
+            Operations.Login(ConfigurationSingleton.CurrentUser, Url, (_, e) =>
             {
                 Debug.Log("login callback: " + e.message.WasSuccessful.ToString());
                 if (e.message.WasSuccessful == true)
@@ -383,7 +383,7 @@ public class FlowNetworkManagerEditor : EditorWindow
 
         if (GUILayout.Button("Register", GUILayout.Height(30)))
         {
-            Operations.Register(uName, pWord, (sender, e) => { Debug.Log(e.message); });
+            Operations.Register(uName, pWord, Url, (sender, e) => { Debug.Log(e.message); });
         }
 
         // Create "Import" Button and define onClick action
