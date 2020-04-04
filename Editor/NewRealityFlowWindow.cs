@@ -276,7 +276,7 @@ public class FlowNetworkManagerEditor : EditorWindow
 
     public void Update()
     {
-        if (Operations._FlowWebsocket != null)
+        if (FlowWebsocket.websocket != null)
         {
             Unity.EditorCoroutines.Editor.EditorCoroutineUtility.StartCoroutine(Operations._FlowWebsocket.ReceiveMessage(), Operations._FlowWebsocket);
         }
