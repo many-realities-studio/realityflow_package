@@ -10,6 +10,7 @@ using Packages.realityflow_package.Runtime.scripts.Messages.ObjectMessages;
 using System.Collections;
 using Packages.realityflow_package.Runtime.scripts.Structures;
 using Packages.realityflow_package.Runtime.scripts.Structures.Actions;
+using Behaviours;
 
 [CustomEditor(typeof(FlowWebsocket))]
 public class FlowNetworkManagerEditor : EditorWindow
@@ -46,6 +47,8 @@ public class FlowNetworkManagerEditor : EditorWindow
     public int selectedTrigger = 0;
     public int selectedTarget = 0;
     public FlowBehaviour headBehaviour = null;
+
+    public string previousBehaviourId = null;
 
 
     enum EWindowView
@@ -477,6 +480,8 @@ public class FlowNetworkManagerEditor : EditorWindow
 
         if (GUILayout.Button("Add Interaction", GUILayout.Height(40)))
         {
+            previousBehaviourId = null;
+
             objectNames.Clear();
             objectIds.Clear();
 
@@ -835,8 +840,13 @@ public class FlowNetworkManagerEditor : EditorWindow
             GameObject firstObject = FlowTObject.idToGameObjectMapping[firstObjectId].AttachedGameObject;
 
             addingChain = true;
+
             TeleportAction teleportAction = new TeleportAction(new TeleportCoordinates(firstObject, false));
-            FlowBehaviour fb = new FlowBehaviour("Teleport", Guid.NewGuid().ToString(), firstObjectId, secondObjectId, null, null);
+
+            FlowAction flowAction = new FlowAction();
+            flowAction.ActionType = "Teleport";
+
+            FlowBehaviour fb = new FlowBehaviour("Teleport", Guid.NewGuid().ToString(), firstObjectId, secondObjectId, null, flowAction);
             AddBehaviour(fb);
 
             window = EWindowView.CREATE_BEHAVIOUR;
@@ -849,7 +859,10 @@ public class FlowNetworkManagerEditor : EditorWindow
 
             addingChain = false;
 
-            FlowBehaviour fb = new FlowBehaviour("Teleport", "1", firstObject, secondObject, null, null);
+            FlowAction flowAction = new FlowAction();
+            flowAction.ActionType = "Teleport";
+
+            FlowBehaviour fb = new FlowBehaviour("Teleport", "1", firstObject, secondObject, null, flowAction);
             AddBehaviour(fb);
 
             window = EWindowView.PROJECT_HUB;
@@ -1006,20 +1019,58 @@ public class FlowNetworkManagerEditor : EditorWindow
     /// <param name="flowbehaviour"></param>
     private void AddBehaviour(FlowBehaviour flowbehaviour)
     {
+        Boolean updatePrevious = false; 
+
+        if(previousBehaviourId == null)
+        {
+            previousBehaviourId = flowbehaviour.Id;
+        }
+        else
+        {
+            updatePrevious = true;   
+        }
+
+        // might not need this line at all
         if(flowbehaviour.NextBehaviour == null)
         {
             flowbehaviour.NextBehaviour = new List<string>();
         }
 
+        // Create the behaviour first
         Operations.CreateBehaviour(flowbehaviour, ConfigurationSingleton.CurrentProject.Id, (_, e) =>
         {
             if (e.message.WasSuccessful == true)
             {
-                Debug.Log("it twas successful");
-                Debug.Log(e.message.flowBehaviour);
-            }
+                Debug.Log("Success creating behaviour" + e.message.flowBehaviour);
 
+                if(updatePrevious)
+                {
+                    if (BehaviourEventManager.BehaviourList.TryGetValue(previousBehaviourId, out BehaviourEvent previousBehaviourEvent))
+                    {
+                        previousBehaviourEvent.chainedEventIds.Add(e.message.flowBehaviour.Id);
+                        FlowBehaviour updatedPreviousBehaviour = BehaviourEventManager.ConvertBehaviourEvent(previousBehaviourEvent);
+
+                        // Update the previous behaviour to include the behaviour that was just created 
+                        Operations.UpdateBehaviour(updatedPreviousBehaviour, ConfigurationSingleton.CurrentProject.Id, (_, e) =>
+                        {
+                            if(e.message.WasSuccessful == true)
+                            {
+                                Debug.Log("Added behaviour to chain");
+                            }
+                        });
+                    }
+                }
+
+                // Make the created behaviour the new head of the behaviour chain
+                previousBehaviourId = e.message.flowBehaviour.Id;
+            }
+            else
+            {
+                Debug.Log("Failed to create behaviour");
+            }
         });
+
+
         //if(headBehaviour == null)
         //{
         //    headBehaviour = flowbehaviour;

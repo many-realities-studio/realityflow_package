@@ -1,4 +1,5 @@
 ﻿using Microsoft.MixedReality.Toolkit.UI;
+using RealityFlow.Plugin.Scripts;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -70,6 +71,13 @@ namespace Behaviours
                 return;
 
             interactScript.RemoveInteractableEvent(bEvent, go2);
+        }
+
+
+        public static FlowBehaviour ConvertBehaviourEvent(BehaviourEvent be)
+        {
+            be.
+            FlowBehaviour fb = new FlowBehaviour()
         }
 
         /// <summary>

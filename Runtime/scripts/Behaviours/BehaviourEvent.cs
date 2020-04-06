@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -13,12 +14,15 @@ namespace Behaviours
         [SerializeField]
         private string behaviourName = "default";
 
+        public string Id;
+
         [SerializeField]
         private string firstObject;
         [SerializeField]
         private string secondObject;
         [SerializeField]
         public BehaviourEvent chainedEvent;
+        public List<string> chainedEventIds;
 
         public event Action<string, string, string, BehaviourEvent> EventCalled;
 
@@ -136,6 +140,11 @@ namespace Behaviours
         public string GetSecondObject()
         {
             return secondObject;
+        }
+
+        public string GetFirstObject()
+        {
+            return firstObject;
         }
 
         public void SetChain(BehaviourEvent chain)

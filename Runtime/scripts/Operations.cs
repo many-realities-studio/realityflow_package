@@ -59,6 +59,7 @@ namespace Packages.realityflow_package.Runtime.scripts
             // Set up Behaviour updates
             CreateBehaviour_Received.ReceivedEvent += _CreateBehaviour;
             DeleteBehaviour_Received.ReceivedEvent += _DeleteBehaviour;
+            UpdateBehaviour_Received.ReceivedEvent += _UpdateBehaviour;
 
         }
 
@@ -145,6 +146,14 @@ namespace Packages.realityflow_package.Runtime.scripts
             FlowWebsocket.SendMessage(deleteBehaviour);
 
             DeleteBehaviour_Received.ReceivedEvent += callbackFunction;
+        }
+
+        public static void UpdateBehaviour(FlowBehaviour behaviour, string projectId, UpdateBehaviour_Received.UpdateBehaviourReceived_EventHandler callbackFunction)
+        {
+            UpdateBehaviour_SendToServer updateBehaviour = new UpdateBehaviour_SendToServer(behaviour, projectId);
+            FlowWebsocket.SendMessage(updateBehaviour);
+
+            UpdateBehaviour_Received.ReceivedEvent += callbackFunction;
         }
 
         #endregion
@@ -309,8 +318,9 @@ namespace Packages.realityflow_package.Runtime.scripts
             }
 
             BehaviourEvent newBehaviour = BehaviourEventManager.CreateNewBehaviourEvent(behaviourName, oIsIFirst.GetGuid(), oIsISecond.GetGuid(), null);
+            newBehaviour.Id = fb.Id;
 
-            BehaviourEventManager.BehaviourList.Add(fb.Id, newBehaviour);
+            BehaviourEventManager.BehaviourList.Add(newBehaviour.Id, newBehaviour);
         }
 
 
@@ -383,10 +393,15 @@ namespace Packages.realityflow_package.Runtime.scripts
             // this is where things happen after a DeleteBehaviour message is deserialized
         }
 
+        private static void _UpdateBehaviour(object sender, UpdateBehaviourEventArgs eventArgs)
+        {
+            // this is where things happen after a DeleteBehaviour message is deserialized
+        }
+
         #endregion
-          
-          
-          
+
+
+
 
         #region Project messages received
 
