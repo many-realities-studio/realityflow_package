@@ -54,5 +54,29 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.BehaviourMessage
             this.BehaviourId = behaviourId;
             this.FlowBehaviour = flowBehaviour;
         }
-    } 
+    }
+
+
+
+    /// <summary>
+    /// Update behaviour request message format 
+    /// Receive: <see cref="UpdateBehaviour_Received"/>
+    /// </summary>
+    public class UpdateBehaviour_SendToServer : BaseMessage
+    {
+        [JsonProperty("FlowBehaviour")]
+        FlowBehaviour FlowBehaviour { get; set; }
+
+        [JsonProperty("ProjectId")]
+        string ProjectId { get; set; }
+
+
+        public UpdateBehaviour_SendToServer(FlowBehaviour behaviour, string projectId)
+        {
+            this.FlowBehaviour = behaviour;
+            this.ProjectId = projectId;
+
+            this.MessageType = "UpdateBehaviour";
+        }
+    }
 }
