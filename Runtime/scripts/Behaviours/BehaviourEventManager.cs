@@ -1,4 +1,5 @@
 ﻿using Microsoft.MixedReality.Toolkit.UI;
+using Packages.realityflow_package.Runtime.scripts.Structures.Actions;
 using RealityFlow.Plugin.Scripts;
 using System;
 using System.Collections;
@@ -27,7 +28,7 @@ namespace Behaviours
             BehaviourList = null;
         }
 
-        public static BehaviourEvent CreateNewBehaviourEvent(string name, string go1, string go2, BehaviourEvent chain)
+        public static BehaviourEvent CreateNewBehaviourEvent(string name, string id, string go1, string go2, BehaviourEvent chain)
         {
             GameObject g1 = GetGoFromGuid(go1);
             if (g1)
@@ -38,6 +39,7 @@ namespace Behaviours
                     bEvent.SetName(name);
                     bEvent.SetSecondObject(go2);
                     bEvent.SetChain(chain);
+                    bEvent.Id = id;
                 }
 
                 g1.GetComponent<ObjectIsInteractable>().AddInteractableEvent(bEvent);
@@ -73,11 +75,27 @@ namespace Behaviours
             interactScript.RemoveInteractableEvent(bEvent, go2);
         }
 
-
+        /// <summary>
+        /// Converts a BehaviourEvent to a FlowBehaviour
+        /// </summary>
+        /// <param name="be"></param>
+        /// <returns></returns>
         public static FlowBehaviour ConvertBehaviourEvent(BehaviourEvent be)
         {
-            be.
-            FlowBehaviour fb = new FlowBehaviour()
+            FlowAction flowAction = new FlowAction();
+            string typeOfTrigger = be.GetName();
+            if(typeOfTrigger.Equals("Click") || typeOfTrigger.Equals("Collision"))
+            {
+                flowAction = null;
+            }
+            else
+            {
+                flowAction.ActionType = typeOfTrigger;
+                typeOfTrigger = "Immediate";
+            }
+
+            FlowBehaviour fb = new FlowBehaviour(typeOfTrigger, be.Id, be.GetFirstObject(), be.GetSecondObject(), be.chainedEventIds, flowAction);
+            return fb;
         }
 
         /// <summary>

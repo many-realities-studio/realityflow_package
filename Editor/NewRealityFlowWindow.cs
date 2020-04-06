@@ -49,6 +49,7 @@ public class FlowNetworkManagerEditor : EditorWindow
     public FlowBehaviour headBehaviour = null;
 
     public string previousBehaviourId = null;
+    public Boolean showAllOptions = false;
 
 
     enum EWindowView
@@ -745,17 +746,14 @@ public class FlowNetworkManagerEditor : EditorWindow
         {
             headBehaviour = null;
             addingChain = false;
+            showAllOptions = false;
+            previousBehaviourId = null;
             window = EWindowView.PROJECT_HUB;
         }
 
         GUILayout.Space(10f);
         EditorGUILayout.LabelField("Choose one of the triggers below.");
         EditorGUILayout.BeginHorizontal();
-
-        if (GUILayout.Button("Teleport", GUILayout.Height(75), GUILayout.Width(92)))
-        {
-            window = EWindowView.CREATE_TELEPORT;
-        }
 
         // Create "Logout" Button and define onClick action
         if (GUILayout.Button("Click", GUILayout.Height(75), GUILayout.Width(92)))
@@ -769,35 +767,23 @@ public class FlowNetworkManagerEditor : EditorWindow
             //window = EWindowView.CREATE_CLICK;
         }
 
-        // Create "Logout" Button and define onClick action
-        if (GUILayout.Button("Snapzone", GUILayout.Height(75), GUILayout.Width(92)))
-        {
-
-        }
+        
         EditorGUILayout.EndHorizontal();
-
-        //if (GUILayout.Button("Teleport", GUILayout.Height(75), GUILayout.Width(92)))
-        //{
-        //    window = EWindowView.CREATE_TELEPORT;
-        //}
-
-        //// Create "Logout" Button and define onClick action
-        //if (GUILayout.Button("Click", GUILayout.Height(75), GUILayout.Width(92)))
-        //{
-        //    window = EWindowView.CREATE_CLICK;
-        //}
-
-        //// Create "Logout" Button and define onClick action
-        //if (GUILayout.Button("Snapzone", GUILayout.Height(75), GUILayout.Width(92)))
-        //{
-
-        //}
-        //EditorGUILayout.EndHorizontal();
 
         if (addingChain)
         {
+
+
             EditorGUILayout.BeginHorizontal();
-            // Create "Logout" Button and define onClick action
+            if (GUILayout.Button("Teleport", GUILayout.Height(75), GUILayout.Width(92)))
+            {
+                window = EWindowView.CREATE_TELEPORT;
+            }
+     
+            if (GUILayout.Button("Snapzone", GUILayout.Height(75), GUILayout.Width(92)))
+            {
+
+            }
             if (GUILayout.Button("Enable", GUILayout.Height(75), GUILayout.Width(92)))
             {
                 window = EWindowView.CREATE_ENABLE;
@@ -807,6 +793,7 @@ public class FlowNetworkManagerEditor : EditorWindow
             {
                 window = EWindowView.CREATE_DISABLE;
             }
+
             EditorGUILayout.EndHorizontal();
         }
     }
@@ -856,15 +843,18 @@ public class FlowNetworkManagerEditor : EditorWindow
         {
             string firstObject = objectIds[selectedTrigger].ToString();
             string secondObject = objectIds[selectedTarget].ToString();
-
-            addingChain = false;
-
+            
             FlowAction flowAction = new FlowAction();
             flowAction.ActionType = "Teleport";
 
-            FlowBehaviour fb = new FlowBehaviour("Teleport", "1", firstObject, secondObject, null, flowAction);
+            string id = Guid.NewGuid().ToString();
+
+            FlowBehaviour fb = new FlowBehaviour("Immediate", id, firstObject, secondObject, null, flowAction);
             AddBehaviour(fb);
 
+            addingChain = false;
+            showAllOptions = false;
+            previousBehaviourId = null;
             window = EWindowView.PROJECT_HUB;
         }
 
@@ -896,13 +886,12 @@ public class FlowNetworkManagerEditor : EditorWindow
         {
             string firstObject = objectIds[selectedTrigger].ToString();
 
-            addingChain = true;
-
             string id = Guid.NewGuid().ToString();
 
             FlowBehaviour fb = new FlowBehaviour("Click", id, firstObject, firstObject, null, null);
             AddBehaviour(fb);
 
+            addingChain = true;
             window = EWindowView.CREATE_BEHAVIOUR;
         }
 
@@ -1017,41 +1006,59 @@ public class FlowNetworkManagerEditor : EditorWindow
     /// If adding on to the behaviour chain, then adds the flowBehaviour to the end of the current chain
     /// </summary>
     /// <param name="flowbehaviour"></param>
-    private void AddBehaviour(FlowBehaviour flowbehaviour)
+    private void AddBehaviour(FlowBehaviour newFlowBehaviour)
     {
         Boolean updatePrevious = false; 
 
         if(previousBehaviourId == null)
         {
-            previousBehaviourId = flowbehaviour.Id;
+            previousBehaviourId = newFlowBehaviour.Id;
         }
         else
         {
             updatePrevious = true;   
         }
 
-        // might not need this line at all
-        if(flowbehaviour.NextBehaviour == null)
-        {
-            flowbehaviour.NextBehaviour = new List<string>();
-        }
+        //// might not need this line at all
+        //if(flowbehaviour.NextBehaviour == null)
+        //{
+        //    flowbehaviour.NextBehaviour = new List<string>();
+        //}
 
         // Create the behaviour first
-        Operations.CreateBehaviour(flowbehaviour, ConfigurationSingleton.CurrentProject.Id, (_, e) =>
+        Operations.CreateBehaviour(newFlowBehaviour, ConfigurationSingleton.CurrentProject.Id, (_, e) =>
         {
             if (e.message.WasSuccessful == true)
             {
                 Debug.Log("Success creating behaviour" + e.message.flowBehaviour);
 
+
+                // Add it to the chain
                 if(updatePrevious)
                 {
                     if (BehaviourEventManager.BehaviourList.TryGetValue(previousBehaviourId, out BehaviourEvent previousBehaviourEvent))
                     {
-                        previousBehaviourEvent.chainedEventIds.Add(e.message.flowBehaviour.Id);
-                        FlowBehaviour updatedPreviousBehaviour = BehaviourEventManager.ConvertBehaviourEvent(previousBehaviourEvent);
+                        // Convert BehaviourEvent to flowbehaviour
+                        FlowBehaviour fb = BehaviourEventManager.ConvertBehaviourEvent(previousBehaviourEvent);
+
+                        // Remove the behaviour Event from all lists and objects
+                        string firstObjectId = previousBehaviourEvent.GetFirstObject();
+                        string secondObjectId = previousBehaviourEvent.GetSecondObject();
+
+                        BehaviourEventManager.BehaviourList.Remove(previousBehaviourEvent.Id);
+                        BehaviourEventManager.DeleteBehaviourEvent(firstObjectId, secondObjectId, previousBehaviourEvent);
+                        Destroy(previousBehaviourEvent);
+
+                        // Add the newly created behaviour event Id to the previous events list of nextBehaviours
+                        if(fb.NextBehaviour == null)
+                        {
+                            fb.NextBehaviour = new List<string>();
+                        }
+                        fb.NextBehaviour.Add(e.message.flowBehaviour.Id);
+
 
                         // Update the previous behaviour to include the behaviour that was just created 
-                        Operations.UpdateBehaviour(updatedPreviousBehaviour, ConfigurationSingleton.CurrentProject.Id, (_, e) =>
+                        Operations.UpdateBehaviour(fb, ConfigurationSingleton.CurrentProject.Id, (_, e) =>
                         {
                             if(e.message.WasSuccessful == true)
                             {
@@ -1068,38 +1075,7 @@ public class FlowNetworkManagerEditor : EditorWindow
             {
                 Debug.Log("Failed to create behaviour");
             }
-        });
-
-
-        //if(headBehaviour == null)
-        //{
-        //    headBehaviour = flowbehaviour;
-        //    Debug.Log("Making " + flowbehaviour.TypeOfTrigger + " the head behaviour");
-        //}
-        //else
-        //{
-        //    FlowBehaviour head = headBehaviour;
-
-        //    while(head.NextBehaviour != null)
-        //    {
-        //        head = head.NextBehaviour;
-        //    }
-
-        //    head.NextBehaviour = flowbehaviour;
-        //    Debug.Log("making " + flowbehaviour.TypeOfTrigger + "the chain behaviour");
-        //}
-
-        //if (!addingChain)
-        //{
-        //    Operations.CreateBehaviour(headBehaviour, ConfigurationSingleton.CurrentProject.Id, (_, e) =>
-        //    {
-        //        if(e.message.WasSuccessful == true)
-        //        {
-        //            Debug.Log("it twas successful");
-        //            Debug.Log(e.message.flowBehaviour[0]);
-        //        }
-        //    });
-        //}
+        }); 
     }
 }
 

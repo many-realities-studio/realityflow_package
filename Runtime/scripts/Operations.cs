@@ -317,8 +317,13 @@ namespace Packages.realityflow_package.Runtime.scripts
                 return;
             }
 
-            BehaviourEvent newBehaviour = BehaviourEventManager.CreateNewBehaviourEvent(behaviourName, oIsIFirst.GetGuid(), oIsISecond.GetGuid(), null);
-            newBehaviour.Id = fb.Id;
+            BehaviourEvent newBehaviour = BehaviourEventManager.CreateNewBehaviourEvent(behaviourName, fb.Id, oIsIFirst.GetGuid(), oIsISecond.GetGuid(), null);
+
+            if(newBehaviour == null)
+            {
+                Debug.Log("Failed to create new behaviour");
+                return;
+            }
 
             BehaviourEventManager.BehaviourList.Add(newBehaviour.Id, newBehaviour);
         }
@@ -395,7 +400,7 @@ namespace Packages.realityflow_package.Runtime.scripts
 
         private static void _UpdateBehaviour(object sender, UpdateBehaviourEventArgs eventArgs)
         {
-            // this is where things happen after a DeleteBehaviour message is deserialized
+            // this is where things happen after an UpdateBehaviour message is deserialized
         }
 
         #endregion
