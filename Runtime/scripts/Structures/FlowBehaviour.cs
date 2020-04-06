@@ -28,7 +28,7 @@ namespace RealityFlow.Plugin.Scripts
         [JsonProperty("NextBehaviour")]
         public List<string> NextBehaviour { get; set; } // The chain behaviour
 
-        [JsonProperty("FlowAction")]
+        [JsonProperty("Action")]
         public FlowAction flowAction { get; set; }
 
         public FlowBehaviour(string typeOfTrigger, string id, string triggerObjectId, string targetObjectId, List<string> nextBehaviour, FlowAction flowAction)

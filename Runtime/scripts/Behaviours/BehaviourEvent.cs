@@ -33,7 +33,7 @@ namespace Behaviours
         /// </summary>
         private void Awake()
         {
-            //firstObject = gameObject.GetComponent<ObjectIsInteractable>().GetGuid();
+           // firstObject = gameObject.GetComponent<ObjectIsInteractable>().GetGuid();
             //GetBehaviourEventManager();
         }
         public void Initialize()
@@ -145,6 +145,11 @@ namespace Behaviours
         public string GetFirstObject()
         {
             return firstObject;
+        }
+
+        public void SetFirstObject(string go1)
+        {
+            firstObject = go1;
         }
 
         public void SetChain(BehaviourEvent chain)

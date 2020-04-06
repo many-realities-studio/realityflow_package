@@ -37,6 +37,7 @@ namespace Behaviours
                 if (bEvent)
                 {
                     bEvent.SetName(name);
+                    bEvent.SetFirstObject(go1);
                     bEvent.SetSecondObject(go2);
                     bEvent.SetChain(chain);
                     bEvent.Id = id;

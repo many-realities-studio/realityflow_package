@@ -888,7 +888,10 @@ public class FlowNetworkManagerEditor : EditorWindow
 
             string id = Guid.NewGuid().ToString();
 
-            FlowBehaviour fb = new FlowBehaviour("Click", id, firstObject, firstObject, null, null);
+            FlowAction flowAction = new FlowAction();
+            flowAction.ActionType = "empty";
+
+            FlowBehaviour fb = new FlowBehaviour("Click", id, firstObject, firstObject, null, flowAction);
             AddBehaviour(fb);
 
             addingChain = true;
@@ -926,7 +929,7 @@ public class FlowNetworkManagerEditor : EditorWindow
             FlowAction flowAction = new FlowAction();
             flowAction.ActionType = "Enable";
 
-            FlowBehaviour fb = new FlowBehaviour("Enable", "1", firstObject, firstObject, null, flowAction);
+            FlowBehaviour fb = new FlowBehaviour("Immediate", "1", firstObject, firstObject, null, flowAction);
             AddBehaviour(fb);
 
             window = EWindowView.CREATE_BEHAVIOUR;
@@ -940,7 +943,7 @@ public class FlowNetworkManagerEditor : EditorWindow
             FlowAction flowAction = new FlowAction();
             flowAction.ActionType = "Enable";
 
-            FlowBehaviour fb = new FlowBehaviour("Enable", "1", firstObject, firstObject, null, flowAction);
+            FlowBehaviour fb = new FlowBehaviour("Immediate", "1", firstObject, firstObject, null, flowAction);
             AddBehaviour(fb);
 
             window = EWindowView.PROJECT_HUB;
@@ -977,7 +980,7 @@ public class FlowNetworkManagerEditor : EditorWindow
             FlowAction flowAction = new FlowAction();
             flowAction.ActionType = "Disable";
 
-            FlowBehaviour fb = new FlowBehaviour("Disable", "1", firstObject, firstObject, null, flowAction);
+            FlowBehaviour fb = new FlowBehaviour("Immediate", "1", firstObject, firstObject, null, flowAction);
             AddBehaviour(fb);
 
             window = EWindowView.CREATE_BEHAVIOUR;
@@ -991,7 +994,7 @@ public class FlowNetworkManagerEditor : EditorWindow
             FlowAction flowAction = new FlowAction();
             flowAction.ActionType = "Disable";
 
-            FlowBehaviour fb = new FlowBehaviour("Disable", "1", firstObject, firstObject, null, flowAction);
+            FlowBehaviour fb = new FlowBehaviour("Immediate", "1", firstObject, firstObject, null, flowAction);
             AddBehaviour(fb);
 
             window = EWindowView.PROJECT_HUB;

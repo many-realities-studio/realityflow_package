@@ -301,7 +301,7 @@ namespace Packages.realityflow_package.Runtime.scripts
             FlowBehaviour fb = eventArgs.message.flowBehaviour;
             string behaviourName = fb.TypeOfTrigger;
             
-            if (fb.flowAction != null)
+            if (fb.flowAction.Equals("empty"))
             {
                 // The TypeOfTrigger would be "Immediate", so we use ActionType instead 
                 behaviourName = fb.flowAction.ActionType;
@@ -420,7 +420,7 @@ namespace Packages.realityflow_package.Runtime.scripts
 
             string behaviourName = fb.TypeOfTrigger;
 
-            if (fb.flowAction != null)
+            if (fb.flowAction.Equals("empty"))
             {
                 // The TypeOfTrigger would be "Immediate", so we use ActionType instead 
                 behaviourName = fb.flowAction.ActionType;
