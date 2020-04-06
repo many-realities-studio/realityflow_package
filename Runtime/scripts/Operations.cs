@@ -319,11 +319,11 @@ namespace Packages.realityflow_package.Runtime.scripts
         {
             // this is where things happen after a createBehaviour message is deserialized
 
-            FlowTObject.idToGameObjectMapping.TryGetValue(fb.FirstObject, out FlowTObject firstobject);
-            FlowTObject.idToGameObjectMapping.TryGetValue(fb.SecondObject, out FlowTObject secondobject);
+            FlowTObject.idToGameObjectMapping.TryGetValue(fb.TriggerObjectId, out FlowTObject firstobject);
+            FlowTObject.idToGameObjectMapping.TryGetValue(fb.TargetObjectId, out FlowTObject secondobject);
 
             Debug.Log("FIRSTOBJECT");
-            Debug.Log(fb.FirstObject);
+            Debug.Log(fb.TriggerObjectId);
 
             GameObject firstGameObject = firstobject.AttachedGameObject;
             GameObject secondGameObject = secondobject.AttachedGameObject;
@@ -334,14 +334,14 @@ namespace Packages.realityflow_package.Runtime.scripts
             //if (oIsIFirst == null)
             //{
 
-            ObjectIsInteractable oIsIFirst = bem.MakeObjectInteractable(firstGameObject, fb.FirstObject);
-            ObjectIsInteractable oIsISecond = bem.MakeObjectInteractable(secondGameObject, fb.SecondObject);
+            ObjectIsInteractable oIsIFirst = bem.MakeObjectInteractable(firstGameObject, fb.TriggerObjectId);
+            ObjectIsInteractable oIsISecond = bem.MakeObjectInteractable(secondGameObject, fb.TargetObjectId);
             
             //Debug.Log("GUID IS");
             //Debug.Log(oIsIFirst.GetGuid().ToString());
 
 
-            BehaviourEvent newBehaviour = bem.CreateNewBehaviourEvent(fb.Name, oIsIFirst.GetGuid(), oIsISecond.GetGuid(), chainedBehaviour);
+            BehaviourEvent newBehaviour = bem.CreateNewBehaviourEvent(fb.TypeOfTrigger, oIsIFirst.GetGuid(), oIsISecond.GetGuid(), chainedBehaviour);
 
             if(newBehaviour == null)
             {

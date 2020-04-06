@@ -3,13 +3,30 @@
 public class TeleportCoordinates : MonoBehaviour
 {
     [SerializeField]
-    private Vector3 coordinates = Vector3.zero;
+    public Vector3 coordinates = Vector3.zero;
     [SerializeField]
-    private Quaternion rotation = Quaternion.identity;
+    public Quaternion rotation = Quaternion.identity;
     [SerializeField]
-    private Vector3 scale = Vector3.one;
+    public Vector3 scale = Vector3.one;
     [SerializeField]
-    private bool isSZone = false;
+    public bool IsSnapZone = false;
+
+    public TeleportCoordinates(Vector3 coordinates, Quaternion rotation, Vector3 scale, bool isSnapZone)
+    {
+        this.coordinates = coordinates;
+        this.rotation = rotation;
+        this.scale = scale;
+        this.IsSnapZone = isSnapZone;
+    }
+
+    public TeleportCoordinates(GameObject gameObjectToTeleportTo, bool isSnapZone)
+    {
+        coordinates = gameObjectToTeleportTo.transform.position;
+        rotation = gameObjectToTeleportTo.transform.rotation;
+        scale = gameObjectToTeleportTo.transform.localScale;
+
+        IsSnapZone = isSnapZone;
+    }
 
     /// <summary>
     /// Global coordinates for Teleport, local for SnapZone
@@ -30,15 +47,9 @@ public class TeleportCoordinates : MonoBehaviour
         return rotation;
     }
 
-    public bool IsSnapZone()
-    {
-        return isSZone;
-    }
-
-
     public void SetSnapZone(bool tf)
     {
-        isSZone = tf;
+        IsSnapZone = tf;
     }
 
     public void SetCoordinates(Vector3 newCoordinates)

@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Packages.realityflow_package.Runtime.scripts.Structures;
 using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
@@ -12,33 +13,32 @@ namespace RealityFlow.Plugin.Scripts
     /// </summary>
     public class FlowBehaviour
     {
-        [JsonProperty("Name")]
-        public string Name { get; set; } // The behaviour type
+        [JsonProperty("TypeOfTrigger")]
+        public string TypeOfTrigger { get; set; } // The behaviour type
 
         [JsonProperty("Id")]
         public string Id { get; set; } // The ID of this behaviour
 
-        [JsonProperty("Trigger")]
-        public string FirstObject { get; set; } // The first object ID - typically the trigger object
+        [JsonProperty("TriggerObjectId")]
+        public string TriggerObjectId { get; set; } // The first object ID - typically the trigger object
 
-        [JsonProperty("Target")]
-        public string SecondObject { get; set; } // The second object ID - typically the target object
+        [JsonProperty("TargetObjectId")]
+        public string TargetObjectId { get; set; } // The second object ID - typically the target object
 
-        [JsonProperty("FlowBehaviour")]
-        public FlowBehaviour BehaviourChain { get; set; } // The chain behaviour
+        [JsonProperty("NextBehaviour")]
+        public List<string> NextBehaviour { get; set; } // The chain behaviour
 
-        [JsonProperty("ChainOwner")]
-        public string ChainOwner { get; set; } // The object that owns this behaviour
+        [JsonProperty("FlowAction")]
+        public FlowAction flowAction { get; set; }
 
-
-        public FlowBehaviour(string name, string id, string firstObject, string secondObject, FlowBehaviour behaviourChain, string chainOwner)
+        public FlowBehaviour(string typeOfTrigger, string id, string triggerObjectId, string targetObjectId, List<string> nextBehaviour, FlowAction flowAction)
         {
-            Name = name;
+            TypeOfTrigger = typeOfTrigger;
             Id = id;
-            FirstObject = firstObject;
-            SecondObject = secondObject;
-            BehaviourChain = behaviourChain;
-            ChainOwner = chainOwner;
+            TriggerObjectId = triggerObjectId;
+            TargetObjectId = targetObjectId;
+            NextBehaviour = nextBehaviour;
+            this.flowAction = flowAction;
         }
     }
 }

@@ -4,17 +4,12 @@ using UnityEditor;
 using System;
 using System.IO;
 using RealityFlow.Plugin.Scripts;
-//using RealityFlow.Plugin.Scripts.Events;
 using RealityFlow.Plugin.Editor;
 using Packages.realityflow_package.Runtime.scripts;
-//using Packages.realityflow_package.Runtime.scripts.Managers;
-using Packages.realityflow_package.Runtime.scripts.Messages;
 using Packages.realityflow_package.Runtime.scripts.Messages.ObjectMessages;
-using Packages.realityflow_package.Runtime.scripts.Messages.UserMessages;
-using Packages.realityflow_package.Runtime.scripts.Messages.ProjectMessages;
-using Packages.realityflow_package.Runtime.scripts.Messages.RoomMessages;
-using Behaviours;
 using System.Collections;
+using Packages.realityflow_package.Runtime.scripts.Structures;
+using Packages.realityflow_package.Runtime.scripts.Structures.Actions;
 
 [CustomEditor(typeof(FlowWebsocket))]
 public class FlowNetworkManagerEditor : EditorWindow
@@ -810,12 +805,14 @@ public class FlowNetworkManagerEditor : EditorWindow
    
         if (GUILayout.Button("Yes", GUILayout.Height(30), GUILayout.Width(40)))
         {
-            string firstObject = objectIds[selectedTrigger].ToString();
-            string secondObject = objectIds[selectedTarget].ToString();
+            string firstObjectId = objectIds[selectedTrigger].ToString();
+            string secondObjectId = objectIds[selectedTarget].ToString();
+
+            GameObject firstObject = FlowTObject.idToGameObjectMapping[firstObjectId].AttachedGameObject;
 
             addingChain = true;
-
-            FlowBehaviour fb = new FlowBehaviour("Teleport", "1", firstObject, secondObject, null, firstObject);
+            TeleportAction teleportAction = new TeleportAction(new TeleportCoordinates(firstObject, false));
+            FlowBehaviour fb = new FlowBehaviour("Teleport", Guid.NewGuid().ToString(), firstObjectId, secondObjectId, null, );
             AddBehaviour(fb);
 
             window = EWindowView.CREATE_BEHAVIOUR;
@@ -974,19 +971,19 @@ public class FlowNetworkManagerEditor : EditorWindow
         if(headBehaviour == null)
         {
             headBehaviour = flowbehaviour;
-            Debug.Log("Making " + flowbehaviour.Name + " the head behaviour");
+            Debug.Log("Making " + flowbehaviour.TypeOfTrigger + " the head behaviour");
         }
         else
         {
             FlowBehaviour head = headBehaviour;
 
-            while(head.BehaviourChain != null)
+            while(head.NextBehaviour != null)
             {
-                head = head.BehaviourChain;
+                head = head.NextBehaviour;
             }
 
-            head.BehaviourChain = flowbehaviour;
-            Debug.Log("making " + flowbehaviour.Name + "the chain behaviour");
+            head.NextBehaviour = flowbehaviour;
+            Debug.Log("making " + flowbehaviour.TypeOfTrigger + "the chain behaviour");
         }
 
         if (!addingChain)

@@ -91,7 +91,7 @@ namespace Behaviours
                     return;
                 case "SnapZone":
                     // take in more info than teleport, but basically acts as a teleport within the other object
-                    if (obj.GetComponent<TeleportCoordinates>().IsSnapZone())
+                    if (obj.GetComponent<TeleportCoordinates>().IsSnapZone)
                     {
                         transform.position = obj.transform.position + obj.GetComponent<TeleportCoordinates>().GetCoordinates();
                         transform.localScale = obj.GetComponent<TeleportCoordinates>().GetScale();
