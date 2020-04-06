@@ -290,73 +290,93 @@ namespace Packages.realityflow_package.Runtime.scripts
         private static void _CreateBehaviour(object sender, CreateBehaviourEventArgs eventArgs)
         {
             // this is where things happen after a createBehaviour message is deserialized
-
-            FlowBehaviour[] flowBehaviours = eventArgs.message.flowBehaviour;
-            BehaviourEventManager bem = GameObject.Find("BehaviourEventManager").GetComponent<BehaviourEventManager>();
-
-            int index = flowBehaviours.Length - 1;
-            BehaviourEvent current = null;
-
-           // FlowBehaviour fb = eventArgs.message.flowBehaviour[index];
-
-            while(index > -1)
+            FlowBehaviour fb = eventArgs.message.flowBehaviour;
+            string behaviourName = fb.TypeOfTrigger;
+            
+            if (fb.flowAction != null)
             {
-                FlowBehaviour fb = flowBehaviours[index];
-                BehaviourEvent be = SetBehaviour(bem, fb, current);
-
-                if(be == null)
-                {
-                    Debug.Log("Behaviour is null");
-                    break;
-                }
-                current = be;
-                Debug.Log(be.GetName() + " " + index);
-                index--;
+                // The TypeOfTrigger would be "Immediate", so we use ActionType instead 
+                behaviourName = fb.flowAction.ActionType;
             }
+
+            ObjectIsInteractable oIsIFirst = FindAndMakeInteractable(fb.TriggerObjectId);
+            ObjectIsInteractable oIsISecond = FindAndMakeInteractable(fb.TargetObjectId);
+            
+            if(oIsIFirst == null || oIsISecond == null)
+            {
+                Debug.Log("There is a missing gameobject. Failed to make Interaction.");
+                return;
+            }
+
+            BehaviourEvent newBehaviour = BehaviourEventManager.CreateNewBehaviourEvent(behaviourName, oIsIFirst.GetGuid(), oIsISecond.GetGuid(), null);
+
+            BehaviourEventManager.BehaviourList.Add(fb.Id, newBehaviour);
         }
 
-        public static BehaviourEvent SetBehaviour(BehaviourEventManager bem, FlowBehaviour fb, BehaviourEvent chainedBehaviour)
+
+        /// <summary>
+        /// Finds the gameobject associated with objectId, and adds an ObjectIsInteractable component to it.
+        /// </summary>
+        /// <param name="objectId"></param>
+        /// <returns></returns>
+        public static ObjectIsInteractable FindAndMakeInteractable(string objectId)
         {
-            // this is where things happen after a createBehaviour message is deserialized
-
-            FlowTObject.idToGameObjectMapping.TryGetValue(fb.TriggerObjectId, out FlowTObject firstobject);
-            FlowTObject.idToGameObjectMapping.TryGetValue(fb.TargetObjectId, out FlowTObject secondobject);
-
-            Debug.Log("FIRSTOBJECT");
-            Debug.Log(fb.TriggerObjectId);
-
-            GameObject firstGameObject = firstobject.AttachedGameObject;
-            GameObject secondGameObject = secondobject.AttachedGameObject;
-
-            //ObjectIsInteractable oIsIFirst = firstObj.GetComponent<ObjectIsInteractable>();
-            //ObjectIsInteractable oIsISecond = secondObj.GetComponent<ObjectIsInteractable>();
-
-            //if (oIsIFirst == null)
-            //{
-
-            ObjectIsInteractable oIsIFirst = bem.MakeObjectInteractable(firstGameObject, fb.TriggerObjectId);
-            ObjectIsInteractable oIsISecond = bem.MakeObjectInteractable(secondGameObject, fb.TargetObjectId);
-            
-            //Debug.Log("GUID IS");
-            //Debug.Log(oIsIFirst.GetGuid().ToString());
-
-
-            BehaviourEvent newBehaviour = bem.CreateNewBehaviourEvent(fb.TypeOfTrigger, oIsIFirst.GetGuid(), oIsISecond.GetGuid(), chainedBehaviour);
-
-            if(newBehaviour == null)
+            if(FlowTObject.idToGameObjectMapping.TryGetValue(objectId, out FlowTObject foundObject))
             {
-                Debug.Log("The behaviour is NULLLLLLLLLLLLLLLLLLLLLLLL");
+                Debug.Log("Found object " + foundObject.Id + " ... making interactable");
+                ObjectIsInteractable oIsI = BehaviourEventManager.MakeObjectInteractable(foundObject.AttachedGameObject, objectId);
+                return oIsI;
             }
+
             else
             {
-                Debug.Log("Behaviour Created!");
-                //Debug.Log(newBehaviour.GetName());
-                Debug.Log(newBehaviour.GetSecondObject());
+                Debug.Log("Cannot make object interactable. Object not found in project.");
+                return null;
             }
-           
-
-            return newBehaviour;
         }
+
+
+
+        //public static BehaviourEvent SetBehaviour(FlowBehaviour fb, BehaviourEvent chainedBehaviour)
+        //{
+        //    // this is where things happen after a createBehaviour message is deserialized
+
+        //    FlowTObject.idToGameObjectMapping.TryGetValue(fb.TriggerObjectId, out FlowTObject firstobject);
+        //    FlowTObject.idToGameObjectMapping.TryGetValue(fb.TargetObjectId, out FlowTObject secondobject);
+
+        //    Debug.Log("FIRSTOBJECT");
+        //    Debug.Log(fb.TriggerObjectId);
+
+        //    GameObject firstGameObject = firstobject.AttachedGameObject;
+        //    GameObject secondGameObject = secondobject.AttachedGameObject;
+
+        //    //ObjectIsInteractable oIsIFirst = firstObj.GetComponent<ObjectIsInteractable>();
+        //    //ObjectIsInteractable oIsISecond = secondObj.GetComponent<ObjectIsInteractable>();
+
+        //    //if (oIsIFirst == null)
+        //    //{
+
+        //    ObjectIsInteractable oIsIFirst = BehaviourEventManager.MakeObjectInteractable(firstGameObject, fb.TriggerObjectId);
+        //    ObjectIsInteractable oIsISecond = BehaviourEventManager.MakeObjectInteractable(secondGameObject, fb.TargetObjectId);
+            
+        //    //Debug.Log("GUID IS");
+        //    //Debug.Log(oIsIFirst.GetGuid().ToString());
+
+
+        //    BehaviourEvent newBehaviour = BehaviourEventManager.CreateNewBehaviourEvent(fb.TypeOfTrigger, oIsIFirst.GetGuid(), oIsISecond.GetGuid(), chainedBehaviour);
+
+        //    if(newBehaviour == null)
+        //    {
+        //        Debug.Log("The behaviour is NULL");
+        //    }
+        //    else
+        //    {
+        //        Debug.Log("Behaviour Created!");
+        //        //Debug.Log(newBehaviour.GetName());
+        //        Debug.Log(newBehaviour.GetSecondObject());
+        //    }
+        //    return newBehaviour;
+        //}
 
         private static void _DeleteBehaviour(object sender, DeleteBehaviourEventArgs eventArgs)
         {
@@ -389,9 +409,9 @@ namespace Packages.realityflow_package.Runtime.scripts
         {
             ConfigurationSingleton.CurrentProject = eventArgs.message.flowProject;
 
-            GameObject bemObject = GameObject.FindGameObjectWithTag("BehaviourEventManager");
-            
-            if (bemObject == null)
+           // GameObject bemObject = GameObject.FindGameObjectWithTag("BehaviourEventManager");
+
+            /*if (bemObject == null)
             {
                 bemObject = new GameObject();
                 bemObject.AddComponent<BehaviourEventManager>();
@@ -400,7 +420,10 @@ namespace Packages.realityflow_package.Runtime.scripts
             }
 
             BehaviourEventManager bem = bemObject.GetComponent<BehaviourEventManager>();
-            bem.Initialize();
+            bem.Initialize();*/
+
+            BehaviourEventManager.Clear();
+            BehaviourEventManager.Initialize();
 
         }
 

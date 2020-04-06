@@ -11,17 +11,19 @@ namespace Behaviours
         public static event Action<string> SendEventDown;
         public static Dictionary<string, GameObject> GoIds = null;
         public static States DefaultInteractableStates;
-       // public static Dictionary<string, FlowBehavio>
+        public static Dictionary<string, BehaviourEvent> BehaviourList;
 
         public static void Initialize()
         {
             GoIds = new Dictionary<string, GameObject>();
+            BehaviourList = new Dictionary<string, BehaviourEvent>();
            // DefaultInteractableStates = ScriptableObject.CreateInstance<States>();
         }
 
         public static void Clear()
         {
             GoIds = null;
+            BehaviourList = null;
         }
 
         public static BehaviourEvent CreateNewBehaviourEvent(string name, string go1, string go2, BehaviourEvent chain)

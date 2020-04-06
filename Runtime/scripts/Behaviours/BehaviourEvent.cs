@@ -9,7 +9,7 @@ namespace Behaviours
     /// </summary>
     public class BehaviourEvent : MonoBehaviour
     {
-        private BehaviourEventManager BEM;
+       
         [SerializeField]
         private string behaviourName = "default";
 
@@ -47,9 +47,8 @@ namespace Behaviours
         /// </summary>
         private void GetBehaviourEventManager()
         {
-            BEM = FindObjectOfType<BehaviourEventManager>();
-            BEM.SendEventDown += OnCallDown;
-            EventCalled += BEM.ListenToEvents;
+            BehaviourEventManager.SendEventDown += OnCallDown;
+            EventCalled += BehaviourEventManager.ListenToEvents;
         }
 
         /// <summary>
@@ -68,7 +67,7 @@ namespace Behaviours
         {
             Debug.Log("here!!");
 
-            GameObject obj = BEM.GetGoFromGuid(secondObject);
+            GameObject obj = BehaviourEventManager.GetGoFromGuid(secondObject);
 
             CallBehaviourEvent();
 
