@@ -6,28 +6,25 @@ using UnityEngine;
 
 namespace Behaviours
 {
-    public class BehaviourEventManager : MonoBehaviour
+    public static class BehaviourEventManager
     {
-        public event Action<string> SendEventDown;
-        public Dictionary<string, GameObject> GoIds = null;
-        public States DefaultInteractableStates;
+        public static event Action<string> SendEventDown;
+        public static Dictionary<string, GameObject> GoIds = null;
+        public static States DefaultInteractableStates;
+       // public static Dictionary<string, FlowBehavio>
 
-        void Awake()
-        {
-            if(GoIds == null)
-            {
-                GoIds = new Dictionary<string, GameObject>();
-            }
-            
-        }
-
-        public void Initialize()
+        public static void Initialize()
         {
             GoIds = new Dictionary<string, GameObject>();
            // DefaultInteractableStates = ScriptableObject.CreateInstance<States>();
         }
 
-        public BehaviourEvent CreateNewBehaviourEvent(string name, string go1, string go2, BehaviourEvent chain)
+        public static void Clear()
+        {
+            GoIds = null;
+        }
+
+        public static BehaviourEvent CreateNewBehaviourEvent(string name, string go1, string go2, BehaviourEvent chain)
         {
             GameObject g1 = GetGoFromGuid(go1);
             if (g1)
@@ -48,7 +45,7 @@ namespace Behaviours
             return null;
         }
 
-        public BehaviourEvent AddChain(BehaviourEvent b1, BehaviourEvent b2)
+        public static  BehaviourEvent AddChain(BehaviourEvent b1, BehaviourEvent b2)
         {
             BehaviourEvent temp = b1;
 
@@ -62,7 +59,7 @@ namespace Behaviours
         }
 
         // needs to check second gameobject
-        public void DeleteBehaviourEvent(string  go1, string go2, BehaviourEvent bEvent)
+        public static void DeleteBehaviourEvent(string  go1, string go2, BehaviourEvent bEvent)
         {
             GameObject g1 = GetGoFromGuid(go1);
             ObjectIsInteractable interactScript = g1.GetComponent<ObjectIsInteractable>();
@@ -80,12 +77,12 @@ namespace Behaviours
         /// <param name="go1"></param>
         /// <param name="go2"></param>
         /// <param name="chain"></param>
-        public void ListenToEvents(string eventName, string go1, string go2, BehaviourEvent chain)
+        public static void ListenToEvents(string eventName, string go1, string go2, BehaviourEvent chain)
         {
             // sends updated coordinates
         }
 
-        public ObjectIsInteractable MakeObjectInteractable(GameObject go, string objectId)
+        public static ObjectIsInteractable MakeObjectInteractable(GameObject go, string objectId)
         {
             ObjectIsInteractable oisI = go.GetComponent<ObjectIsInteractable>();
     
@@ -105,7 +102,7 @@ namespace Behaviours
             return oisI;
         }
 
-        public GameObject GetGoFromGuid(string guid)
+        public static GameObject GetGoFromGuid(string guid)
         {
             GameObject temp;
 
