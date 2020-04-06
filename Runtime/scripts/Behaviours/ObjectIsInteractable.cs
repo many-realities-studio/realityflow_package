@@ -24,6 +24,8 @@ namespace Behaviours
 
 
 
+
+
         #region Monobehaviour Methods
 
         /// <summary>
@@ -162,6 +164,7 @@ namespace Behaviours
             {
                 interactableEvents = new Dictionary<BehaviourEvent, string>();
             }
+            
             if (!interactableEvents.ContainsKey(e))
             {
                 SetEventTrigger += e.EventTrigger;

@@ -32,11 +32,14 @@ namespace Behaviours
         /// Calls initialization functions
         /// </summary>
         private void Awake()
+<<<<<<< HEAD
         {
            // firstObject = gameObject.GetComponent<ObjectIsInteractable>().GetGuid();
             //GetBehaviourEventManager();
         }
         public void Initialize()
+=======
+>>>>>>> origin
         {
             firstObject = gameObject.GetComponent<ObjectIsInteractable>().GetGuid();
             GetBehaviourEventManager();
@@ -51,8 +54,14 @@ namespace Behaviours
         /// </summary>
         private void GetBehaviourEventManager()
         {
+<<<<<<< HEAD
             BehaviourEventManager.SendEventDown += OnCallDown;
             EventCalled += BehaviourEventManager.ListenToEvents;
+=======
+            BEM = FindObjectOfType<BehaviourEventManager>();
+            BEM.SendEventDown += OnCallDown;
+            EventCalled += BEM.ListenToEvents;
+>>>>>>> origin
         }
 
         /// <summary>
