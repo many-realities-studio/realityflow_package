@@ -18,16 +18,7 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.BehaviourMessage
     {
 
         [JsonProperty("FlowBehaviour")]
-        public FlowBehaviour[] flowBehaviour { get; set; }
-
-        [JsonProperty("ObjectId")]
-        public String objectId { get; set; }
-
-        [JsonProperty("ProjectId")]
-        public String projectId { get; set; }
-
-        [JsonProperty("FlowUser")]
-        public FlowUser flowUser{ get; set; }
+        public FlowBehaviour flowBehaviour { get; set; }
 
         // Definition of event type (What gets sent to the subscribers
         public delegate void CreateBehaviourReceived_EventHandler(object sender, CreateBehaviourEventArgs eventArgs);
@@ -53,6 +44,7 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.BehaviourMessage
         {
             this.MessageType = "CreateBehaviour";
             this.WasSuccessful = wasSuccessful;
+
         }
 
         /// <summary>

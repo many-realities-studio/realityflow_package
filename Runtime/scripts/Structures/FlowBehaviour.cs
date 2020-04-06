@@ -1,9 +1,9 @@
 ﻿using Newtonsoft.Json;
-using Packages.realityflow_package.Runtime.scripts.Structures;
 using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 using UnityEngine;
+using Packages.realityflow_package.Runtime.scripts.Structures.Actions;
 
 namespace RealityFlow.Plugin.Scripts
 {

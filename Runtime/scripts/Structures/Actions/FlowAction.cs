@@ -8,8 +8,8 @@ namespace Packages.realityflow_package.Runtime.scripts.Structures.Actions
 {
     public class FlowAction
     {
-        string Id;
-        string ActionType;
+        public string Id;
+        public string ActionType;
 
         public FlowAction(string id)
         {

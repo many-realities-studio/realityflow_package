@@ -744,7 +744,7 @@ public class FlowNetworkManagerEditor : EditorWindow
         }
 
         GUILayout.Space(10f);
-        EditorGUILayout.LabelField("Choose one of the behaviours below.");
+        EditorGUILayout.LabelField("Choose one of the triggers below.");
         EditorGUILayout.BeginHorizontal();
 
         if (GUILayout.Button("Teleport", GUILayout.Height(75), GUILayout.Width(92)))
@@ -759,11 +759,35 @@ public class FlowNetworkManagerEditor : EditorWindow
         }
 
         // Create "Logout" Button and define onClick action
+        if (GUILayout.Button("On Collision", GUILayout.Height(75), GUILayout.Width(92)))
+        {
+            //window = EWindowView.CREATE_CLICK;
+        }
+
+        // Create "Logout" Button and define onClick action
         if (GUILayout.Button("Snapzone", GUILayout.Height(75), GUILayout.Width(92)))
         {
 
         }
         EditorGUILayout.EndHorizontal();
+
+        //if (GUILayout.Button("Teleport", GUILayout.Height(75), GUILayout.Width(92)))
+        //{
+        //    window = EWindowView.CREATE_TELEPORT;
+        //}
+
+        //// Create "Logout" Button and define onClick action
+        //if (GUILayout.Button("Click", GUILayout.Height(75), GUILayout.Width(92)))
+        //{
+        //    window = EWindowView.CREATE_CLICK;
+        //}
+
+        //// Create "Logout" Button and define onClick action
+        //if (GUILayout.Button("Snapzone", GUILayout.Height(75), GUILayout.Width(92)))
+        //{
+
+        //}
+        //EditorGUILayout.EndHorizontal();
 
         if (addingChain)
         {
@@ -812,7 +836,7 @@ public class FlowNetworkManagerEditor : EditorWindow
 
             addingChain = true;
             TeleportAction teleportAction = new TeleportAction(new TeleportCoordinates(firstObject, false));
-            FlowBehaviour fb = new FlowBehaviour("Teleport", Guid.NewGuid().ToString(), firstObjectId, secondObjectId, null, );
+            FlowBehaviour fb = new FlowBehaviour("Teleport", Guid.NewGuid().ToString(), firstObjectId, secondObjectId, null, null);
             AddBehaviour(fb);
 
             window = EWindowView.CREATE_BEHAVIOUR;
@@ -825,7 +849,7 @@ public class FlowNetworkManagerEditor : EditorWindow
 
             addingChain = false;
 
-            FlowBehaviour fb = new FlowBehaviour("Teleport", "1", firstObject, secondObject, null, firstObject);
+            FlowBehaviour fb = new FlowBehaviour("Teleport", "1", firstObject, secondObject, null, null);
             AddBehaviour(fb);
 
             window = EWindowView.PROJECT_HUB;
@@ -852,7 +876,7 @@ public class FlowNetworkManagerEditor : EditorWindow
 
         GUILayout.Space(120f);
 
-        GUILayout.Label("Press OK to setup the event that will be triggered when the above object is clicked.");
+        GUILayout.Label("Press OK to setup the event that will take place when the above object is clicked.");
         GUILayout.BeginHorizontal();
 
         if (GUILayout.Button("OK", GUILayout.Height(30), GUILayout.Width(40)))
@@ -861,7 +885,9 @@ public class FlowNetworkManagerEditor : EditorWindow
 
             addingChain = true;
 
-            FlowBehaviour fb = new FlowBehaviour("Click", "1", firstObject, firstObject, null, firstObject);
+            string id = Guid.NewGuid().ToString();
+
+            FlowBehaviour fb = new FlowBehaviour("Click", id, firstObject, firstObject, null, null);
             AddBehaviour(fb);
 
             window = EWindowView.CREATE_BEHAVIOUR;
@@ -895,7 +921,10 @@ public class FlowNetworkManagerEditor : EditorWindow
         {
             string firstObject = objectIds[selectedTrigger].ToString();
 
-            FlowBehaviour fb = new FlowBehaviour("Enable", "1", firstObject, firstObject, null, firstObject);
+            FlowAction flowAction = new FlowAction();
+            flowAction.ActionType = "Enable";
+
+            FlowBehaviour fb = new FlowBehaviour("Enable", "1", firstObject, firstObject, null, flowAction);
             AddBehaviour(fb);
 
             window = EWindowView.CREATE_BEHAVIOUR;
@@ -906,7 +935,10 @@ public class FlowNetworkManagerEditor : EditorWindow
             string firstObject = objectIds[selectedTrigger].ToString();
             addingChain = false;
 
-            FlowBehaviour fb = new FlowBehaviour("Enable", "1", firstObject, firstObject, null, firstObject);
+            FlowAction flowAction = new FlowAction();
+            flowAction.ActionType = "Enable";
+
+            FlowBehaviour fb = new FlowBehaviour("Enable", "1", firstObject, firstObject, null, flowAction);
             AddBehaviour(fb);
 
             window = EWindowView.PROJECT_HUB;
@@ -940,7 +972,10 @@ public class FlowNetworkManagerEditor : EditorWindow
             string firstObject = objectIds[selectedTrigger].ToString();
             addingChain = true;
 
-            FlowBehaviour fb = new FlowBehaviour("Disable", "1", firstObject, firstObject, null, firstObject);
+            FlowAction flowAction = new FlowAction();
+            flowAction.ActionType = "Disable";
+
+            FlowBehaviour fb = new FlowBehaviour("Disable", "1", firstObject, firstObject, null, flowAction);
             AddBehaviour(fb);
 
             window = EWindowView.CREATE_BEHAVIOUR;
@@ -951,7 +986,10 @@ public class FlowNetworkManagerEditor : EditorWindow
             string firstObject = objectIds[selectedTrigger].ToString();
             addingChain = false;
 
-            FlowBehaviour fb = new FlowBehaviour("Disable", "1", firstObject, firstObject, null, firstObject);
+            FlowAction flowAction = new FlowAction();
+            flowAction.ActionType = "Disable";
+
+            FlowBehaviour fb = new FlowBehaviour("Disable", "1", firstObject, firstObject, null, flowAction);
             AddBehaviour(fb);
 
             window = EWindowView.PROJECT_HUB;
@@ -968,35 +1006,49 @@ public class FlowNetworkManagerEditor : EditorWindow
     /// <param name="flowbehaviour"></param>
     private void AddBehaviour(FlowBehaviour flowbehaviour)
     {
-        if(headBehaviour == null)
+        if(flowbehaviour.NextBehaviour == null)
         {
-            headBehaviour = flowbehaviour;
-            Debug.Log("Making " + flowbehaviour.TypeOfTrigger + " the head behaviour");
+            flowbehaviour.NextBehaviour = new List<string>();
         }
-        else
-        {
-            FlowBehaviour head = headBehaviour;
 
-            while(head.NextBehaviour != null)
+        Operations.CreateBehaviour(flowbehaviour, ConfigurationSingleton.CurrentProject.Id, (_, e) =>
+        {
+            if (e.message.WasSuccessful == true)
             {
-                head = head.NextBehaviour;
+                Debug.Log("it twas successful");
+                Debug.Log(e.message.flowBehaviour);
             }
 
-            head.NextBehaviour = flowbehaviour;
-            Debug.Log("making " + flowbehaviour.TypeOfTrigger + "the chain behaviour");
-        }
+        });
+        //if(headBehaviour == null)
+        //{
+        //    headBehaviour = flowbehaviour;
+        //    Debug.Log("Making " + flowbehaviour.TypeOfTrigger + " the head behaviour");
+        //}
+        //else
+        //{
+        //    FlowBehaviour head = headBehaviour;
 
-        if (!addingChain)
-        {
-            Operations.CreateBehaviour(headBehaviour, ConfigurationSingleton.CurrentProject.Id, (_, e) =>
-            {
-                if(e.message.WasSuccessful == true)
-                {
-                    Debug.Log("it twas successful");
-                    Debug.Log(e.message.flowBehaviour[0]);
-                }
-            });
-        }
+        //    while(head.NextBehaviour != null)
+        //    {
+        //        head = head.NextBehaviour;
+        //    }
+
+        //    head.NextBehaviour = flowbehaviour;
+        //    Debug.Log("making " + flowbehaviour.TypeOfTrigger + "the chain behaviour");
+        //}
+
+        //if (!addingChain)
+        //{
+        //    Operations.CreateBehaviour(headBehaviour, ConfigurationSingleton.CurrentProject.Id, (_, e) =>
+        //    {
+        //        if(e.message.WasSuccessful == true)
+        //        {
+        //            Debug.Log("it twas successful");
+        //            Debug.Log(e.message.flowBehaviour[0]);
+        //        }
+        //    });
+        //}
     }
 }
 

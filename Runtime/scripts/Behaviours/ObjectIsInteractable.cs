@@ -109,7 +109,7 @@ namespace Behaviours
             //interactableScript.Profiles[0].Target = gameObject;
             //interactableScript.Profiles[0].Themes.Add(new Theme());
             interactableScript.IsEnabled = true;
-            interactableScript.States = FindObjectOfType<BehaviourEventManager>().DefaultInteractableStates;
+            interactableScript.States = BehaviourEventManager.DefaultInteractableStates;
             interactableScript.OnClick.AddListener(() => OnSelect());
         }
 
@@ -208,7 +208,7 @@ namespace Behaviours
                     if (bEvent.GetSecondObject() == go2)
                     {
                         interactableEvents.Remove(bEvent);
-                        GameObject g2 = FindObjectOfType<EventSystem>().GetComponent<BehaviourEventManager>().GetGoFromGuid(go2);
+                        GameObject g2 = BehaviourEventManager.GetGoFromGuid(go2);
                         if (g2.GetComponent<ObjectIsInteractable>())
                         {
                             g2.GetComponent<ObjectIsInteractable>().RemoveInteractableEvent(bEvent);
