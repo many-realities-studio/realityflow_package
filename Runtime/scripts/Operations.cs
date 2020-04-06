@@ -19,8 +19,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using UnityEditor;
-using UnityEngine;
 
 namespace Packages.realityflow_package.Runtime.scripts
 {
@@ -31,6 +29,7 @@ namespace Packages.realityflow_package.Runtime.scripts
     public static class Operations
     {
         public static FlowWebsocket FlowWebsocket { get; private set; }
+        public static object FlowNetworkManagerEditor { get; private set; }
 
         static Operations()
         {
@@ -401,6 +400,50 @@ namespace Packages.realityflow_package.Runtime.scripts
         private static void _UpdateBehaviour(object sender, UpdateBehaviourEventArgs eventArgs)
         {
             // this is where things happen after an UpdateBehaviour message is deserialized
+            // do the same as createBehaviour?
+
+            // this is where things happen after a createBehaviour message is deserialized
+            FlowBehaviour fb = eventArgs.message.flowBehaviour;
+
+            // For those receiving updateBehaviour messages, if they did not remove it from 
+            // the list already, then it still exists on the objects
+            if(BehaviourEventManager.BehaviourList.ContainsKey(fb.Id))
+            {
+                if (BehaviourEventManager.BehaviourList.TryGetValue(fb.Id, out BehaviourEvent outdatedBehaviourEvent))
+                {
+                    BehaviourEventManager.BehaviourList.Remove(outdatedBehaviourEvent.Id);
+                    BehaviourEventManager.DeleteBehaviourEvent(outdatedBehaviourEvent.GetFirstObject(), outdatedBehaviourEvent.GetSecondObject(), outdatedBehaviourEvent);
+                    UnityEngine.Object.Destroy(outdatedBehaviourEvent);
+                }
+            }
+
+
+            string behaviourName = fb.TypeOfTrigger;
+
+            if (fb.flowAction != null)
+            {
+                // The TypeOfTrigger would be "Immediate", so we use ActionType instead 
+                behaviourName = fb.flowAction.ActionType;
+            }
+
+            ObjectIsInteractable oIsIFirst = FindAndMakeInteractable(fb.TriggerObjectId);
+            ObjectIsInteractable oIsISecond = FindAndMakeInteractable(fb.TargetObjectId);
+
+            if (oIsIFirst == null || oIsISecond == null)
+            {
+                Debug.Log("There is a missing gameobject. Failed to make Interaction.");
+                return;
+            }
+
+            BehaviourEvent newBehaviour = BehaviourEventManager.CreateNewBehaviourEvent(behaviourName, fb.Id, oIsIFirst.GetGuid(), oIsISecond.GetGuid(), null);
+
+            if (newBehaviour == null)
+            {
+                Debug.Log("Failed to create new behaviour");
+                return;
+            }
+
+            BehaviourEventManager.BehaviourList.Add(newBehaviour.Id, newBehaviour);
         }
 
         #endregion
