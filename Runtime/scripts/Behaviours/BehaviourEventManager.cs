@@ -13,12 +13,13 @@ namespace Behaviours
         public static event Action<string> SendEventDown;
         public static Dictionary<string, GameObject> GoIds = null;
         public static States DefaultInteractableStates;
-        public static Dictionary<string, BehaviourEvent> BehaviourList;
+        public static Dictionary<string, FlowBehaviour> BehaviourList;
+        public static string PreviousBehaviourId = null;
 
         public static void Initialize()
         {
             GoIds = new Dictionary<string, GameObject>();
-            BehaviourList = new Dictionary<string, BehaviourEvent>();
+            BehaviourList = new Dictionary<string, FlowBehaviour>();
             //DefaultInteractableStates = ScriptableObject.CreateInstance<States>();
         }
 
@@ -27,6 +28,80 @@ namespace Behaviours
             GoIds = null;
             BehaviourList = null;
         }
+
+
+        /// <summary>
+        /// Adds the FlowBehaviour to the BehaviourList and makes each object Interactable
+        /// </summary>
+        /// <param name="flowBehaviour"></param>
+        public static void CreateNewBehaviour(FlowBehaviour flowBehaviour)
+        {
+
+            // Add the behaviour to the list of behaviours 
+            BehaviourEventManager.BehaviourList.Add(flowBehaviour.Id, flowBehaviour);
+            
+            // Make both objects interactable
+            ObjectIsInteractable oIsIFirst = FindAndMakeInteractable(flowBehaviour.TriggerObjectId);
+            ObjectIsInteractable oIsISecond = FindAndMakeInteractable(flowBehaviour.TargetObjectId);
+
+
+            if (oIsIFirst == null || oIsISecond == null)
+            {
+                Debug.LogWarning("There is a missing gameobject. Failed to make Interaction.");
+                return;
+            }
+        }
+
+
+        /// <summary>
+        /// Finds the gameobject associated with objectId, and adds an ObjectIsInteractable component to it.
+        /// </summary>
+        /// <param name="objectId"></param>
+        /// <returns></returns>
+        public static ObjectIsInteractable FindAndMakeInteractable(string objectId)
+        {
+            if (FlowTObject.idToGameObjectMapping.TryGetValue(objectId, out FlowTObject foundObject))
+            {
+                Debug.Log("Found object " + foundObject.Id + " ... making interactable");
+                ObjectIsInteractable oIsI = MakeObjectInteractable(foundObject.AttachedGameObject, objectId);
+                return oIsI;
+            }
+
+            else
+            {
+                Debug.Log("Cannot make object interactable. Object not found in project.");
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Adds the childFlowBehaviourId into the parent's NextBehaviour list
+        /// </summary>
+        /// <param name="childFlowBehaviourId"></param>
+        /// <param name="parentFlowBehaviourId"></param>
+        public static void LinkBehaviours(string childFlowBehaviourId, string parentFlowBehaviourId)
+        {
+            if(BehaviourList.TryGetValue(parentFlowBehaviourId, out FlowBehaviour parentFlowBehaviour))
+            {
+                parentFlowBehaviour.NextBehaviour.Add(childFlowBehaviourId);
+            }
+
+            else
+            {
+                Debug.LogWarning("Unable to find ParentBehaviour.");
+            }
+        }
+
+
+
+        public static void UpdateBehaviour(FlowBehaviour flowBehaviour)
+        {
+
+        }
+
+
+
+
 
         public static BehaviourEvent CreateNewBehaviourEvent(string name, string id, string go1, string go2, BehaviourEvent chain)
         {
@@ -39,7 +114,7 @@ namespace Behaviours
                     bEvent.SetName(name);
                     bEvent.SetFirstObject(go1);
                     bEvent.SetSecondObject(go2);
-                    bEvent.SetChain(chain);
+                   // bEvent.SetChain(chain);
                     bEvent.Id = id;
                 }
 
@@ -76,37 +151,6 @@ namespace Behaviours
             interactScript.RemoveInteractableEvent(bEvent, go2);
         }
 
-        /// <summary>
-        /// Converts a BehaviourEvent to a FlowBehaviour
-        /// </summary>
-        /// <param name="be"></param>
-        /// <returns></returns>
-        public static FlowBehaviour ConvertBehaviourEvent(BehaviourEvent be)
-        {
-            FlowAction flowAction = new FlowAction();
-            string typeOfTrigger = be.GetName();
-            if(typeOfTrigger.Equals("Click") || typeOfTrigger.Equals("Collision"))
-            {
-                flowAction = null;
-            }
-            else
-            {
-                flowAction.ActionType = typeOfTrigger;
-                typeOfTrigger = "Immediate";
-            }
-
-            FlowBehaviour fb = new FlowBehaviour(typeOfTrigger, be.Id, be.GetFirstObject(), be.GetSecondObject(), be.chainedEventIds, flowAction);
-            Debug.Log("The behaviours chained event ids = ");
-            if(fb.NextBehaviour != null)
-            {
-                foreach(string id in fb.NextBehaviour)
-                {
-                    Debug.Log("id");
-                }
-
-            }
-            return fb;
-        }
 
         /// <summary>
         /// Registers when a BehaviourEvent has been called - sends up to server communicator

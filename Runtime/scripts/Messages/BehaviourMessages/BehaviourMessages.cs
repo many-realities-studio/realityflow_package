@@ -22,13 +22,17 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.BehaviourMessage
         [JsonProperty("ProjectId")]
         string ProjectId { get; set; }
 
+        [JsonProperty("BehavioursToLinkTo")]
+        List<string> BehavioursToLinkTo { get; set; } 
 
-        public CreateBehaviour_SendToServer(FlowBehaviour behaviour, string projectId)
+
+        public CreateBehaviour_SendToServer(FlowBehaviour behaviour, string projectId, List<string> behavioursToLinkTo)
         {
             this.FlowBehaviour = behaviour;
             this.ProjectId = projectId;
 
             this.MessageType = "CreateBehaviour";
+            this.BehavioursToLinkTo = behavioursToLinkTo;
         }
     }
 

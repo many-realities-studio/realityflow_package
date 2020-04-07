@@ -25,6 +25,7 @@ namespace Behaviours
         public BehaviourEvent chainedEvent;
         public List<string> chainedEventIds;
 
+
         public event Action<string, string, string, BehaviourEvent> EventCalled;
 
         #region Monobehaviour Functions
@@ -37,17 +38,16 @@ namespace Behaviours
            // firstObject = gameObject.GetComponent<ObjectIsInteractable>().GetGuid();
             //GetBehaviourEventManager();
         }
-        public void Initialize()
-
-        {
-            firstObject = gameObject.GetComponent<ObjectIsInteractable>().GetGuid();
-            GetBehaviourEventManager();
-        }
 
         #endregion // Monobehaviour Functions
 
         #region Custom Functions
 
+        public void Initialize()
+        {
+            firstObject = gameObject.GetComponent<ObjectIsInteractable>().GetGuid();
+            GetBehaviourEventManager();
+        }
         /// <summary>
         /// Finds Behaviour Event Manager and assigns it to local variable for later reference
         /// </summary>

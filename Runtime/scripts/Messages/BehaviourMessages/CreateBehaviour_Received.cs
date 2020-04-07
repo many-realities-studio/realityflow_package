@@ -20,6 +20,9 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.BehaviourMessage
         [JsonProperty("FlowBehaviour")]
         public FlowBehaviour flowBehaviour { get; set; }
 
+        [JsonProperty("BehavioursToLinkTo")]
+        public List<string> behavioursToLinkTo { get; set; } 
+
         // Definition of event type (What gets sent to the subscribers
         public delegate void CreateBehaviourReceived_EventHandler(object sender, CreateBehaviourEventArgs eventArgs);
 
@@ -54,6 +57,13 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.BehaviourMessage
         public static void ReceiveMessage(string message)
         {
             var p2 = MessageSerializer.DesearializeObject<CreateBehaviour_Received>(message);
+
+            switch(p2.ActionType)
+            {
+                case "Teleport":
+                    p2 = MessageSerializer.DesearializeObject<CreateBehaviour_Received<TeleportAction>>(message);
+            }
+
             Debug.Log("Message received: " + p2.ToString());
             p2.RaiseEvent();
         }

@@ -48,7 +48,7 @@ public class FlowNetworkManagerEditor : EditorWindow
     public int selectedTarget = 0;
     public FlowBehaviour headBehaviour = null;
 
-    public string previousBehaviourId = null;
+   // public string previousBehaviourId = null;
     public Boolean showAllOptions = false;
 
 
@@ -481,7 +481,7 @@ public class FlowNetworkManagerEditor : EditorWindow
 
         if (GUILayout.Button("Add Interaction", GUILayout.Height(40)))
         {
-            previousBehaviourId = null;
+            BehaviourEventManager.PreviousBehaviourId = null;
 
             objectNames.Clear();
             objectIds.Clear();
@@ -580,7 +580,6 @@ public class FlowNetworkManagerEditor : EditorWindow
                 {
                     Operations.OpenProject(project.Id, ConfigurationSingleton.CurrentUser, (_, e) =>
                     {
-                        Debug.Log("HEAR YEE ");
                         Debug.Log(e.message);
                         if(e.message.WasSuccessful == true)
                         {
@@ -745,10 +744,9 @@ public class FlowNetworkManagerEditor : EditorWindow
     {       
         if (GUILayout.Button("Back", GUILayout.Height(30), GUILayout.Width(40)))
         {
-            headBehaviour = null;
+           // headBehaviour = null;
             addingChain = false;
             showAllOptions = false;
-            previousBehaviourId = null;
             window = EWindowView.PROJECT_HUB;
         }
 
@@ -836,7 +834,7 @@ public class FlowNetworkManagerEditor : EditorWindow
 
             string id = Guid.NewGuid().ToString();
 
-            FlowBehaviour fb = new FlowBehaviour("Immediate", id, firstObjectId, secondObjectId, null, flowAction);
+            FlowBehaviour fb = new FlowBehaviour("Immediate", id, firstObjectId, secondObjectId, flowAction);
             AddBehaviour(fb);
 
             window = EWindowView.CREATE_BEHAVIOUR;
@@ -852,12 +850,11 @@ public class FlowNetworkManagerEditor : EditorWindow
 
             string id = Guid.NewGuid().ToString();
 
-            FlowBehaviour fb = new FlowBehaviour("Immediate", id, firstObject, secondObject, null, flowAction);
+            FlowBehaviour fb = new FlowBehaviour("Immediate", id, firstObject, secondObject, flowAction);
             AddBehaviour(fb);
 
             addingChain = false;
             showAllOptions = false;
-            previousBehaviourId = null;
             window = EWindowView.PROJECT_HUB;
         }
 
@@ -891,7 +888,7 @@ public class FlowNetworkManagerEditor : EditorWindow
 
             string id = Guid.NewGuid().ToString();
 
-            FlowBehaviour fb = new FlowBehaviour("Click", id, firstObject, firstObject, null, null);
+            FlowBehaviour fb = new FlowBehaviour("Click", id, firstObject, firstObject, null);
             AddBehaviour(fb);
 
             addingChain = true;
@@ -929,7 +926,7 @@ public class FlowNetworkManagerEditor : EditorWindow
             FlowAction flowAction = new FlowAction();
             flowAction.ActionType = "Enable";
 
-            FlowBehaviour fb = new FlowBehaviour("Immediate", "1", firstObject, firstObject, null, flowAction);
+            FlowBehaviour fb = new FlowBehaviour("Immediate", "1", firstObject, firstObject, flowAction);
             AddBehaviour(fb);
 
             window = EWindowView.CREATE_BEHAVIOUR;
@@ -942,13 +939,12 @@ public class FlowNetworkManagerEditor : EditorWindow
             FlowAction flowAction = new FlowAction();
             flowAction.ActionType = "Enable";
 
-            FlowBehaviour fb = new FlowBehaviour("Immediate", "1", firstObject, firstObject, null, flowAction);
+            FlowBehaviour fb = new FlowBehaviour("Immediate", "1", firstObject, firstObject, flowAction);
             AddBehaviour(fb);
 
 
             addingChain = false;
             showAllOptions = false;
-            previousBehaviourId = null;
             window = EWindowView.PROJECT_HUB;
         }
 
@@ -983,7 +979,7 @@ public class FlowNetworkManagerEditor : EditorWindow
             FlowAction flowAction = new FlowAction();
             flowAction.ActionType = "Disable";
 
-            FlowBehaviour fb = new FlowBehaviour("Immediate", "1", firstObject, firstObject, null, flowAction);
+            FlowBehaviour fb = new FlowBehaviour("Immediate", "1", firstObject, firstObject, flowAction);
             AddBehaviour(fb);
 
             window = EWindowView.CREATE_BEHAVIOUR;
@@ -997,9 +993,8 @@ public class FlowNetworkManagerEditor : EditorWindow
             FlowAction flowAction = new FlowAction();
             flowAction.ActionType = "Disable";
 
-            FlowBehaviour fb = new FlowBehaviour("Immediate", "1", firstObject, firstObject, null, flowAction);
+            FlowBehaviour fb = new FlowBehaviour("Immediate", "1", firstObject, firstObject, flowAction);
             AddBehaviour(fb);
-
             
             window = EWindowView.PROJECT_HUB;
         }
@@ -1017,55 +1012,39 @@ public class FlowNetworkManagerEditor : EditorWindow
     /// <param name="flowbehaviour"></param>
     private void AddBehaviour(FlowBehaviour newFlowBehaviour)
     {
-       /* Boolean updatePrevious = false; 
-
-        if(previousBehaviourId == null)
+        // Create the list of behaviours that need to add newFlowBehaviour to their chain 
+        List<string> behavioursToLinkTo = new List<string>();
+        if(BehaviourEventManager.PreviousBehaviourId != null)
         {
-            Debug.Log("Previous id is null");
-            previousBehaviourId = newFlowBehaviour.Id;
-        }
-        else
-        {
-            Debug.Log("There is already a previous behaviour id");
-            updatePrevious = true;   
-        }*/
-
-        // might not need this line at all
-        if (newFlowBehaviour.NextBehaviour == null)
-        {
-            newFlowBehaviour.NextBehaviour = new List<string>();
+            behavioursToLinkTo.Add(BehaviourEventManager.PreviousBehaviourId);
         }
 
         // Create the behaviour first
-        Operations.CreateBehaviour(newFlowBehaviour, ConfigurationSingleton.CurrentProject.Id, (sender, e) =>
+        Operations.CreateBehaviour(newFlowBehaviour, ConfigurationSingleton.CurrentProject.Id, behavioursToLinkTo, (sender, e) =>
         {
-            if (e.message.WasSuccessful == true)
+            // If creation was successful:
+                // Create the new behaviour (Locally)
+                // Add new behaviour to table of known behaviours
+
+                // Link the new behaviour to the list of 
+
+                // Set previous behaviour ID to be the new behaviour
+            
+            // Else delete behaviour (locally)
+
+            
+
+            /// Not in the default:
+            if(e.message.WasSuccessful == true)
             {
-                Debug.Log("Success creating behaviour " + e.message.flowBehaviour.TypeOfTrigger);
-
-
-                // Add it to the chain if a chain exists
-                if(previousBehaviourId != null)
-                {
-                    
-                    if (BehaviourEventManager.BehaviourList.TryGetValue(previousBehaviourId, out BehaviourEvent previousBehaviourEvent))
-                    {
-                        Debug.Log("Starting process to update " + previousBehaviourEvent.Id);
-                        AddNewBehaviourToPrevious(previousBehaviourEvent, e.message.flowBehaviour.Id);
-                    }
-                }
-
-                // Make the created behaviour the new head of the behaviour chain
-                previousBehaviourId = newFlowBehaviour.Id;
+                BehaviourEventManager.PreviousBehaviourId = e.message.flowBehaviour.Id;
             }
+
             else
             {
-                Debug.Log("Failed to create behaviour");
+                Debug.LogWarning("Failed to create behaviour");
             }
         });
-
-        Debug.Log("Number of behaviours in bem = " + BehaviourEventManager.BehaviourList.Count);
-
     }
 
     private void AddNewBehaviourToPrevious(BehaviourEvent previousBehaviourEvent, string newBehaviourId)

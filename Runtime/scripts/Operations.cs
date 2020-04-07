@@ -129,9 +129,9 @@ namespace Packages.realityflow_package.Runtime.scripts
         #endregion // ObjectOperations
         #region BehaviourOperations
 
-        public static void CreateBehaviour(FlowBehaviour behaviour, string projectId, CreateBehaviour_Received.CreateBehaviourReceived_EventHandler callbackFunction)
+        public static void CreateBehaviour(FlowBehaviour behaviour, string projectId, List<string> behavioursToLinkTo, CreateBehaviour_Received.CreateBehaviourReceived_EventHandler callbackFunction)
         {
-            CreateBehaviour_SendToServer createBehaviour = new CreateBehaviour_SendToServer(behaviour, projectId);
+            CreateBehaviour_SendToServer createBehaviour = new CreateBehaviour_SendToServer(behaviour, projectId, behavioursToLinkTo);
             FlowWebsocket.SendMessage(createBehaviour);
 
             CreateBehaviour_Received.ReceivedEvent += callbackFunction;
@@ -297,58 +297,19 @@ namespace Packages.realityflow_package.Runtime.scripts
         #region Behaviour messages received
         private static void _CreateBehaviour(object sender, CreateBehaviourEventArgs eventArgs)
         {
-            // this is where things happen after a createBehaviour message is deserialized
-            FlowBehaviour fb = eventArgs.message.flowBehaviour;
-            string behaviourName = fb.TypeOfTrigger;
-            
-            if (fb.flowAction != null)
+            if(eventArgs.message.WasSuccessful == true)
             {
-                // The TypeOfTrigger would be "Immediate", so we use ActionType instead 
-                behaviourName = fb.flowAction.ActionType;
-            }
+                Debug.Log("Success creating behaviour " + eventArgs.message.flowBehaviour.TypeOfTrigger);
 
+                BehaviourEventManager.CreateNewBehaviour(eventArgs.message.flowBehaviour);
 
-            ObjectIsInteractable oIsIFirst = FindAndMakeInteractable(fb.TriggerObjectId);
-            ObjectIsInteractable oIsISecond = FindAndMakeInteractable(fb.TargetObjectId);
-            
-            if(oIsIFirst == null || oIsISecond == null)
-            {
-                Debug.Log("There is a missing gameobject. Failed to make Interaction.");
-                return;
-            }
-
-            BehaviourEvent newBehaviour = BehaviourEventManager.CreateNewBehaviourEvent(behaviourName, fb.Id, oIsIFirst.GetGuid(), oIsISecond.GetGuid(), null);
-
-            if(newBehaviour == null)
-            {
-                Debug.Log("Failed to create new behaviour");
-                return;
-            }
-
-            BehaviourEventManager.BehaviourList.Add(newBehaviour.Id, newBehaviour);
+                foreach(string behaviourToLinkId in eventArgs.message.behavioursToLinkTo)
+                {
+                    BehaviourEventManager.LinkBehaviours(eventArgs.message.flowBehaviour.Id, behaviourToLinkId);
+                }
+            }         
+           
             Debug.Log("Number of behaviours in bem = " + BehaviourEventManager.BehaviourList.Count);
-        }
-
-
-        /// <summary>
-        /// Finds the gameobject associated with objectId, and adds an ObjectIsInteractable component to it.
-        /// </summary>
-        /// <param name="objectId"></param>
-        /// <returns></returns>
-        public static ObjectIsInteractable FindAndMakeInteractable(string objectId)
-        {
-            if(FlowTObject.idToGameObjectMapping.TryGetValue(objectId, out FlowTObject foundObject))
-            {
-                Debug.Log("Found object " + foundObject.Id + " ... making interactable");
-                ObjectIsInteractable oIsI = BehaviourEventManager.MakeObjectInteractable(foundObject.AttachedGameObject, objectId);
-                return oIsI;
-            }
-
-            else
-            {
-                Debug.Log("Cannot make object interactable. Object not found in project.");
-                return null;
-            }
         }
 
 
@@ -360,15 +321,26 @@ namespace Packages.realityflow_package.Runtime.scripts
 
         private static void _UpdateBehaviour(object sender, UpdateBehaviourEventArgs eventArgs)
         {
-            // this is where things happen after an UpdateBehaviour message is deserialized
-            // do the same as createBehaviour?
+            if (eventArgs.message.WasSuccessful == true)
+            {
+                Debug.Log("Success updating behaviour " + eventArgs.message.flowBehaviour.TypeOfTrigger);
 
-            // this is where things happen after a createBehaviour message is deserialized
-            FlowBehaviour fb = eventArgs.message.flowBehaviour;
+                BehaviourEventManager.UpdateBehaviour();
+
+
+               // BehaviourEventManager.CreateNewBehaviour(eventArgs.message.flowBehaviour);
+
+                //foreach (string behaviourToLinkId in eventArgs.message.behavioursToLinkTo)
+                //{
+                //    BehaviourEventManager.LinkBehaviours(eventArgs.message.flowBehaviour.Id, behaviourToLinkId);
+                //}
+            }
+
+            Debug.Log("Number of behaviours in bem = " + BehaviourEventManager.BehaviourList.Count);
 
             // For those receiving updateBehaviour messages, if they did not remove it from 
             // the list already, then it still exists on the objects
-            if(BehaviourEventManager.BehaviourList.ContainsKey(fb.Id))
+            if (BehaviourEventManager.BehaviourList.ContainsKey(fb.Id))
             {
                 if (BehaviourEventManager.BehaviourList.TryGetValue(fb.Id, out BehaviourEvent outdatedBehaviourEvent))
                 {
@@ -378,46 +350,20 @@ namespace Packages.realityflow_package.Runtime.scripts
                 }
             }
 
-            // Figure out what the behaviourName should be for the BehaviourEvent
-            string behaviourName = fb.TypeOfTrigger;
 
-            if (fb.flowAction != null)
-            {
-                // The TypeOfTrigger would be "Immediate", so we use ActionType instead 
-                behaviourName = fb.flowAction.ActionType;
-            }
 
-            // Make the associated objects interactable, if they are not already
-            ObjectIsInteractable oIsIFirst = FindAndMakeInteractable(fb.TriggerObjectId);
-            ObjectIsInteractable oIsISecond = FindAndMakeInteractable(fb.TargetObjectId);
+            //if(newBehaviour.chainedEvent == null)
+            //{
+            //    newBehaviour.chainedEventIds = new List<string>();
+            //}
+            //// Add all of its chained behaviour ids
+            //foreach (string behaviourId in fb.NextBehaviour)
+            //{
+            //    newBehaviour.chainedEventIds.Add(behaviourId);
+            //}
 
-            if (oIsIFirst == null || oIsISecond == null)
-            {
-                Debug.Log("There is a missing gameobject. Failed to make Interaction.");
-                return;
-            }
-
-            // Create a new Behaviour Event 
-            BehaviourEvent newBehaviour = BehaviourEventManager.CreateNewBehaviourEvent(behaviourName, fb.Id, oIsIFirst.GetGuid(), oIsISecond.GetGuid(), null);
-
-            if (newBehaviour == null)
-            {
-                Debug.Log("Failed to create new behaviour");
-                return;
-            }
-
-            if(newBehaviour.chainedEvent == null)
-            {
-                newBehaviour.chainedEventIds = new List<string>();
-            }
-            // Add all of its chained behaviour ids
-            foreach (string behaviourId in fb.NextBehaviour)
-            {
-                newBehaviour.chainedEventIds.Add(behaviourId);
-            }
-
-            BehaviourEventManager.BehaviourList.Add(newBehaviour.Id, newBehaviour);
-            Debug.Log("Number of behaviours in bem = " + BehaviourEventManager.BehaviourList.Count);
+            //BehaviourEventManager.BehaviourList.Add(newBehaviour.Id, newBehaviour);
+            //Debug.Log("Number of behaviours in bem = " + BehaviourEventManager.BehaviourList.Count);
         }
 
         #endregion
