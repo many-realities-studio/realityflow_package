@@ -14,6 +14,7 @@ namespace Behaviours
         [SerializeField]
         private string behaviourName = "default";
 
+        [SerializeField]
         public string Id { get; set; }
 
         [SerializeField]

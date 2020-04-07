@@ -9,7 +9,7 @@ namespace Behaviours
     /// <summary>
     /// Determines whether the object is interactable and logs which objects and events it is interactable with
     /// </summary>
-    public class ObjectIsInteractable : MonoBehaviour
+    public class ObjectIsInteractable : MonoBehaviour, IPointerClickHandler
     {
         private Dictionary<string, bool> interactableWith;
         private Dictionary<BehaviourEvent, string> interactableEvents;
@@ -70,12 +70,25 @@ namespace Behaviours
             }
         }
 
-        private void OnMouseDown()
+        //private void OnMouseDown()
+        //{
+        //    Debug.Log("clicked");
+        //    if (interactableEvents.ContainsValue("Click"))
+        //    {
+        //        SetEventTrigger.Invoke();
+        //    }
+        //}
+
+
+        public void OnPointerClick(PointerEventData eventData)
         {
-            Debug.Log("clicked");
-            if (interactableEvents.ContainsValue("Click"))
+            if (eventData.pointerPressRaycast.gameObject == gameObject)
             {
-                SetEventTrigger.Invoke();
+                Debug.Log("clicked");
+                if (interactableEvents.ContainsValue("Click"))
+                {
+                    SetEventTrigger.Invoke();
+                }
             }
         }
 
@@ -106,13 +119,24 @@ namespace Behaviours
             this.objectId = objectId;
             interactableWith = new Dictionary<string, bool>();
             interactableEvents = new Dictionary<BehaviourEvent, string>();
-            interactableScript = gameObject.AddComponent<Interactable>();
 
-            //interactableScript.Profiles[0].Target = gameObject;
-            //interactableScript.Profiles[0].Themes.Add(new Theme());
-            interactableScript.IsEnabled = true;
-            interactableScript.States = BehaviourEventManager.DefaultInteractableStates;
-            interactableScript.OnClick.AddListener(() => OnSelect());
+            if (!(SystemInfo.deviceType == DeviceType.Desktop || SystemInfo.deviceType == DeviceType.Handheld))
+            {
+                interactableScript = gameObject.AddComponent<Interactable>();
+
+                //interactableScript.Profiles[0].Target = gameObject;
+                //interactableScript.Profiles[0].Themes.Add(new Theme());
+                interactableScript.IsEnabled = true;
+                //interactableScript.States = BehaviourEventManager.DefaultInteractableStates;
+                interactableScript.OnClick.AddListener(() => OnSelect());
+            }
+            else
+            {
+                if (Camera.main.gameObject.GetComponent<PhysicsRaycaster>() == null)
+                {
+                    Camera.main.gameObject.AddComponent<PhysicsRaycaster>();
+                }
+            }
         }
 
         /// <summary>

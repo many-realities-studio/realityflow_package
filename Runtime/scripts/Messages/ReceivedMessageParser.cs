@@ -56,10 +56,12 @@ namespace Packages.realityflow_package.Runtime.scripts
 
             // Behaviour Messages
             messageRouter.Add("CreateBehaviour", CreateBehaviour_Received.ReceiveMessage);
-          
+            messageRouter.Add("UpdateBehaviour", UpdateBehaviour_Received.ReceiveMessage);
+
             // Checkout system messages
             messageRouter.Add("CheckinObject", CheckinObject_Received.ReceiveMessage);
             messageRouter.Add("CheckoutObject", CheckoutObject_Received.ReceiveMessage);
+
         }
 
         public static void DoNothing(string message)

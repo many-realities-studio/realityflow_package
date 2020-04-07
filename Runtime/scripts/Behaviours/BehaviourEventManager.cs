@@ -19,7 +19,7 @@ namespace Behaviours
         {
             GoIds = new Dictionary<string, GameObject>();
             BehaviourList = new Dictionary<string, BehaviourEvent>();
-           // DefaultInteractableStates = ScriptableObject.CreateInstance<States>();
+            //DefaultInteractableStates = ScriptableObject.CreateInstance<States>();
         }
 
         public static void Clear()
@@ -96,6 +96,15 @@ namespace Behaviours
             }
 
             FlowBehaviour fb = new FlowBehaviour(typeOfTrigger, be.Id, be.GetFirstObject(), be.GetSecondObject(), be.chainedEventIds, flowAction);
+            Debug.Log("The behaviours chained event ids = ");
+            if(fb.NextBehaviour != null)
+            {
+                foreach(string id in fb.NextBehaviour)
+                {
+                    Debug.Log("id");
+                }
+
+            }
             return fb;
         }
 

@@ -301,11 +301,12 @@ namespace Packages.realityflow_package.Runtime.scripts
             FlowBehaviour fb = eventArgs.message.flowBehaviour;
             string behaviourName = fb.TypeOfTrigger;
             
-            if (fb.flowAction.Equals("empty"))
+            if (fb.flowAction != null)
             {
                 // The TypeOfTrigger would be "Immediate", so we use ActionType instead 
                 behaviourName = fb.flowAction.ActionType;
             }
+
 
             ObjectIsInteractable oIsIFirst = FindAndMakeInteractable(fb.TriggerObjectId);
             ObjectIsInteractable oIsISecond = FindAndMakeInteractable(fb.TargetObjectId);
@@ -325,6 +326,7 @@ namespace Packages.realityflow_package.Runtime.scripts
             }
 
             BehaviourEventManager.BehaviourList.Add(newBehaviour.Id, newBehaviour);
+            Debug.Log("Number of behaviours in bem = " + BehaviourEventManager.BehaviourList.Count);
         }
 
 
@@ -350,52 +352,11 @@ namespace Packages.realityflow_package.Runtime.scripts
         }
 
 
-
-        //public static BehaviourEvent SetBehaviour(FlowBehaviour fb, BehaviourEvent chainedBehaviour)
-        //{
-        //    // this is where things happen after a createBehaviour message is deserialized
-
-        //    FlowTObject.idToGameObjectMapping.TryGetValue(fb.TriggerObjectId, out FlowTObject firstobject);
-        //    FlowTObject.idToGameObjectMapping.TryGetValue(fb.TargetObjectId, out FlowTObject secondobject);
-
-        //    Debug.Log("FIRSTOBJECT");
-        //    Debug.Log(fb.TriggerObjectId);
-
-        //    GameObject firstGameObject = firstobject.AttachedGameObject;
-        //    GameObject secondGameObject = secondobject.AttachedGameObject;
-
-        //    //ObjectIsInteractable oIsIFirst = firstObj.GetComponent<ObjectIsInteractable>();
-        //    //ObjectIsInteractable oIsISecond = secondObj.GetComponent<ObjectIsInteractable>();
-
-        //    //if (oIsIFirst == null)
-        //    //{
-
-        //    ObjectIsInteractable oIsIFirst = BehaviourEventManager.MakeObjectInteractable(firstGameObject, fb.TriggerObjectId);
-        //    ObjectIsInteractable oIsISecond = BehaviourEventManager.MakeObjectInteractable(secondGameObject, fb.TargetObjectId);
-            
-        //    //Debug.Log("GUID IS");
-        //    //Debug.Log(oIsIFirst.GetGuid().ToString());
-
-
-        //    BehaviourEvent newBehaviour = BehaviourEventManager.CreateNewBehaviourEvent(fb.TypeOfTrigger, oIsIFirst.GetGuid(), oIsISecond.GetGuid(), chainedBehaviour);
-
-        //    if(newBehaviour == null)
-        //    {
-        //        Debug.Log("The behaviour is NULL");
-        //    }
-        //    else
-        //    {
-        //        Debug.Log("Behaviour Created!");
-        //        //Debug.Log(newBehaviour.GetName());
-        //        Debug.Log(newBehaviour.GetSecondObject());
-        //    }
-        //    return newBehaviour;
-        //}
-
         private static void _DeleteBehaviour(object sender, DeleteBehaviourEventArgs eventArgs)
         {
             // this is where things happen after a DeleteBehaviour message is deserialized
         }
+
 
         private static void _UpdateBehaviour(object sender, UpdateBehaviourEventArgs eventArgs)
         {
@@ -413,19 +374,20 @@ namespace Packages.realityflow_package.Runtime.scripts
                 {
                     BehaviourEventManager.BehaviourList.Remove(outdatedBehaviourEvent.Id);
                     BehaviourEventManager.DeleteBehaviourEvent(outdatedBehaviourEvent.GetFirstObject(), outdatedBehaviourEvent.GetSecondObject(), outdatedBehaviourEvent);
-                    UnityEngine.Object.Destroy(outdatedBehaviourEvent);
+                    UnityEngine.Object.DestroyImmediate(outdatedBehaviourEvent);
                 }
             }
 
-
+            // Figure out what the behaviourName should be for the BehaviourEvent
             string behaviourName = fb.TypeOfTrigger;
 
-            if (fb.flowAction.Equals("empty"))
+            if (fb.flowAction != null)
             {
                 // The TypeOfTrigger would be "Immediate", so we use ActionType instead 
                 behaviourName = fb.flowAction.ActionType;
             }
 
+            // Make the associated objects interactable, if they are not already
             ObjectIsInteractable oIsIFirst = FindAndMakeInteractable(fb.TriggerObjectId);
             ObjectIsInteractable oIsISecond = FindAndMakeInteractable(fb.TargetObjectId);
 
@@ -435,6 +397,7 @@ namespace Packages.realityflow_package.Runtime.scripts
                 return;
             }
 
+            // Create a new Behaviour Event 
             BehaviourEvent newBehaviour = BehaviourEventManager.CreateNewBehaviourEvent(behaviourName, fb.Id, oIsIFirst.GetGuid(), oIsISecond.GetGuid(), null);
 
             if (newBehaviour == null)
@@ -443,7 +406,18 @@ namespace Packages.realityflow_package.Runtime.scripts
                 return;
             }
 
+            if(newBehaviour.chainedEvent == null)
+            {
+                newBehaviour.chainedEventIds = new List<string>();
+            }
+            // Add all of its chained behaviour ids
+            foreach (string behaviourId in fb.NextBehaviour)
+            {
+                newBehaviour.chainedEventIds.Add(behaviourId);
+            }
+
             BehaviourEventManager.BehaviourList.Add(newBehaviour.Id, newBehaviour);
+            Debug.Log("Number of behaviours in bem = " + BehaviourEventManager.BehaviourList.Count);
         }
 
         #endregion
