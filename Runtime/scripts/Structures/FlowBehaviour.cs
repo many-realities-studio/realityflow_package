@@ -15,7 +15,7 @@ namespace RealityFlow.Plugin.Scripts
     public class FlowBehaviour
     {
         [JsonProperty("TypeOfTrigger")]
-        public string TypeOfTrigger { get; set; } // The behaviour type
+        public string TypeOfTrigger { get; set; } // The trigger type
 
         [JsonProperty("Id")]
         public string Id { get; set; } // The ID of this behaviour
@@ -30,7 +30,9 @@ namespace RealityFlow.Plugin.Scripts
         public List<string> NextBehaviour { get; set; } // The chain behaviour
 
 
-        public event Action<string, string, string, BehaviourEvent> EventCalled;
+        public string BehaviourName { get; set; } // the behaviour name
+
+        public event Action<string, string, string, List<string>> EventCalled;
 
 
         public FlowAction flowAction { get; set; }
@@ -49,6 +51,7 @@ namespace RealityFlow.Plugin.Scripts
             NextBehaviour = nextBehaviour;
             this.flowAction = flowAction;
             EventCalled += BehaviourEventManager.ListenToEvents;
+            BehaviourName = GetBehaviourName();
         }
 
 
@@ -66,7 +69,7 @@ namespace RealityFlow.Plugin.Scripts
 
         public void EventTrigger()
         {
-            OnCallDown(GetBehaviourName());
+            OnCallDown(BehaviourName);
         }
 
 
@@ -75,8 +78,7 @@ namespace RealityFlow.Plugin.Scripts
         /// </summary>
         public void CallBehaviourEvent()
         {
-
-            EventCalled.Invoke(GetBehaviourName(), TriggerObjectId, TargetObjectId, chainedEvent);
+            EventCalled.Invoke(BehaviourName, TriggerObjectId, TargetObjectId, NextBehaviour);
         }
 
 
@@ -123,9 +125,9 @@ namespace RealityFlow.Plugin.Scripts
                         {
                             if(BehaviourEventManager.BehaviourList.TryGetValue(chainedBehaviourId, out FlowBehaviour chainedBehaviour))
                             {
-
+                                chainedBehaviour.EventTrigger();
                             }
-                            chainedBehaviour.EventTrigger();
+                            
                             Debug.Log("execute chained events");
                         }
                     }
@@ -142,11 +144,11 @@ namespace RealityFlow.Plugin.Scripts
                     return;
                 case "Enable":
                     // enable second object and all related scripts
-                    triggerObject.SetActive(true);
+                    targetObject.SetActive(true);
                     return;
                 case "Disable":
                     // disable second object and all related scripts
-                    triggerObject.SetActive(false);
+                    targetObject.SetActive(false);
                     return;
                 default:
                     Debug.LogError("BehaviourEvent.OnCallDown returned no matching script name for " + scriptName);

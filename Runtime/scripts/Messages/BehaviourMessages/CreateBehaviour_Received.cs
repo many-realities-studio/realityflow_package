@@ -57,13 +57,6 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.BehaviourMessage
         public static void ReceiveMessage(string message)
         {
             var p2 = MessageSerializer.DesearializeObject<CreateBehaviour_Received>(message);
-
-            switch(p2.ActionType)
-            {
-                case "Teleport":
-                    p2 = MessageSerializer.DesearializeObject<CreateBehaviour_Received<TeleportAction>>(message);
-            }
-
             Debug.Log("Message received: " + p2.ToString());
             p2.RaiseEvent();
         }

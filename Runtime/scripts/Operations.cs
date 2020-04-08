@@ -325,7 +325,7 @@ namespace Packages.realityflow_package.Runtime.scripts
             {
                 Debug.Log("Success updating behaviour " + eventArgs.message.flowBehaviour.TypeOfTrigger);
 
-                BehaviourEventManager.UpdateBehaviour();
+               // BehaviourEventManager.UpdateBehaviour();
 
 
                // BehaviourEventManager.CreateNewBehaviour(eventArgs.message.flowBehaviour);
@@ -336,19 +336,19 @@ namespace Packages.realityflow_package.Runtime.scripts
                 //}
             }
 
-            Debug.Log("Number of behaviours in bem = " + BehaviourEventManager.BehaviourList.Count);
+            //Debug.Log("Number of behaviours in bem = " + BehaviourEventManager.BehaviourList.Count);
 
-            // For those receiving updateBehaviour messages, if they did not remove it from 
-            // the list already, then it still exists on the objects
-            if (BehaviourEventManager.BehaviourList.ContainsKey(fb.Id))
-            {
-                if (BehaviourEventManager.BehaviourList.TryGetValue(fb.Id, out BehaviourEvent outdatedBehaviourEvent))
-                {
-                    BehaviourEventManager.BehaviourList.Remove(outdatedBehaviourEvent.Id);
-                    BehaviourEventManager.DeleteBehaviourEvent(outdatedBehaviourEvent.GetFirstObject(), outdatedBehaviourEvent.GetSecondObject(), outdatedBehaviourEvent);
-                    UnityEngine.Object.DestroyImmediate(outdatedBehaviourEvent);
-                }
-            }
+            //// For those receiving updateBehaviour messages, if they did not remove it from 
+            //// the list already, then it still exists on the objects
+            //if (BehaviourEventManager.BehaviourList.ContainsKey(fb.Id))
+            //{
+            //    if (BehaviourEventManager.BehaviourList.TryGetValue(fb.Id, out BehaviourEvent outdatedBehaviourEvent))
+            //    {
+            //        BehaviourEventManager.BehaviourList.Remove(outdatedBehaviourEvent.Id);
+            //        BehaviourEventManager.DeleteBehaviourEvent(outdatedBehaviourEvent.GetFirstObject(), outdatedBehaviourEvent.GetSecondObject(), outdatedBehaviourEvent);
+            //        UnityEngine.Object.DestroyImmediate(outdatedBehaviourEvent);
+            //    }
+            //}
 
 
 

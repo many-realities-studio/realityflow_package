@@ -1047,10 +1047,10 @@ public class FlowNetworkManagerEditor : EditorWindow
         });
     }
 
-    private void AddNewBehaviourToPrevious(BehaviourEvent previousBehaviourEvent, string newBehaviourId)
-    {
+    //private void AddNewBehaviourToPrevious(BehaviourEvent previousBehaviourEvent, string newBehaviourId)
+    //{
         // Convert BehaviourEvent to flowbehaviour
-        FlowBehaviour fb = BehaviourEventManager.ConvertBehaviourEvent(previousBehaviourEvent);
+       // FlowBehaviour fb = BehaviourEventManager.ConvertBehaviourEvent(previousBehaviourEvent);
 
         // Remove the behaviour Event from all lists and objects
        // string firstObjectId = previousBehaviourEvent.GetFirstObject();
@@ -1061,21 +1061,21 @@ public class FlowNetworkManagerEditor : EditorWindow
        // DestroyImmediate(previousBehaviourEvent);
 
         // Add the newly created behaviour event Id to the previous events list of nextBehaviours
-        if (fb.NextBehaviour == null)
-        {
-            fb.NextBehaviour = new List<string>();
-        }
-        fb.NextBehaviour.Add(newBehaviourId);
+        //if (fb.NextBehaviour == null)
+        //{
+        //    fb.NextBehaviour = new List<string>();
+        //}
+        //fb.NextBehaviour.Add(newBehaviourId);
 
 
-        // Update the previous behaviour to include the behaviour that was just created 
-        Operations.UpdateBehaviour(fb, ConfigurationSingleton.CurrentProject.Id, (_, e) =>
-        {
-            if (e.message.WasSuccessful == true)
-            {
-                Debug.Log("Added behaviour to chain");
-            }
-        });
-    }
+        //// Update the previous behaviour to include the behaviour that was just created 
+        //Operations.UpdateBehaviour(fb, ConfigurationSingleton.CurrentProject.Id, (_, e) =>
+        //{
+        //    if (e.message.WasSuccessful == true)
+        //    {
+        //        Debug.Log("Added behaviour to chain");
+        //    }
+        //});
+    //}
 }
 

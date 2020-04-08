@@ -20,7 +20,6 @@ namespace Behaviours
         {
             GoIds = new Dictionary<string, GameObject>();
             BehaviourList = new Dictionary<string, FlowBehaviour>();
-            //DefaultInteractableStates = ScriptableObject.CreateInstance<States>();
         }
 
         public static void Clear()
@@ -74,6 +73,34 @@ namespace Behaviours
             }
         }
 
+
+        /// <summary>
+        /// Adds an ObjectIsInteractable component to the game object and adds its' id to the list
+        /// of game objects (GoIds)
+        /// </summary>
+        /// <param name="go"></param>
+        /// <param name="objectId"></param>
+        /// <returns></returns>
+        public static ObjectIsInteractable MakeObjectInteractable(GameObject go, string objectId)
+        {
+            ObjectIsInteractable oisI = go.GetComponent<ObjectIsInteractable>();
+
+            if (oisI == null)
+            {
+                oisI = go.AddComponent<ObjectIsInteractable>();
+                oisI.Initialize(objectId);
+            }
+
+            string temp = oisI.GetGuid();
+
+            if (!GoIds.ContainsKey(temp))
+            {
+                GoIds.Add(temp, go);
+            }
+
+            return oisI;
+        }
+
         /// <summary>
         /// Adds the childFlowBehaviourId into the parent's NextBehaviour list
         /// </summary>
@@ -93,54 +120,31 @@ namespace Behaviours
         }
 
 
-
         public static void UpdateBehaviour(FlowBehaviour flowBehaviour)
         {
 
         }
 
-
-
-
-
-        public static BehaviourEvent CreateNewBehaviourEvent(string name, string id, string go1, string go2, BehaviourEvent chain)
+        /// <summary>
+        /// Adds the FlowBehaviour fb2 to fb1's NextBehaviour list
+        /// </summary>
+        /// <param name="fb1"></param>
+        /// <param name="fb2"></param>
+        /// <returns></returns>
+        public static  FlowBehaviour AddChain(FlowBehaviour fb1, FlowBehaviour fb2)
         {
-            GameObject g1 = GetGoFromGuid(go1);
-            if (g1)
-            {
-                BehaviourEvent bEvent = g1.AddComponent<BehaviourEvent>();
-                if (bEvent)
-                {
-                    bEvent.SetName(name);
-                    bEvent.SetFirstObject(go1);
-                    bEvent.SetSecondObject(go2);
-                   // bEvent.SetChain(chain);
-                    bEvent.Id = id;
-                }
+            fb1.NextBehaviour.Add(fb2.Id);
 
-                g1.GetComponent<ObjectIsInteractable>().AddInteractableEvent(bEvent);
-                GetGoFromGuid(go2).GetComponent<ObjectIsInteractable>().AddInteractableEvent(bEvent);
-
-                return bEvent;
-            }
-            return null;
+            return fb1;
         }
 
-        public static  BehaviourEvent AddChain(BehaviourEvent b1, BehaviourEvent b2)
-        {
-            BehaviourEvent temp = b1;
-
-            while (temp.chainedEvent != null)
-            {
-                temp = temp.chainedEvent;
-            }
-
-            temp.SetChain(b2);
-            return b1;
-        }
-
-        // needs to check second gameobject
-        public static void DeleteBehaviourEvent(string  go1, string go2, BehaviourEvent bEvent)
+        /// <summary>
+        /// Removes the FlowBehaviour from go1 and go2's list of interactable events
+        /// </summary>
+        /// <param name="go1"></param>
+        /// <param name="go2"></param>
+        /// <param name="flowBehaviour"></param>
+        public static void DeleteFlowBehaviour(string  go1, string go2, FlowBehaviour flowBehaviour)
         {
             GameObject g1 = GetGoFromGuid(go1);
             ObjectIsInteractable interactScript = g1.GetComponent<ObjectIsInteractable>();
@@ -148,7 +152,7 @@ namespace Behaviours
             if (interactScript == null)
                 return;
 
-            interactScript.RemoveInteractableEvent(bEvent, go2);
+            interactScript.RemoveInteractableEvent(flowBehaviour, go2);
         }
 
 
@@ -159,31 +163,18 @@ namespace Behaviours
         /// <param name="go1"></param>
         /// <param name="go2"></param>
         /// <param name="chain"></param>
-        public static void ListenToEvents(string eventName, string go1, string go2, BehaviourEvent chain)
+        public static void ListenToEvents(string eventName, string go1, string go2, List<string> nextBehaviours)
         {
             // sends updated coordinates
         }
 
-        public static ObjectIsInteractable MakeObjectInteractable(GameObject go, string objectId)
-        {
-            ObjectIsInteractable oisI = go.GetComponent<ObjectIsInteractable>();
-    
-            if(oisI == null)
-            {
-                oisI = go.AddComponent<ObjectIsInteractable>();
-                oisI.Initialize(objectId);
-            }
-            
-            string temp = oisI.GetGuid();
 
-            if (!GoIds.ContainsKey(temp))
-            {
-                GoIds.Add(temp, go);
-            }
-            
-            return oisI;
-        }
-
+       
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="guid"></param>
+        /// <returns>The GameObject associated with the guid. Returns null if object is not found</returns>
         public static GameObject GetGoFromGuid(string guid)
         {
             GameObject temp;
@@ -192,13 +183,15 @@ namespace Behaviours
             {
                 GoIds = new Dictionary<string, GameObject>();
             }
-            
 
-            GoIds.TryGetValue(guid, out temp);
+            if(GoIds.TryGetValue(guid, out temp))
+            {
+                Debug.Log(temp);
+                return temp;
+            }
 
-            Debug.Log(temp);
-            return temp;
+            Debug.LogWarning("The game object could not be found in the GoIds list.");
+            return null;
         }
-
     }
 }
