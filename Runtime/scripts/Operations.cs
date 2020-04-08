@@ -325,45 +325,8 @@ namespace Packages.realityflow_package.Runtime.scripts
             {
                 Debug.Log("Success updating behaviour " + eventArgs.message.flowBehaviour.TypeOfTrigger);
 
-               // BehaviourEventManager.UpdateBehaviour();
-
-
-               // BehaviourEventManager.CreateNewBehaviour(eventArgs.message.flowBehaviour);
-
-                //foreach (string behaviourToLinkId in eventArgs.message.behavioursToLinkTo)
-                //{
-                //    BehaviourEventManager.LinkBehaviours(eventArgs.message.flowBehaviour.Id, behaviourToLinkId);
-                //}
+                BehaviourEventManager.UpdateBehaviour(eventArgs.message.flowBehaviour);
             }
-
-            //Debug.Log("Number of behaviours in bem = " + BehaviourEventManager.BehaviourList.Count);
-
-            //// For those receiving updateBehaviour messages, if they did not remove it from 
-            //// the list already, then it still exists on the objects
-            //if (BehaviourEventManager.BehaviourList.ContainsKey(fb.Id))
-            //{
-            //    if (BehaviourEventManager.BehaviourList.TryGetValue(fb.Id, out BehaviourEvent outdatedBehaviourEvent))
-            //    {
-            //        BehaviourEventManager.BehaviourList.Remove(outdatedBehaviourEvent.Id);
-            //        BehaviourEventManager.DeleteBehaviourEvent(outdatedBehaviourEvent.GetFirstObject(), outdatedBehaviourEvent.GetSecondObject(), outdatedBehaviourEvent);
-            //        UnityEngine.Object.DestroyImmediate(outdatedBehaviourEvent);
-            //    }
-            //}
-
-
-
-            //if(newBehaviour.chainedEvent == null)
-            //{
-            //    newBehaviour.chainedEventIds = new List<string>();
-            //}
-            //// Add all of its chained behaviour ids
-            //foreach (string behaviourId in fb.NextBehaviour)
-            //{
-            //    newBehaviour.chainedEventIds.Add(behaviourId);
-            //}
-
-            //BehaviourEventManager.BehaviourList.Add(newBehaviour.Id, newBehaviour);
-            //Debug.Log("Number of behaviours in bem = " + BehaviourEventManager.BehaviourList.Count);
         }
 
         #endregion

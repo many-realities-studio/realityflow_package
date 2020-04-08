@@ -1019,24 +1019,12 @@ public class FlowNetworkManagerEditor : EditorWindow
             behavioursToLinkTo.Add(BehaviourEventManager.PreviousBehaviourId);
         }
 
-        // Create the behaviour first
+        // Create the new behaviour
         Operations.CreateBehaviour(newFlowBehaviour, ConfigurationSingleton.CurrentProject.Id, behavioursToLinkTo, (sender, e) =>
         {
-            // If creation was successful:
-                // Create the new behaviour (Locally)
-                // Add new behaviour to table of known behaviours
-
-                // Link the new behaviour to the list of 
-
-                // Set previous behaviour ID to be the new behaviour
-            
-            // Else delete behaviour (locally)
-
-            
-
-            /// Not in the default:
             if(e.message.WasSuccessful == true)
             {
+                // Update the Previous behaviour Id
                 BehaviourEventManager.PreviousBehaviourId = e.message.flowBehaviour.Id;
             }
 
@@ -1046,36 +1034,5 @@ public class FlowNetworkManagerEditor : EditorWindow
             }
         });
     }
-
-    //private void AddNewBehaviourToPrevious(BehaviourEvent previousBehaviourEvent, string newBehaviourId)
-    //{
-        // Convert BehaviourEvent to flowbehaviour
-       // FlowBehaviour fb = BehaviourEventManager.ConvertBehaviourEvent(previousBehaviourEvent);
-
-        // Remove the behaviour Event from all lists and objects
-       // string firstObjectId = previousBehaviourEvent.GetFirstObject();
-        // string secondObjectId = previousBehaviourEvent.GetSecondObject();
-
-      //  BehaviourEventManager.BehaviourList.Remove(previousBehaviourEvent.Id);
-       // BehaviourEventManager.DeleteBehaviourEvent(firstObjectId, secondObjectId, previousBehaviourEvent);
-       // DestroyImmediate(previousBehaviourEvent);
-
-        // Add the newly created behaviour event Id to the previous events list of nextBehaviours
-        //if (fb.NextBehaviour == null)
-        //{
-        //    fb.NextBehaviour = new List<string>();
-        //}
-        //fb.NextBehaviour.Add(newBehaviourId);
-
-
-        //// Update the previous behaviour to include the behaviour that was just created 
-        //Operations.UpdateBehaviour(fb, ConfigurationSingleton.CurrentProject.Id, (_, e) =>
-        //{
-        //    if (e.message.WasSuccessful == true)
-        //    {
-        //        Debug.Log("Added behaviour to chain");
-        //    }
-        //});
-    //}
 }
 

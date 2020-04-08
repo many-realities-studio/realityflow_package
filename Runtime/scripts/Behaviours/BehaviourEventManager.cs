@@ -43,7 +43,6 @@ namespace Behaviours
             ObjectIsInteractable oIsIFirst = FindAndMakeInteractable(flowBehaviour.TriggerObjectId);
             ObjectIsInteractable oIsISecond = FindAndMakeInteractable(flowBehaviour.TargetObjectId);
 
-
             if (oIsIFirst == null || oIsISecond == null)
             {
                 Debug.LogWarning("There is a missing gameobject. Failed to make Interaction.");
@@ -110,7 +109,10 @@ namespace Behaviours
         {
             if(BehaviourList.TryGetValue(parentFlowBehaviourId, out FlowBehaviour parentFlowBehaviour))
             {
-                parentFlowBehaviour.NextBehaviour.Add(childFlowBehaviourId);
+                if (!parentFlowBehaviour.NextBehaviour.Contains(childFlowBehaviourId))
+                {
+                    parentFlowBehaviour.NextBehaviour.Add(childFlowBehaviourId);
+                }
             }
 
             else
@@ -122,7 +124,18 @@ namespace Behaviours
 
         public static void UpdateBehaviour(FlowBehaviour flowBehaviour)
         {
+            // Add the behaviour to the list of behaviours 
+            BehaviourEventManager.BehaviourList.Add(flowBehaviour.Id, flowBehaviour);
 
+            // Make both objects interactable
+            ObjectIsInteractable oIsIFirst = FindAndMakeInteractable(flowBehaviour.TriggerObjectId);
+            ObjectIsInteractable oIsISecond = FindAndMakeInteractable(flowBehaviour.TargetObjectId);
+
+            if (oIsIFirst == null || oIsISecond == null)
+            {
+                Debug.LogWarning("There is a missing gameobject. Failed to make Interaction.");
+                return;
+            }
         }
 
         /// <summary>
@@ -133,7 +146,11 @@ namespace Behaviours
         /// <returns></returns>
         public static  FlowBehaviour AddChain(FlowBehaviour fb1, FlowBehaviour fb2)
         {
-            fb1.NextBehaviour.Add(fb2.Id);
+            if (!fb1.NextBehaviour.Contains(fb2.Id))
+            {
+                fb1.NextBehaviour.Add(fb2.Id);
+            }
+            
 
             return fb1;
         }
