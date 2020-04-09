@@ -37,11 +37,13 @@ namespace Behaviours
         {
 
             // Add the behaviour to the list of behaviours 
-            BehaviourEventManager.BehaviourList.Add(flowBehaviour.Id, flowBehaviour);
+            BehaviourList[flowBehaviour.Id] = flowBehaviour;
             
             // Make both objects interactable
             ObjectIsInteractable oIsIFirst = FindAndMakeInteractable(flowBehaviour.TriggerObjectId);
             ObjectIsInteractable oIsISecond = FindAndMakeInteractable(flowBehaviour.TargetObjectId);
+
+            oIsIFirst.AddInteractableEvent(flowBehaviour);
 
             if (oIsIFirst == null || oIsISecond == null)
             {
@@ -126,7 +128,7 @@ namespace Behaviours
         public static void UpdateBehaviour(FlowBehaviour flowBehaviour)
         {
             // Add the behaviour to the list of behaviours 
-            BehaviourEventManager.BehaviourList.Add(flowBehaviour.Id, flowBehaviour);
+            BehaviourList.Add(flowBehaviour.Id, flowBehaviour);
 
             // Make both objects interactable
             ObjectIsInteractable oIsIFirst = FindAndMakeInteractable(flowBehaviour.TriggerObjectId);

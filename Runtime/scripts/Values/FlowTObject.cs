@@ -42,7 +42,7 @@ namespace RealityFlow.Plugin.Scripts
                         UnityEngine.Object prefabReference = Resources.Load(Prefab);
                         if(prefabReference == null)
                         {
-                            Debug.Log("cannot load prefab" + prefabReference.name);
+                            Debug.Log("cannot load prefab");
                         }
                         _AttachedGameObject = GameObject.Instantiate(prefabReference) as GameObject;
                     }
@@ -297,7 +297,7 @@ namespace RealityFlow.Plugin.Scripts
             AttachedGameObject.name = name;
 
             AttachedGameObject.AddComponent<FlowObject_Monobehaviour>();
-            var monoBehaviour = AttachedGameObject.GetComponent<FlowObject_Monobehaviour>();
+            FlowObject_Monobehaviour monoBehaviour = AttachedGameObject.GetComponent<FlowObject_Monobehaviour>();
 
             monoBehaviour.underlyingFlowObject = this;
         }
@@ -337,7 +337,7 @@ namespace RealityFlow.Plugin.Scripts
                     AttachedGameObject.AddComponent<FlowObject_Monobehaviour>();
                     AttachedGameObject.transform.hasChanged = false;
 
-                    var monoBehaviour = AttachedGameObject.GetComponent<FlowObject_Monobehaviour>();
+                    FlowObject_Monobehaviour monoBehaviour = AttachedGameObject.GetComponent<FlowObject_Monobehaviour>();
                     monoBehaviour.underlyingFlowObject = this;
                 } 
             //}
@@ -437,8 +437,8 @@ namespace RealityFlow.Plugin.Scripts
             foreach (FlowTObject flowObject in idToGameObjectMapping.Values)
             {
                 UnityEngine.Object.DestroyImmediate(flowObject.AttachedGameObject);
-                FlowTObject.idToGameObjectMapping = new Dictionary<string, FlowTObject>();
             }
+            FlowTObject.idToGameObjectMapping = new Dictionary<string, FlowTObject>();
         }
 
         //public bool Equals(FlowTObject fo)

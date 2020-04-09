@@ -741,7 +741,22 @@ public class FlowNetworkManagerEditor : EditorWindow
 
 
     private void _CreateBehaviourView()
-    {       
+    {
+        Debug.Log("All the current Behaviours: ");
+
+        foreach(FlowBehaviour fb in BehaviourEventManager.BehaviourList.Values)
+        {
+            Debug.Log(fb.BehaviourName + " " + fb.TargetObjectId + " " + fb.TriggerObjectId + " " + fb.Id + "\n");
+        }
+
+        Debug.Log("All the objects in the mapping: ");
+        foreach(FlowTObject t in FlowTObject.idToGameObjectMapping.Values)
+        {
+            Debug.Log(t.Name + "\n");
+        }
+
+
+
         if (GUILayout.Button("Back", GUILayout.Height(30), GUILayout.Width(40)))
         {
            // headBehaviour = null;
@@ -926,7 +941,9 @@ public class FlowNetworkManagerEditor : EditorWindow
             FlowAction flowAction = new FlowAction();
             flowAction.ActionType = "Enable";
 
-            FlowBehaviour fb = new FlowBehaviour("Immediate", "1", firstObject, firstObject, flowAction);
+            string id = Guid.NewGuid().ToString();
+
+            FlowBehaviour fb = new FlowBehaviour("Immediate", id, firstObject, firstObject, flowAction);
             AddBehaviour(fb);
 
             window = EWindowView.CREATE_BEHAVIOUR;
@@ -939,9 +956,10 @@ public class FlowNetworkManagerEditor : EditorWindow
             FlowAction flowAction = new FlowAction();
             flowAction.ActionType = "Enable";
 
-            FlowBehaviour fb = new FlowBehaviour("Immediate", "1", firstObject, firstObject, flowAction);
-            AddBehaviour(fb);
+            string id = Guid.NewGuid().ToString();
 
+            FlowBehaviour fb = new FlowBehaviour("Immediate", id, firstObject, firstObject, flowAction);
+            AddBehaviour(fb);
 
             addingChain = false;
             showAllOptions = false;
@@ -979,7 +997,9 @@ public class FlowNetworkManagerEditor : EditorWindow
             FlowAction flowAction = new FlowAction();
             flowAction.ActionType = "Disable";
 
-            FlowBehaviour fb = new FlowBehaviour("Immediate", "1", firstObject, firstObject, flowAction);
+            string id = Guid.NewGuid().ToString();
+
+            FlowBehaviour fb = new FlowBehaviour("Immediate", id, firstObject, firstObject, flowAction);
             AddBehaviour(fb);
 
             window = EWindowView.CREATE_BEHAVIOUR;
@@ -993,7 +1013,9 @@ public class FlowNetworkManagerEditor : EditorWindow
             FlowAction flowAction = new FlowAction();
             flowAction.ActionType = "Disable";
 
-            FlowBehaviour fb = new FlowBehaviour("Immediate", "1", firstObject, firstObject, flowAction);
+            string id = Guid.NewGuid().ToString();
+            
+            FlowBehaviour fb = new FlowBehaviour("Immediate", id, firstObject, firstObject, flowAction);
             AddBehaviour(fb);
             
             window = EWindowView.PROJECT_HUB;
