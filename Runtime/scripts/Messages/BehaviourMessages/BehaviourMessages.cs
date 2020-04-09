@@ -22,7 +22,8 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.BehaviourMessage
         [JsonProperty("ProjectId")]
         string ProjectId { get; set; }
 
-        [JsonProperty("BehavioursToLinkTo")]
+
+        [JsonProperty("BehaviorsToLinkTo")]
         List<string> BehavioursToLinkTo { get; set; } 
 
 

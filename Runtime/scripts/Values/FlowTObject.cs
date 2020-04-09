@@ -40,6 +40,10 @@ namespace RealityFlow.Plugin.Scripts
                     else
                     {
                         UnityEngine.Object prefabReference = Resources.Load(Prefab);
+                        if(prefabReference == null)
+                        {
+                            Debug.Log("cannot load prefab" + prefabReference.name);
+                        }
                         _AttachedGameObject = GameObject.Instantiate(prefabReference) as GameObject;
                     }
                 }
@@ -281,6 +285,7 @@ namespace RealityFlow.Plugin.Scripts
         public FlowTObject(string name, Vector3 position, Quaternion rotation, Vector3 scale, Color color, string ObjectPrefab)
         {
             this.Prefab = ObjectPrefab;
+            Debug.Log("prefab is " + Prefab);
             this.Name = name;
             this.Position = position;
             this.Rotation = rotation;

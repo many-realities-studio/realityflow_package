@@ -82,6 +82,7 @@ namespace Behaviours
         /// <returns></returns>
         public static ObjectIsInteractable MakeObjectInteractable(GameObject go, string objectId)
         {
+
             ObjectIsInteractable oisI = go.GetComponent<ObjectIsInteractable>();
 
             if (oisI == null)

@@ -20,7 +20,7 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.BehaviourMessage
         [JsonProperty("FlowBehaviour")]
         public FlowBehaviour flowBehaviour { get; set; }
 
-        [JsonProperty("BehavioursToLinkTo")]
+        [JsonProperty("BehaviorsToLinkTo")]
         public List<string> behavioursToLinkTo { get; set; } 
 
         // Definition of event type (What gets sent to the subscribers

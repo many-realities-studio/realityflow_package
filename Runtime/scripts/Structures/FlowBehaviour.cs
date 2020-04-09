@@ -34,7 +34,7 @@ namespace RealityFlow.Plugin.Scripts
 
         public event Action<string, string, string, List<string>> EventCalled;
 
-
+        [JsonProperty("Action")] 
         public FlowAction flowAction { get; set; }
 
         // public delegate void ParseMessage(string message); // Definition of a parse message method
@@ -42,6 +42,7 @@ namespace RealityFlow.Plugin.Scripts
         // public static Dictionary<string, ParseMessage> messageRouter = new Dictionary<string, ParseMessage>();
 
 
+        [JsonConstructor] 
         public FlowBehaviour(string typeOfTrigger, string id, string triggerObjectId, string targetObjectId, List<string> nextBehaviour, FlowAction flowAction)
         {
             TypeOfTrigger = typeOfTrigger;
@@ -51,7 +52,11 @@ namespace RealityFlow.Plugin.Scripts
             NextBehaviour = nextBehaviour;
             this.flowAction = flowAction;
             EventCalled += BehaviourEventManager.ListenToEvents;
-            BehaviourName = GetBehaviourName();
+            BehaviourName = typeOfTrigger;
+            if (TypeOfTrigger.Equals("Immediate"))
+            {
+                BehaviourName = this.flowAction.ActionType;
+            }
         }
 
 
@@ -62,7 +67,7 @@ namespace RealityFlow.Plugin.Scripts
             TriggerObjectId = triggerObjectId;
             TargetObjectId = targetObjectId;
             NextBehaviour = new List<string>();
-            //flowAction = 
+            this.flowAction = flowAction;
         }
 
 
