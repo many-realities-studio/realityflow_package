@@ -48,6 +48,7 @@ namespace Packages.realityflow_package.Runtime.scripts
             // Room Messages
             messageRouter.Add("JoinRoom", JoinRoom_Received.ReceiveMessage);
             messageRouter.Add("UserJoinedRoom", DoNothing);
+            messageRouter.Add("UserLeftRoom", UserLeftRoom_Received.ReceiveMessage);
 
             // User Messages
             messageRouter.Add("LoginUser", LoginUser_Received.ReceiveMessage);

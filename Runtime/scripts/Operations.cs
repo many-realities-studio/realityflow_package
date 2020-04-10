@@ -44,6 +44,7 @@ namespace Packages.realityflow_package.Runtime.scripts
 
             // Set up Room updates
             JoinRoom_Received.ReceivedEvent += _JoinRoom;
+            UserLeftRoom_Received.ReceivedEvent += _UserLeftRoom;
 
             // Set up User updates
             LoginUser_Received.ReceivedEvent += _LoginUser;
@@ -316,6 +317,11 @@ namespace Packages.realityflow_package.Runtime.scripts
         private static void _JoinRoom(object sender, JoinRoomMessageEventArgs eventArgs)
         {
                 
+        }
+
+        private static void _UserLeftRoom(object sender, UserLeftRoomMessageEventArgs eventArgs)
+        {
+            Debug.Log("Room Alert: " + eventArgs.message.leftRoomMessage);
         }
         #endregion Room messages received
 
