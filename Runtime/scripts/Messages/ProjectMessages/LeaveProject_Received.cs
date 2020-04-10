@@ -15,18 +15,14 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.ProjectMessages
     /// </summary>
     public class LeaveProject_Received : ConfirmationMessage_Received
     {
-        [JsonProperty("FlowProject")]
-        public FlowProject flowProject { get; set; }
-
         // Definition of event type (What gets sent to the subscribers
         public delegate void LeaveProjectReceived_EventHandler(object sender, LeaveProjectMessageEventArgs eventArgs);
 
         // The object that handles publishing/subscribing
         private static LeaveProjectReceived_EventHandler _ReceivedEvent;
 
-        public LeaveProject_Received(FlowProject flowProject)
+        public LeaveProject_Received()
         {
-            this.flowProject = flowProject;
             this.MessageType = "LeaveProject";
         }
 
