@@ -23,7 +23,7 @@ namespace Packages.realityflow_package.Runtime.scripts
     /// </summary>
     public static class Operations
     {
-        public static FlowWebsocket FlowWebsocket { get; private set; }
+        public static FlowWebsocket _FlowWebsocket { get; private set; }
 
         static Operations()
         {
@@ -52,30 +52,40 @@ namespace Packages.realityflow_package.Runtime.scripts
 
         #region UserOperations
 
-        public static void Login(FlowUser flowUser, LoginUser_Received.LoginReceived_EventHandler callbackFunction)
+        public static void Login(FlowUser flowUser, string url, LoginUser_Received.LoginReceived_EventHandler callbackFunction)
         {
-            Login_SendToServer loginMessage = new Login_SendToServer(flowUser);
-            FlowWebsocket.SendMessage(loginMessage);
+            bool connectionSuccessful = ConnectToServer(url, flowUser);
 
-            ConfigurationSingleton.CurrentUser = flowUser;
+            if (FlowWebsocket.websocket.ReadyState == WebSocketSharp.WebSocketState.Open)
+            {
+                Login_SendToServer loginMessage = new Login_SendToServer(flowUser);
+                _FlowWebsocket.SendMessage(loginMessage);
 
-            LoginUser_Received.ReceivedEvent += callbackFunction;
+                ConfigurationSingleton.CurrentUser = flowUser;
+
+                LoginUser_Received.ReceivedEvent += callbackFunction; 
+            }
         }
         
-        public static void Logout(FlowUser flowUser, LogoutUser_Received.LogoutReceived_EventHandler callbackFunction)
+        public static void Logout(FlowUser flowUser)
         {
             Logout_SendToServer logoutMessage = new Logout_SendToServer(flowUser);
-            FlowWebsocket.SendMessage(logoutMessage);
+            _FlowWebsocket.SendMessage(logoutMessage);
 
-            LogoutUser_Received.ReceivedEvent += callbackFunction;
+            _FlowWebsocket.Disconnect();
         }
 
-        public static void Register(string username, string password, RegisterUser_Received.RegisterUserReceived_EventHandler callbackFunction)
+        public static void Register(string username, string password, string url,RegisterUser_Received.RegisterUserReceived_EventHandler callbackFunction)
         {
-            RegisterUser_SendToServer register = new RegisterUser_SendToServer(new FlowUser(username, password));
-            FlowWebsocket.SendMessage(register);
+            bool connectionSuccssfull = ConnectToServer(url);
 
-            RegisterUser_Received.ReceivedEvent += callbackFunction;
+            if (FlowWebsocket.websocket.ReadyState == WebSocketSharp.WebSocketState.Open)
+            {
+                RegisterUser_SendToServer register = new RegisterUser_SendToServer(new FlowUser(username, password));
+                _FlowWebsocket.SendMessage(register);
+
+                RegisterUser_Received.ReceivedEvent += callbackFunction; 
+            }
         }
 
         #endregion // UserOperations
@@ -85,7 +95,7 @@ namespace Packages.realityflow_package.Runtime.scripts
         {
             CreateObject_SendToServer createObject =
                 new CreateObject_SendToServer(flowObject, /*flowUser,*/ projectId);
-            FlowWebsocket.SendMessage(createObject);
+            _FlowWebsocket.SendMessage(createObject);
 
             CreateObject_Received.ReceivedEvent += callbackFunction;
         }
@@ -93,7 +103,7 @@ namespace Packages.realityflow_package.Runtime.scripts
         public static void UpdateObject(FlowTObject flowObject, FlowUser flowUser, string projectId, UpdateObject_Received.UpdateObjectReceived_EventHandler callbackFunction)
         {
             UpdateObject_SendToServer updateObject = new UpdateObject_SendToServer(flowObject, /*flowUser,*/ projectId);
-            FlowWebsocket.SendMessage(updateObject);
+            _FlowWebsocket.SendMessage(updateObject);
 
             UpdateObject_Received.ReceivedEvent += callbackFunction;
         }
@@ -101,7 +111,7 @@ namespace Packages.realityflow_package.Runtime.scripts
         public static void FinalizedUpdateObject(FlowTObject flowObject, FlowUser flowUser, string projectId, FinalizedUpdateObject_Received.FinalizedUpdateObjectRecieved_EventHandler callbackFunction)
         {
             FinalizedUpdateObject_SendToServer finalUpdateObject = new FinalizedUpdateObject_SendToServer(flowObject, projectId);
-            FlowWebsocket.SendMessage(finalUpdateObject);
+            _FlowWebsocket.SendMessage(finalUpdateObject);
 
             FinalizedUpdateObject_Received.ReceivedEvent += callbackFunction;
         }
@@ -109,7 +119,7 @@ namespace Packages.realityflow_package.Runtime.scripts
         public static void DeleteObject(string idOfObjectToDelete, string projectId, DeleteObject_Received.DeleteObjectReceived_EventHandler callbackFunction)
         {
             DeleteObject_SendToServer deleteObject = new DeleteObject_SendToServer(projectId, idOfObjectToDelete);
-            FlowWebsocket.SendMessage(deleteObject);
+            _FlowWebsocket.SendMessage(deleteObject);
 
             DeleteObject_Received.ReceivedEvent += callbackFunction;
         }
@@ -120,7 +130,7 @@ namespace Packages.realityflow_package.Runtime.scripts
         public static void CreateProject(FlowProject flowProject, FlowUser flowUser, CreateProject_Received.CreateProjectReceived_EventHandler callbackFunction)
         {
             CreateProject_SendToServer createProject = new CreateProject_SendToServer(flowProject, flowUser);
-            FlowWebsocket.SendMessage(createProject);
+            _FlowWebsocket.SendMessage(createProject);
 
             CreateProject_Received.ReceivedEvent += callbackFunction;
         }
@@ -128,7 +138,7 @@ namespace Packages.realityflow_package.Runtime.scripts
         public static void DeleteProject(FlowProject flowProject, FlowUser flowUser, DeleteProject_Received.DeleteProjectReceived_EventHandler callbackFunction)
         {
             DeleteProject_SendToServer deleteProject = new DeleteProject_SendToServer(flowProject, flowUser);
-            FlowWebsocket.SendMessage(deleteProject);
+            _FlowWebsocket.SendMessage(deleteProject);
 
             DeleteProject_Received.ReceivedEvent += callbackFunction;
         }
@@ -142,7 +152,7 @@ namespace Packages.realityflow_package.Runtime.scripts
             //else
             //{
             OpenProject_SendToServer openProject = new OpenProject_SendToServer(projectId, flowUser);
-            FlowWebsocket.SendMessage(openProject);
+            _FlowWebsocket.SendMessage(openProject);
             
             OpenProject_Received.ReceivedEvent += callbackFunction;
             //}
@@ -151,7 +161,7 @@ namespace Packages.realityflow_package.Runtime.scripts
         public static void GetAllUserProjects(FlowUser flowUser, GetAllUserProjects_Received.GetAllUserProjects_EventHandler callbackFunction)
         {
             GetAllUserProjects_SendToServer getAllUserProjects = new GetAllUserProjects_SendToServer(flowUser);
-            FlowWebsocket.SendMessage(getAllUserProjects);
+            _FlowWebsocket.SendMessage(getAllUserProjects);
 
             GetAllUserProjects_Received.ReceivedEvent += callbackFunction;
         }
@@ -163,7 +173,7 @@ namespace Packages.realityflow_package.Runtime.scripts
         public static void JoinRoom(string projectId, FlowUser flowUser, JoinRoom_Received.JoinRoomReceived_EventHandler callbackFunction)
         {
             JoinRoom_SendToServer joinRoom = new JoinRoom_SendToServer(projectId, flowUser);
-            FlowWebsocket.SendMessage(joinRoom);
+            _FlowWebsocket.SendMessage(joinRoom);
 
             JoinRoom_Received.ReceivedEvent += callbackFunction;
         }
@@ -175,7 +185,7 @@ namespace Packages.realityflow_package.Runtime.scripts
         public static void CheckoutObject(string objectID, string projectID, CheckoutObject_Received.CheckoutObjectReceived_EventHandler callbackFunction)
         {
             CheckoutObject_SendToServer checkoutObject = new CheckoutObject_SendToServer(objectID, projectID);
-            FlowWebsocket.SendMessage(checkoutObject);
+            _FlowWebsocket.SendMessage(checkoutObject);
 
             CheckoutObject_Received.ReceivedEvent += callbackFunction;
         }
@@ -183,7 +193,7 @@ namespace Packages.realityflow_package.Runtime.scripts
         public static void CheckinObject(string objectID, string projectID, CheckinObject_Received.CheckinObjectReceived_EventHandler callbackFunction)
         {
             CheckinObject_SendToServer checkinObject = new CheckinObject_SendToServer(objectID, projectID);
-            FlowWebsocket.SendMessage(checkinObject);
+            _FlowWebsocket.SendMessage(checkinObject);
 
             CheckinObject_Received.ReceivedEvent += callbackFunction;
         }
@@ -194,9 +204,15 @@ namespace Packages.realityflow_package.Runtime.scripts
         /// Establish a connection to the server
         /// </summary>
         /// <param name="url"></param>
-        public static void ConnectToServer(string url)
+        public static bool ConnectToServer(string url, FlowUser flowUser = null)
         {
-            FlowWebsocket = new FlowWebsocket(url);
+            if(flowUser == null)
+            {
+                flowUser = new FlowUser("God", "Jesus");
+            }
+            _FlowWebsocket = new FlowWebsocket(url, flowUser);
+
+            return _FlowWebsocket.IsConnected;
         }
 
         //public delegate void functionCalledOnUpdate();
@@ -293,7 +309,7 @@ namespace Packages.realityflow_package.Runtime.scripts
 
         private static void _RegisterUser(object sender, ConfirmationMessageEventArgs eventArgs)
         {
-                
+            _FlowWebsocket.Disconnect();
         }
     #endregion User messages received
 
