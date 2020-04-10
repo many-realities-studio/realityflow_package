@@ -301,8 +301,8 @@ namespace RealityFlow.Plugin.Scripts
         public FlowTObject(string id, float x, float y, float z, float q_x, float q_y, float q_z, float q_w, float s_x, float s_y, float s_z, float r, float g, float b, float a, string name, string prefab)
         {
             Id = id;
-            if (idToGameObjectMapping.ContainsKey(id) && idToGameObjectMapping[id].CanBeModified == false)
-            {
+            //if (idToGameObjectMapping.ContainsKey(id) && idToGameObjectMapping[id].CanBeModified == false)
+            //{
                 this.Prefab = prefab;
                 X = x;
                 Y = y;
@@ -335,7 +335,7 @@ namespace RealityFlow.Plugin.Scripts
                     var monoBehaviour = AttachedGameObject.GetComponent<FlowObject_Monobehaviour>();
                     monoBehaviour.underlyingFlowObject = this;
                 } 
-            }
+           // }
         }
 
         /// <summary>
