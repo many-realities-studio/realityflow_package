@@ -5,6 +5,7 @@ using System.Runtime.Serialization;
 using UnityEngine;
 using Packages.realityflow_package.Runtime.scripts.Structures.Actions;
 using Behaviours;
+using Packages.realityflow_package.Runtime.scripts.Messages;
 
 namespace RealityFlow.Plugin.Scripts
 {
@@ -14,6 +15,8 @@ namespace RealityFlow.Plugin.Scripts
     /// </summary>
     public class FlowBehaviour
     {
+        private dynamic _flowAction;
+
         [JsonProperty("TypeOfTrigger")]
         public string TypeOfTrigger { get; set; } // The trigger type
 
@@ -29,18 +32,32 @@ namespace RealityFlow.Plugin.Scripts
         [JsonProperty("NextBehaviour")]
         public List<string> NextBehaviour { get; set; } // The chain behaviour
 
-
         public string BehaviourName { get; set; } // the behaviour name
 
         public event Action<string, string, string, List<string>> EventCalled;
 
+        [JsonProperty("Action")]
+        public dynamic flowAction
+        {
+            get => _flowAction;
+            set
+            {
+                if(value.GetType() != typeof(FlowAction))
+                {
+                    FlowAction baseAction = MessageSerializer.DesearializeObject<FlowAction>(value);
+                    _flowAction = FlowAction.ConvertToChildClass(value, baseAction.ActionType);
 
-        public FlowAction flowAction { get; set; }
+                }
+                else
+                {
+                    _flowAction = value;
+                }
+            }
+        }
 
         // public delegate void ParseMessage(string message); // Definition of a parse message method
 
         // public static Dictionary<string, ParseMessage> messageRouter = new Dictionary<string, ParseMessage>();
-
 
         public FlowBehaviour(string typeOfTrigger, string id, string triggerObjectId, string targetObjectId, List<string> nextBehaviour, FlowAction flowAction)
         {
@@ -54,7 +71,6 @@ namespace RealityFlow.Plugin.Scripts
             BehaviourName = GetBehaviourName();
         }
 
-
         public FlowBehaviour(string typeOfTrigger, string id, string triggerObjectId, string targetObjectId, FlowAction flowAction)
         {
             TypeOfTrigger = typeOfTrigger;
@@ -65,7 +81,10 @@ namespace RealityFlow.Plugin.Scripts
             //flowAction = 
         }
 
+        public static FlowBehaviour CreateFromJSON()
+        {
 
+        }
 
         public void EventTrigger()
         {
