@@ -36,36 +36,50 @@ namespace Packages.realityflow_package.Runtime.scripts
         public static List<String> ReceivedMessages = new List<string>();
         public static WebSocketSharp.WebSocket websocket;
 
+        public bool IsConnected { get; private set; }
+
         /// <summary>
         /// Link up the message parser and establish connection to the desired URL
         /// </summary>
         /// <param name="url"></param>
-        public FlowWebsocket(string url)
+        public FlowWebsocket(string url, FlowUser flowUser)
         {
             messageParser = ReceivedMessageParser.Parse;
-            Connect(url);
+            Connect(url, flowUser.Username, flowUser.Password);
         }
 
         /// <summary>
         /// Connect to the desired server over a websocket connection
         /// </summary>
         /// <param name="url">URL address of server that should be connected to</param>
-        public void Connect(string url)
+        public void Connect(string url, string username, string password)
         {
-            //string url = "ws://echo.websocket.org";
             Debug.Log("Establishing websocket connection to " + url);
             try
             {
                 websocket = new WebSocketSharp.WebSocket(url);
                 //websocket.OnMessage += (sender, e) => Debug.Log("Received message: " + e.Data.ToString());
                 websocket.OnMessage += (sender, e) => ActionOnReceiveMessage(e.Data.ToString());
+                websocket.SetCredentials(username, password, true);
                 websocket.Connect();
 
-                Debug.Log("Connection established with " + url);
+
+                IsConnected = true;
             }
             catch (Exception e)
             {
+                IsConnected = false;
                 Debug.LogError("Failed to establish connection to: " + url + ", " + e);
+            }
+
+
+            if (websocket.ReadyState == WebSocketState.Open)
+            {
+                Debug.Log("Connection is open with: " + url); 
+            }
+            else
+            {
+                Debug.LogError("Failed to open connection with: " + url);
             }
         }
 
@@ -88,9 +102,16 @@ namespace Packages.realityflow_package.Runtime.scripts
         {
             string sentMessage = MessageSerializer.SerializeMessage(message);
 
-            Debug.Log("Sending message: " + sentMessage);
+            try
+            {
+                Debug.Log("Sending message: " + sentMessage);
 
-            websocket.Send(sentMessage);
+                websocket.Send(sentMessage);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError("Failed to send message: " + sentMessage + " " + e);
+            }
 
             //System.IO.File.WriteAllText(@"C:\Users\Matthew Kurtz\Desktop\FlowTests\SentCommands\" + typeof(T).ToString() + ".json", sentMessage);
 
@@ -140,9 +161,16 @@ namespace Packages.realityflow_package.Runtime.scripts
                 Debug.LogError(e);
             }
 
+
             ReceivedMessages.RemoveAll((o) => true); // Remove everything from the list
 
             yield return null;
+        }
+
+        internal void Disconnect()
+        {
+            websocket.Close();
+            websocket = null;
         }
     }
 }

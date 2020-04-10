@@ -7,28 +7,27 @@ using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Packages.realityflow_package.Runtime.scripts.Messages.ProjectMessages
+namespace Packages.realityflow_package.Runtime.scripts.Messages.RoomMessages
 {
-    public class CreateProject_Received : ConfirmationMessage_Received
+    public class UserLeftRoom_Received : ReceivedMessage
     {
-
-        [JsonProperty("FlowProject")]
-        public FlowProject flowProject { get; set; }
+        [JsonProperty("Message")]
+        public string leftRoomMessage { get; set; }
 
         // Definition of event type (What gets sent to the subscribers
-        public delegate void CreateProjectReceived_EventHandler(object sender, CreateProjectMessageArgs eventArgs);
+        public delegate void UserLeftRoomReceived_EventHandler(object sender, UserLeftRoomMessageEventArgs eventArgs);
 
         // The object that handles publishing/subscribing
-        private static CreateProjectReceived_EventHandler _ReceivedEvent;
+        private static UserLeftRoomReceived_EventHandler _ReceivedEvent;
 
-        public CreateProject_Received(FlowProject flowProject, bool wasSuccessful)
+        public UserLeftRoom_Received(string Message)
         {
-            this.flowProject = flowProject;
-            this.MessageType = "CreateProject";
-            this.WasSuccessful = wasSuccessful;
+            this.leftRoomMessage = Message;
+            this.MessageType = "UserLeftRoom";
+
         }
 
-        public static event CreateProjectReceived_EventHandler ReceivedEvent
+        public static event UserLeftRoomReceived_EventHandler ReceivedEvent
         {
             add
             {
@@ -49,7 +48,7 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.ProjectMessages
         /// <param name="message">The message to be parsed</param>
         public static void ReceiveMessage(string message)
         {
-            ConfirmationMessage_Received response = MessageSerializer.DesearializeObject<CreateProject_Received>(message);
+            UserLeftRoom_Received response = MessageSerializer.DesearializeObject<UserLeftRoom_Received>(message);
             response.RaiseEvent();
         }
 
@@ -61,16 +60,16 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.ProjectMessages
             // Raise the event in a thread-safe manner using the ?. operator.
             if (_ReceivedEvent != null)
             {
-                _ReceivedEvent.Invoke(this, new CreateProjectMessageArgs(this));
+                _ReceivedEvent.Invoke(this, new UserLeftRoomMessageEventArgs(this));
             }
         }
     }
 
-    public class CreateProjectMessageArgs : EventArgs
+    public class UserLeftRoomMessageEventArgs : EventArgs
     {
-        public CreateProject_Received message;
+        public UserLeftRoom_Received message { get; set; }
 
-        public CreateProjectMessageArgs(CreateProject_Received message)
+        public UserLeftRoomMessageEventArgs(UserLeftRoom_Received message)
         {
             this.message = message;
         }

@@ -15,8 +15,9 @@ using Behaviours;
 [CustomEditor(typeof(FlowWebsocket))]
 public class FlowNetworkManagerEditor : EditorWindow
 {
-    private const string Url = "ws://localhost:8999/";
-    //private const string Url = "ws://plato.mrl.ai:8999";
+    //private const string Url = "ws://localhost:8999/";
+    private string _Url = "ws://plato.mrl.ai:8999";
+    //private const string Url = "ws://68e6e63b.ngrok.io";
 
     // View parameters
     private Rect headerSection;
@@ -110,7 +111,7 @@ public class FlowNetworkManagerEditor : EditorWindow
         //    newUser = new FlowUser("testUsername", "TestPassword");
 
         //Operations.ConnectToServer("ws://echo.websocket.org");
-        Operations.ConnectToServer(Url);
+        //Operations.ConnectToServer(Url);
 
         InitTextures();
         //InitData();
@@ -289,7 +290,7 @@ public class FlowNetworkManagerEditor : EditorWindow
 
     private void OnDestroy()
     {
-        Operations.Logout(ConfigurationSingleton.CurrentUser, (_, e) => { });
+        Operations.Logout(ConfigurationSingleton.CurrentUser);
 
         FlowTObject.RemoveAllObjectsFromScene();
         ConfigurationSingleton.CurrentProject = null;
@@ -299,10 +300,10 @@ public class FlowNetworkManagerEditor : EditorWindow
 
     public void Update()
     {
-        //if(Operations.FlowWebsocket != null)
-        //{
-            Unity.EditorCoroutines.Editor.EditorCoroutineUtility.StartCoroutine(Operations.FlowWebsocket.ReceiveMessage(), Operations.FlowWebsocket);
-        //}
+        if (FlowWebsocket.websocket != null)
+        {
+            Unity.EditorCoroutines.Editor.EditorCoroutineUtility.StartCoroutine(Operations._FlowWebsocket.ReceiveMessage(), Operations._FlowWebsocket);
+        }
 
         //foreach(string flowObjectId in FlowTObject.idToGameObjectMapping.Keys)
         //{
@@ -377,13 +378,17 @@ public class FlowNetworkManagerEditor : EditorWindow
         pWord = EditorGUILayout.PasswordField(pWord);
         EditorGUILayout.EndHorizontal();
 
+        EditorGUILayout.BeginHorizontal();
+        GUILayout.Label("Server URL: ");
+        _Url = EditorGUILayout.TextField(_Url);
+        EditorGUILayout.EndHorizontal();
 
         // Create "Log in" Button and define onClick action
         if (GUILayout.Button("Log in", GUILayout.Height(40)))
         {
             // Send login event to the server
             ConfigurationSingleton.CurrentUser = new FlowUser(uName, pWord);
-            Operations.Login(ConfigurationSingleton.CurrentUser, (_, e) =>
+            Operations.Login(ConfigurationSingleton.CurrentUser, _Url, (_, e) =>
             {
                 Debug.Log("login callback: " + e.message.WasSuccessful.ToString());
                 if (e.message.WasSuccessful == true)
@@ -407,7 +412,7 @@ public class FlowNetworkManagerEditor : EditorWindow
 
         if (GUILayout.Button("Register", GUILayout.Height(30)))
         {
-            Operations.Register(uName, pWord, (sender, e) => { Debug.Log(e.message); });
+            Operations.Register(uName, pWord, _Url, (sender, e) => { Debug.Log(e.message); });
         }
 
         // Create "Import" Button and define onClick action
@@ -440,13 +445,8 @@ public class FlowNetworkManagerEditor : EditorWindow
             // Send logout event to the server
             if (ConfigurationSingleton.CurrentUser != null)
             {
-                Operations.Logout(ConfigurationSingleton.CurrentUser, (sender, e) => 
-                {
-                    if (e.message.WasSuccessful == true)
-                    {
-                        window = EWindowView.LOGIN;
-                    }
-                });
+                Operations.Logout(ConfigurationSingleton.CurrentUser);
+                window = EWindowView.LOGIN;
             }
 
             // Send the user back to the login screen
@@ -707,8 +707,19 @@ public class FlowNetworkManagerEditor : EditorWindow
 
     private void ExitProject()
     {
-        FlowTObject.RemoveAllObjectsFromScene();
-        ConfigurationSingleton.CurrentProject = null;
+        Operations.LeaveProject(ConfigurationSingleton.CurrentProject.Id, ConfigurationSingleton.CurrentUser, (_, e) =>
+        {
+            if(e.message.WasSuccessful == true)
+            {
+                ConfigurationSingleton.CurrentProject = null;
+                FlowTObject.RemoveAllObjectsFromScene();
+            }
+
+            else
+            {
+                Debug.LogWarning("Error leaving project.");
+            }
+        });
     }
 
     private void _CreateProjectImportView()

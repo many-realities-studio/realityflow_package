@@ -44,10 +44,12 @@ namespace Packages.realityflow_package.Runtime.scripts
             messageRouter.Add("DeleteProject", DeleteProject_Received.ReceiveMessage);
             messageRouter.Add("FetchProjects", GetAllUserProjects_Received.ReceiveMessage);
             messageRouter.Add("OpenProject", OpenProject_Received.ReceiveMessage);
+            messageRouter.Add("LeaveProject", LeaveProject_Received.ReceiveMessage);
 
             // Room Messages
             messageRouter.Add("JoinRoom", JoinRoom_Received.ReceiveMessage);
             messageRouter.Add("UserJoinedRoom", DoNothing);
+            messageRouter.Add("UserLeftRoom", UserLeftRoom_Received.ReceiveMessage);
 
             // User Messages
             messageRouter.Add("LoginUser", LoginUser_Received.ReceiveMessage);

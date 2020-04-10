@@ -70,6 +70,26 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.ProjectMessages
     }
 
     /// <summary>
+    /// Leave project request message format 
+    /// <see cref="LeaveProject_Received"/>
+    /// </summary>
+    public class LeaveProject_SendToServer : BaseMessage
+    {
+        [JsonProperty("ProjectId")]
+        string projectId { get; set; }
+
+        [JsonProperty("FlowUser")]
+        FlowUser flowUser { get; set; }
+
+        public LeaveProject_SendToServer(string projectId, FlowUser flowUser)
+        {
+            this.projectId = projectId;
+            this.flowUser = flowUser;
+            this.MessageType = "LeaveProject";
+        }
+    }
+
+    /// <summary>
     /// Message format to request a list of all projects that the user has 
     /// <see cref="GetAllUserProjects_Received"/>
     /// </summary>

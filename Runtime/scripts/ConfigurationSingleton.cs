@@ -11,5 +11,7 @@ namespace Packages.realityflow_package.Runtime.scripts
     {
         public static FlowProject CurrentProject { get; set; }
         public static FlowUser CurrentUser { get; set; }
+        public static string ProjectToLoadId { get; set; }
+        public static string CurrentCheckedOutObjectId { get; set; } = null;
     }
 }
