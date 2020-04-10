@@ -17,8 +17,8 @@ using Packages.realityflow_package.Runtime.scripts.Messages.RoomMessages;
 [CustomEditor(typeof(FlowWebsocket))]
 public class FlowNetworkManagerEditor : EditorWindow
 {
-    //private const string Url = "ws://localhost:8999/";
-    private const string Url = "ws://plato.mrl.ai:8999";
+    private const string Url = "ws://localhost:8999/";
+   // private const string Url = "ws://plato.mrl.ai:8999";
 
     // View parameters
     private Rect headerSection;
@@ -654,8 +654,19 @@ public class FlowNetworkManagerEditor : EditorWindow
 
     private void ExitProject()
     {
-        FlowTObject.RemoveAllObjectsFromScene();
-        ConfigurationSingleton.CurrentProject = null;
+        Operations.LeaveProject(ConfigurationSingleton.CurrentProject.Id, ConfigurationSingleton.CurrentUser, (_, e) =>
+        {
+            if(e.message.WasSuccessful == true)
+            {
+                ConfigurationSingleton.CurrentProject = null;
+                FlowTObject.RemoveAllObjectsFromScene();
+            }
+
+            else
+            {
+                Debug.LogWarning("Error leaving project.");
+            }
+        });
     }
 
     private void _CreateProjectImportView()

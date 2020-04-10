@@ -40,6 +40,7 @@ namespace Packages.realityflow_package.Runtime.scripts
             DeleteProject_Received.ReceivedEvent += _DeleteProject;
             GetAllUserProjects_Received.ReceivedEvent += _GetAllUserProjects;
             OpenProject_Received.ReceivedEvent += _OpenProject;
+            LeaveProject_Received.ReceivedEvent += _LeaveProject;
 
             // Set up Room updates
             JoinRoom_Received.ReceivedEvent += _JoinRoom;
@@ -156,6 +157,14 @@ namespace Packages.realityflow_package.Runtime.scripts
             
             OpenProject_Received.ReceivedEvent += callbackFunction;
             //}
+        }
+
+        public static void LeaveProject(string projectId, FlowUser flowUser, LeaveProject_Received.LeaveProjectReceived_EventHandler callbackFunction)
+        {
+            LeaveProject_SendToServer leaveProject = new LeaveProject_SendToServer(projectId, flowUser);
+            _FlowWebsocket.SendMessage(leaveProject);
+
+            LeaveProject_Received.ReceivedEvent += callbackFunction;
         }
 
         public static void GetAllUserProjects(FlowUser flowUser, GetAllUserProjects_Received.GetAllUserProjects_EventHandler callbackFunction)
@@ -286,6 +295,19 @@ namespace Packages.realityflow_package.Runtime.scripts
         private static void _OpenProject(object sender, OpenProjectMessageEventArgs eventArgs)
         {
             ConfigurationSingleton.CurrentProject = eventArgs.message.flowProject;
+        }
+
+        private static void _LeaveProject(object sender, LeaveProjectMessageEventArgs eventArgs)
+        {
+            if(eventArgs.message.WasSuccessful == true)
+            {
+                Debug.Log("Successfully left project");
+            }
+            else
+            {
+                Debug.LogWarning("Unable to leave project.");
+            }
+            
         }
 
         #endregion Project messages received

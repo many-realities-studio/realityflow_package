@@ -43,6 +43,7 @@ namespace Packages.realityflow_package.Runtime.scripts
             messageRouter.Add("DeleteProject", DeleteProject_Received.ReceiveMessage);
             messageRouter.Add("FetchProjects", GetAllUserProjects_Received.ReceiveMessage);
             messageRouter.Add("OpenProject", OpenProject_Received.ReceiveMessage);
+            messageRouter.Add("LeaveProject", LeaveProject_Received.ReceiveMessage);
 
             // Room Messages
             messageRouter.Add("JoinRoom", JoinRoom_Received.ReceiveMessage);
