@@ -161,6 +161,7 @@ namespace Packages.realityflow_package.Runtime.scripts
                 Debug.LogError(e);
             }
 
+
             ReceivedMessages.RemoveAll((o) => true); // Remove everything from the list
 
             yield return null;
