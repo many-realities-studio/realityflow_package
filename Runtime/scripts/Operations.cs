@@ -266,9 +266,11 @@ namespace Packages.realityflow_package.Runtime.scripts
 
         #region Project messages received
 
-        private static void _CreateProject(object sender, ConfirmationMessageEventArgs eventArgs)
+        private static void _CreateProject(object sender, CreateProjectMessageArgs eventArgs)
         {
-                
+            ConfigurationSingleton.CurrentProject = eventArgs.message.flowProject;
+
+            Operations.OpenProject(ConfigurationSingleton.CurrentProject.Id, ConfigurationSingleton.CurrentUser, (_, e) => { Debug.Log("opened project after create: " + e.message.WasSuccessful); });
         }
 
         private static void _DeleteProject(object sender, ConfirmationMessageEventArgs eventArgs)

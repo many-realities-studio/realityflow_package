@@ -13,10 +13,10 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.ProjectMessages
     {
 
         [JsonProperty("FlowProject")]
-        FlowProject flowProject { get; set; }
+        public FlowProject flowProject { get; set; }
 
         // Definition of event type (What gets sent to the subscribers
-        public delegate void CreateProjectReceived_EventHandler(object sender, ConfirmationMessageEventArgs eventArgs);
+        public delegate void CreateProjectReceived_EventHandler(object sender, CreateProjectMessageArgs eventArgs);
 
         // The object that handles publishing/subscribing
         private static CreateProjectReceived_EventHandler _ReceivedEvent;
@@ -61,8 +61,18 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.ProjectMessages
             // Raise the event in a thread-safe manner using the ?. operator.
             if (_ReceivedEvent != null)
             {
-                _ReceivedEvent.Invoke(this, new ConfirmationMessageEventArgs(this));
+                _ReceivedEvent.Invoke(this, new CreateProjectMessageArgs(this));
             }
+        }
+    }
+
+    public class CreateProjectMessageArgs : EventArgs
+    {
+        public CreateProject_Received message;
+
+        public CreateProjectMessageArgs(CreateProject_Received message)
+        {
+            this.message = message;
         }
     }
 }
