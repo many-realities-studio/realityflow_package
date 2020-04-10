@@ -67,12 +67,12 @@ namespace Packages.realityflow_package.Runtime.scripts
             }
         }
         
-        public static void Logout(FlowUser flowUser, LogoutUser_Received.LogoutReceived_EventHandler callbackFunction)
+        public static void Logout(FlowUser flowUser)
         {
             Logout_SendToServer logoutMessage = new Logout_SendToServer(flowUser);
             _FlowWebsocket.SendMessage(logoutMessage);
 
-            LogoutUser_Received.ReceivedEvent += callbackFunction;
+            _FlowWebsocket.Disconnect();
         }
 
         public static void Register(string username, string password, string url,RegisterUser_Received.RegisterUserReceived_EventHandler callbackFunction)

@@ -17,8 +17,8 @@ using Packages.realityflow_package.Runtime.scripts.Messages.RoomMessages;
 [CustomEditor(typeof(FlowWebsocket))]
 public class FlowNetworkManagerEditor : EditorWindow
 {
-    private const string Url = "ws://localhost:8999/";
-    //private const string Url = "ws://plato.mrl.ai:8999";
+    //private const string Url = "ws://localhost:8999/";
+    private const string Url = "ws://plato.mrl.ai:8999";
 
     // View parameters
     private Rect headerSection;
@@ -266,7 +266,7 @@ public class FlowNetworkManagerEditor : EditorWindow
 
     private void OnDestroy()
     {
-        Operations.Logout(ConfigurationSingleton.CurrentUser, (_, e) => { });
+        Operations.Logout(ConfigurationSingleton.CurrentUser);
 
         FlowTObject.RemoveAllObjectsFromScene();
         ConfigurationSingleton.CurrentProject = null;
@@ -416,13 +416,8 @@ public class FlowNetworkManagerEditor : EditorWindow
             // Send logout event to the server
             if (ConfigurationSingleton.CurrentUser != null)
             {
-                Operations.Logout(ConfigurationSingleton.CurrentUser, (sender, e) => 
-                {
-                    if (e.message.WasSuccessful == true)
-                    {
-                        window = EWindowView.LOGIN;
-                    }
-                });
+                Operations.Logout(ConfigurationSingleton.CurrentUser);
+                window = EWindowView.LOGIN;
             }
 
             // Send the user back to the login screen
