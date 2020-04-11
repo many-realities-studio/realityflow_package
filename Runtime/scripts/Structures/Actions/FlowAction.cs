@@ -1,4 +1,5 @@
-﻿using Packages.realityflow_package.Runtime.scripts.Messages;
+﻿using Newtonsoft.Json;
+using Packages.realityflow_package.Runtime.scripts.Messages;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,6 +18,16 @@ namespace Packages.realityflow_package.Runtime.scripts.Structures.Actions
             Id = id;
         }
 
+        public FlowAction(bool noAction)
+        {
+            Id = Guid.NewGuid().ToString();
+            if(noAction == true)
+            {
+                ActionType = "NoAction";
+            }
+        }
+
+        [JsonConstructor]
         public FlowAction()
         {
             Id = Guid.NewGuid().ToString();
@@ -35,7 +46,7 @@ namespace Packages.realityflow_package.Runtime.scripts.Structures.Actions
                 case "Disable":
                     return MessageSerializer.DesearializeObject<FlowAction>(JsonObject);
                 default:
-                    return null;
+                    return new FlowAction(true);
             }
         }
     }
