@@ -56,7 +56,7 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages
             //return memoryStream;
         }
 
-        public static T DesearializeObject<T>(string messageToDeserialize) where T : BaseMessage
+        public static T DesearializeObject<T>(string messageToDeserialize)
         {
             return JsonConvert.DeserializeObject<T>(messageToDeserialize);
 
