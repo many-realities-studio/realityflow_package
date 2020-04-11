@@ -32,6 +32,7 @@ namespace RealityFlow.Plugin.Scripts
         [JsonProperty("NextBehaviour")]
         public List<string> NextBehaviour { get; set; } // The chain behaviour
 
+        [JsonIgnore]
         public string BehaviourName { get; set; } // the behaviour name
 
         public event Action<string, string, string, List<string>> EventCalled;
