@@ -40,6 +40,10 @@ namespace RealityFlow.Plugin.Scripts
                     else
                     {
                         UnityEngine.Object prefabReference = Resources.Load(Prefab);
+                        if(prefabReference == null)
+                        {
+                            Debug.Log("cannot load prefab");
+                        }
                         _AttachedGameObject = GameObject.Instantiate(prefabReference) as GameObject;
                     }
                 }
@@ -281,6 +285,7 @@ namespace RealityFlow.Plugin.Scripts
         public FlowTObject(string name, Vector3 position, Quaternion rotation, Vector3 scale, Color color, string ObjectPrefab)
         {
             this.Prefab = ObjectPrefab;
+            Debug.Log("prefab is " + Prefab);
             this.Name = name;
             this.Position = position;
             this.Rotation = rotation;
@@ -292,7 +297,7 @@ namespace RealityFlow.Plugin.Scripts
             AttachedGameObject.name = name;
 
             AttachedGameObject.AddComponent<FlowObject_Monobehaviour>();
-            var monoBehaviour = AttachedGameObject.GetComponent<FlowObject_Monobehaviour>();
+            FlowObject_Monobehaviour monoBehaviour = AttachedGameObject.GetComponent<FlowObject_Monobehaviour>();
 
             monoBehaviour.underlyingFlowObject = this;
         }
@@ -301,41 +306,37 @@ namespace RealityFlow.Plugin.Scripts
         public FlowTObject(string id, float x, float y, float z, float q_x, float q_y, float q_z, float q_w, float s_x, float s_y, float s_z, float r, float g, float b, float a, string name, string prefab)
         {
             Id = id;
-          //  if (idToGameObjectMapping.ContainsKey(id) && idToGameObjectMapping[id].CanBeModified == false)
-            //{
-                this.Prefab = prefab;
-                X = x;
-                Y = y;
-                Z = z;
-                Q_x = q_x;
-                Q_y = q_y;
-                Q_z = q_z;
-                Q_w = q_w;
-                S_x = s_x;
-                S_y = s_y;
-                S_z = s_z;
-                R = r;
-                G = g;
-                B = b;
-                A = a;
-                Name = name;
+            this.Prefab = prefab;
+            X = x;
+            Y = y;
+            Z = z;
+            Q_x = q_x;
+            Q_y = q_y;
+            Q_z = q_z;
+            Q_w = q_w;
+            S_x = s_x;
+            S_y = s_y;
+            S_z = s_z;
+            R = r;
+            G = g;
+            B = b;
+            A = a;
+            Name = name;
+            
+            if (idToGameObjectMapping.ContainsKey(id))
+            {
+                idToGameObjectMapping[id].UpdateObjectLocally(this);
+            }
+            else // Create game object if it doesn't exist
+            {
+                idToGameObjectMapping.Add(Id, this);
+                AttachedGameObject.name = name;
+                AttachedGameObject.AddComponent<FlowObject_Monobehaviour>();
+                AttachedGameObject.transform.hasChanged = false;
 
-
-                if (idToGameObjectMapping.ContainsKey(id))
-                {
-                    idToGameObjectMapping[id].UpdateObjectLocally(this);
-                }
-                else // Create game object if it doesn't exist
-                {
-                    idToGameObjectMapping.Add(Id, this);
-                    AttachedGameObject.name = name;
-                    AttachedGameObject.AddComponent<FlowObject_Monobehaviour>();
-                    AttachedGameObject.transform.hasChanged = false;
-
-                    var monoBehaviour = AttachedGameObject.GetComponent<FlowObject_Monobehaviour>();
-                    monoBehaviour.underlyingFlowObject = this;
-                } 
-            //}
+                var monoBehaviour = AttachedGameObject.GetComponent<FlowObject_Monobehaviour>();
+                monoBehaviour.underlyingFlowObject = this;
+            } 
         }
 
         /// <summary>
@@ -364,7 +365,7 @@ namespace RealityFlow.Plugin.Scripts
 
                 if (CanBeModified == true)
                 {
-                    Operations.UpdateObject(this, ConfigurationSingleton.CurrentUser, ConfigurationSingleton.CurrentProject.Id, (_, e) => { Debug.Log(e.message); });
+                    Operations.UpdateObject(this, ConfigurationSingleton.CurrentUser, ConfigurationSingleton.CurrentProject.Id, (_, e) => {/* Debug.Log(e.message);*/ });
                 }
 
                 AttachedGameObject.transform.hasChanged = false;
@@ -432,8 +433,8 @@ namespace RealityFlow.Plugin.Scripts
             foreach (FlowTObject flowObject in idToGameObjectMapping.Values)
             {
                 UnityEngine.Object.DestroyImmediate(flowObject.AttachedGameObject);
-                FlowTObject.idToGameObjectMapping = new Dictionary<string, FlowTObject>();
             }
+            FlowTObject.idToGameObjectMapping = new Dictionary<string, FlowTObject>();
         }
 
         //public bool Equals(FlowTObject fo)

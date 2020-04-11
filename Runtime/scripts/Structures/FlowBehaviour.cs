@@ -59,6 +59,7 @@ namespace RealityFlow.Plugin.Scripts
 
         // public static Dictionary<string, ParseMessage> messageRouter = new Dictionary<string, ParseMessage>();
 
+        [JsonConstructor] 
         public FlowBehaviour(string typeOfTrigger, string id, string triggerObjectId, string targetObjectId, List<string> nextBehaviour, FlowAction flowAction)
         {
             TypeOfTrigger = typeOfTrigger;
@@ -68,7 +69,11 @@ namespace RealityFlow.Plugin.Scripts
             NextBehaviour = nextBehaviour;
             this.flowAction = flowAction;
             EventCalled += BehaviourEventManager.ListenToEvents;
-            BehaviourName = GetBehaviourName();
+            BehaviourName = typeOfTrigger;
+            if (TypeOfTrigger.Equals("Immediate"))
+            {
+                BehaviourName = this.flowAction.ActionType;
+            }
         }
 
         public FlowBehaviour(string typeOfTrigger, string id, string triggerObjectId, string targetObjectId, FlowAction flowAction)
@@ -78,12 +83,7 @@ namespace RealityFlow.Plugin.Scripts
             TriggerObjectId = triggerObjectId;
             TargetObjectId = targetObjectId;
             NextBehaviour = new List<string>();
-            //flowAction = 
-        }
-
-        public static FlowBehaviour CreateFromJSON()
-        {
-
+            this.flowAction = flowAction;
         }
 
         public void EventTrigger()
