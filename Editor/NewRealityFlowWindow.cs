@@ -4,22 +4,14 @@ using UnityEditor;
 using System;
 using System.IO;
 using RealityFlow.Plugin.Scripts;
-//using RealityFlow.Plugin.Scripts.Events;
 using RealityFlow.Plugin.Editor;
 using Packages.realityflow_package.Runtime.scripts;
-//using Packages.realityflow_package.Runtime.scripts.Managers;
-using Packages.realityflow_package.Runtime.scripts.Messages;
 using Packages.realityflow_package.Runtime.scripts.Messages.ObjectMessages;
-using Packages.realityflow_package.Runtime.scripts.Messages.UserMessages;
-using Packages.realityflow_package.Runtime.scripts.Messages.ProjectMessages;
-using Packages.realityflow_package.Runtime.scripts.Messages.RoomMessages;
 
 [CustomEditor(typeof(FlowWebsocket))]
 public class FlowNetworkManagerEditor : EditorWindow
 {
-    //private const string Url = "ws://localhost:8999/";
     private string _Url = "ws://plato.mrl.ai:8999";
-    //private const string Url = "ws://68e6e63b.ngrok.io";
 
     // View parameters
     private Rect headerSection;
@@ -42,9 +34,6 @@ public class FlowNetworkManagerEditor : EditorWindow
 
     private IList<FlowProject> _ProjectList = null;
 
-    //FlowTObject newObject = null;// = new FlowTObject(new Color(0, 0, 0, 0), "TestFlowId", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "TestObject");
-    //FlowUser newUser = null;// = new FlowUser("testUsername", "TestPassword");
-
     enum EWindowView
     {
         LOGIN = 0,
@@ -66,39 +55,12 @@ public class FlowNetworkManagerEditor : EditorWindow
         FlowNetworkManagerEditor window = (FlowNetworkManagerEditor)EditorWindow.GetWindow(typeof(FlowNetworkManagerEditor));
         window.Show();
     }
-    //FlowTObject testObject;
-    //FlowUser testUser;
-    //FlowProject testProject;
 
     /// <summary>
     /// This function is called when this object becomes enabled and active
     /// </summary>
     private void OnEnable()
     {
-        //if(testObject == null)
-        //{
-        //    testObject = new FlowTObject(GUID.Generate().ToString(), 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, "name");
-        //}
-        //if (testUser == null)
-        //{
-        //     testUser = new FlowUser("user", "pass"); ;
-        //}
-        //if(testProject == null)
-        //{
-        //    testProject = new FlowProject("flowId", "description", 0, "projectName"/*, new FlowTObject[]
-        //    {
-        //         testObject
-        //    }*/);
-        //}
-
-        //if(newObject == null)
-        //    newObject = new FlowTObject(GUID.Generate().ToString(), 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, "name");
-        //if (newUser == null)
-        //    newUser = new FlowUser("testUsername", "TestPassword");
-
-        //Operations.ConnectToServer("ws://echo.websocket.org");
-        //Operations.ConnectToServer(Url);
-
         InitTextures();
         //InitData();
         skin = Resources.Load<GUISkin>("guiStyles/RFSkin");
@@ -115,146 +77,6 @@ public class FlowNetworkManagerEditor : EditorWindow
     public void OnGUI()
     {
         _ViewDictionary[window]();
-
-        //if (GUILayout.Button("Fetch Projects"))
-        //{
-        //    Operations.GetAllUserProjects(ConfigurationSingleton.CurrentUser, (_, e) =>
-        //    {
-        //        _ProjectList = e.message.Projects;
-        //        Debug.Log("Project list from fetch projects button: " + (_ProjectList == null ? "null" : _ProjectList.ToString()));
-
-        //        foreach (FlowProject f in _ProjectList)
-        //        {
-        //            Debug.Log(f.ProjectName);
-        //        }
-        //    });
-        //}
-
-        //if (GUILayout.Button("Create", GUILayout.Height(20)))
-        //{
-        //    //GameObject go = GameObject.CreatePrimitive(PrimitiveType.Capsule);
-
-        //    //if (newUser == null)
-        //    //{
-        //    //    newUser = new FlowUser("user", "pass");
-        //    //}
-
-        //    #region User messages
-
-        //    // Login
-        //    //System.IO.File.WriteAllText(@"C:\Users\Matthew Kurtz\Desktop\FlowTests\SentCommands\UserMessages\" + typeof(Login_SendToServer).ToString() + ".json", MessageSerializer.ConvertToString(new Login_SendToServer(testUser)));
-
-        //    //System.IO.File.WriteAllText(@"C:\Users\Matthew Kurtz\Desktop\FlowTests\SentCommands\UserMessages\" + typeof(LoginUser_Received).ToString() + ".json", MessageSerializer.ConvertToString(new LoginUser_Received(true)));
-
-        //    //// Register / CreateUser
-        //    //System.IO.File.WriteAllText(@"C:\Users\Matthew Kurtz\Desktop\FlowTests\SentCommands\UserMessages\" + typeof(RegisterUser_SendToServer).ToString() + ".json", MessageSerializer.ConvertToString(new RegisterUser_SendToServer(testUser)));
-
-        //    //System.IO.File.WriteAllText(@"C:\Users\Matthew Kurtz\Desktop\FlowTests\SentCommands\UserMessages\" + typeof(RegisterUser_Received).ToString() + ".json", MessageSerializer.ConvertToString(new RegisterUser_Received(true)));
-
-        //    //// Logout
-        //    //System.IO.File.WriteAllText(@"C:\Users\Matthew Kurtz\Desktop\FlowTests\SentCommands\UserMessages\" + typeof(Logout_SendToServer).ToString() + ".json", MessageSerializer.ConvertToString(new Logout_SendToServer(testUser)));
-
-        //    //System.IO.File.WriteAllText(@"C:\Users\Matthew Kurtz\Desktop\FlowTests\SentCommands\UserMessages\" + typeof(LogoutUser_Received).ToString() + ".json", MessageSerializer.ConvertToString(new LogoutUser_Received(true)));
-
-        //    #endregion User messages
-
-        //    #region Object messages
-
-        //    //// Create Object
-        //    //System.IO.File.WriteAllText(@"C:\Users\Matthew Kurtz\Desktop\FlowTests\SentCommands\ObjectMessages\" + typeof(CreateObject_SendToServer).ToString() + ".json", MessageSerializer.ConvertToString(new CreateObject_SendToServer(testObject, /*testUser,*/ testProject.Id)));
-
-        //    //System.IO.File.WriteAllText(@"C:\Users\Matthew Kurtz\Desktop\FlowTests\SentCommands\ObjectMessages\" + typeof(CreateObject_Received).ToString() + ".json", MessageSerializer.ConvertToString(new CreateObject_Received(testObject)));
-
-        //    //// Delete Object
-        //    //System.IO.File.WriteAllText(@"C:\Users\Matthew Kurtz\Desktop\FlowTests\SentCommands\ObjectMessages\" + typeof(DeleteObject_SendToServer).ToString() + ".json", MessageSerializer.ConvertToString(new DeleteObject_SendToServer(testProject.Id, testObject.Id)));
-
-        //    ////System.IO.File.WriteAllText(@"C:\Users\Matthew Kurtz\Desktop\FlowTests\SentCommands\ObjectMessages\" + typeof(DeleteObject_Received).ToString() + ".json", MessageSerializer.ConvertToString(new DeleteObject_Received()));
-
-        //    //// Update Object
-        //    //System.IO.File.WriteAllText(@"C:\Users\Matthew Kurtz\Desktop\FlowTests\SentCommands\ObjectMessages\" + typeof(UpdateObject_SendToServer).ToString() + ".json", MessageSerializer.ConvertToString(new UpdateObject_SendToServer(testObject, /*testUser,*/ testProject.Id)));
-
-        //    //System.IO.File.WriteAllText(@"C:\Users\Matthew Kurtz\Desktop\FlowTests\SentCommands\ObjectMessages\" + typeof(UpdateObject_Received).ToString() + ".json", MessageSerializer.ConvertToString(new UpdateObject_Received(testObject)));
-
-        //    //// Finalized update object
-        //    //System.IO.File.WriteAllText(@"C:\Users\Matthew Kurtz\Desktop\FlowTests\SentCommands\ObjectMessages\" + typeof(FinalizedUpdateObject_SendToServer).ToString() + ".json", MessageSerializer.ConvertToString(new FinalizedUpdateObject_SendToServer(testObject, testProject.Id)));
-
-        //    //System.IO.File.WriteAllText(@"C:\Users\Matthew Kurtz\Desktop\FlowTests\SentCommands\ObjectMessages\" + typeof(FinalizedUpdateObject_Received).ToString() + ".json", MessageSerializer.ConvertToString(new FinalizedUpdateObject_Received(testObject)));
-
-        //    #endregion Object messages
-
-        //    #region Project messages
-        //    //// Create project
-        //    //System.IO.File.WriteAllText(@"C:\Users\Matthew Kurtz\Desktop\FlowTests\SentCommands\ProjectMessages\" + typeof(CreateProject_SendToServer).ToString() + ".json", MessageSerializer.ConvertToString(new CreateProject_SendToServer(testProject, testUser)));
-        //    //System.IO.File.WriteAllText(@"C:\Users\Matthew Kurtz\Desktop\FlowTests\SentCommands\ProjectMessages\" + typeof(CreateProject_Received).ToString() + ".json", MessageSerializer.ConvertToString(new CreateProject_Received(testProject, true)));
-
-        //    //// Delete project
-        //    //System.IO.File.WriteAllText(@"C:\Users\Matthew Kurtz\Desktop\FlowTests\SentCommands\ProjectMessages\" + typeof(DeleteProject_SendToServer).ToString() + ".json", MessageSerializer.ConvertToString(new DeleteProject_SendToServer(testProject, testUser)));
-
-        //    ////System.IO.File.WriteAllText(@"C:\Users\Matthew Kurtz\Desktop\FlowTests\SentCommands\ProjectMessages\" + typeof(DeleteObject_Received).ToString() + ".json", MessageSerializer.ConvertToString(new DeleteObject_Received()));
-
-        //    //// Fetch project list
-        //    //System.IO.File.WriteAllText(@"C:\Users\Matthew Kurtz\Desktop\FlowTests\SentCommands\ProjectMessages\" + typeof(GetAllUserProjects_SendToServer).ToString() + ".json", MessageSerializer.ConvertToString(new GetAllUserProjects_SendToServer(testUser)));
-        //    //System.IO.File.WriteAllText(@"C:\Users\Matthew Kurtz\Desktop\FlowTests\SentCommands\ProjectMessages\" + typeof(GetAllUserProjects_Received).ToString() + ".json", MessageSerializer.ConvertToString(new GetAllUserProjects_Received(new List<FlowProject>() { testProject })));
-
-        //    //// Open project
-        //    //System.IO.File.WriteAllText(@"C:\Users\Matthew Kurtz\Desktop\FlowTests\SentCommands\ProjectMessages\" + typeof(OpenProject_SendToServer).ToString() + ".json", MessageSerializer.ConvertToString(new OpenProject_SendToServer(testProject.Id, testUser)));
-        //    //System.IO.File.WriteAllText(@"C:\Users\Matthew Kurtz\Desktop\FlowTests\SentCommands\ProjectMessages\" + typeof(OpenProject_Received).ToString() + ".json", MessageSerializer.ConvertToString(new OpenProject_Received(testProject)));
-
-        //    #endregion Project messages
-
-        //    //// Room messages
-        //    //System.IO.File.WriteAllText(@"C:\Users\Matthew Kurtz\Desktop\FlowTests\SentCommands\RoomMessages\" + typeof(JoinRoom_SendToServer).ToString() + ".json", MessageSerializer.ConvertToString(new JoinRoom_SendToServer(testProject.Id, testUser)));
-        //    //System.IO.File.WriteAllText(@"C:\Users\Matthew Kurtz\Desktop\FlowTests\SentCommands\RoomMessages\" + typeof(JoinRoom_Received).ToString() + ".json", MessageSerializer.ConvertToString(new JoinRoom_Received(testProject)));
-
-        //    //    //Operations.CreateObject(newObject, newUser, "TestProjectId", CreateObjectCallbackTest);
-
-        //    //    //UpdateObject_SendToServer updateObject = new UpdateObject_SendToServer(newObject, newUser, "ProjectId");
-        //    //    //Operations.FlowWebsocket.SendMessage(updateObject);
-
-        //    //    //Operations.DeleteObject("TestProjectId", DeleteObjectCallback);
-
-
-        //    //    //FinalizedUpdateObject_SendToServer finalizedUpdateObject = new FinalizedUpdateObject_SendToServer(newObject, newUser, "ProjectId");
-        //    //    //Operations.FlowWebsocket.SendMessage(finalizedUpdateObject);
-        //    //}
-
-        //    // if (GUILayout.Button("Edit", GUILayout.Height(20)))
-        //    // {
-        //    //     if(NewObjectManager.Sphere == null)
-        //    //     {
-        //    //         NewObjectManager.Sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-        //    //     }
-        //    //     FlowTObject newObject = new FlowTObject(NewObjectManager.Sphere);
-        //    //     newObject.flowId = 2.ToString();
-
-        //    //     NewObjectManager.EditObject(newObject);
-        //    // }
-
-        //    ////FlowNetworkManager myTarget = (FlowNetworkManager) target;
-        //    //if (GUILayout.Button("Connect to server"))
-        //    //{
-        //    //    flowWebsocket.Connect("ws://echo.websocket.org");
-        //    //}
-
-        //    //if (GUILayout.Button("Send message to server"))
-        //    //{
-        //    //    flowWebsocket.SendMessage("Helloooo!");
-        //    //}
-
-        //    //if(GUILayout.Button("Start coroutine"))
-        //    //{
-        //    //    Debug.Log("Starting coroutine");
-
-        //    //    Unity.EditorCoroutines.Editor.EditorCoroutineUtility.StartCoroutine(flowWebsocket.ReceiveMessage(), flowWebsocket);
-        //    //}
-
-        //    ////Unity.EditorCoroutines.Editor.EditorCoroutineUtility.StartCoroutine(flowWebsocket.ReceiveMessage(), flowWebsocket);
-
-        //    //if (GUILayout.Button("Create primitive cube"))
-        //    //{
-        //    //    GameObject.CreatePrimitive(PrimitiveType.Cube);
-        //    //}
-        //}
     }
 
     private void DeleteObjectCallback(object sender, DeleteObjectMessageEventArgs eventArgs)
@@ -283,24 +105,6 @@ public class FlowNetworkManagerEditor : EditorWindow
         {
             Unity.EditorCoroutines.Editor.EditorCoroutineUtility.StartCoroutine(Operations._FlowWebsocket.ReceiveMessage(), Operations._FlowWebsocket);
         }
-
-        //foreach(string flowObjectId in FlowTObject.idToGameObjectMapping.Keys)
-        //{
-        //    FlowTObject currentObject = FlowTObject.idToGameObjectMapping[flowObjectId];
-
-        //    // If the current object is selected
-        //    if (Selection.Contains(currentObject.AttachedGameObject))
-        //    {
-        //        FlowObject_Monobehaviour currentObjectMonobehaviour = currentObject.AttachedGameObject.GetComponent(typeof(FlowObject_Monobehaviour)) as FlowObject_Monobehaviour;
-
-        //        bool currentIsCheckedOut = currentObjectMonobehaviour.checkedOut;
-
-        //        if(currentIsCheckedOut == true)
-        //        {
-
-        //        }
-        //    }
-        //}
     }
 
     // Initializes the texture2d values
@@ -504,8 +308,6 @@ public class FlowNetworkManagerEditor : EditorWindow
 
     private void _CreateDeleteObjectView()
     {
-        //GameObject objectManagerGameObject = GameObject.FindGameObjectWithTag("ObjManager");
-
         // Create "Back" Button and define onClick action
         EditorGUILayout.BeginHorizontal();
         if (GUILayout.Button("Back", GUILayout.Height(20)))
@@ -523,22 +325,6 @@ public class FlowNetworkManagerEditor : EditorWindow
                 Operations.DeleteObject(currentFlowObject.Id, ConfigurationSingleton.CurrentProject.Id, (_, e) => { Debug.Log("Deleted Object " + e.message); });
             }
         }
-
-        //if (objectManagerGameObject != null)
-        //{
-        //    // TODO: Replace this with new code to get all flowObjects
-        //    List<GameObject> gameObjectsList = objectManagerGameObject.GetComponent<ObjectManager>().GetFlowObjects();
-
-        //    // List out all game objects in the scene
-        //    foreach (GameObject gameObject in gameObjectsList)
-        //    {
-        //        // Add a button whose name is the name of the game object and define the onClick event
-        //        if (GUILayout.Button(gameObject.name, GUILayout.Height(30)))
-        //        {
-        //            DeleteObject(gameObject);
-        //        }
-        //    }
-        //}
     }
 
     private bool _RefreshProjectList = true;
@@ -546,17 +332,6 @@ public class FlowNetworkManagerEditor : EditorWindow
 
     private void _CreateLoadProjectView()
     {
-        //if(_RefreshProjectList == true)
-        //{
-        //    Operations.GetAllUserProjects(ConfigurationSingleton.CurrentUser, (_, e) =>
-        //    {
-        //        _ProjectList = e.message.ProjectList;
-        //        Debug.Log(e.message);
-        //    });
-
-        //    _RefreshProjectList = false;
-        //}
-
         // Create "Back" Button and define onClick action
         EditorGUILayout.BeginHorizontal();
         if (GUILayout.Button("Back", GUILayout.Height(20)))
@@ -584,28 +359,6 @@ public class FlowNetworkManagerEditor : EditorWindow
                 }
             }
         }
-
-        // List all of the available projects
-        //if (Config.projectList != null)
-        //{
-        //    foreach (FlowProject project in Config.projectList)
-        //    {
-        //        // Add a button whose name is the name of the project and define the onClick event
-        //        if (GUILayout.Button(project.ProjectName, GUILayout.Height(30)))
-        //        {
-        //            //// Set the current project to the selected project
-        //            //Config.projectId = project._id;
-        //            //FlowProject.activeProject.projectName = project.projectName;
-
-        //            //// Send a request to the server to fetch the desired project
-        //            //ProjectFetchEvent fetch = new ProjectFetchEvent();
-        //            //fetch.Send(); /// TODO: Refactor to be more explicit about which project is getting fetched
-
-        //            // Send the user to the Project Hub screen
-        //            window = EWindowView.PROJECT_HUB;
-        //        }
-        //    }
-        //}
     }
 
     private void _CreateProjectCreationView()
@@ -651,13 +404,6 @@ public class FlowNetworkManagerEditor : EditorWindow
                         // TODO: display to the user that create project failed
                     }
                 });
-                //// Send ProjectCreate event to the server
-                //ProjectCreateEvent create = new ProjectCreateEvent();
-                ////create.Send(projectName);
-
-                // Send the user to the Project Hub screen
-                //window = EWindowView.PROJECT_HUB;
-                //projectName = ""; // TODO: What does this do?
             }
         }
     }
@@ -689,10 +435,6 @@ public class FlowNetworkManagerEditor : EditorWindow
             // Create "Invite" Button and define onClick action
             if (GUILayout.Button("Invite", GUILayout.Height(40)))
             {
-                //// Send Project Invite event to the server
-                //ProjectInviteEvent invite = new ProjectInviteEvent();
-                //invite.send(userToInvite);
-
                 // Send the user to the Project Hub screen
                 window = EWindowView.PROJECT_HUB;
             }
