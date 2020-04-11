@@ -385,6 +385,8 @@ public class FlowNetworkManagerEditor : EditorWindow
                     // TODO: Display that login failed
                 }
             });
+            uName = "";
+            pWord = "";
         }
 
         // Create "Register" Button and define onClick action
@@ -423,6 +425,7 @@ public class FlowNetworkManagerEditor : EditorWindow
         openProjectId = EditorGUILayout.TextField(openProjectId);
         if (GUILayout.Button("Open"))
         {
+            ProjectDebugInfo = "";
             if (openProjectId != "")
             {
                 Debug.Log("opening project: " + openProjectId);
@@ -433,11 +436,17 @@ public class FlowNetworkManagerEditor : EditorWindow
                         ConfigurationSingleton.CurrentProject = e.message.flowProject;
                         window = EWindowView.PROJECT_HUB;
                     }
+                    else
+                    {
+                        ProjectDebugInfo = "Project does not exist";
+                    }
                 });
+                openProjectId = "";
             }
             else
             {
-                Debug.Log("Bad project Id");
+                ProjectDebugInfo = "Please enter the project ID before attempting to open";
+                openProjectId = "";
             }
         }
         GUILayout.EndHorizontal();
@@ -455,6 +464,10 @@ public class FlowNetworkManagerEditor : EditorWindow
             // Send the user back to the login screen
             //window = EWindowView.LOGIN;
         }
+
+        GUILayout.BeginHorizontal();
+        EditorGUILayout.LabelField(ProjectDebugInfo);
+        GUILayout.EndHorizontal();
     }
 
     private void _CreateProjectHubView()
@@ -529,6 +542,8 @@ public class FlowNetworkManagerEditor : EditorWindow
     }
 
     private bool _RefreshProjectList = true;
+    private string ProjectDebugInfo;
+
     private void _CreateLoadProjectView()
     {
         //if(_RefreshProjectList == true)
