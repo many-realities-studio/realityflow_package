@@ -12,7 +12,7 @@ namespace RealityFlow.Plugin.Scripts
     /// Anything marked with a [DataMember] annotation is marked to be serialized and
     /// sent to the server.
     /// </summary>
-    public class FlowProject : FlowValue
+    public class FlowProject
     {
         [JsonProperty("Id")]
         public string Id { get; set; } // The unique ID of the project
