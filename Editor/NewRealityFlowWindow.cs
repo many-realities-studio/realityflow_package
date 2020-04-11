@@ -34,6 +34,8 @@ public class FlowNetworkManagerEditor : EditorWindow
     private EWindowView window = EWindowView.LOGIN;
     private string projectName;
     private string userToInvite;
+    private string openProjectId = "";
+
 
     private Dictionary<EWindowView, ChangeView> _ViewDictionary = new Dictionary<EWindowView, ChangeView>();
     private delegate void ChangeView();
@@ -415,6 +417,30 @@ public class FlowNetworkManagerEditor : EditorWindow
             // Send the user to the load project screen
             window = EWindowView.LOAD_PROJECT;
         }
+
+        GUILayout.BeginHorizontal();
+        GUILayout.Label("Open project by Id");
+        openProjectId = EditorGUILayout.TextField(openProjectId);
+        if (GUILayout.Button("Open"))
+        {
+            if (openProjectId != "")
+            {
+                Debug.Log("opening project: " + openProjectId);
+                Operations.OpenProject(openProjectId, ConfigurationSingleton.CurrentUser, (_, e) => 
+                {
+                    if (e.message.WasSuccessful == true)
+                    {
+                        ConfigurationSingleton.CurrentProject = e.message.flowProject;
+                        window = EWindowView.PROJECT_HUB;
+                    }
+                });
+            }
+            else
+            {
+                Debug.Log("Bad project Id");
+            }
+        }
+        GUILayout.EndHorizontal();
 
         // Create "Logout" Button and define onClick action
         if (GUILayout.Button("Logout", GUILayout.Height(20)))
