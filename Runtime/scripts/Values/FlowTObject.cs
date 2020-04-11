@@ -11,7 +11,7 @@ using Newtonsoft.Json;
 namespace RealityFlow.Plugin.Scripts
 {
     [System.Serializable]
-    public class FlowTObject : FlowValue
+    public class FlowTObject
     {
         public static Dictionary<string, FlowTObject> idToGameObjectMapping = new Dictionary<string, FlowTObject>();
 
