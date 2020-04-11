@@ -43,11 +43,10 @@ namespace RealityFlow.Plugin.Scripts
             get => _flowAction;
             set
             {
-                if(value.GetType() != typeof(FlowAction))
+                if(value != null && value.GetType() != typeof(FlowAction))
                 {
                     FlowAction baseAction = MessageSerializer.DesearializeObject<FlowAction>(value);
                     _flowAction = FlowAction.ConvertToChildClass(value, baseAction.ActionType);
-
                 }
                 else
                 {
@@ -61,7 +60,7 @@ namespace RealityFlow.Plugin.Scripts
         // public static Dictionary<string, ParseMessage> messageRouter = new Dictionary<string, ParseMessage>();
 
         [JsonConstructor] 
-        public FlowBehaviour(string typeOfTrigger, string id, string triggerObjectId, string targetObjectId, List<string> nextBehaviour, FlowAction flowAction)
+        public FlowBehaviour(string typeOfTrigger, string id, string triggerObjectId, string targetObjectId, List<string> nextBehaviour, dynamic flowAction)
         {
             TypeOfTrigger = typeOfTrigger;
             Id = id;
@@ -77,7 +76,7 @@ namespace RealityFlow.Plugin.Scripts
             }
         }
 
-        public FlowBehaviour(string typeOfTrigger, string id, string triggerObjectId, string targetObjectId, FlowAction flowAction)
+        public FlowBehaviour(string typeOfTrigger, string id, string triggerObjectId, string targetObjectId, dynamic flowAction)
         {
             TypeOfTrigger = typeOfTrigger;
             Id = id;
