@@ -45,6 +45,9 @@ namespace RealityFlow.Plugin.Scripts
         [JsonProperty("_ObjectList")]
         public IEnumerable<FlowTObject> _ObjectList { get => _objectList; set => _objectList = value; }
 
+        [JsonProperty("_BehaviourList")]
+        public List<FlowBehaviour> behaviourList { get; set; }
+
         public FlowProject(string flowId, string description, int dateModified, string projectName/*, IEnumerable<FlowTObject> ObjectList*/)
         {
             Id = flowId;

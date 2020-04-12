@@ -143,7 +143,7 @@ namespace Packages.realityflow_package.Runtime.scripts
         public static void CreateBehaviour(FlowBehaviour behaviour, string projectId, List<string> behavioursToLinkTo, CreateBehaviour_Received.CreateBehaviourReceived_EventHandler callbackFunction)
         {
             CreateBehaviour_SendToServer createBehaviour = new CreateBehaviour_SendToServer(behaviour, projectId, behavioursToLinkTo);
-            FlowWebsocket.SendMessage(createBehaviour);
+            _FlowWebsocket.SendMessage(createBehaviour);
 
             CreateBehaviour_Received.ReceivedEvent += callbackFunction;
         }
@@ -153,7 +153,7 @@ namespace Packages.realityflow_package.Runtime.scripts
         public static void DeleteBehaviour(FlowBehaviour behaviour, string behaviourId, string projectId, DeleteBehaviour_Received.DeleteBehaviourReceived_EventHandler callbackFunction)
         {
             DeleteBehaviour_SendToServer deleteBehaviour = new DeleteBehaviour_SendToServer(behaviour, behaviourId, projectId);
-            FlowWebsocket.SendMessage(deleteBehaviour);
+            _FlowWebsocket.SendMessage(deleteBehaviour);
 
             DeleteBehaviour_Received.ReceivedEvent += callbackFunction;
         }
@@ -161,7 +161,7 @@ namespace Packages.realityflow_package.Runtime.scripts
         public static void UpdateBehaviour(FlowBehaviour behaviour, string projectId, UpdateBehaviour_Received.UpdateBehaviourReceived_EventHandler callbackFunction)
         {
             UpdateBehaviour_SendToServer updateBehaviour = new UpdateBehaviour_SendToServer(behaviour, projectId);
-            FlowWebsocket.SendMessage(updateBehaviour);
+            _FlowWebsocket.SendMessage(updateBehaviour);
 
             UpdateBehaviour_Received.ReceivedEvent += callbackFunction;
         }
@@ -401,21 +401,39 @@ namespace Packages.realityflow_package.Runtime.scripts
 
             Selection.activeObject = asset;
            // GameObject bemObject = GameObject.FindGameObjectWithTag("BehaviourEventManager");
-
-            /*if (bemObject == null)
+            if(eventArgs.message.WasSuccessful == true)
             {
-                bemObject = new GameObject();
-                bemObject.AddComponent<BehaviourEventManager>();
-                bemObject.name = "BehaviourEventManager";
-                bemObject.tag = "BehaviourEventManager";
+                ConfigurationSingleton.CurrentProject = eventArgs.message.flowProject;
+
+                // Clear the behaviour list and BEM
+                BehaviourEventManager.Clear();
+                BehaviourEventManager.Initialize();
+
+
+                Debug.Log("Number of behaviours in bem = " + BehaviourEventManager.BehaviourList.Count);
+
+                if(eventArgs.message.flowProject.behaviourList == null)
+                {
+                    Debug.Log("It's null huh");
+                }
+                else
+                {
+                    Debug.Log("ya yeet");
+                }
+
+                foreach(FlowBehaviour fb in eventArgs.message.flowProject.behaviourList)
+                {
+                    BehaviourEventManager.CreateNewBehaviour(fb);
+                }
+
+                Debug.Log("Number of behaviours in bem = " + BehaviourEventManager.BehaviourList.Count);
+
+                foreach (FlowBehaviour fb in BehaviourEventManager.BehaviourList.Values)
+                {
+                    Debug.Log(fb.flowAction.ActionType);
+                }
             }
-
-            BehaviourEventManager bem = bemObject.GetComponent<BehaviourEventManager>();
-            bem.Initialize();*/
-
-            BehaviourEventManager.Clear();
-            BehaviourEventManager.Initialize();
-
+            
         }
 
         private static void _LeaveProject(object sender, LeaveProjectMessageEventArgs eventArgs)
@@ -423,6 +441,10 @@ namespace Packages.realityflow_package.Runtime.scripts
             if(eventArgs.message.WasSuccessful == true)
             {
                 Debug.Log("Successfully left project");
+
+                // Clear the behaviour list and BEM
+                BehaviourEventManager.Clear();
+                BehaviourEventManager.Initialize();
             }
             else
             {

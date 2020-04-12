@@ -11,13 +11,14 @@ using System.Collections;
 using Packages.realityflow_package.Runtime.scripts.Structures;
 using Packages.realityflow_package.Runtime.scripts.Structures.Actions;
 using Behaviours;
+using System.Globalization;
 
 [CustomEditor(typeof(FlowWebsocket))]
 public class FlowNetworkManagerEditor : EditorWindow
 {
     //private const string Url = "ws://localhost:8999/";
     private string _Url = "ws://plato.mrl.ai:8999";
-    //private const string Url = "ws://68e6e63b.ngrok.io";
+    private const string Url = "ws://a73c9fa8.ngrok.io";
 
     // View parameters
     private Rect headerSection;
@@ -37,6 +38,21 @@ public class FlowNetworkManagerEditor : EditorWindow
     private delegate void ChangeView();
 
     private IList<FlowProject> _ProjectList = null;
+
+    private string defaultZero = "0";
+    private string positionX;
+    private string positionY;
+    private string positionZ;
+
+    private string rotationX;
+    private string rotationY;
+    private string rotationZ;
+
+    private string scaleX;
+    private string scaleY;
+    private string scaleZ;
+
+
 
     //FlowTObject newObject = null;// = new FlowTObject(new Color(0, 0, 0, 0), "TestFlowId", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "TestObject");
     //FlowUser newUser = null;// = new FlowUser("testUsername", "TestPassword");
@@ -130,6 +146,7 @@ public class FlowNetworkManagerEditor : EditorWindow
         _ViewDictionary.Add(EWindowView.CREATE_CLICK, _CreateClickView);
         _ViewDictionary.Add(EWindowView.CREATE_ENABLE, _CreateEnableView);
         _ViewDictionary.Add(EWindowView.CREATE_DISABLE, _CreateDisableView);
+        _ViewDictionary.Add(EWindowView.CREATE_SNAPZONE, _CreateSnapZoneView);
 
 
     }
@@ -797,18 +814,18 @@ public class FlowNetworkManagerEditor : EditorWindow
 
     private void _CreateBehaviourView()
     {
-        //Debug.Log("All the current Behaviours: ");
+        // Debug.Log("All the current Behaviours: ");
 
-        foreach(FlowBehaviour fb in BehaviourEventManager.BehaviourList.Values)
-        {
-            //Debug.Log(fb.BehaviourName + " " + fb.TargetObjectId + " " + fb.TriggerObjectId + " " + fb.Id + "\n");
-        }
+        //foreach(FlowBehaviour fb in BehaviourEventManager.BehaviourList.Values)
+        //{
+        //    Debug.Log(fb.BehaviourName + " " + fb.TargetObjectId + " " + fb.TriggerObjectId + " " + fb.Id + "\n");
+        //}
 
         //Debug.Log("All the objects in the mapping: ");
-        foreach(FlowTObject t in FlowTObject.idToGameObjectMapping.Values)
-        {
-            //Debug.Log(t.Name + "\n");
-        }
+        //foreach(FlowTObject t in FlowTObject.idToGameObjectMapping.Values)
+        //{
+        //    Debug.Log(t.Name + "\n");
+        //}
 
 
         if (GUILayout.Button("Back", GUILayout.Height(30), GUILayout.Width(40)))
@@ -823,22 +840,29 @@ public class FlowNetworkManagerEditor : EditorWindow
         EditorGUILayout.LabelField("Choose one of the triggers below.");
         EditorGUILayout.BeginHorizontal();
 
-        // Create "Logout" Button and define onClick action
-        if (GUILayout.Button("Click", GUILayout.Height(75), GUILayout.Width(92)))
+        if (!addingChain)
         {
-            window = EWindowView.CREATE_CLICK;
-        }
+            // Create "Logout" Button and define onClick action
+            if (GUILayout.Button("Click", GUILayout.Height(75), GUILayout.Width(92)))
+            {
+                window = EWindowView.CREATE_CLICK;
+            }
 
-        // Create "Logout" Button and define onClick action
-        if (GUILayout.Button("On Collision", GUILayout.Height(75), GUILayout.Width(92)))
-        {
-            //window = EWindowView.CREATE_CLICK;
+            // Create "Logout" Button and define onClick action
+            if (GUILayout.Button("On Collision", GUILayout.Height(75), GUILayout.Width(92)))
+            {
+                //window = EWindowView.CREATE_CLICK;
+            }
         }
+        
+
+        
 
         
         EditorGUILayout.EndHorizontal();
 
-        if (addingChain)
+        //if (/*addingChain*/)
+        if(true)
         {
 
 
@@ -850,7 +874,7 @@ public class FlowNetworkManagerEditor : EditorWindow
      
             if (GUILayout.Button("Snapzone", GUILayout.Height(75), GUILayout.Width(92)))
             {
-
+                window = EWindowView.CREATE_SNAPZONE;
             }
             if (GUILayout.Button("Enable", GUILayout.Height(75), GUILayout.Width(92)))
             {
@@ -866,6 +890,10 @@ public class FlowNetworkManagerEditor : EditorWindow
         }
     }
 
+    private void CreatePositionScaleRotation()
+    {
+
+    }
 
     private void _CreateTeleportView()
     {
@@ -878,10 +906,17 @@ public class FlowNetworkManagerEditor : EditorWindow
 
         GUILayout.Space(10f);
         EditorGUILayout.LabelField("Teleport");
+        //GUILayout.Space(30f);
+
+        EditorGUILayout.LabelField("Select the object that will teleport.");
         GUILayout.Space(30f);
 
         selectedTrigger = EditorGUI.Popup(new Rect(0, 100, position.width, 30), "TriggerObject:", selectedTrigger, objectOptions);
-        selectedTarget = EditorGUI.Popup(new Rect(0, 150, position.width, 30), "TargetObject:", selectedTarget, objectOptions);
+       // selectedTarget = EditorGUI.Popup(new Rect(0, 150, position.width, 30), "TargetObject:", selectedTarget, objectOptions);
+        GUILayout.Space(30f);
+
+        CreateTransformUI("teleport");
+
 
         GUILayout.Space(120f);
         GUILayout.Label("Add another interaction?");
@@ -890,21 +925,13 @@ public class FlowNetworkManagerEditor : EditorWindow
         if (GUILayout.Button("Yes", GUILayout.Height(30), GUILayout.Width(40)))
         {
             string firstObjectId = objectIds[selectedTrigger].ToString();
-            string secondObjectId = objectIds[selectedTarget].ToString();
+            //string secondObjectId = objectIds[selectedTarget].ToString();
 
-            GameObject firstObject = FlowTObject.idToGameObjectMapping[firstObjectId].AttachedGameObject;
+           // GameObject firstObject = FlowTObject.idToGameObjectMapping[firstObjectId].AttachedGameObject;
 
             addingChain = true;
 
-            TeleportAction teleportAction = new TeleportAction(new TeleportCoordinates(firstObject, false));
-
-            FlowAction flowAction = new FlowAction();
-            flowAction.ActionType = "Teleport";
-
-            string id = Guid.NewGuid().ToString();
-
-            FlowBehaviour fb = new FlowBehaviour("Immediate", id, firstObjectId, secondObjectId, flowAction);
-            AddBehaviour(fb);
+            CreateTeleportCoordinates(firstObjectId, false, positionX, positionY, positionZ, rotationX, rotationY, rotationZ, scaleX, scaleY, scaleZ);
 
             window = EWindowView.CREATE_BEHAVIOUR;
         }
@@ -912,15 +939,8 @@ public class FlowNetworkManagerEditor : EditorWindow
         if (GUILayout.Button("No", GUILayout.Height(30), GUILayout.Width(40)))
         {
             string firstObject = objectIds[selectedTrigger].ToString();
-            string secondObject = objectIds[selectedTarget].ToString();
-            
-            FlowAction flowAction = new FlowAction();
-            flowAction.ActionType = "Teleport";
 
-            string id = Guid.NewGuid().ToString();
-
-            FlowBehaviour fb = new FlowBehaviour("Immediate", id, firstObject, secondObject, flowAction);
-            AddBehaviour(fb);
+            CreateTeleportCoordinates(firstObject, false, positionX, positionY, positionZ, rotationX, rotationY, rotationZ, scaleX, scaleY, scaleZ);
 
             addingChain = false;
             showAllOptions = false;
@@ -929,6 +949,110 @@ public class FlowNetworkManagerEditor : EditorWindow
 
         GUILayout.EndHorizontal();
         GUILayout.EndVertical();
+    }
+
+    /// <summary>
+    /// Converts each 
+    /// </summary>
+    /// <param name="firstObjectId"></param>
+    /// <param name="isSnapZone"></param>
+    /// <param name="posX">X position</param>
+    /// <param name="posY">Y position</param>
+    /// <param name="posZ">Z position</param>
+    /// <param name="rotX">X rotation</param>
+    /// <param name="rotY">Y rotation</param>
+    /// <param name="rotZ">Z rotation</param>
+    /// <param name="scaleX">X scale</param>
+    /// <param name="scaleY">Y Scale</param>
+    /// <param name="scaleZ">Z Scale</param>
+    public void CreateTeleportCoordinates(string firstObjectId, Boolean isSnapZone, string posX, string posY, string posZ, string rotX, string rotY, string rotZ, string scaleX, string scaleY, string scaleZ)
+    {
+        // Convert position coordinates into a Vector3
+        Vector3 positionCoords = new Vector3(float.Parse(posX, CultureInfo.InvariantCulture.NumberFormat),
+                                                 float.Parse(posY, CultureInfo.InvariantCulture.NumberFormat),
+                                                 float.Parse(posZ, CultureInfo.InvariantCulture.NumberFormat));
+
+        // Convert rotation coordinates into a Quaternion
+        Quaternion rotationCoords = new Quaternion(float.Parse(rotX, CultureInfo.InvariantCulture.NumberFormat),
+                                                   float.Parse(rotY, CultureInfo.InvariantCulture.NumberFormat),
+                                                   float.Parse(rotZ, CultureInfo.InvariantCulture.NumberFormat),
+                                                   1f);
+
+        // Convert scale coordinates into a Vector3
+        Vector3 scaleCoords = new Vector3(float.Parse(scaleX, CultureInfo.InvariantCulture.NumberFormat),
+                                          float.Parse(scaleY, CultureInfo.InvariantCulture.NumberFormat),
+                                          float.Parse(scaleZ, CultureInfo.InvariantCulture.NumberFormat));
+
+
+        // Create the TeleportCoordinates and pass it into the constructor for TeleportAction
+        TeleportCoordinates teleportCoordinates = new TeleportCoordinates(positionCoords, rotationCoords, scaleCoords, isSnapZone);
+        TeleportAction teleportAction = new TeleportAction(teleportCoordinates);
+
+        string id = Guid.NewGuid().ToString();
+
+        FlowBehaviour fb = new FlowBehaviour("Immediate", id, firstObjectId, firstObjectId, teleportAction);
+        AddBehaviour(fb);
+    }
+
+
+    public void CreateTransformUI(string behaviourType)
+    {
+
+        // Setup the coordinates that the object will teleport to
+        if (behaviourType.Equals("teleport"))
+        {
+            EditorGUILayout.LabelField("Enter the position, scale, and rotation (in floats) that the object will " + behaviourType + " to.");
+        }
+            
+
+        if (behaviourType.Equals("snap"))
+        {
+            EditorGUILayout.LabelField("Enter the position, scale, and rotation relative to the zone object that the snapping object will " + behaviourType + " into.");
+        }
+
+        GUILayout.BeginHorizontal();
+
+        GUILayout.Label("Position X");
+        //string positionX;
+        //EditorGUILayout.TextField()
+        positionX = EditorGUILayout.TextField(positionX);
+
+        GUILayout.Label("Position Y");
+        positionY = EditorGUILayout.TextField(positionY);
+
+        GUILayout.Label("Position Z");
+        positionZ = EditorGUILayout.TextField(positionZ);
+
+        GUILayout.EndHorizontal();
+
+
+        GUILayout.BeginHorizontal();
+
+        GUILayout.Label("Rotation X");
+        rotationX = EditorGUILayout.TextField(rotationX);
+
+        GUILayout.Label("Rotation Y");
+        rotationY = EditorGUILayout.TextField(rotationY);
+
+        GUILayout.Label("Rotation Z");
+        rotationZ = EditorGUILayout.TextField(rotationZ);
+
+        GUILayout.EndHorizontal();
+
+
+        GUILayout.BeginHorizontal();
+
+        GUILayout.Label("Scale X");
+        scaleX = EditorGUILayout.TextField(scaleX);
+
+        GUILayout.Label("Scale Y");
+        scaleY = EditorGUILayout.TextField(scaleY);
+
+        GUILayout.Label("Scale Z");
+        scaleZ = EditorGUILayout.TextField(scaleZ);
+
+        GUILayout.EndHorizontal();
+
     }
 
     private void _CreateClickView()
@@ -1071,7 +1195,8 @@ public class FlowNetworkManagerEditor : EditorWindow
             
             FlowBehaviour fb = new FlowBehaviour("Immediate", id, firstObject, firstObject, flowAction);
             AddBehaviour(fb);
-            
+
+            addingChain = false;
             window = EWindowView.PROJECT_HUB;
         }
 
@@ -1079,6 +1204,62 @@ public class FlowNetworkManagerEditor : EditorWindow
         GUILayout.EndVertical();
     }
 
+    private void _CreateSnapZoneView()
+    {
+        GUILayout.BeginVertical();
+
+        if (GUILayout.Button("Back", GUILayout.Height(30), GUILayout.Width(40)))
+        {
+            window = EWindowView.CREATE_BEHAVIOUR;
+        }
+
+        GUILayout.Space(10f);
+        EditorGUILayout.LabelField("Snap Zone");
+        //GUILayout.Space(30f);
+
+        EditorGUILayout.LabelField("Select the snap zone object. Then select the object that will snap into the snap zone object.");
+        GUILayout.Space(30f);
+
+        selectedTarget = EditorGUI.Popup(new Rect(0, 100, position.width, 30), "Snap Zone Object:", selectedTarget, objectOptions);
+        selectedTrigger = EditorGUI.Popup(new Rect(0, 130, position.width, 30), "Snapping Object:", selectedTrigger, objectOptions);
+        
+        GUILayout.Space(80f);
+
+        CreateTransformUI("snap");
+
+
+        GUILayout.Space(100f);
+        GUILayout.Label("Add another interaction?");
+        GUILayout.BeginHorizontal();
+
+        if (GUILayout.Button("Yes", GUILayout.Height(30), GUILayout.Width(40)))
+        {
+            string firstObjectId = objectIds[selectedTrigger].ToString();
+            //string secondObjectId = objectIds[selectedTarget].ToString();
+
+            // GameObject firstObject = FlowTObject.idToGameObjectMapping[firstObjectId].AttachedGameObject;
+
+            addingChain = true;
+
+            CreateTeleportCoordinates(firstObjectId, true, positionX, positionY, positionZ, rotationX, rotationY, rotationZ, scaleX, scaleY, scaleZ);
+
+            window = EWindowView.CREATE_BEHAVIOUR;
+        }
+
+        if (GUILayout.Button("No", GUILayout.Height(30), GUILayout.Width(40)))
+        {
+            string firstObject = objectIds[selectedTrigger].ToString();
+
+            CreateTeleportCoordinates(firstObject, true, positionX, positionY, positionZ, rotationX, rotationY, rotationZ, scaleX, scaleY, scaleZ);
+
+            addingChain = false;
+            showAllOptions = false;
+            window = EWindowView.PROJECT_HUB;
+        }
+
+        GUILayout.EndHorizontal();
+        GUILayout.EndVertical();
+    }
 
 
     /// <summary>
@@ -1088,6 +1269,7 @@ public class FlowNetworkManagerEditor : EditorWindow
     /// <param name="flowbehaviour"></param>
     private void AddBehaviour(FlowBehaviour newFlowBehaviour)
     {
+        Debug.Log("About to add behaviour");
         // Create the list of behaviours that need to add newFlowBehaviour to their chain 
         List<string> behavioursToLinkTo = new List<string>();
         if(BehaviourEventManager.PreviousBehaviourId != null)

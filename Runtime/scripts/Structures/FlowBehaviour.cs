@@ -1,11 +1,13 @@
 ﻿using Newtonsoft.Json;
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 using UnityEngine;
 using Packages.realityflow_package.Runtime.scripts.Structures.Actions;
 using Behaviours;
 using Packages.realityflow_package.Runtime.scripts.Messages;
+using Newtonsoft.Json.Linq;
 
 namespace RealityFlow.Plugin.Scripts
 {
@@ -43,11 +45,12 @@ namespace RealityFlow.Plugin.Scripts
             get => _flowAction;
             set
             {
+
                 if(value == null || (value.GetType() == typeof(string) && value == "null"))
                 {
                     _flowAction = new FlowAction(true);
                 }
-                else if (value.GetType().IsSubclassOf(typeof(FlowAction)) && value.GetType() == typeof(FlowAction))
+                else if (value.GetType().IsSubclassOf(typeof(FlowAction)) == false && value.GetType() != typeof(FlowAction))
                 {
                     FlowAction baseAction = MessageSerializer.DesearializeObject<FlowAction>(value);
                     _flowAction = FlowAction.ConvertToChildClass(value, baseAction.ActionType);
@@ -71,6 +74,22 @@ namespace RealityFlow.Plugin.Scripts
             TriggerObjectId = triggerObjectId;
             TargetObjectId = targetObjectId;
             NextBehaviour = nextBehaviour;
+
+            //NextBehaviour = new List<string>();
+            //if (nextBehaviour is String)
+            //{
+            //    if(nextBehaviour.Equals("[]"))
+            //    Debug.Log("it's zero");
+            //    NextBehaviour = new List<string>();
+            //}
+            //else
+            //{
+            //    if(nextBehaviour.Count > 0)
+            //    {
+            //        NextBehaviour.Add(nextBehaviour);
+            //    }
+            //}
+
             this.flowAction = flowAction;
             EventCalled += BehaviourEventManager.ListenToEvents;
             BehaviourName = typeOfTrigger;
@@ -124,42 +143,51 @@ namespace RealityFlow.Plugin.Scripts
         /// <param name="scriptName"></param>
         private void OnCallDown(string scriptName)
         {
-            Debug.Log("here!!");
+            Debug.Log("Inside OnCallDown");
 
             GameObject triggerObject = BehaviourEventManager.GetGoFromGuid(TriggerObjectId);
             GameObject targetObject = BehaviourEventManager.GetGoFromGuid(TargetObjectId);
 
-            CallBehaviourEvent();
+            // If it's a click event, just trigger the behaviours in its next behaviour list
+            if (scriptName.Equals("Click"))
+            {
+                if (NextBehaviour.Count > 0)
+                {
+                    foreach (string chainedBehaviourId in NextBehaviour)
+                    {
+                        if (BehaviourEventManager.BehaviourList.TryGetValue(chainedBehaviourId, out FlowBehaviour chainedBehaviour))
+                        {
+                            chainedBehaviour.EventTrigger();
+                        }
+
+                        Debug.Log("execute chained events");
+                    }
+                }
+
+                return;
+            }
+
+            // is meant to communicate with the server
+           // CallBehaviourEvent();
 
             // figure out how to add specific code to each script here
             switch (scriptName)
             {
                 case "Teleport":
                     // take in input from colliding object that determines teleport coordinates (teleport nodes)
-                    Vector3 coords = targetObject.GetComponent<TeleportCoordinates>().GetCoordinates();
+
+                    /*** Fix this so that it gets the teleport coordinates from the flowaction ***/
+                    //Vector3 coords = targetObject.GetComponent<TeleportCoordinates>().GetCoordinates();
+                    Vector3 coords = flowAction.teleportCoordinates.GetCoordinates();
                     triggerObject.transform.position = coords;
                     // Set teleport rest for 5 seconds
-                    return;
-                case "Click":
-                    // if object received click input, then trigger chained event
-                    if (NextBehaviour.Count > 0)
-                    {
-                        foreach(string chainedBehaviourId in NextBehaviour)
-                        {
-                            if(BehaviourEventManager.BehaviourList.TryGetValue(chainedBehaviourId, out FlowBehaviour chainedBehaviour))
-                            {
-                                chainedBehaviour.EventTrigger();
-                            }
-                            
-                            Debug.Log("execute chained events");
-                        }
-                    }
                     return;
                 case "SnapZone":
                     // take in more info than teleport, but basically acts as a teleport within the other object
                     if (targetObject.GetComponent<TeleportCoordinates>().IsSnapZone)
                     {
-                        triggerObject.transform.position = targetObject.transform.position + targetObject.GetComponent<TeleportCoordinates>().GetCoordinates();
+                        //triggerObject.transform.position = targetObject.transform.position + targetObject.GetComponent<TeleportCoordinates>().GetCoordinates();
+                        triggerObject.transform.position = targetObject.transform.position + flowAction.teleportCoordinates.GetCoordinates();
                         triggerObject.transform.localScale = targetObject.GetComponent<TeleportCoordinates>().GetScale();
                         triggerObject.transform.rotation = targetObject.GetComponent<TeleportCoordinates>().GetRotation();
                         // set snap zone rest until leaves snap zone
