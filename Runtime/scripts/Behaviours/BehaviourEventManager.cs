@@ -1,4 +1,5 @@
 ﻿using Microsoft.MixedReality.Toolkit.UI;
+using Microsoft.MixedReality.Toolkit.Utilities;
 using Packages.realityflow_package.Runtime.scripts.Structures.Actions;
 using RealityFlow.Plugin.Scripts;
 using System;
@@ -11,15 +12,15 @@ namespace Behaviours
     public static class BehaviourEventManager
     {
         public static event Action<string> SendEventDown;
-        public static Dictionary<string, GameObject> GoIds = null;
+        public static SerializableDictionary<string, GameObject> GoIds = null;
         public static States DefaultInteractableStates;
-        public static Dictionary<string, FlowBehaviour> BehaviourList;
+        public static SerializableDictionary<string, FlowBehaviour> BehaviourList;
         public static string PreviousBehaviourId = null;
 
         public static void Initialize()
         {
-            GoIds = new Dictionary<string, GameObject>();
-            BehaviourList = new Dictionary<string, FlowBehaviour>();
+            GoIds = new SerializableDictionary<string, GameObject>();
+            BehaviourList = new SerializableDictionary<string, FlowBehaviour>();
         }
 
         public static void Clear()
@@ -201,7 +202,7 @@ namespace Behaviours
 
             if(GoIds == null)
             {
-                GoIds = new Dictionary<string, GameObject>();
+                GoIds = new SerializableDictionary<string, GameObject>();
             }
 
             if(GoIds.TryGetValue(guid, out temp))

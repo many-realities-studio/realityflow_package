@@ -4,6 +4,7 @@ using UnityEngine;
 using Microsoft.MixedReality.Toolkit.UI;
 using UnityEngine.EventSystems;
 using RealityFlow.Plugin.Scripts;
+using Microsoft.MixedReality.Toolkit.Utilities;
 
 namespace Behaviours
 {
@@ -12,10 +13,10 @@ namespace Behaviours
     /// </summary>
     public class ObjectIsInteractable : MonoBehaviour, IPointerClickHandler
     {
-        private Dictionary<string, bool> interactableWith;
-        private Dictionary<FlowBehaviour, string> interactableEvents;
+        private static SerializableDictionary<string, bool> interactableWith;
+        private static SerializableDictionary<FlowBehaviour, string> interactableEvents;
 
-        public event Action SetEventTrigger;
+        public static event Action SetEventTrigger;
 
         private Interactable interactableScript;
 
@@ -63,6 +64,7 @@ namespace Behaviours
 
         public void OnPointerClick(PointerEventData eventData)
         {
+            Debug.Log("Pointer clicked");
             if (eventData.pointerPressRaycast.gameObject == gameObject)
             {
                 Debug.Log("clicked");
@@ -102,8 +104,8 @@ namespace Behaviours
         public void Initialize(string objectId)
         {
             this.objectId = objectId;
-            interactableWith = new Dictionary<string, bool>();
-            interactableEvents = new Dictionary<FlowBehaviour, string>();
+            interactableWith = new SerializableDictionary<string, bool>();
+            interactableEvents = new SerializableDictionary<FlowBehaviour, string>();
 
             if (!(SystemInfo.deviceType == DeviceType.Desktop || SystemInfo.deviceType == DeviceType.Handheld))
             {
@@ -174,7 +176,7 @@ namespace Behaviours
         {
             if(interactableEvents == null)
             {
-                interactableEvents = new Dictionary<FlowBehaviour, string>();
+                interactableEvents = new SerializableDictionary<FlowBehaviour, string>();
             }
             
             if (!interactableEvents.ContainsKey(e))
