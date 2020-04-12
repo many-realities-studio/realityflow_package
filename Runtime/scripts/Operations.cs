@@ -72,9 +72,9 @@ namespace Packages.realityflow_package.Runtime.scripts
             if (FlowWebsocket.websocket.ReadyState == WebSocketSharp.WebSocketState.Open)
             {
                 Login_SendToServer loginMessage = new Login_SendToServer(flowUser);
-                _FlowWebsocket.SendMessage(loginMessage);
+                FlowWebsocket.SendMessage(loginMessage);
 
-                ConfigurationSingleton.CurrentUser = flowUser;
+                ConfigurationSingleton.SingleInstance.CurrentUser = flowUser;
 
                 LoginUser_Received.ReceivedEvent += callbackFunction; 
             }
@@ -83,7 +83,7 @@ namespace Packages.realityflow_package.Runtime.scripts
         public static void Logout(FlowUser flowUser)
         {
             Logout_SendToServer logoutMessage = new Logout_SendToServer(flowUser);
-            _FlowWebsocket.SendMessage(logoutMessage);
+            FlowWebsocket.SendMessage(logoutMessage);
 
             _FlowWebsocket.Disconnect();
         }
@@ -95,7 +95,7 @@ namespace Packages.realityflow_package.Runtime.scripts
             if (FlowWebsocket.websocket.ReadyState == WebSocketSharp.WebSocketState.Open)
             {
                 RegisterUser_SendToServer register = new RegisterUser_SendToServer(new FlowUser(username, password));
-                _FlowWebsocket.SendMessage(register);
+                FlowWebsocket.SendMessage(register);
 
                 RegisterUser_Received.ReceivedEvent += callbackFunction; 
             }
@@ -108,7 +108,7 @@ namespace Packages.realityflow_package.Runtime.scripts
         {
             CreateObject_SendToServer createObject =
                 new CreateObject_SendToServer(flowObject, /*flowUser,*/ projectId);
-            _FlowWebsocket.SendMessage(createObject);
+            FlowWebsocket.SendMessage(createObject);
 
             CreateObject_Received.ReceivedEvent += callbackFunction;
         }
@@ -116,7 +116,7 @@ namespace Packages.realityflow_package.Runtime.scripts
         public static void UpdateObject(FlowTObject flowObject, FlowUser flowUser, string projectId, UpdateObject_Received.UpdateObjectReceived_EventHandler callbackFunction)
         {
             UpdateObject_SendToServer updateObject = new UpdateObject_SendToServer(flowObject, /*flowUser,*/ projectId);
-            _FlowWebsocket.SendMessage(updateObject);
+            FlowWebsocket.SendMessage(updateObject);
 
             UpdateObject_Received.ReceivedEvent += callbackFunction;
         }
@@ -124,7 +124,7 @@ namespace Packages.realityflow_package.Runtime.scripts
         public static void FinalizedUpdateObject(FlowTObject flowObject, FlowUser flowUser, string projectId, FinalizedUpdateObject_Received.FinalizedUpdateObjectRecieved_EventHandler callbackFunction)
         {
             FinalizedUpdateObject_SendToServer finalUpdateObject = new FinalizedUpdateObject_SendToServer(flowObject, projectId);
-            _FlowWebsocket.SendMessage(finalUpdateObject);
+            FlowWebsocket.SendMessage(finalUpdateObject);
 
             FinalizedUpdateObject_Received.ReceivedEvent += callbackFunction;
         }
@@ -132,7 +132,7 @@ namespace Packages.realityflow_package.Runtime.scripts
         public static void DeleteObject(string idOfObjectToDelete, string projectId, DeleteObject_Received.DeleteObjectReceived_EventHandler callbackFunction)
         {
             DeleteObject_SendToServer deleteObject = new DeleteObject_SendToServer(projectId, idOfObjectToDelete);
-            _FlowWebsocket.SendMessage(deleteObject);
+            FlowWebsocket.SendMessage(deleteObject);
 
             DeleteObject_Received.ReceivedEvent += callbackFunction;
         }
@@ -174,7 +174,7 @@ namespace Packages.realityflow_package.Runtime.scripts
         public static void CreateProject(FlowProject flowProject, FlowUser flowUser, CreateProject_Received.CreateProjectReceived_EventHandler callbackFunction)
         {
             CreateProject_SendToServer createProject = new CreateProject_SendToServer(flowProject, flowUser);
-            _FlowWebsocket.SendMessage(createProject);
+            FlowWebsocket.SendMessage(createProject);
 
             CreateProject_Received.ReceivedEvent += callbackFunction;
         }
@@ -182,7 +182,7 @@ namespace Packages.realityflow_package.Runtime.scripts
         public static void DeleteProject(FlowProject flowProject, FlowUser flowUser, DeleteProject_Received.DeleteProjectReceived_EventHandler callbackFunction)
         {
             DeleteProject_SendToServer deleteProject = new DeleteProject_SendToServer(flowProject, flowUser);
-            _FlowWebsocket.SendMessage(deleteProject);
+            FlowWebsocket.SendMessage(deleteProject);
 
             DeleteProject_Received.ReceivedEvent += callbackFunction;
         }
@@ -196,7 +196,7 @@ namespace Packages.realityflow_package.Runtime.scripts
             //else
             //{
             OpenProject_SendToServer openProject = new OpenProject_SendToServer(projectId, flowUser);
-            _FlowWebsocket.SendMessage(openProject);
+            FlowWebsocket.SendMessage(openProject);
             
             OpenProject_Received.ReceivedEvent += callbackFunction;
             //}
@@ -205,7 +205,7 @@ namespace Packages.realityflow_package.Runtime.scripts
         public static void LeaveProject(string projectId, FlowUser flowUser, LeaveProject_Received.LeaveProjectReceived_EventHandler callbackFunction)
         {
             LeaveProject_SendToServer leaveProject = new LeaveProject_SendToServer(projectId, flowUser);
-            _FlowWebsocket.SendMessage(leaveProject);
+            FlowWebsocket.SendMessage(leaveProject);
 
             LeaveProject_Received.ReceivedEvent += callbackFunction;
         }
@@ -213,7 +213,7 @@ namespace Packages.realityflow_package.Runtime.scripts
         public static void GetAllUserProjects(FlowUser flowUser, GetAllUserProjects_Received.GetAllUserProjects_EventHandler callbackFunction)
         {
             GetAllUserProjects_SendToServer getAllUserProjects = new GetAllUserProjects_SendToServer(flowUser);
-            _FlowWebsocket.SendMessage(getAllUserProjects);
+            FlowWebsocket.SendMessage(getAllUserProjects);
 
             GetAllUserProjects_Received.ReceivedEvent += callbackFunction;
         }
@@ -225,7 +225,7 @@ namespace Packages.realityflow_package.Runtime.scripts
         public static void JoinRoom(string projectId, FlowUser flowUser, JoinRoom_Received.JoinRoomReceived_EventHandler callbackFunction)
         {
             JoinRoom_SendToServer joinRoom = new JoinRoom_SendToServer(projectId, flowUser);
-            _FlowWebsocket.SendMessage(joinRoom);
+            FlowWebsocket.SendMessage(joinRoom);
 
             JoinRoom_Received.ReceivedEvent += callbackFunction;
         }
@@ -237,7 +237,7 @@ namespace Packages.realityflow_package.Runtime.scripts
         public static void CheckoutObject(string objectID, string projectID, CheckoutObject_Received.CheckoutObjectReceived_EventHandler callbackFunction)
         {
             CheckoutObject_SendToServer checkoutObject = new CheckoutObject_SendToServer(objectID, projectID);
-            _FlowWebsocket.SendMessage(checkoutObject);
+            FlowWebsocket.SendMessage(checkoutObject);
 
             CheckoutObject_Received.ReceivedEvent += callbackFunction;
         }
@@ -245,7 +245,7 @@ namespace Packages.realityflow_package.Runtime.scripts
         public static void CheckinObject(string objectID, string projectID, CheckinObject_Received.CheckinObjectReceived_EventHandler callbackFunction)
         {
             CheckinObject_SendToServer checkinObject = new CheckinObject_SendToServer(objectID, projectID);
-            _FlowWebsocket.SendMessage(checkinObject);
+            FlowWebsocket.SendMessage(checkinObject);
 
             CheckinObject_Received.ReceivedEvent += callbackFunction;
         }
@@ -363,9 +363,18 @@ namespace Packages.realityflow_package.Runtime.scripts
 
         private static void _CreateProject(object sender, CreateProjectMessageArgs eventArgs)
         {
-            ConfigurationSingleton.CurrentProject = eventArgs.message.flowProject;
+            ConfigurationSingleton.SingleInstance.CurrentProject = eventArgs.message.flowProject;
+            //ConfigurationSingleton asset = ScriptableObject.CreateInstance<ConfigurationSingleton>();
+            //asset.CurrentProject = ConfigurationSingleton.SingleInstance.CurrentProject;
+            //asset.CurrentUser = ConfigurationSingleton.SingleInstance.CurrentUser;
+            //AssetDatabase.CreateAsset(asset, "Assets/RealityFlowConfiguration.asset");
+            //AssetDatabase.SaveAssets();
 
-            Operations.OpenProject(ConfigurationSingleton.CurrentProject.Id, ConfigurationSingleton.CurrentUser, (_, e) => { Debug.Log("opened project after create: " + e.message.WasSuccessful); });
+            //EditorUtility.FocusProjectWindow();
+
+            //Selection.activeObject = asset;
+
+            Operations.OpenProject(ConfigurationSingleton.SingleInstance.CurrentProject.Id, ConfigurationSingleton.SingleInstance.CurrentUser, (_, e) => { Debug.Log("opened project after create: " + e.message.WasSuccessful); });
         }
 
         private static void _DeleteProject(object sender, ConfirmationMessageEventArgs eventArgs)
@@ -380,8 +389,17 @@ namespace Packages.realityflow_package.Runtime.scripts
 
         private static void _OpenProject(object sender, OpenProjectMessageEventArgs eventArgs)
         {
-            ConfigurationSingleton.CurrentProject = eventArgs.message.flowProject;
+            ConfigurationSingleton.SingleInstance.CurrentProject = eventArgs.message.flowProject;
 
+            ConfigurationSingleton asset = ScriptableObject.CreateInstance<ConfigurationSingleton>();
+            asset.CurrentProject = ConfigurationSingleton.SingleInstance.CurrentProject;
+            asset.CurrentUser = ConfigurationSingleton.SingleInstance.CurrentUser;
+            AssetDatabase.CreateAsset(asset, "Assets/RealityFlowConfiguration.asset");
+            AssetDatabase.SaveAssets();
+
+            EditorUtility.FocusProjectWindow();
+
+            Selection.activeObject = asset;
            // GameObject bemObject = GameObject.FindGameObjectWithTag("BehaviourEventManager");
 
             /*if (bemObject == null)
@@ -435,8 +453,8 @@ namespace Packages.realityflow_package.Runtime.scripts
 
         private static void _LogoutUser(object sender, ConfirmationMessageEventArgs eventArgs)
         {
-            ConfigurationSingleton.CurrentProject = null;
-            ConfigurationSingleton.CurrentUser = null;
+            ConfigurationSingleton.SingleInstance.CurrentProject = null;
+            ConfigurationSingleton.SingleInstance.CurrentUser = null;
         }
 
         private static void _RegisterUser(object sender, ConfirmationMessageEventArgs eventArgs)
