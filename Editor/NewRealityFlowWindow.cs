@@ -355,7 +355,9 @@ public class FlowNetworkManagerEditor : EditorWindow
                 {
                     Operations.CheckinObject(obj.Id, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) => { });
                 }
-            } 
+            }
+
+            Operations.Logout(ConfigurationSingleton.SingleInstance.CurrentUser);
         }
     }
 
