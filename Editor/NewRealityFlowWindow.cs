@@ -89,6 +89,7 @@ public class FlowNetworkManagerEditor : EditorWindow
     /// </summary>
     private void OnEnable()
     {
+        EditorApplication.playModeStateChanged += _PlayModeStateHasChanged;
         //if(testObject == null)
         //{
         //    testObject = new FlowTObject(GUID.Generate().ToString(), 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, "name");
@@ -137,9 +138,14 @@ public class FlowNetworkManagerEditor : EditorWindow
     {
         _ViewDictionary[window]();
 
+        if (GUILayout.Button("Check BEM"))
+        {
+            //Debug.Log(BehaviourEventManager.BehaviourList);
+        }
+
         //if (GUILayout.Button("Fetch Projects"))
         //{
-        //    Operations.GetAllUserProjects(ConfigurationSingleton.CurrentUser, (_, e) =>
+        //    Operations.GetAllUserProjects(ConfigurationSingleton.SingleInstance.CurrentUser, (_, e) =>
         //    {
         //        _ProjectList = e.message.Projects;
         //        Debug.Log("Project list from fetch projects button: " + (_ProjectList == null ? "null" : _ProjectList.ToString()));
@@ -290,12 +296,50 @@ public class FlowNetworkManagerEditor : EditorWindow
 
     private void OnDestroy()
     {
-        Operations.Logout(ConfigurationSingleton.CurrentUser);
+        Operations.Logout(ConfigurationSingleton.SingleInstance.CurrentUser);
 
         FlowTObject.RemoveAllObjectsFromScene();
-        ConfigurationSingleton.CurrentProject = null;
-        ConfigurationSingleton.CurrentUser = null;
+        ConfigurationSingleton.SingleInstance.CurrentProject = null;
+        ConfigurationSingleton.SingleInstance.CurrentUser = null;
 
+    }
+
+    private void _PlayModeStateHasChanged(PlayModeStateChange state)
+    {
+        ConfigurationSingleton.SingleInstance = AssetDatabase.LoadAssetAtPath<ConfigurationSingleton>("Assets/RealityFlowConfiguration.asset");
+
+        FlowUser currentUser = ConfigurationSingleton.SingleInstance.CurrentUser;
+        FlowProject currentProject = ConfigurationSingleton.SingleInstance.CurrentProject;
+
+        if(state == PlayModeStateChange.EnteredEditMode 
+            || state == PlayModeStateChange.EnteredPlayMode)
+        {
+            Operations.Login(currentUser, _Url, (_, e) =>
+            {
+                if (e.message.WasSuccessful)
+                {
+                    Operations.OpenProject(currentProject.Id, currentUser, (__, ee) =>
+                    {
+                        if (ee.message.WasSuccessful)
+                        {
+                            Debug.Log("Successfully logged in user after switching play mode state!");
+                        }
+                    });
+                }
+            });
+        }
+        else if (state == PlayModeStateChange.ExitingEditMode
+            || state == PlayModeStateChange.ExitingPlayMode)
+        {
+            // Check in all objects
+            foreach (FlowTObject obj in FlowTObject.idToGameObjectMapping.Values)
+            {
+                if (obj.CanBeModified == true)
+                {
+                    Operations.CheckinObject(obj.Id, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) => { });
+                }
+            } 
+        }
     }
 
     public void Update()
@@ -387,13 +431,13 @@ public class FlowNetworkManagerEditor : EditorWindow
         if (GUILayout.Button("Log in", GUILayout.Height(40)))
         {
             // Send login event to the server
-            ConfigurationSingleton.CurrentUser = new FlowUser(uName, pWord);
-            Operations.Login(ConfigurationSingleton.CurrentUser, _Url, (_, e) =>
+            ConfigurationSingleton.SingleInstance.CurrentUser = new FlowUser(uName, pWord);
+            Operations.Login(ConfigurationSingleton.SingleInstance.CurrentUser, _Url, (_, e) =>
             {
                 Debug.Log("login callback: " + e.message.WasSuccessful.ToString());
                 if (e.message.WasSuccessful == true)
                 {
-                    Operations.GetAllUserProjects(ConfigurationSingleton.CurrentUser, (__, _e) =>
+                    Operations.GetAllUserProjects(ConfigurationSingleton.SingleInstance.CurrentUser, (__, _e) =>
                     {
                         _ProjectList = _e.message.Projects;
                         Debug.Log("Project list = " + _ProjectList);
@@ -402,7 +446,7 @@ public class FlowNetworkManagerEditor : EditorWindow
                 }
                 else
                 {
-                    ConfigurationSingleton.CurrentUser = null;
+                    ConfigurationSingleton.SingleInstance.CurrentUser = null;
                     // TODO: Display that login failed
                 }
             });
@@ -443,9 +487,9 @@ public class FlowNetworkManagerEditor : EditorWindow
         if (GUILayout.Button("Logout", GUILayout.Height(20)))
         {
             // Send logout event to the server
-            if (ConfigurationSingleton.CurrentUser != null)
+            if (ConfigurationSingleton.SingleInstance.CurrentUser != null)
             {
-                Operations.Logout(ConfigurationSingleton.CurrentUser);
+                Operations.Logout(ConfigurationSingleton.SingleInstance.CurrentUser);
                 window = EWindowView.LOGIN;
             }
 
@@ -527,7 +571,7 @@ public class FlowNetworkManagerEditor : EditorWindow
             if(GUILayout.Button(currentFlowObject.Name, GUILayout.Height(30)))
             {
                 //TODO: make sure this deletes the object
-                Operations.DeleteObject(currentFlowObject.Id, ConfigurationSingleton.CurrentProject.Id, (_, e) => { Debug.Log("Deleted Object " + e.message); });
+                Operations.DeleteObject(currentFlowObject.Id, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) => { Debug.Log("Deleted Object " + e.message); });
             }
         }
 
@@ -554,7 +598,7 @@ public class FlowNetworkManagerEditor : EditorWindow
     {
         //if(_RefreshProjectList == true)
         //{
-        //    Operations.GetAllUserProjects(ConfigurationSingleton.CurrentUser, (_, e) =>
+        //    Operations.GetAllUserProjects(ConfigurationSingleton.SingleInstance.CurrentUser, (_, e) =>
         //    {
         //        _ProjectList = e.message.ProjectList;
         //        Debug.Log(e.message);
@@ -578,12 +622,12 @@ public class FlowNetworkManagerEditor : EditorWindow
             {
                 if (GUILayout.Button(project.ProjectName, GUILayout.Height(30)))
                 {
-                    Operations.OpenProject(project.Id, ConfigurationSingleton.CurrentUser, (_, e) =>
+                    Operations.OpenProject(project.Id, ConfigurationSingleton.SingleInstance.CurrentUser, (_, e) =>
                     {
                         Debug.Log(e.message);
                         if(e.message.WasSuccessful == true)
                         {
-                            ConfigurationSingleton.CurrentProject = e.message.flowProject;
+                            ConfigurationSingleton.SingleInstance.CurrentProject = e.message.flowProject;
                             window = EWindowView.PROJECT_HUB;
                         }
                     });
@@ -641,9 +685,9 @@ public class FlowNetworkManagerEditor : EditorWindow
             // Create "Create Project" Button and define onClick action
             if (GUILayout.Button("Create Project", GUILayout.Height(40)))
             {
-                ConfigurationSingleton.CurrentProject = new FlowProject("GUID", "description", 0, projectName/*, new List<FlowTObject>()*/);
+                ConfigurationSingleton.SingleInstance.CurrentProject = new FlowProject("GUID", "description", 0, projectName/*, new List<FlowTObject>()*/);
                 // TODO: Generate guid
-                Operations.CreateProject(ConfigurationSingleton.CurrentProject, ConfigurationSingleton.CurrentUser, (_, e) =>
+                Operations.CreateProject(ConfigurationSingleton.SingleInstance.CurrentProject, ConfigurationSingleton.SingleInstance.CurrentUser, (_, e) =>
                 {
                     if (e.message.WasSuccessful == true)
                     {
@@ -653,7 +697,7 @@ public class FlowNetworkManagerEditor : EditorWindow
                     }
                     else
                     {
-                        ConfigurationSingleton.CurrentProject = null;
+                        ConfigurationSingleton.SingleInstance.CurrentProject = null;
                         // TODO: display to the user that create project failed
                     }
                 });
@@ -707,11 +751,11 @@ public class FlowNetworkManagerEditor : EditorWindow
 
     private void ExitProject()
     {
-        Operations.LeaveProject(ConfigurationSingleton.CurrentProject.Id, ConfigurationSingleton.CurrentUser, (_, e) =>
+        Operations.LeaveProject(ConfigurationSingleton.SingleInstance.CurrentProject.Id, ConfigurationSingleton.SingleInstance.CurrentUser, (_, e) =>
         {
             if(e.message.WasSuccessful == true)
             {
-                ConfigurationSingleton.CurrentProject = null;
+                ConfigurationSingleton.SingleInstance.CurrentProject = null;
                 FlowTObject.RemoveAllObjectsFromScene();
             }
 
@@ -753,19 +797,18 @@ public class FlowNetworkManagerEditor : EditorWindow
 
     private void _CreateBehaviourView()
     {
-        Debug.Log("All the current Behaviours: ");
+        //Debug.Log("All the current Behaviours: ");
 
         foreach(FlowBehaviour fb in BehaviourEventManager.BehaviourList.Values)
         {
-            Debug.Log(fb.BehaviourName + " " + fb.TargetObjectId + " " + fb.TriggerObjectId + " " + fb.Id + "\n");
+            //Debug.Log(fb.BehaviourName + " " + fb.TargetObjectId + " " + fb.TriggerObjectId + " " + fb.Id + "\n");
         }
 
-        Debug.Log("All the objects in the mapping: ");
+        //Debug.Log("All the objects in the mapping: ");
         foreach(FlowTObject t in FlowTObject.idToGameObjectMapping.Values)
         {
-            Debug.Log(t.Name + "\n");
+            //Debug.Log(t.Name + "\n");
         }
-
 
 
         if (GUILayout.Button("Back", GUILayout.Height(30), GUILayout.Width(40)))
@@ -914,7 +957,7 @@ public class FlowNetworkManagerEditor : EditorWindow
 
             string id = Guid.NewGuid().ToString();
 
-            FlowBehaviour fb = new FlowBehaviour("Click", id, firstObject, firstObject, null);
+            FlowBehaviour fb = new FlowBehaviour("Click", id, firstObject, firstObject, new FlowAction(true));
             AddBehaviour(fb);
 
             addingChain = true;
@@ -1053,7 +1096,7 @@ public class FlowNetworkManagerEditor : EditorWindow
         }
 
         // Create the new behaviour
-        Operations.CreateBehaviour(newFlowBehaviour, ConfigurationSingleton.CurrentProject.Id, behavioursToLinkTo, (sender, e) =>
+        Operations.CreateBehaviour(newFlowBehaviour, ConfigurationSingleton.SingleInstance.CurrentProject.Id, behavioursToLinkTo, (sender, e) =>
         {
             if(e.message.WasSuccessful == true)
             {
