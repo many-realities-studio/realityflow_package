@@ -47,7 +47,11 @@ namespace RealityFlow.Plugin.Scripts
                 {
                     _flowAction = new FlowAction(true);
                 }
-                else if (value.GetType().IsSubclassOf(typeof(FlowAction)) == false || value.GetType() != typeof(FlowAction))
+                //else if (value is FlowAction)
+                //{
+                //    Debug.Log("it is flowaction type");
+                //}
+                else if (value.GetType().IsSubclassOf(typeof(FlowAction)) == false && value.GetType() != typeof(FlowAction))
                 {
                    // Debug.Log("The action is " + value.ActionType);
                     FlowAction baseAction = MessageSerializer.DesearializeObject<FlowAction>(value);
