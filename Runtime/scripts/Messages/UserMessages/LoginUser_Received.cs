@@ -76,6 +76,7 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.UserMessages
             if (_ReceivedEvent != null)
             {
                 _ReceivedEvent.Invoke(this, new LoginUserMessageEventArgs(this));
+                _ReceivedEvent = null;
             }
         }
     }
