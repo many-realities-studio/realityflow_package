@@ -28,7 +28,7 @@ namespace Packages.realityflow_package.Runtime.scripts
         {
             if (underlyingFlowObject != null)
             {
-                //underlyingFlowObject.UpdateObjectGlobally(underlyingFlowObject);
+                underlyingFlowObject.UpdateObjectGlobally(underlyingFlowObject);
             }
         }
     }

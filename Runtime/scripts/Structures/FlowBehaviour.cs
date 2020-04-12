@@ -17,6 +17,7 @@ namespace RealityFlow.Plugin.Scripts
     /// </summary>
     public class FlowBehaviour
     {
+        [JsonIgnore]
         private dynamic _flowAction;
 
         [JsonProperty("TypeOfTrigger")]
@@ -188,8 +189,11 @@ namespace RealityFlow.Plugin.Scripts
                     {
                         //triggerObject.transform.position = targetObject.transform.position + targetObject.GetComponent<TeleportCoordinates>().GetCoordinates();
                         triggerObject.transform.position = targetObject.transform.position + flowAction.teleportCoordinates.GetCoordinates();
-                        triggerObject.transform.localScale = targetObject.GetComponent<TeleportCoordinates>().GetScale();
-                        triggerObject.transform.rotation = targetObject.GetComponent<TeleportCoordinates>().GetRotation();
+                        triggerObject.transform.localScale = flowAction.teleportCoordinates.GetScale();
+                        triggerObject.transform.rotation = flowAction.teleportCoordinates.GetRotation();
+
+                        //triggerObject.transform.localScale = targetObject.GetComponent<TeleportCoordinates>().GetScale();
+                        //triggerObject.transform.rotation = targetObject.GetComponent<TeleportCoordinates>().GetRotation();
                         // set snap zone rest until leaves snap zone
                     }
                     return;
