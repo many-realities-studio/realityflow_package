@@ -16,6 +16,19 @@ namespace Packages.realityflow_package.Runtime.scripts.Structures.Actions
 
 
         [JsonConstructor]
+        public FlowAction(string ActionType)
+        {
+            this.ActionType = ActionType;
+
+            Id = Guid.NewGuid().ToString();
+        }
+
+        public FlowAction()
+        {
+
+        }
+
+        
         public FlowAction(string ActionType, string Id)
         {
             Debug.Log("in here");
@@ -31,19 +44,17 @@ namespace Packages.realityflow_package.Runtime.scripts.Structures.Actions
         }
         */
         public FlowAction(bool noAction)
-        {
-            Id = Guid.NewGuid().ToString();
+        {           
             if(noAction == true)
             {
                 ActionType = "NoAction";
             }
+
+            Id = Guid.NewGuid().ToString();
         }
 
         
-        public FlowAction()
-        {
-            Id = Guid.NewGuid().ToString();
-        }
+        
 
         public static dynamic ConvertToChildClass(string JsonObject, string actionType)
         {

@@ -7,6 +7,7 @@ using UnityEngine;
 using Packages.realityflow_package.Runtime.scripts.Structures.Actions;
 using Behaviours;
 using Packages.realityflow_package.Runtime.scripts.Messages;
+using Newtonsoft.Json.Linq;
 
 namespace RealityFlow.Plugin.Scripts
 {
@@ -44,13 +45,13 @@ namespace RealityFlow.Plugin.Scripts
             get => _flowAction;
             set
             {
+
                 if(value == null || (value.GetType() == typeof(string) && value == "null"))
                 {
                     _flowAction = new FlowAction(true);
                 }
                 else if (value.GetType().IsSubclassOf(typeof(FlowAction)) == false && value.GetType() != typeof(FlowAction))
                 {
-                   // Debug.Log("The action is " + value.ActionType);
                     FlowAction baseAction = MessageSerializer.DesearializeObject<FlowAction>(value);
                     _flowAction = FlowAction.ConvertToChildClass(value, baseAction.ActionType);
                 }
@@ -66,27 +67,29 @@ namespace RealityFlow.Plugin.Scripts
         // public static Dictionary<string, ParseMessage> messageRouter = new Dictionary<string, ParseMessage>();
 
         [JsonConstructor] 
-        public FlowBehaviour(string typeOfTrigger, string id, string triggerObjectId, string targetObjectId, dynamic nextBehaviour, dynamic flowAction)
+        public FlowBehaviour(string typeOfTrigger, string id, string triggerObjectId, string targetObjectId, List<string> nextBehaviour, dynamic flowAction)
         {
             TypeOfTrigger = typeOfTrigger;
             Id = id;
             TriggerObjectId = triggerObjectId;
             TargetObjectId = targetObjectId;
-            NextBehaviour = new List<string>();
-            if (nextBehaviour is String)
-            {
-                if(nextBehaviour.Equals("[]"))
-                Debug.Log("it's zero");
-                //NextBehaviour = new List<string>();
-            }
-            else
-            {
-                if(nextBehaviour.Count > 0)
-                {
-                    NextBehaviour.Add(nextBehaviour);
-                }
-            }
-                
+            NextBehaviour = nextBehaviour;
+
+            //NextBehaviour = new List<string>();
+            //if (nextBehaviour is String)
+            //{
+            //    if(nextBehaviour.Equals("[]"))
+            //    Debug.Log("it's zero");
+            //    NextBehaviour = new List<string>();
+            //}
+            //else
+            //{
+            //    if(nextBehaviour.Count > 0)
+            //    {
+            //        NextBehaviour.Add(nextBehaviour);
+            //    }
+            //}
+
             this.flowAction = flowAction;
             EventCalled += BehaviourEventManager.ListenToEvents;
             BehaviourName = typeOfTrigger;

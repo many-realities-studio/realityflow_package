@@ -908,35 +908,42 @@ public class FlowNetworkManagerEditor : EditorWindow
         GUILayout.EndVertical();
     }
 
-
+    /// <summary>
+    /// Converts each 
+    /// </summary>
+    /// <param name="firstObjectId"></param>
+    /// <param name="isSnapZone"></param>
+    /// <param name="posX">X position</param>
+    /// <param name="posY">Y position</param>
+    /// <param name="posZ">Z position</param>
+    /// <param name="rotX">X rotation</param>
+    /// <param name="rotY">Y rotation</param>
+    /// <param name="rotZ">Z rotation</param>
+    /// <param name="scaleX">X scale</param>
+    /// <param name="scaleY">Y Scale</param>
+    /// <param name="scaleZ">Z Scale</param>
     public void CreateTeleportCoordinates(string firstObjectId, Boolean isSnapZone, string posX, string posY, string posZ, string rotX, string rotY, string rotZ, string scaleX, string scaleY, string scaleZ)
     {
+        // Convert position coordinates into a Vector3
         Vector3 positionCoords = new Vector3(float.Parse(posX, CultureInfo.InvariantCulture.NumberFormat),
                                                  float.Parse(posY, CultureInfo.InvariantCulture.NumberFormat),
                                                  float.Parse(posZ, CultureInfo.InvariantCulture.NumberFormat));
 
+        // Convert rotation coordinates into a Quaternion
         Quaternion rotationCoords = new Quaternion(float.Parse(rotX, CultureInfo.InvariantCulture.NumberFormat),
                                                    float.Parse(rotY, CultureInfo.InvariantCulture.NumberFormat),
                                                    float.Parse(rotZ, CultureInfo.InvariantCulture.NumberFormat),
                                                    1f);
 
+        // Convert scale coordinates into a Vector3
         Vector3 scaleCoords = new Vector3(float.Parse(scaleX, CultureInfo.InvariantCulture.NumberFormat),
                                           float.Parse(scaleY, CultureInfo.InvariantCulture.NumberFormat),
                                           float.Parse(scaleZ, CultureInfo.InvariantCulture.NumberFormat));
 
+
+        // Create the TeleportCoordinates and pass it into the constructor for TeleportAction
         TeleportCoordinates teleportCoordinates = new TeleportCoordinates(positionCoords, rotationCoords, scaleCoords, isSnapZone);
-
-
         TeleportAction teleportAction = new TeleportAction(teleportCoordinates);
-
-        teleportAction.ActionType = "Teleport";
-        if (isSnapZone)
-        {
-            teleportAction.ActionType = "SnapZone";
-        }
-            
-
-        teleportAction.Id = "no id";
 
         string id = Guid.NewGuid().ToString();
 
