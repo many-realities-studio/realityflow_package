@@ -117,10 +117,11 @@ namespace Behaviours
             }
             else
             {
-                if (Camera.main.gameObject.GetComponent<PhysicsRaycaster>() == null)
+               /* if (Camera.main.gameObject.GetComponent<PhysicsRaycaster>() == null)
                 {
                     Camera.main.gameObject.AddComponent<PhysicsRaycaster>();
                 }
+                */
             }
         }
 

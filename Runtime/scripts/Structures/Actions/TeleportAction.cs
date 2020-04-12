@@ -6,13 +6,15 @@ using System.Threading.Tasks;
 
 namespace Packages.realityflow_package.Runtime.scripts.Structures.Actions
 {
-    public class TeleportAction
+    public class TeleportAction : FlowAction
     {
         TeleportCoordinates teleportCoordinates;
+
 
         public TeleportAction(TeleportCoordinates teleportCoordinates)
         {
             this.teleportCoordinates = teleportCoordinates;
+            this.ActionType = "Teleport";
         }
     }
 }

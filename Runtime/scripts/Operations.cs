@@ -143,7 +143,7 @@ namespace Packages.realityflow_package.Runtime.scripts
         public static void CreateBehaviour(FlowBehaviour behaviour, string projectId, List<string> behavioursToLinkTo, CreateBehaviour_Received.CreateBehaviourReceived_EventHandler callbackFunction)
         {
             CreateBehaviour_SendToServer createBehaviour = new CreateBehaviour_SendToServer(behaviour, projectId, behavioursToLinkTo);
-            FlowWebsocket.SendMessage(createBehaviour);
+            _FlowWebsocket.SendMessage(createBehaviour);
 
             CreateBehaviour_Received.ReceivedEvent += callbackFunction;
         }
@@ -153,7 +153,7 @@ namespace Packages.realityflow_package.Runtime.scripts
         public static void DeleteBehaviour(FlowBehaviour behaviour, string behaviourId, string projectId, DeleteBehaviour_Received.DeleteBehaviourReceived_EventHandler callbackFunction)
         {
             DeleteBehaviour_SendToServer deleteBehaviour = new DeleteBehaviour_SendToServer(behaviour, behaviourId, projectId);
-            FlowWebsocket.SendMessage(deleteBehaviour);
+            _FlowWebsocket.SendMessage(deleteBehaviour);
 
             DeleteBehaviour_Received.ReceivedEvent += callbackFunction;
         }
@@ -161,7 +161,7 @@ namespace Packages.realityflow_package.Runtime.scripts
         public static void UpdateBehaviour(FlowBehaviour behaviour, string projectId, UpdateBehaviour_Received.UpdateBehaviourReceived_EventHandler callbackFunction)
         {
             UpdateBehaviour_SendToServer updateBehaviour = new UpdateBehaviour_SendToServer(behaviour, projectId);
-            FlowWebsocket.SendMessage(updateBehaviour);
+            _FlowWebsocket.SendMessage(updateBehaviour);
 
             UpdateBehaviour_Received.ReceivedEvent += callbackFunction;
         }

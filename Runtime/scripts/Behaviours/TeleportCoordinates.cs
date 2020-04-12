@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class TeleportCoordinates : MonoBehaviour
+public class TeleportCoordinates
 {
     [SerializeField]
     public Vector3 coordinates = Vector3.zero;

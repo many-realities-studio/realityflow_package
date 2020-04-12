@@ -47,8 +47,9 @@ namespace RealityFlow.Plugin.Scripts
                 {
                     _flowAction = new FlowAction(true);
                 }
-                else if(value.GetType() != typeof(FlowAction))
+                else if (value.GetType().IsSubclassOf(typeof(FlowAction)) == false || value.GetType() != typeof(FlowAction))
                 {
+                   // Debug.Log("The action is " + value.ActionType);
                     FlowAction baseAction = MessageSerializer.DesearializeObject<FlowAction>(value);
                     _flowAction = FlowAction.ConvertToChildClass(value, baseAction.ActionType);
                 }
@@ -124,36 +125,43 @@ namespace RealityFlow.Plugin.Scripts
         /// <param name="scriptName"></param>
         private void OnCallDown(string scriptName)
         {
-            Debug.Log("here!!");
+            Debug.Log("Inside OnCallDown");
 
             GameObject triggerObject = BehaviourEventManager.GetGoFromGuid(TriggerObjectId);
             GameObject targetObject = BehaviourEventManager.GetGoFromGuid(TargetObjectId);
 
-            CallBehaviourEvent();
+            // If it's a click event, just trigger the behaviours in its next behaviour list
+            if (scriptName.Equals("Click"))
+            {
+                if (NextBehaviour.Count > 0)
+                {
+                    foreach (string chainedBehaviourId in NextBehaviour)
+                    {
+                        if (BehaviourEventManager.BehaviourList.TryGetValue(chainedBehaviourId, out FlowBehaviour chainedBehaviour))
+                        {
+                            chainedBehaviour.EventTrigger();
+                        }
+
+                        Debug.Log("execute chained events");
+                    }
+                }
+
+                return;
+            }
+
+            // is meant to communicate with the server
+           // CallBehaviourEvent();
 
             // figure out how to add specific code to each script here
             switch (scriptName)
             {
                 case "Teleport":
                     // take in input from colliding object that determines teleport coordinates (teleport nodes)
+
+                    /*** Fix this so that it gets the teleport coordinates from the flowaction ***/
                     Vector3 coords = targetObject.GetComponent<TeleportCoordinates>().GetCoordinates();
                     triggerObject.transform.position = coords;
                     // Set teleport rest for 5 seconds
-                    return;
-                case "Click":
-                    // if object received click input, then trigger chained event
-                    if (NextBehaviour.Count > 0)
-                    {
-                        foreach(string chainedBehaviourId in NextBehaviour)
-                        {
-                            if(BehaviourEventManager.BehaviourList.TryGetValue(chainedBehaviourId, out FlowBehaviour chainedBehaviour))
-                            {
-                                chainedBehaviour.EventTrigger();
-                            }
-                            
-                            Debug.Log("execute chained events");
-                        }
-                    }
                     return;
                 case "SnapZone":
                     // take in more info than teleport, but basically acts as a teleport within the other object
