@@ -380,24 +380,39 @@ namespace Packages.realityflow_package.Runtime.scripts
 
         private static void _OpenProject(object sender, OpenProjectMessageEventArgs eventArgs)
         {
-            ConfigurationSingleton.CurrentProject = eventArgs.message.flowProject;
-
-           // GameObject bemObject = GameObject.FindGameObjectWithTag("BehaviourEventManager");
-
-            /*if (bemObject == null)
+            if(eventArgs.message.WasSuccessful == true)
             {
-                bemObject = new GameObject();
-                bemObject.AddComponent<BehaviourEventManager>();
-                bemObject.name = "BehaviourEventManager";
-                bemObject.tag = "BehaviourEventManager";
+                ConfigurationSingleton.CurrentProject = eventArgs.message.flowProject;
+
+                // Clear the behaviour list and BEM
+                BehaviourEventManager.Clear();
+                BehaviourEventManager.Initialize();
+
+
+                Debug.Log("Number of behaviours in bem = " + BehaviourEventManager.BehaviourList.Count);
+
+                if(eventArgs.message.flowProject.behaviourList == null)
+                {
+                    Debug.Log("It's null huh");
+                }
+                else
+                {
+                    Debug.Log("ya yeet");
+                }
+
+                foreach(FlowBehaviour fb in eventArgs.message.flowProject.behaviourList)
+                {
+                    BehaviourEventManager.CreateNewBehaviour(fb);
+                }
+
+                Debug.Log("Number of behaviours in bem = " + BehaviourEventManager.BehaviourList.Count);
+
+                foreach (FlowBehaviour fb in BehaviourEventManager.BehaviourList.Values)
+                {
+                    Debug.Log(fb.flowAction.ActionType);
+                }
             }
-
-            BehaviourEventManager bem = bemObject.GetComponent<BehaviourEventManager>();
-            bem.Initialize();*/
-
-            BehaviourEventManager.Clear();
-            BehaviourEventManager.Initialize();
-
+            
         }
 
         private static void _LeaveProject(object sender, LeaveProjectMessageEventArgs eventArgs)
@@ -405,6 +420,10 @@ namespace Packages.realityflow_package.Runtime.scripts
             if(eventArgs.message.WasSuccessful == true)
             {
                 Debug.Log("Successfully left project");
+
+                // Clear the behaviour list and BEM
+                BehaviourEventManager.Clear();
+                BehaviourEventManager.Initialize();
             }
             else
             {

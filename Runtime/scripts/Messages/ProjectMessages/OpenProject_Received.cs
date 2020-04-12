@@ -18,6 +18,7 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.ProjectMessages
         [JsonProperty("FlowProject")]
         public FlowProject flowProject { get; set; }
 
+
         // Definition of event type (What gets sent to the subscribers
         public delegate void OpenProjectReceived_EventHandler(object sender, OpenProjectMessageEventArgs eventArgs);
 
