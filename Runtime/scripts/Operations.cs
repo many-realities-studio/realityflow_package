@@ -409,7 +409,11 @@ namespace Packages.realityflow_package.Runtime.scripts
 
                 foreach (FlowBehaviour fb in BehaviourEventManager.BehaviourList.Values)
                 {
-                    Debug.Log(fb.flowAction.ActionType);
+                    Debug.Log(fb.flowAction.ActionType );
+                    if(fb.flowAction.ActionType != "NoAction")
+                    {
+                        Debug.Log("teleport coordinates is " + fb.flowAction.teleportCoordinates.coordinates.x);
+                    }
                 }
             }
             

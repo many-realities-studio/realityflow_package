@@ -6,8 +6,7 @@ namespace Behaviours
     public class TeleportCoordinates
     {
 
-        public Vector3 coordinates { get; set; } = Vector3.zero;
-        //public Vector3 coordinates = Vector3.zero;
+        public Vector3 coordinates = Vector3.zero;
         public Quaternion rotation = Quaternion.identity;
         public Vector3 scale = Vector3.one;
         public bool IsSnapZone = false;

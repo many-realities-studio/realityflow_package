@@ -63,6 +63,7 @@ namespace Behaviours
 
         public void OnPointerClick(PointerEventData eventData)
         {
+            Debug.Log("It's clicked");
             if (eventData.pointerPressRaycast.gameObject == gameObject)
             {
                 Debug.Log("clicked");
