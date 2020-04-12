@@ -4,7 +4,8 @@
         "RealityFlowScripts",
         "RealityFlowObjectData",
         "com.RealityFlow.Resources",
-        "com.RealityFlow"
+        "com.RealityFlow",
+        "Microsoft.MixedReality.Toolkit.Editor.Utilities"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
@@ -13,5 +14,6 @@
     "precompiledReferences": [],
     "autoReferenced": true,
     "defineConstraints": [],
-    "versionDefines": []
+    "versionDefines": [],
+    "noEngineReferences": false
 }
