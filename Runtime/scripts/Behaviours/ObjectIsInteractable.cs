@@ -119,11 +119,11 @@ namespace Behaviours
             }
             else
             {
-               /* if (Camera.main.gameObject.GetComponent<PhysicsRaycaster>() == null)
+                if (Camera.main.gameObject.GetComponent<PhysicsRaycaster>() == null)
                 {
                     Camera.main.gameObject.AddComponent<PhysicsRaycaster>();
                 }
-                */
+
             }
         }
 
@@ -226,7 +226,8 @@ namespace Behaviours
                     if (flowBehaviour.TargetObjectId == go2)
                     {
                         interactableEvents.Remove(flowBehaviour);
-                        GameObject g2 = BehaviourEventManager.GetGoFromGuid(go2);
+                        GameObject g2 = FlowTObject.idToGameObjectMapping[go2].AttachedGameObject;
+                            //BehaviourEventManager.GetGoFromGuid(go2);
                         if (g2.GetComponent<ObjectIsInteractable>())
                         {
                             g2.GetComponent<ObjectIsInteractable>().RemoveInteractableEvent(flowBehaviour);
