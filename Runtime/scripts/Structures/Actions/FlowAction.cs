@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
 
 namespace Packages.realityflow_package.Runtime.scripts.Structures.Actions
 {
@@ -13,11 +14,22 @@ namespace Packages.realityflow_package.Runtime.scripts.Structures.Actions
         public string Id;
         public string ActionType;
 
+
+        [JsonConstructor]
+        public FlowAction(string ActionType, string Id)
+        {
+            Debug.Log("in here");
+            this.ActionType = ActionType;
+            this.Id = Id;
+            //Id = Guid.NewGuid().ToString();
+        }
+
+        /*
         public FlowAction(string id)
         {
             Id = id;
         }
-
+        */
         public FlowAction(bool noAction)
         {
             Id = Guid.NewGuid().ToString();
@@ -27,7 +39,7 @@ namespace Packages.realityflow_package.Runtime.scripts.Structures.Actions
             }
         }
 
-        [JsonConstructor]
+        
         public FlowAction()
         {
             Id = Guid.NewGuid().ToString();

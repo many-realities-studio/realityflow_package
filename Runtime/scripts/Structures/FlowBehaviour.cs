@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 using UnityEngine;
@@ -47,10 +48,6 @@ namespace RealityFlow.Plugin.Scripts
                 {
                     _flowAction = new FlowAction(true);
                 }
-                //else if (value is FlowAction)
-                //{
-                //    Debug.Log("it is flowaction type");
-                //}
                 else if (value.GetType().IsSubclassOf(typeof(FlowAction)) == false && value.GetType() != typeof(FlowAction))
                 {
                    // Debug.Log("The action is " + value.ActionType);
@@ -69,13 +66,27 @@ namespace RealityFlow.Plugin.Scripts
         // public static Dictionary<string, ParseMessage> messageRouter = new Dictionary<string, ParseMessage>();
 
         [JsonConstructor] 
-        public FlowBehaviour(string typeOfTrigger, string id, string triggerObjectId, string targetObjectId, List<string> nextBehaviour, dynamic flowAction)
+        public FlowBehaviour(string typeOfTrigger, string id, string triggerObjectId, string targetObjectId, dynamic nextBehaviour, dynamic flowAction)
         {
             TypeOfTrigger = typeOfTrigger;
             Id = id;
             TriggerObjectId = triggerObjectId;
             TargetObjectId = targetObjectId;
-            NextBehaviour = nextBehaviour;
+            NextBehaviour = new List<string>();
+            if (nextBehaviour is String)
+            {
+                if(nextBehaviour.Equals("[]"))
+                Debug.Log("it's zero");
+                //NextBehaviour = new List<string>();
+            }
+            else
+            {
+                if(nextBehaviour.Count > 0)
+                {
+                    NextBehaviour.Add(nextBehaviour);
+                }
+            }
+                
             this.flowAction = flowAction;
             EventCalled += BehaviourEventManager.ListenToEvents;
             BehaviourName = typeOfTrigger;
@@ -163,7 +174,8 @@ namespace RealityFlow.Plugin.Scripts
                     // take in input from colliding object that determines teleport coordinates (teleport nodes)
 
                     /*** Fix this so that it gets the teleport coordinates from the flowaction ***/
-                    Vector3 coords = targetObject.GetComponent<TeleportCoordinates>().GetCoordinates();
+                    //Vector3 coords = targetObject.GetComponent<TeleportCoordinates>().GetCoordinates();
+                    Vector3 coords = flowAction.teleportCoordinates.GetCoordinates();
                     triggerObject.transform.position = coords;
                     // Set teleport rest for 5 seconds
                     return;
@@ -171,7 +183,8 @@ namespace RealityFlow.Plugin.Scripts
                     // take in more info than teleport, but basically acts as a teleport within the other object
                     if (targetObject.GetComponent<TeleportCoordinates>().IsSnapZone)
                     {
-                        triggerObject.transform.position = targetObject.transform.position + targetObject.GetComponent<TeleportCoordinates>().GetCoordinates();
+                        //triggerObject.transform.position = targetObject.transform.position + targetObject.GetComponent<TeleportCoordinates>().GetCoordinates();
+                        triggerObject.transform.position = targetObject.transform.position + flowAction.teleportCoordinates.GetCoordinates();
                         triggerObject.transform.localScale = targetObject.GetComponent<TeleportCoordinates>().GetScale();
                         triggerObject.transform.rotation = targetObject.GetComponent<TeleportCoordinates>().GetRotation();
                         // set snap zone rest until leaves snap zone
