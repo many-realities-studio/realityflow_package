@@ -143,7 +143,7 @@ namespace Packages.realityflow_package.Runtime.scripts
         public static void CreateBehaviour(FlowBehaviour behaviour, string projectId, List<string> behavioursToLinkTo, CreateBehaviour_Received.CreateBehaviourReceived_EventHandler callbackFunction)
         {
             CreateBehaviour_SendToServer createBehaviour = new CreateBehaviour_SendToServer(behaviour, projectId, behavioursToLinkTo);
-            _FlowWebsocket.SendMessage(createBehaviour);
+            FlowWebsocket.SendMessage(createBehaviour);
 
             CreateBehaviour_Received.ReceivedEvent += callbackFunction;
         }
@@ -153,7 +153,7 @@ namespace Packages.realityflow_package.Runtime.scripts
         public static void DeleteBehaviour(FlowBehaviour behaviour, string behaviourId, string projectId, DeleteBehaviour_Received.DeleteBehaviourReceived_EventHandler callbackFunction)
         {
             DeleteBehaviour_SendToServer deleteBehaviour = new DeleteBehaviour_SendToServer(behaviour, behaviourId, projectId);
-            _FlowWebsocket.SendMessage(deleteBehaviour);
+            FlowWebsocket.SendMessage(deleteBehaviour);
 
             DeleteBehaviour_Received.ReceivedEvent += callbackFunction;
         }
@@ -161,7 +161,7 @@ namespace Packages.realityflow_package.Runtime.scripts
         public static void UpdateBehaviour(FlowBehaviour behaviour, string projectId, UpdateBehaviour_Received.UpdateBehaviourReceived_EventHandler callbackFunction)
         {
             UpdateBehaviour_SendToServer updateBehaviour = new UpdateBehaviour_SendToServer(behaviour, projectId);
-            _FlowWebsocket.SendMessage(updateBehaviour);
+            FlowWebsocket.SendMessage(updateBehaviour);
 
             UpdateBehaviour_Received.ReceivedEvent += callbackFunction;
         }
@@ -397,13 +397,13 @@ namespace Packages.realityflow_package.Runtime.scripts
             AssetDatabase.CreateAsset(asset, "Assets/RealityFlowConfiguration.asset");
             AssetDatabase.SaveAssets();
 
-            EditorUtility.FocusProjectWindow();
+            //EditorUtility.FocusProjectWindow();
 
-            Selection.activeObject = asset;
+            //Selection.activeObject = asset;
            // GameObject bemObject = GameObject.FindGameObjectWithTag("BehaviourEventManager");
             if(eventArgs.message.WasSuccessful == true)
             {
-                ConfigurationSingleton.CurrentProject = eventArgs.message.flowProject;
+                ConfigurationSingleton.SingleInstance.CurrentProject = eventArgs.message.flowProject;
 
                 // Clear the behaviour list and BEM
                 BehaviourEventManager.Clear();
