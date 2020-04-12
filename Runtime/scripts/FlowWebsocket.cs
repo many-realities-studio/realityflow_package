@@ -23,6 +23,7 @@ namespace Packages.realityflow_package.Runtime.scripts
     /// a message is received over a websocket connection)
     /// </summary>
     [ExecuteAlways]
+    [Serializable]
     public class FlowWebsocket
     {
         /// <summary>
@@ -34,6 +35,8 @@ namespace Packages.realityflow_package.Runtime.scripts
         public MessageParser messageParser;
 
         public static List<String> ReceivedMessages = new List<string>();
+
+        [NonSerialized]
         public static WebSocketSharp.WebSocket websocket;
 
         public bool IsConnected { get; private set; }
@@ -83,22 +86,22 @@ namespace Packages.realityflow_package.Runtime.scripts
             }
         }
 
-        /// <summary>
-        /// Send a message
-        /// </summary>
-        /// <param name="message">Message to send</param>
-        public new void SendMessage(string message)
-        {
-            Debug.Log("Sending message: " + message);
-            websocket.Send(message);
-        }
+        ///// <summary>
+        ///// Send a message
+        ///// </summary>
+        ///// <param name="message">Message to send</param>
+        //public new void SendMessage(string message)
+        //{
+        //    Debug.Log("Sending message: " + message);
+        //    websocket.Send(message);
+        //}
 
         /// <summary>
         /// Send a message
         /// </summary>
         /// <typeparam name="T">Type of message that should be sent (Needs to inherit from base message)</typeparam>
         /// <param name="message">The message object that should be sent</param>
-        public void SendMessage<T>(T message) where T : BaseMessage
+        public static void SendMessage<T>(T message) where T : BaseMessage
         {
             string sentMessage = MessageSerializer.SerializeMessage(message);
 
