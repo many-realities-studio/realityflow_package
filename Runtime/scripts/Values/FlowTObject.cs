@@ -7,13 +7,15 @@ using Packages.realityflow_package.Runtime.scripts;
 using System.Collections.Generic;
 using System;
 using Newtonsoft.Json;
+using Microsoft.MixedReality.Toolkit.Utilities;
 
 namespace RealityFlow.Plugin.Scripts
 {
     [System.Serializable]
     public class FlowTObject : FlowValue
     {
-        public static Dictionary<string, FlowTObject> idToGameObjectMapping = new Dictionary<string, FlowTObject>();
+        [SerializeField]
+        public static SerializableDictionary<string, FlowTObject> idToGameObjectMapping = new SerializableDictionary<string, FlowTObject>();
 
         public bool CanBeModified { get => _canBeModified; set => _canBeModified = value; }
 
@@ -32,6 +34,16 @@ namespace RealityFlow.Plugin.Scripts
                     // The game object already exists
                     if (idToGameObjectMapping.ContainsKey(Id))
                     {
+                        if(idToGameObjectMapping[Id]._AttachedGameObject == null)
+                        {    
+                            UnityEngine.Object prefabReference = Resources.Load(idToGameObjectMapping[Id].Prefab);
+                            if (prefabReference == null)
+                            {
+                                Debug.Log("cannot load prefab");
+                            }
+                            idToGameObjectMapping[Id]._AttachedGameObject = GameObject.Instantiate(prefabReference) as GameObject;
+                        }
+
                         _AttachedGameObject = idToGameObjectMapping[Id]._AttachedGameObject;
                     }
 
@@ -244,6 +256,7 @@ namespace RealityFlow.Plugin.Scripts
             }
         }
 
+        [SerializeField]
         private string _Prefab;
 
         public string Prefab
@@ -279,7 +292,7 @@ namespace RealityFlow.Plugin.Scripts
         //        Scale = t.localScale;
         //    }
 
-        //    Operations.UpdateObject(this, ConfigurationSingleton.CurrentUser, ConfigurationSingleton.CurrentProject.Id, (_, e) => Debug.Log("Update object received"));
+        //    Operations.UpdateObject(this, ConfigurationSingleton.SingleInstance.CurrentUser, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) => Debug.Log("Update object received"));
         //}
 
         public FlowTObject(string name, Vector3 position, Quaternion rotation, Vector3 scale, Color color, string ObjectPrefab)
@@ -365,7 +378,7 @@ namespace RealityFlow.Plugin.Scripts
 
                 if (CanBeModified == true)
                 {
-                    Operations.UpdateObject(this, ConfigurationSingleton.CurrentUser, ConfigurationSingleton.CurrentProject.Id, (_, e) => {/* Debug.Log(e.message);*/ });
+                    Operations.UpdateObject(this, ConfigurationSingleton.SingleInstance.CurrentUser, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) => {/* Debug.Log(e.message);*/ });
                 }
 
                 AttachedGameObject.transform.hasChanged = false;
@@ -386,21 +399,16 @@ namespace RealityFlow.Plugin.Scripts
         {
             if (CanBeModified == true)
             {
-                Operations.CheckinObject(Id, ConfigurationSingleton.CurrentProject.Id, (_, e) =>
+                Operations.CheckinObject(Id, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) =>
                 {
                     // On successful checkin
                     if (e.message.WasSuccessful == true)
                     {
                         _canBeModified = false;
-                        Debug.Log("Setting to false");
+                        //Debug.Log("Setting to false");
                     }
-                    else
-                    {
-                        _canBeModified = true;
-                        Debug.Log("Setting to true");
-                    }
-                    Debug.Log(e.message.WasSuccessful);
-                    Debug.Log("Can be modified2 = " + CanBeModified);
+                    //Debug.Log(e.message.WasSuccessful);
+                    //Debug.Log("Can be modified2 = " + CanBeModified);
                 });
             }
         }
@@ -409,22 +417,17 @@ namespace RealityFlow.Plugin.Scripts
         {
             if (CanBeModified == false)
             {
-                Operations.CheckoutObject(Id, ConfigurationSingleton.CurrentProject.Id, (_, e) =>
+                Operations.CheckoutObject(Id, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) =>
                     {
                 // On successful checkout
                 if (e.message.WasSuccessful == true)
-                        {
-                            _canBeModified = true;
-                            Debug.Log("Setting to true");
-                        }
-                        else
-                        {
-                            _canBeModified = false;
-                            Debug.Log("Setting to false");
-                        }
-                        Debug.Log(e.message.WasSuccessful);
-                        Debug.Log("Can be modified1 = " + _canBeModified);
-                    }); 
+                {
+                    _canBeModified = true;
+                    //Debug.Log("Setting to true");
+                }
+                //Debug.Log(e.message.WasSuccessful);
+                //Debug.Log("Can be modified = " + _canBeModified);
+            }); 
             }
         }
         
@@ -434,7 +437,7 @@ namespace RealityFlow.Plugin.Scripts
             {
                 UnityEngine.Object.DestroyImmediate(flowObject.AttachedGameObject);
             }
-            FlowTObject.idToGameObjectMapping = new Dictionary<string, FlowTObject>();
+            FlowTObject.idToGameObjectMapping = new SerializableDictionary<string, FlowTObject>();
         }
 
         //public bool Equals(FlowTObject fo)
