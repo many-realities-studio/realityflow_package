@@ -152,12 +152,15 @@ namespace Packages.realityflow_package.Runtime.scripts
         {
             try
             {
-                foreach (string message in ReceivedMessages)
+                for(int i = 0; i < ReceivedMessages.Count; i++)
                 {
-                    Debug.Log("Received message: " + message);
-                    messageParser(message);
-                    //GameObject.CreatePrimitive(PrimitiveType.Cube);
+                    Debug.Log("Received message: " + ReceivedMessages[i]);
+                    messageParser(ReceivedMessages[i]);
                 }
+                //foreach (string message in ReceivedMessages)
+                //{
+                //    //GameObject.CreatePrimitive(PrimitiveType.Cube);
+                //}
             }
             catch (Exception e)
             {
