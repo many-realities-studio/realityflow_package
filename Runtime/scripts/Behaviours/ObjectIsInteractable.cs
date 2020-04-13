@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
 using Microsoft.MixedReality.Toolkit.UI;
@@ -37,7 +38,7 @@ namespace Behaviours
         
         public List<FlowBehaviour> GetAllInteractableEvents()
         {
-            return interactableEvents.Keys;
+            return interactableEvents.Keys.ToList();
         }
 
 
