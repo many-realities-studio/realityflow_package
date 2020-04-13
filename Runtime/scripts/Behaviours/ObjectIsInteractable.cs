@@ -16,7 +16,7 @@ namespace Behaviours
         private static SerializableDictionary<string, bool> interactableWith;
         private static SerializableDictionary<FlowBehaviour, string> interactableEvents;
 
-        public static event Action SetEventTrigger;
+        public event Action SetEventTrigger;
 
         private Interactable interactableScript;
 
