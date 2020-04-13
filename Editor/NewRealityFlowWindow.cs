@@ -84,7 +84,8 @@ public class FlowNetworkManagerEditor : EditorWindow
         CREATE_CLICK = 10,
         CREATE_SNAPZONE = 11,
         CREATE_ENABLE = 12,
-        CREATE_DISABLE = 13
+        CREATE_DISABLE = 13,
+        DELETE_BEHAVIOUR = 14
     }
 
 
@@ -146,6 +147,7 @@ public class FlowNetworkManagerEditor : EditorWindow
         _ViewDictionary.Add(EWindowView.CREATE_ENABLE, _CreateEnableView);
         _ViewDictionary.Add(EWindowView.CREATE_DISABLE, _CreateDisableView);
         _ViewDictionary.Add(EWindowView.CREATE_SNAPZONE, _CreateSnapZoneView);
+        _ViewDictionary.Add(EWindowView.DELETE_BEHAVIOUR, _DeleteBehaviourView);
 
 
     }
@@ -496,6 +498,8 @@ public class FlowNetworkManagerEditor : EditorWindow
             window = EWindowView.DELETE_OBJECT;
         }
 
+        EditorGUILayout.BeginHorizontal();
+
         if (GUILayout.Button("Add Interaction", GUILayout.Height(40)))
         {
             BehaviourEventManager.PreviousBehaviourId = null;
@@ -518,6 +522,15 @@ public class FlowNetworkManagerEditor : EditorWindow
             addingChain = false;
             window = EWindowView.CREATE_BEHAVIOUR;
         }
+
+
+        if (GUILayout.Button("Delete Interaction", GUILayout.Height(40)))
+        {
+            window = EWindowView.DELETE_BEHAVIOUR;
+               
+        }
+
+        EditorGUILayout.EndHorizontal();
 
         // Create "Export" Button and define onClick action
         if (GUILayout.Button("Export", GUILayout.Height(20)))
@@ -768,23 +781,110 @@ public class FlowNetworkManagerEditor : EditorWindow
     }
 
 
+    public string CreateBehaviourTitle(FlowBehaviour fb)
+    {
+        // Find the object names and trigger types to display nicely on the Delete Interaction UI
+        string triggerObjectIdName = FlowTObject.idToGameObjectMapping[fb.TriggerObjectId].Name;
+        Boolean hasNextBehaviours = (fb.NextBehaviour.Count > 0);
+        string chainBehaviour = (hasNextBehaviours ? BehaviourEventManager.BehaviourList[fb.NextBehaviour[0]].BehaviourName : "no chain");
+        string nextBehaviourObjectName;
+
+        // Determine what the object name for the chained behaviour is
+        if (hasNextBehaviours)
+        {
+            string nextBehaviourId = fb.NextBehaviour[0];
+            string nextBehaviourTriggerObjectId = BehaviourEventManager.BehaviourList[nextBehaviourId].TriggerObjectId;
+            nextBehaviourObjectName = FlowTObject.idToGameObjectMapping[nextBehaviourTriggerObjectId].Name;
+        }
+        else
+        {
+            nextBehaviourObjectName = "no object";
+        }
+        // Create the string to display on the button detailing the behaviour
+        string behaviourTitle = "Type of Trigger: " + fb.TypeOfTrigger +
+                                "\t\tChain behaviour: " + chainBehaviour +
+                                "\nOn Object: " + triggerObjectIdName +
+                                "\t\tOn Object: " + nextBehaviourObjectName;
+
+        return behaviourTitle;
+
+    }
+
+    private void _DeleteBehaviourView()
+    {
+        if (GUILayout.Button("Back", GUILayout.Height(30), GUILayout.Width(40)))
+        {
+            window = EWindowView.PROJECT_HUB;
+        }
+
+        GUILayout.Space(10f);
+
+        EditorGUILayout.LabelField("Delete Interaction");
+        EditorGUILayout.LabelField("Choose an interaction to delete by pressing its button.");
+
+        GUILayout.Space(20f);
+
+        // Grab all the current flowBehaviours in the behaviour list and create buttons 
+        foreach (FlowBehaviour currentFlowBehaviour in BehaviourEventManager.BehaviourList.Values)
+        {
+            // only grab the click behaviours and delete its chain since it's the only trigger we have setup
+            if (currentFlowBehaviour.TypeOfTrigger.Equals("Click"))
+            {
+
+                string behaviourTitle = CreateBehaviourTitle(currentFlowBehaviour);
+
+
+                // Create the button to delete the interaction
+                if (GUILayout.Button(behaviourTitle, GUILayout.Height(70)))
+                {
+                    // Make the List that will keep all the behaviour ids in the chain so we can send to server to delete
+                    List<string> deleteBehaviourIds = new List<string>();
+
+                    // Make a reference so we can traverse down the chain
+                    FlowBehaviour head = currentFlowBehaviour;
+                    deleteBehaviourIds.Add(currentFlowBehaviour.Id);
+
+                    // Add the behaviour's chain Id's
+                    while (head.NextBehaviour != null && head.NextBehaviour.Count > 0)
+                    {
+                        // this should be doing BFS and adding each id into the delete
+                        // but for now ui is setup to only have one behaviour in a behaviour's 
+                        // nextbehaviour array, so for now just add the first one
+                        deleteBehaviourIds.Add(head.NextBehaviour[0]);
+
+                        // make the nextbeheviour the new head and iterate through its chain
+                        head = BehaviourEventManager.BehaviourList[head.NextBehaviour[0]];
+                    }
+
+                    Operations.DeleteBehaviour(deleteBehaviourIds, ConfigurationSingleton.CurrentProject.Id, (_, e) =>
+                    {
+                        if (e.message.WasSuccessful)
+                        {
+                            Debug.Log("Successfully deleted behaviours ");
+                            foreach (string s in e.message.BehaviourIds)
+                            {
+                                Debug.Log(s);
+                            }
+                        }
+                        else
+                        {
+                            Debug.Log("Unable to delete the behaviours");
+                        }
+
+                    });
+
+                    // Change window back to Project hub
+                    window = EWindowView.PROJECT_HUB;
+
+                }
+            }
+        }
+    }
+
+
+
     private void _CreateBehaviourView()
     {
-        // Debug.Log("All the current Behaviours: ");
-
-        //foreach(FlowBehaviour fb in BehaviourEventManager.BehaviourList.Values)
-        //{
-        //    Debug.Log(fb.BehaviourName + " " + fb.TargetObjectId + " " + fb.TriggerObjectId + " " + fb.Id + "\n");
-        //}
-
-        //Debug.Log("All the objects in the mapping: ");
-        //foreach(FlowTObject t in FlowTObject.idToGameObjectMapping.Values)
-        //{
-        //    Debug.Log(t.Name + "\n");
-        //}
-
-
-
         if (GUILayout.Button("Back", GUILayout.Height(30), GUILayout.Width(40)))
         {
            // headBehaviour = null;
@@ -794,7 +894,8 @@ public class FlowNetworkManagerEditor : EditorWindow
         }
 
         GUILayout.Space(10f);
-        EditorGUILayout.LabelField("Choose one of the triggers below.");
+        string optionType = (addingChain == true ? "actions" : "triggers");
+        EditorGUILayout.LabelField("Choose one of the " + optionType + " below.");
         EditorGUILayout.BeginHorizontal();
 
         if (!addingChain)
@@ -805,21 +906,17 @@ public class FlowNetworkManagerEditor : EditorWindow
                 window = EWindowView.CREATE_CLICK;
             }
 
-            // Create "Logout" Button and define onClick action
-            if (GUILayout.Button("On Collision", GUILayout.Height(75), GUILayout.Width(92)))
-            {
-                //window = EWindowView.CREATE_CLICK;
-            }
+            //// Create "Logout" Button and define onClick action
+            //if (GUILayout.Button("On Collision", GUILayout.Height(75), GUILayout.Width(92)))
+            //{
+            //    //window = EWindowView.CREATE_CLICK;
+            //}
         }
-        
-
-        
-
         
         EditorGUILayout.EndHorizontal();
 
         //if (/*addingChain*/)
-        if(true)
+        if(addingChain)
         {
 
 
@@ -1077,10 +1174,11 @@ public class FlowNetworkManagerEditor : EditorWindow
             flowAction.ActionType = "Enable";
 
             string id = Guid.NewGuid().ToString();
-
+            
             FlowBehaviour fb = new FlowBehaviour("Immediate", id, firstObject, firstObject, flowAction);
             AddBehaviour(fb);
 
+            addingChain = true;
             window = EWindowView.CREATE_BEHAVIOUR;
         }
 
@@ -1127,7 +1225,7 @@ public class FlowNetworkManagerEditor : EditorWindow
         if (GUILayout.Button("Yes", GUILayout.Height(30), GUILayout.Width(40)))
         {
             string firstObject = objectIds[selectedTrigger].ToString();
-            addingChain = true;
+            
 
             FlowAction flowAction = new FlowAction();
             flowAction.ActionType = "Disable";
@@ -1137,13 +1235,13 @@ public class FlowNetworkManagerEditor : EditorWindow
             FlowBehaviour fb = new FlowBehaviour("Immediate", id, firstObject, firstObject, flowAction);
             AddBehaviour(fb);
 
+            addingChain = true;
             window = EWindowView.CREATE_BEHAVIOUR;
         }
 
         if (GUILayout.Button("No", GUILayout.Height(30), GUILayout.Width(40)))
         {
             string firstObject = objectIds[selectedTrigger].ToString();
-            addingChain = false;
 
             FlowAction flowAction = new FlowAction();
             flowAction.ActionType = "Disable";
@@ -1192,14 +1290,10 @@ public class FlowNetworkManagerEditor : EditorWindow
         if (GUILayout.Button("Yes", GUILayout.Height(30), GUILayout.Width(40)))
         {
             string firstObjectId = objectIds[selectedTrigger].ToString();
-            //string secondObjectId = objectIds[selectedTarget].ToString();
-
-            // GameObject firstObject = FlowTObject.idToGameObjectMapping[firstObjectId].AttachedGameObject;
-
-            addingChain = true;
 
             CreateTeleportCoordinates(firstObjectId, true, positionX, positionY, positionZ, rotationX, rotationY, rotationZ, scaleX, scaleY, scaleZ);
 
+            addingChain = true;
             window = EWindowView.CREATE_BEHAVIOUR;
         }
 
