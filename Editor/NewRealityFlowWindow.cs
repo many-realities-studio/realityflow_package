@@ -301,16 +301,6 @@ public class FlowNetworkManagerEditor : EditorWindow
         //}
     }
 
-    private void DeleteObjectCallback(object sender, DeleteObjectMessageEventArgs eventArgs)
-    {
-        throw new NotImplementedException();
-    }
-
-    private void CreateObjectCallbackTest(object sender, CreateObjectMessageEventArgs eventArgs)
-    {
-        Debug.Log("Final: " + eventArgs.message.ToString());
-    }
-
     private void OnDestroy()
     {
         Operations.Logout(ConfigurationSingleton.SingleInstance.CurrentUser);
