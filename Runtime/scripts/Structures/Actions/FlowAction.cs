@@ -61,13 +61,13 @@ namespace Packages.realityflow_package.Runtime.scripts.Structures.Actions
             switch(actionType)
             {
                 case "Teleport":
-                    return MessageSerializer.DesearializeObject<TeleportAction>(JsonObject);
+                    return MessageSerializer.DesearializeObject(JsonObject, typeof(TeleportAction));
                 case "SnapZone":
-                    return MessageSerializer.DesearializeObject<TeleportAction>(JsonObject);
+                    return MessageSerializer.DesearializeObject(JsonObject, typeof(TeleportAction));
                 case "Enable":
-                    return MessageSerializer.DesearializeObject<FlowAction>(JsonObject);
+                    return MessageSerializer.DesearializeObject(JsonObject, typeof(FlowAction));
                 case "Disable":
-                    return MessageSerializer.DesearializeObject<FlowAction>(JsonObject);
+                    return MessageSerializer.DesearializeObject(JsonObject, typeof(FlowAction));
                 default:
                     return new FlowAction(true);
             }

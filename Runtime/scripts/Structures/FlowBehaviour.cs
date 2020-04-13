@@ -53,7 +53,7 @@ namespace RealityFlow.Plugin.Scripts
                 }
                 else if (value.GetType().IsSubclassOf(typeof(FlowAction)) == false && value.GetType() != typeof(FlowAction))
                 {
-                    FlowAction baseAction = MessageSerializer.DesearializeObject<FlowAction>(value);
+                    FlowAction baseAction = MessageSerializer.DesearializeObject(value, typeof(FlowAction));
                     _flowAction = FlowAction.ConvertToChildClass(value, baseAction.ActionType);
                 }
                 else
