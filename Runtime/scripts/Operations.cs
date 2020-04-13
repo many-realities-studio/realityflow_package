@@ -140,11 +140,10 @@ namespace Packages.realityflow_package.Runtime.scripts
         }
 
 
-
-        public static void DeleteBehaviour(FlowBehaviour behaviour, string behaviourId, string projectId, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
+        public static void DeleteBehaviour(List<string> behaviourIds, string projectId, DeleteBehaviour_Received.DeleteBehaviourReceived_EventHandler callbackFunction)
         {
-            DeleteBehaviour_SendToServer deleteBehaviour = new DeleteBehaviour_SendToServer(behaviour, behaviourId, projectId);
-            FlowWebsocket.SendMessage(deleteBehaviour);
+            DeleteBehaviour_SendToServer deleteBehaviour = new DeleteBehaviour_SendToServer(behaviourIds, projectId);
+            _FlowWebsocket.SendMessage(deleteBehaviour);
 
             ReceivedMessage.AddEventHandler(typeof(DeleteBehaviour_Received), true, callbackFunction);
         }
@@ -332,6 +331,20 @@ namespace Packages.realityflow_package.Runtime.scripts
         private static void _DeleteBehaviour(object sender, BaseReceivedEventArgs eventArgs)
         {
             // this is where things happen after a DeleteBehaviour message is deserialized
+            if (eventArgs.message.WasSuccessful)
+            {
+                
+                // for each behaviour id in behaviourIds, delete from behaviour list and from each object's interactablevents
+                foreach(string id in eventArgs.message.BehaviourIds)
+                {
+                    FlowBehaviour fb = BehaviourEventManager.BehaviourList[id];
+
+                    BehaviourEventManager.DeleteFlowBehaviour(fb.TriggerObjectId, fb.TriggerObjectId, fb);
+                }
+                Debug.Log("Successfully delete all behaviours in the chain");
+                Debug.Log("Number of behaviours in bem = " + BehaviourEventManager.BehaviourList.Count);
+
+            }
         }
 
 
@@ -419,14 +432,14 @@ namespace Packages.realityflow_package.Runtime.scripts
 
                 Debug.Log("Number of behaviours in bem = " + BehaviourEventManager.BehaviourList.Count);
 
-                foreach (FlowBehaviour fb in BehaviourEventManager.BehaviourList.Values)
-                {
-                    Debug.Log(fb.flowAction.ActionType );
-                    if(fb.flowAction.ActionType != "NoAction")
-                    {
-                        Debug.Log("teleport coordinates is " + fb.flowAction.teleportCoordinates.coordinates.x);
-                    }
-                }
+                //foreach (FlowBehaviour fb in BehaviourEventManager.BehaviourList.Values)
+                //{
+                //    Debug.Log(fb.flowAction.ActionType );
+                //    if(fb.flowAction.ActionType != "NoAction")
+                //    {
+                //        Debug.Log("teleport coordinates is " + fb.flowAction.teleportCoordinates.coordinates.x);
+                //    }
+                //}
             }
             
         }

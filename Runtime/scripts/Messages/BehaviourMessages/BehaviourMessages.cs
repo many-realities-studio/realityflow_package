@@ -46,18 +46,15 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.BehaviourMessage
         [JsonProperty("ProjectId")]
         string ProjectId { get; set; }
 
-        [JsonProperty("BehaviourId")]
-        string BehaviourId { get; set; }
-
-        [JsonProperty("FlowBehaviour")]
-        FlowBehaviour FlowBehaviour { get; set; }
+        [JsonProperty("BehaviourIds")]
+        List<string> behaviourIds { get; set; }
 
 
-        public DeleteBehaviour_SendToServer(FlowBehaviour flowBehaviour, string behaviourId, string projectId)
+        public DeleteBehaviour_SendToServer(List<string> behaviourIds, string projectId)
         {
             this.ProjectId = projectId;
-            this.BehaviourId = behaviourId;
-            this.FlowBehaviour = flowBehaviour;
+            this.behaviourIds = behaviourIds;
+            this.MessageType = "DeleteBehaviour";
         }
     }
 
