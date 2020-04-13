@@ -16,9 +16,8 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.BehaviourMessage
 {
     public class DeleteBehaviour_Received : ConfirmationMessage_Received
     {
-
         [JsonProperty("BehaviourId")]
-        public String BehaviourId { get; set; }
+        public List<string> BehaviourIds { get; set; }
 
         public DeleteBehaviour_Received(string message, bool wasSuccessful) : base(wasSuccessful)
         {

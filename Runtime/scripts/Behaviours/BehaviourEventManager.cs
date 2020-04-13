@@ -167,14 +167,15 @@ namespace Behaviours
         /// <param name="flowBehaviour"></param>
         public static void DeleteFlowBehaviour(string  go1, string go2, FlowBehaviour flowBehaviour)
         {
+           
             GameObject g1 = FlowTObject.idToGameObjectMapping[go1].AttachedGameObject;
-            //GetGoFromGuid(go1);
             ObjectIsInteractable interactScript = g1.GetComponent<ObjectIsInteractable>();
 
             if (interactScript == null)
                 return;
 
             interactScript.RemoveInteractableEvent(flowBehaviour, go2);
+            BehaviourList.Remove(flowBehaviour.Id);
         }
 
 

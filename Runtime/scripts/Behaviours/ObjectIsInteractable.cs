@@ -227,7 +227,6 @@ namespace Behaviours
                     {
                         interactableEvents.Remove(flowBehaviour);
                         GameObject g2 = FlowTObject.idToGameObjectMapping[go2].AttachedGameObject;
-                            //BehaviourEventManager.GetGoFromGuid(go2);
                         if (g2.GetComponent<ObjectIsInteractable>())
                         {
                             g2.GetComponent<ObjectIsInteractable>().RemoveInteractableEvent(flowBehaviour);
