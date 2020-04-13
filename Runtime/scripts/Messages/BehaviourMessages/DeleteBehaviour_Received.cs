@@ -16,9 +16,8 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.BehaviourMessage
 {
     public class DeleteBehaviour_Received : ConfirmationMessage_Received
     {
-
         [JsonProperty("BehaviourId")]
-        public String BehaviourId { get; set; }
+        public List<string> BehaviourIds { get; set; }
 
         // Definition of event type (What gets sent to the subscribers
         public delegate void DeleteBehaviourReceived_EventHandler(object sender, DeleteBehaviourEventArgs eventArgs);
