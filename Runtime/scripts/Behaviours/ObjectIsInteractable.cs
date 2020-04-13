@@ -33,6 +33,12 @@ namespace Behaviours
         {
             return objectId;
         }
+        
+        
+        public List<FlowBehaviour> GetAllInteractableEvents()
+        {
+            return interactableEvents.Keys;
+        }
 
 
         #endregion // Monobehaviour Methods
