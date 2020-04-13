@@ -56,9 +56,9 @@ namespace Packages.realityflow_package.Runtime.scripts
             messageRouter.Add("CreateUser", typeof(RegisterUser_Received));
 
             // Behaviour Messages
-            messageRouter.Add("CreateBehaviour", CreateBehaviour_Received.ReceiveMessage);
-            messageRouter.Add("UpdateBehaviour", UpdateBehaviour_Received.ReceiveMessage);
-            messageRouter.Add("DeleteBehaviour", DeleteBehaviour_Received.ReceiveMessage);
+            messageRouter.Add("CreateBehaviour", typeof(CreateBehaviour_Received));
+            messageRouter.Add("UpdateBehaviour", typeof(UpdateBehaviour_Received));
+            messageRouter.Add("DeleteBehaviour", typeof(DeleteBehaviour_Received));
 
             // Checkout system messages
             messageRouter.Add("CheckinObject", typeof(CheckinObject_Received));
