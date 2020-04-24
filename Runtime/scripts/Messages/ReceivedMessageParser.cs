@@ -47,7 +47,7 @@ namespace Packages.realityflow_package.Runtime.scripts
 
             // Room Messages
             messageRouter.Add("JoinRoom", typeof(JoinRoom_Received));
-            //messageRouter.Add("UserJoinedRoom", typeof(room);
+            messageRouter.Add("UserJoinedRoom", typeof(JoinRoom_Received));
             messageRouter.Add("UserLeftRoom", typeof(UserLeftRoom_Received));
 
             // User Messages
