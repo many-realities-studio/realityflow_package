@@ -90,11 +90,11 @@ public class FlowNetworkManagerEditor : EditorWindow
 
 
     // Add menu named "My Window" to the Window menu
-    [MenuItem("Window/FlowNetworkManagerEditor")]
+    [MenuItem("Window/Reality Flow")]
     static void Init()
     {
         // Get existing open window or if none, make a new one:
-        FlowNetworkManagerEditor window = (FlowNetworkManagerEditor)EditorWindow.GetWindow(typeof(FlowNetworkManagerEditor));
+        FlowNetworkManagerEditor window = (FlowNetworkManagerEditor)EditorWindow.GetWindow(typeof(FlowNetworkManagerEditor), false, "Reality Flow");
         window.Show();
     }
     //FlowTObject testObject;
@@ -156,11 +156,6 @@ public class FlowNetworkManagerEditor : EditorWindow
     public void OnGUI()
     {
         _ViewDictionary[window]();
-
-        if (GUILayout.Button("Check BEM"))
-        {
-            //Debug.Log(BehaviourEventManager.BehaviourList);
-        }
 
         //if (GUILayout.Button("Fetch Projects"))
         //{
@@ -494,6 +489,26 @@ public class FlowNetworkManagerEditor : EditorWindow
             window = EWindowView.LOAD_PROJECT;
         }
 
+        EditorGUILayout.BeginHorizontal();
+
+        openProjectId = EditorGUILayout.TextField(openProjectId);
+        if(GUILayout.Button("Open"))
+        {
+            Operations.OpenProject(openProjectId, ConfigurationSingleton.SingleInstance.CurrentUser, (_, e) =>
+            {
+                if(e.message.WasSuccessful == true)
+                {
+                    Debug.Log(e.message);
+                    if (e.message.WasSuccessful == true)
+                    {
+                        ConfigurationSingleton.SingleInstance.CurrentProject = e.message.flowProject;
+                        window = EWindowView.PROJECT_HUB;
+                    }
+                }
+            });
+        }
+        EditorGUILayout.EndHorizontal();
+
         // Create "Logout" Button and define onClick action
         if (GUILayout.Button("Logout", GUILayout.Height(20)))
         {
@@ -568,11 +583,7 @@ public class FlowNetworkManagerEditor : EditorWindow
 
         EditorGUILayout.EndHorizontal();
 
-        // Create "Export" Button and define onClick action
-        if (GUILayout.Button("Export", GUILayout.Height(20)))
-        {
-            ConfirmationWindow.OpenWindow();
-        }
+       EditorGUILayout.TextArea("Project code: " + ConfigurationSingleton.SingleInstance.CurrentProject.Id);
     }
 
     private void _CreateDeleteObjectView()
@@ -615,6 +626,8 @@ public class FlowNetworkManagerEditor : EditorWindow
     }
 
     private bool _RefreshProjectList = true;
+    private bool displayProjectCode = false;
+    private string openProjectId;
 
     private void _CreateLoadProjectView()
     {
@@ -892,7 +905,7 @@ public class FlowNetworkManagerEditor : EditorWindow
                         head = BehaviourEventManager.BehaviourList[head.NextBehaviour[0]];
                     }
 
-                    Operations.DeleteBehaviour(deleteBehaviourIds, ConfigurationSingleton.CurrentProject.Id, (_, e) =>
+                    Operations.DeleteBehaviour(deleteBehaviourIds, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) =>
                     {
                         if (e.message.WasSuccessful)
                         {
