@@ -164,7 +164,7 @@ namespace Packages.realityflow_package.Runtime.scripts
             }
             catch (Exception e)
             {
-                Debug.LogError(e);
+                Debug.LogWarning(e);
             }
 
 
