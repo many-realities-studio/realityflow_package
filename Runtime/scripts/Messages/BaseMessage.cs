@@ -14,7 +14,7 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages
     /// </summary>
     public class BaseMessage
     {
-        public delegate void ParseMessage(string message); // Definition of a parse message method
+        //public delegate void ParseMessage(string message); // Definition of a parse message method
 
         [JsonProperty("MessageType")]
         public string MessageType { get; set; } // Type of message being sent

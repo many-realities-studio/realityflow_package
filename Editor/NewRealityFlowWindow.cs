@@ -4,21 +4,21 @@ using UnityEditor;
 using System;
 using System.IO;
 using RealityFlow.Plugin.Scripts;
-//using RealityFlow.Plugin.Scripts.Events;
 using RealityFlow.Plugin.Editor;
 using Packages.realityflow_package.Runtime.scripts;
-//using Packages.realityflow_package.Runtime.scripts.Managers;
-using Packages.realityflow_package.Runtime.scripts.Messages;
 using Packages.realityflow_package.Runtime.scripts.Messages.ObjectMessages;
-using Packages.realityflow_package.Runtime.scripts.Messages.UserMessages;
-using Packages.realityflow_package.Runtime.scripts.Messages.ProjectMessages;
-using Packages.realityflow_package.Runtime.scripts.Messages.RoomMessages;
+using System.Collections;
+using Packages.realityflow_package.Runtime.scripts.Structures;
+using Packages.realityflow_package.Runtime.scripts.Structures.Actions;
+using Behaviours;
+using System.Globalization;
 
 [CustomEditor(typeof(FlowWebsocket))]
 public class FlowNetworkManagerEditor : EditorWindow
 {
     //private const string Url = "ws://localhost:8999/";
-    private const string Url = "ws://plato.mrl.ai:8999";
+    private string _Url = "ws://plato.mrl.ai:8999";
+    private const string Url = "ws://a73c9fa8.ngrok.io";
 
     // View parameters
     private Rect headerSection;
@@ -39,8 +39,35 @@ public class FlowNetworkManagerEditor : EditorWindow
 
     private IList<FlowProject> _ProjectList = null;
 
+    private string defaultZero = "0";
+    private string positionX;
+    private string positionY;
+    private string positionZ;
+
+    private string rotationX;
+    private string rotationY;
+    private string rotationZ;
+
+    private string scaleX;
+    private string scaleY;
+    private string scaleZ;
+
+
+
     //FlowTObject newObject = null;// = new FlowTObject(new Color(0, 0, 0, 0), "TestFlowId", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "TestObject");
     //FlowUser newUser = null;// = new FlowUser("testUsername", "TestPassword");
+
+    public string[] objectOptions;
+    public ArrayList objectNames = new ArrayList();
+    public ArrayList objectIds = new ArrayList();
+    public Boolean addingChain = false;
+    public int selectedTrigger = 0;
+    public int selectedTarget = 0;
+    public FlowBehaviour headBehaviour = null;
+
+   // public string previousBehaviourId = null;
+    public Boolean showAllOptions = false;
+
 
     enum EWindowView
     {
@@ -51,16 +78,23 @@ public class FlowNetworkManagerEditor : EditorWindow
         LOAD_PROJECT = 4,
         PROJECT_CREATION = 5,
         INVITE_USER = 6,
-        PROJECT_IMPORT = 7
+        PROJECT_IMPORT = 7,
+        CREATE_BEHAVIOUR = 8,
+        CREATE_TELEPORT = 9,
+        CREATE_CLICK = 10,
+        CREATE_SNAPZONE = 11,
+        CREATE_ENABLE = 12,
+        CREATE_DISABLE = 13,
+        DELETE_BEHAVIOUR = 14
     }
 
 
     // Add menu named "My Window" to the Window menu
-    [MenuItem("Window/FlowNetworkManagerEditor")]
+    [MenuItem("Window/Reality Flow")]
     static void Init()
     {
         // Get existing open window or if none, make a new one:
-        FlowNetworkManagerEditor window = (FlowNetworkManagerEditor)EditorWindow.GetWindow(typeof(FlowNetworkManagerEditor));
+        FlowNetworkManagerEditor window = (FlowNetworkManagerEditor)EditorWindow.GetWindow(typeof(FlowNetworkManagerEditor), false, "Reality Flow");
         window.Show();
     }
     //FlowTObject testObject;
@@ -72,6 +106,7 @@ public class FlowNetworkManagerEditor : EditorWindow
     /// </summary>
     private void OnEnable()
     {
+        EditorApplication.playModeStateChanged += _PlayModeStateHasChanged;
         //if(testObject == null)
         //{
         //    testObject = new FlowTObject(GUID.Generate().ToString(), 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, "name");
@@ -107,6 +142,15 @@ public class FlowNetworkManagerEditor : EditorWindow
         _ViewDictionary.Add(EWindowView.PROJECT_CREATION, _CreateProjectCreationView);
         _ViewDictionary.Add(EWindowView.INVITE_USER, _CreateInviteUserView); // not implementec
         _ViewDictionary.Add(EWindowView.PROJECT_IMPORT, _CreateProjectImportView);
+        _ViewDictionary.Add(EWindowView.CREATE_BEHAVIOUR, _CreateBehaviourView);
+        _ViewDictionary.Add(EWindowView.CREATE_TELEPORT, _CreateTeleportView);
+        _ViewDictionary.Add(EWindowView.CREATE_CLICK, _CreateClickView);
+        _ViewDictionary.Add(EWindowView.CREATE_ENABLE, _CreateEnableView);
+        _ViewDictionary.Add(EWindowView.CREATE_DISABLE, _CreateDisableView);
+        _ViewDictionary.Add(EWindowView.CREATE_SNAPZONE, _CreateSnapZoneView);
+        _ViewDictionary.Add(EWindowView.DELETE_BEHAVIOUR, _DeleteBehaviourView);
+
+
     }
 
     public void OnGUI()
@@ -115,7 +159,7 @@ public class FlowNetworkManagerEditor : EditorWindow
 
         //if (GUILayout.Button("Fetch Projects"))
         //{
-        //    Operations.GetAllUserProjects(ConfigurationSingleton.CurrentUser, (_, e) =>
+        //    Operations.GetAllUserProjects(ConfigurationSingleton.SingleInstance.CurrentUser, (_, e) =>
         //    {
         //        _ProjectList = e.message.Projects;
         //        Debug.Log("Project list from fetch projects button: " + (_ProjectList == null ? "null" : _ProjectList.ToString()));
@@ -254,24 +298,54 @@ public class FlowNetworkManagerEditor : EditorWindow
         //}
     }
 
-    private void DeleteObjectCallback(object sender, DeleteObjectMessageEventArgs eventArgs)
-    {
-        throw new NotImplementedException();
-    }
-
-    private void CreateObjectCallbackTest(object sender, CreateObjectMessageEventArgs eventArgs)
-    {
-        Debug.Log("Final: " + eventArgs.message.ToString());
-    }
-
     private void OnDestroy()
     {
-        Operations.Logout(ConfigurationSingleton.CurrentUser);
+        Operations.Logout(ConfigurationSingleton.SingleInstance.CurrentUser);
 
         FlowTObject.RemoveAllObjectsFromScene();
-        ConfigurationSingleton.CurrentProject = null;
-        ConfigurationSingleton.CurrentUser = null;
+        ConfigurationSingleton.SingleInstance.CurrentProject = null;
+        ConfigurationSingleton.SingleInstance.CurrentUser = null;
 
+    }
+
+    private void _PlayModeStateHasChanged(PlayModeStateChange state)
+    {
+        ConfigurationSingleton.SingleInstance = AssetDatabase.LoadAssetAtPath<ConfigurationSingleton>("Assets/RealityFlowConfiguration.asset");
+
+        FlowUser currentUser = ConfigurationSingleton.SingleInstance.CurrentUser;
+        FlowProject currentProject = ConfigurationSingleton.SingleInstance.CurrentProject;
+
+        if(state == PlayModeStateChange.EnteredEditMode 
+            || state == PlayModeStateChange.EnteredPlayMode)
+        {
+            Operations.Login(currentUser, _Url, (_, e) =>
+            {
+                if (e.message.WasSuccessful)
+                {
+                    Operations.OpenProject(currentProject.Id, currentUser, (__, ee) =>
+                    {
+                        if (ee.message.WasSuccessful)
+                        {
+                            Debug.Log("Successfully logged in user after switching play mode state!");
+                        }
+                    });
+                }
+            });
+        }
+        else if (state == PlayModeStateChange.ExitingEditMode
+            || state == PlayModeStateChange.ExitingPlayMode)
+        {
+            // Check in all objects
+            foreach (FlowTObject obj in FlowTObject.idToGameObjectMapping.Values)
+            {
+                if (obj.CanBeModified == true)
+                {
+                    Operations.CheckinObject(obj.Id, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) => { });
+                }
+            }
+
+            Operations.Logout(ConfigurationSingleton.SingleInstance.CurrentUser);
+        }
     }
 
     public void Update()
@@ -354,17 +428,22 @@ public class FlowNetworkManagerEditor : EditorWindow
         pWord = EditorGUILayout.PasswordField(pWord);
         EditorGUILayout.EndHorizontal();
 
+        EditorGUILayout.BeginHorizontal();
+        GUILayout.Label("Server URL: ");
+        _Url = EditorGUILayout.TextField(_Url);
+        EditorGUILayout.EndHorizontal();
+
         // Create "Log in" Button and define onClick action
         if (GUILayout.Button("Log in", GUILayout.Height(40)))
         {
             // Send login event to the server
-            ConfigurationSingleton.CurrentUser = new FlowUser(uName, pWord);
-            Operations.Login(ConfigurationSingleton.CurrentUser, Url, (_, e) =>
+            ConfigurationSingleton.SingleInstance.CurrentUser = new FlowUser(uName, pWord);
+            Operations.Login(ConfigurationSingleton.SingleInstance.CurrentUser, _Url, (_, e) =>
             {
                 Debug.Log("login callback: " + e.message.WasSuccessful.ToString());
                 if (e.message.WasSuccessful == true)
                 {
-                    Operations.GetAllUserProjects(ConfigurationSingleton.CurrentUser, (__, _e) =>
+                    Operations.GetAllUserProjects(ConfigurationSingleton.SingleInstance.CurrentUser, (__, _e) =>
                     {
                         _ProjectList = _e.message.Projects;
                         Debug.Log("Project list = " + _ProjectList);
@@ -373,7 +452,7 @@ public class FlowNetworkManagerEditor : EditorWindow
                 }
                 else
                 {
-                    ConfigurationSingleton.CurrentUser = null;
+                    ConfigurationSingleton.SingleInstance.CurrentUser = null;
                     // TODO: Display that login failed
                 }
             });
@@ -383,7 +462,7 @@ public class FlowNetworkManagerEditor : EditorWindow
 
         if (GUILayout.Button("Register", GUILayout.Height(30)))
         {
-            Operations.Register(uName, pWord, Url, (sender, e) => { Debug.Log(e.message); });
+            Operations.Register(uName, pWord, _Url, (sender, e) => { Debug.Log(e.message); });
         }
 
         // Create "Import" Button and define onClick action
@@ -410,13 +489,33 @@ public class FlowNetworkManagerEditor : EditorWindow
             window = EWindowView.LOAD_PROJECT;
         }
 
+        EditorGUILayout.BeginHorizontal();
+
+        openProjectId = EditorGUILayout.TextField(openProjectId);
+        if(GUILayout.Button("Open"))
+        {
+            Operations.OpenProject(openProjectId, ConfigurationSingleton.SingleInstance.CurrentUser, (_, e) =>
+            {
+                if(e.message.WasSuccessful == true)
+                {
+                    Debug.Log(e.message);
+                    if (e.message.WasSuccessful == true)
+                    {
+                        ConfigurationSingleton.SingleInstance.CurrentProject = e.message.flowProject;
+                        window = EWindowView.PROJECT_HUB;
+                    }
+                }
+            });
+        }
+        EditorGUILayout.EndHorizontal();
+
         // Create "Logout" Button and define onClick action
         if (GUILayout.Button("Logout", GUILayout.Height(20)))
         {
             // Send logout event to the server
-            if (ConfigurationSingleton.CurrentUser != null)
+            if (ConfigurationSingleton.SingleInstance.CurrentUser != null)
             {
-                Operations.Logout(ConfigurationSingleton.CurrentUser);
+                Operations.Logout(ConfigurationSingleton.SingleInstance.CurrentUser);
                 window = EWindowView.LOGIN;
             }
 
@@ -450,11 +549,41 @@ public class FlowNetworkManagerEditor : EditorWindow
             window = EWindowView.DELETE_OBJECT;
         }
 
-        // Create "Export" Button and define onClick action
-        if (GUILayout.Button("Export", GUILayout.Height(20)))
+        EditorGUILayout.BeginHorizontal();
+
+        if (GUILayout.Button("Add Interaction", GUILayout.Height(40)))
         {
-            ConfirmationWindow.OpenWindow();
+            BehaviourEventManager.PreviousBehaviourId = null;
+
+            objectNames.Clear();
+            objectIds.Clear();
+
+            Dictionary<string, FlowTObject>.ValueCollection  values = FlowTObject.idToGameObjectMapping.Values;
+
+            foreach(FlowTObject obj in values)
+            {
+                objectNames.Add(obj.Name);
+                objectIds.Add(obj.Id);
+            }
+
+            objectOptions = (string[])objectNames.ToArray(typeof(string));
+
+
+            // Send user to Create Behaviour Screen
+            addingChain = false;
+            window = EWindowView.CREATE_BEHAVIOUR;
         }
+
+
+        if (GUILayout.Button("Delete Interaction", GUILayout.Height(40)))
+        {
+            window = EWindowView.DELETE_BEHAVIOUR;
+               
+        }
+
+        EditorGUILayout.EndHorizontal();
+
+       EditorGUILayout.TextArea("Project code: " + ConfigurationSingleton.SingleInstance.CurrentProject.Id);
     }
 
     private void _CreateDeleteObjectView()
@@ -475,7 +604,7 @@ public class FlowNetworkManagerEditor : EditorWindow
             if(GUILayout.Button(currentFlowObject.Name, GUILayout.Height(30)))
             {
                 //TODO: make sure this deletes the object
-                Operations.DeleteObject(currentFlowObject.Id, ConfigurationSingleton.CurrentProject.Id, (_, e) => { Debug.Log("Deleted Object " + e.message); });
+                Operations.DeleteObject(currentFlowObject.Id, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) => { Debug.Log("Deleted Object " + e.message); });
             }
         }
 
@@ -497,11 +626,14 @@ public class FlowNetworkManagerEditor : EditorWindow
     }
 
     private bool _RefreshProjectList = true;
+    private bool displayProjectCode = false;
+    private string openProjectId;
+
     private void _CreateLoadProjectView()
     {
         //if(_RefreshProjectList == true)
         //{
-        //    Operations.GetAllUserProjects(ConfigurationSingleton.CurrentUser, (_, e) =>
+        //    Operations.GetAllUserProjects(ConfigurationSingleton.SingleInstance.CurrentUser, (_, e) =>
         //    {
         //        _ProjectList = e.message.ProjectList;
         //        Debug.Log(e.message);
@@ -519,18 +651,18 @@ public class FlowNetworkManagerEditor : EditorWindow
         }
         EditorGUILayout.EndHorizontal();
 
-        if(_ProjectList != null)
+        if (_ProjectList != null)
         {
             foreach (FlowProject project in _ProjectList)
             {
                 if (GUILayout.Button(project.ProjectName, GUILayout.Height(30)))
                 {
-                    Operations.OpenProject(project.Id, ConfigurationSingleton.CurrentUser, (_, e) =>
+                    Operations.OpenProject(project.Id, ConfigurationSingleton.SingleInstance.CurrentUser, (_, e) =>
                     {
                         Debug.Log(e.message);
                         if(e.message.WasSuccessful == true)
                         {
-                            ConfigurationSingleton.CurrentProject = e.message.flowProject;
+                            ConfigurationSingleton.SingleInstance.CurrentProject = e.message.flowProject;
                             window = EWindowView.PROJECT_HUB;
                         }
                     });
@@ -588,11 +720,11 @@ public class FlowNetworkManagerEditor : EditorWindow
             // Create "Create Project" Button and define onClick action
             if (GUILayout.Button("Create Project", GUILayout.Height(40)))
             {
-                ConfigurationSingleton.CurrentProject = new FlowProject("GUID", "description", 0, projectName/*, new List<FlowTObject>()*/);
+                ConfigurationSingleton.SingleInstance.CurrentProject = new FlowProject("GUID", "description", 0, projectName/*, new List<FlowTObject>()*/);
                 // TODO: Generate guid
-                Operations.CreateProject(ConfigurationSingleton.CurrentProject, ConfigurationSingleton.CurrentUser, (_, e) =>
+                Operations.CreateProject(ConfigurationSingleton.SingleInstance.CurrentProject, ConfigurationSingleton.SingleInstance.CurrentUser, (_, e) =>
                 {
-                    if(e.message.WasSuccessful == true)
+                    if (e.message.WasSuccessful == true)
                     {
                         // TODO: overwrite current project with new received project info
                         window = EWindowView.PROJECT_HUB;
@@ -600,7 +732,7 @@ public class FlowNetworkManagerEditor : EditorWindow
                     }
                     else
                     {
-                        ConfigurationSingleton.CurrentProject = null;
+                        ConfigurationSingleton.SingleInstance.CurrentProject = null;
                         // TODO: display to the user that create project failed
                     }
                 });
@@ -654,8 +786,19 @@ public class FlowNetworkManagerEditor : EditorWindow
 
     private void ExitProject()
     {
-        FlowTObject.RemoveAllObjectsFromScene();
-        ConfigurationSingleton.CurrentProject = null;
+        Operations.LeaveProject(ConfigurationSingleton.SingleInstance.CurrentProject.Id, ConfigurationSingleton.SingleInstance.CurrentUser, (_, e) =>
+        {
+            if(e.message.WasSuccessful == true)
+            {
+                ConfigurationSingleton.SingleInstance.CurrentProject = null;
+                FlowTObject.RemoveAllObjectsFromScene();
+            }
+
+            else
+            {
+                Debug.LogWarning("Error leaving project.");
+            }
+        });
     }
 
     private void _CreateProjectImportView()
@@ -685,4 +828,569 @@ public class FlowNetworkManagerEditor : EditorWindow
         }
         reader.Close();
     }
+
+
+    public string CreateBehaviourTitle(FlowBehaviour fb)
+    {
+        // Find the object names and trigger types to display nicely on the Delete Interaction UI
+        string triggerObjectIdName = FlowTObject.idToGameObjectMapping[fb.TriggerObjectId].Name;
+        Boolean hasNextBehaviours = (fb.NextBehaviour.Count > 0);
+        string chainBehaviour = (hasNextBehaviours ? BehaviourEventManager.BehaviourList[fb.NextBehaviour[0]].BehaviourName : "no chain");
+        string nextBehaviourObjectName;
+
+        // Determine what the object name for the chained behaviour is
+        if (hasNextBehaviours)
+        {
+            string nextBehaviourId = fb.NextBehaviour[0];
+            string nextBehaviourTriggerObjectId = BehaviourEventManager.BehaviourList[nextBehaviourId].TriggerObjectId;
+            nextBehaviourObjectName = FlowTObject.idToGameObjectMapping[nextBehaviourTriggerObjectId].Name;
+        }
+        else
+        {
+            nextBehaviourObjectName = "no object";
+        }
+        // Create the string to display on the button detailing the behaviour
+        string behaviourTitle = "Type of Trigger: " + fb.TypeOfTrigger +
+                                "\t\tChain behaviour: " + chainBehaviour +
+                                "\nOn Object: " + triggerObjectIdName +
+                                "\t\tOn Object: " + nextBehaviourObjectName;
+
+        return behaviourTitle;
+
+    }
+
+    private void _DeleteBehaviourView()
+    {
+        if (GUILayout.Button("Back", GUILayout.Height(30), GUILayout.Width(40)))
+        {
+            window = EWindowView.PROJECT_HUB;
+        }
+
+        GUILayout.Space(10f);
+
+        EditorGUILayout.LabelField("Delete Interaction");
+        EditorGUILayout.LabelField("Choose an interaction to delete by pressing its button.");
+
+        GUILayout.Space(20f);
+
+        // Grab all the current flowBehaviours in the behaviour list and create buttons 
+        foreach (FlowBehaviour currentFlowBehaviour in BehaviourEventManager.BehaviourList.Values)
+        {
+            // only grab the click behaviours and delete its chain since it's the only trigger we have setup
+            if (currentFlowBehaviour.TypeOfTrigger.Equals("Click"))
+            {
+
+                string behaviourTitle = CreateBehaviourTitle(currentFlowBehaviour);
+
+
+                // Create the button to delete the interaction
+                if (GUILayout.Button(behaviourTitle, GUILayout.Height(70)))
+                {
+                    // Make the List that will keep all the behaviour ids in the chain so we can send to server to delete
+                    List<string> deleteBehaviourIds = new List<string>();
+
+                    // Make a reference so we can traverse down the chain
+                    FlowBehaviour head = currentFlowBehaviour;
+                    deleteBehaviourIds.Add(currentFlowBehaviour.Id);
+
+                    // Add the behaviour's chain Id's
+                    while (head.NextBehaviour != null && head.NextBehaviour.Count > 0)
+                    {
+                        // this should be doing BFS and adding each id into the delete
+                        // but for now ui is setup to only have one behaviour in a behaviour's 
+                        // nextbehaviour array, so for now just add the first one
+                        deleteBehaviourIds.Add(head.NextBehaviour[0]);
+
+                        // make the nextbeheviour the new head and iterate through its chain
+                        head = BehaviourEventManager.BehaviourList[head.NextBehaviour[0]];
+                    }
+
+                    Operations.DeleteBehaviour(deleteBehaviourIds, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) =>
+                    {
+                        if (e.message.WasSuccessful)
+                        {
+                            Debug.Log("Successfully deleted behaviours ");
+                            foreach (string s in e.message.BehaviourIds)
+                            {
+                                Debug.Log(s);
+                            }
+                        }
+                        else
+                        {
+                            Debug.Log("Unable to delete the behaviours");
+                        }
+
+                    });
+
+                    // Change window back to Project hub
+                    window = EWindowView.PROJECT_HUB;
+
+                }
+            }
+        }
+    }
+
+
+
+    private void _CreateBehaviourView()
+    {
+        if (GUILayout.Button("Back", GUILayout.Height(30), GUILayout.Width(40)))
+        {
+           // headBehaviour = null;
+            addingChain = false;
+            showAllOptions = false;
+            window = EWindowView.PROJECT_HUB;
+        }
+
+        GUILayout.Space(10f);
+        string optionType = (addingChain == true ? "actions" : "triggers");
+        EditorGUILayout.LabelField("Choose one of the " + optionType + " below.");
+        EditorGUILayout.BeginHorizontal();
+
+        if (!addingChain)
+        {
+            // Create "Logout" Button and define onClick action
+            if (GUILayout.Button("Click", GUILayout.Height(75), GUILayout.Width(92)))
+            {
+                window = EWindowView.CREATE_CLICK;
+            }
+
+            //// Create "Logout" Button and define onClick action
+            //if (GUILayout.Button("On Collision", GUILayout.Height(75), GUILayout.Width(92)))
+            //{
+            //    //window = EWindowView.CREATE_CLICK;
+            //}
+        }
+        
+        EditorGUILayout.EndHorizontal();
+
+        //if (/*addingChain*/)
+        if(addingChain)
+        {
+
+
+            EditorGUILayout.BeginHorizontal();
+            if (GUILayout.Button("Teleport", GUILayout.Height(75), GUILayout.Width(92)))
+            {
+                window = EWindowView.CREATE_TELEPORT;
+            }
+     
+            if (GUILayout.Button("Snapzone", GUILayout.Height(75), GUILayout.Width(92)))
+            {
+                window = EWindowView.CREATE_SNAPZONE;
+            }
+            if (GUILayout.Button("Enable", GUILayout.Height(75), GUILayout.Width(92)))
+            {
+                window = EWindowView.CREATE_ENABLE;
+            }
+
+            if (GUILayout.Button("Disable", GUILayout.Height(75), GUILayout.Width(92)))
+            {
+                window = EWindowView.CREATE_DISABLE;
+            }
+
+            EditorGUILayout.EndHorizontal();
+        }
+    }
+
+    private void CreatePositionScaleRotation()
+    {
+
+    }
+
+    private void _CreateTeleportView()
+    {
+        GUILayout.BeginVertical();
+
+        if (GUILayout.Button("Back", GUILayout.Height(30), GUILayout.Width(40)))
+        {
+            window = EWindowView.CREATE_BEHAVIOUR;
+        }
+
+        GUILayout.Space(10f);
+        EditorGUILayout.LabelField("Teleport");
+        //GUILayout.Space(30f);
+
+        EditorGUILayout.LabelField("Select the object that will teleport.");
+        GUILayout.Space(30f);
+
+        selectedTrigger = EditorGUI.Popup(new Rect(0, 100, position.width, 30), "TriggerObject:", selectedTrigger, objectOptions);
+       // selectedTarget = EditorGUI.Popup(new Rect(0, 150, position.width, 30), "TargetObject:", selectedTarget, objectOptions);
+        GUILayout.Space(30f);
+
+        CreateTransformUI("teleport");
+
+
+        GUILayout.Space(120f);
+        GUILayout.Label("Add another interaction?");
+        GUILayout.BeginHorizontal();
+   
+        if (GUILayout.Button("Yes", GUILayout.Height(30), GUILayout.Width(40)))
+        {
+            string firstObjectId = objectIds[selectedTrigger].ToString();
+            //string secondObjectId = objectIds[selectedTarget].ToString();
+
+           // GameObject firstObject = FlowTObject.idToGameObjectMapping[firstObjectId].AttachedGameObject;
+
+            addingChain = true;
+
+            CreateTeleportCoordinates(firstObjectId, false, positionX, positionY, positionZ, rotationX, rotationY, rotationZ, scaleX, scaleY, scaleZ);
+
+            window = EWindowView.CREATE_BEHAVIOUR;
+        }
+
+        if (GUILayout.Button("No", GUILayout.Height(30), GUILayout.Width(40)))
+        {
+            string firstObject = objectIds[selectedTrigger].ToString();
+
+            CreateTeleportCoordinates(firstObject, false, positionX, positionY, positionZ, rotationX, rotationY, rotationZ, scaleX, scaleY, scaleZ);
+
+            addingChain = false;
+            showAllOptions = false;
+            window = EWindowView.PROJECT_HUB;
+        }
+
+        GUILayout.EndHorizontal();
+        GUILayout.EndVertical();
+    }
+
+    /// <summary>
+    /// Converts each 
+    /// </summary>
+    /// <param name="firstObjectId"></param>
+    /// <param name="isSnapZone"></param>
+    /// <param name="posX">X position</param>
+    /// <param name="posY">Y position</param>
+    /// <param name="posZ">Z position</param>
+    /// <param name="rotX">X rotation</param>
+    /// <param name="rotY">Y rotation</param>
+    /// <param name="rotZ">Z rotation</param>
+    /// <param name="scaleX">X scale</param>
+    /// <param name="scaleY">Y Scale</param>
+    /// <param name="scaleZ">Z Scale</param>
+    public void CreateTeleportCoordinates(string firstObjectId, Boolean isSnapZone, string posX, string posY, string posZ, string rotX, string rotY, string rotZ, string scaleX, string scaleY, string scaleZ)
+    {
+        // Convert position coordinates into a Vector3
+        Vector3 positionCoords = new Vector3(float.Parse(posX, CultureInfo.InvariantCulture.NumberFormat),
+                                                 float.Parse(posY, CultureInfo.InvariantCulture.NumberFormat),
+                                                 float.Parse(posZ, CultureInfo.InvariantCulture.NumberFormat));
+
+        // Convert rotation coordinates into a Quaternion
+        Quaternion rotationCoords = new Quaternion(float.Parse(rotX, CultureInfo.InvariantCulture.NumberFormat),
+                                                   float.Parse(rotY, CultureInfo.InvariantCulture.NumberFormat),
+                                                   float.Parse(rotZ, CultureInfo.InvariantCulture.NumberFormat),
+                                                   1f);
+
+        // Convert scale coordinates into a Vector3
+        Vector3 scaleCoords = new Vector3(float.Parse(scaleX, CultureInfo.InvariantCulture.NumberFormat),
+                                          float.Parse(scaleY, CultureInfo.InvariantCulture.NumberFormat),
+                                          float.Parse(scaleZ, CultureInfo.InvariantCulture.NumberFormat));
+
+
+        // Create the TeleportCoordinates and pass it into the constructor for TeleportAction
+        TeleportCoordinates teleportCoordinates = new TeleportCoordinates(positionCoords, rotationCoords, scaleCoords, isSnapZone);
+        TeleportAction teleportAction = new TeleportAction(teleportCoordinates);
+
+        string id = Guid.NewGuid().ToString();
+
+        FlowBehaviour fb = new FlowBehaviour("Immediate", id, firstObjectId, firstObjectId, teleportAction);
+        AddBehaviour(fb);
+    }
+
+
+    public void CreateTransformUI(string behaviourType)
+    {
+
+        // Setup the coordinates that the object will teleport to
+        if (behaviourType.Equals("teleport"))
+        {
+            EditorGUILayout.LabelField("Enter the position, scale, and rotation (in floats) that the object will " + behaviourType + " to.");
+        }
+            
+
+        if (behaviourType.Equals("snap"))
+        {
+            EditorGUILayout.LabelField("Enter the position, scale, and rotation relative to the zone object that the snapping object will " + behaviourType + " into.");
+        }
+
+        GUILayout.BeginHorizontal();
+
+        GUILayout.Label("Position X");
+        //string positionX;
+        //EditorGUILayout.TextField()
+        positionX = EditorGUILayout.TextField(positionX);
+
+        GUILayout.Label("Position Y");
+        positionY = EditorGUILayout.TextField(positionY);
+
+        GUILayout.Label("Position Z");
+        positionZ = EditorGUILayout.TextField(positionZ);
+
+        GUILayout.EndHorizontal();
+
+
+        GUILayout.BeginHorizontal();
+
+        GUILayout.Label("Rotation X");
+        rotationX = EditorGUILayout.TextField(rotationX);
+
+        GUILayout.Label("Rotation Y");
+        rotationY = EditorGUILayout.TextField(rotationY);
+
+        GUILayout.Label("Rotation Z");
+        rotationZ = EditorGUILayout.TextField(rotationZ);
+
+        GUILayout.EndHorizontal();
+
+
+        GUILayout.BeginHorizontal();
+
+        GUILayout.Label("Scale X");
+        scaleX = EditorGUILayout.TextField(scaleX);
+
+        GUILayout.Label("Scale Y");
+        scaleY = EditorGUILayout.TextField(scaleY);
+
+        GUILayout.Label("Scale Z");
+        scaleZ = EditorGUILayout.TextField(scaleZ);
+
+        GUILayout.EndHorizontal();
+
+    }
+
+    private void _CreateClickView()
+    {
+        GUILayout.BeginVertical();
+
+        if (GUILayout.Button("Back", GUILayout.Height(30), GUILayout.Width(40)))
+        {
+            window = EWindowView.CREATE_BEHAVIOUR;
+        }
+
+        GUILayout.Space(10f);
+        EditorGUILayout.LabelField("On Click");
+        GUILayout.Space(30f);
+
+        selectedTrigger = EditorGUI.Popup(new Rect(0, 100, position.width, 30), "Object trigger:", selectedTrigger, objectOptions);
+
+        GUILayout.Space(120f);
+
+        GUILayout.Label("Press OK to setup the event that will take place when the above object is clicked.");
+        GUILayout.BeginHorizontal();
+
+        if (GUILayout.Button("OK", GUILayout.Height(30), GUILayout.Width(40)))
+        {
+            string firstObject = objectIds[selectedTrigger].ToString();
+
+            string id = Guid.NewGuid().ToString();
+
+            FlowBehaviour fb = new FlowBehaviour("Click", id, firstObject, firstObject, new FlowAction(true));
+            AddBehaviour(fb);
+
+            addingChain = true;
+            window = EWindowView.CREATE_BEHAVIOUR;
+        }
+
+        GUILayout.EndHorizontal();
+        GUILayout.EndVertical();
+    }
+
+    private void _CreateEnableView()
+    {
+        GUILayout.BeginVertical();
+
+        if (GUILayout.Button("Back", GUILayout.Height(30), GUILayout.Width(40)))
+        {
+            window = EWindowView.CREATE_BEHAVIOUR;
+        }
+
+        GUILayout.Space(10f);
+        EditorGUILayout.LabelField("Enable Object");
+        GUILayout.Space(30f);
+
+        selectedTrigger = EditorGUI.Popup(new Rect(0, 100, position.width, 30), "Object to Enable:", selectedTrigger, objectOptions);
+
+        GUILayout.Space(120f);
+
+        GUILayout.Label("Add another Interaction?");
+        GUILayout.BeginHorizontal();
+
+        if (GUILayout.Button("Yes", GUILayout.Height(30), GUILayout.Width(40)))
+        {
+            string firstObject = objectIds[selectedTrigger].ToString();
+
+            FlowAction flowAction = new FlowAction();
+            flowAction.ActionType = "Enable";
+
+            string id = Guid.NewGuid().ToString();
+            
+            FlowBehaviour fb = new FlowBehaviour("Immediate", id, firstObject, firstObject, flowAction);
+            AddBehaviour(fb);
+
+            addingChain = true;
+            window = EWindowView.CREATE_BEHAVIOUR;
+        }
+
+        if (GUILayout.Button("No", GUILayout.Height(30), GUILayout.Width(40)))
+        {
+            string firstObject = objectIds[selectedTrigger].ToString();
+
+            FlowAction flowAction = new FlowAction();
+            flowAction.ActionType = "Enable";
+
+            string id = Guid.NewGuid().ToString();
+
+            FlowBehaviour fb = new FlowBehaviour("Immediate", id, firstObject, firstObject, flowAction);
+            AddBehaviour(fb);
+
+            addingChain = false;
+            showAllOptions = false;
+            window = EWindowView.PROJECT_HUB;
+        }
+
+        GUILayout.EndHorizontal();
+        GUILayout.EndVertical();
+    }
+
+    private void _CreateDisableView()
+    {
+        GUILayout.BeginVertical();
+
+        if (GUILayout.Button("Back", GUILayout.Height(30), GUILayout.Width(40)))
+        {
+            window = EWindowView.CREATE_BEHAVIOUR;
+        }
+
+        GUILayout.Space(10f);
+        EditorGUILayout.LabelField("Disable Object");
+        GUILayout.Space(30f);
+
+        selectedTrigger = EditorGUI.Popup(new Rect(0, 100, position.width, 30), "Object to Disable:", selectedTrigger, objectOptions);
+
+        GUILayout.Space(120f);
+        GUILayout.Label("Add another Interaction?");
+        GUILayout.BeginHorizontal();
+
+        if (GUILayout.Button("Yes", GUILayout.Height(30), GUILayout.Width(40)))
+        {
+            string firstObject = objectIds[selectedTrigger].ToString();
+            
+
+            FlowAction flowAction = new FlowAction();
+            flowAction.ActionType = "Disable";
+
+            string id = Guid.NewGuid().ToString();
+
+            FlowBehaviour fb = new FlowBehaviour("Immediate", id, firstObject, firstObject, flowAction);
+            AddBehaviour(fb);
+
+            addingChain = true;
+            window = EWindowView.CREATE_BEHAVIOUR;
+        }
+
+        if (GUILayout.Button("No", GUILayout.Height(30), GUILayout.Width(40)))
+        {
+            string firstObject = objectIds[selectedTrigger].ToString();
+
+            FlowAction flowAction = new FlowAction();
+            flowAction.ActionType = "Disable";
+
+            string id = Guid.NewGuid().ToString();
+            
+            FlowBehaviour fb = new FlowBehaviour("Immediate", id, firstObject, firstObject, flowAction);
+            AddBehaviour(fb);
+
+            addingChain = false;
+            window = EWindowView.PROJECT_HUB;
+        }
+
+        GUILayout.EndHorizontal();
+        GUILayout.EndVertical();
+    }
+
+    private void _CreateSnapZoneView()
+    {
+        GUILayout.BeginVertical();
+
+        if (GUILayout.Button("Back", GUILayout.Height(30), GUILayout.Width(40)))
+        {
+            window = EWindowView.CREATE_BEHAVIOUR;
+        }
+
+        GUILayout.Space(10f);
+        EditorGUILayout.LabelField("Snap Zone");
+        //GUILayout.Space(30f);
+
+        EditorGUILayout.LabelField("Select the snap zone object. Then select the object that will snap into the snap zone object.");
+        GUILayout.Space(30f);
+
+        selectedTarget = EditorGUI.Popup(new Rect(0, 100, position.width, 30), "Snap Zone Object:", selectedTarget, objectOptions);
+        selectedTrigger = EditorGUI.Popup(new Rect(0, 130, position.width, 30), "Snapping Object:", selectedTrigger, objectOptions);
+        
+        GUILayout.Space(80f);
+
+        CreateTransformUI("snap");
+
+
+        GUILayout.Space(100f);
+        GUILayout.Label("Add another interaction?");
+        GUILayout.BeginHorizontal();
+
+        if (GUILayout.Button("Yes", GUILayout.Height(30), GUILayout.Width(40)))
+        {
+            string firstObjectId = objectIds[selectedTrigger].ToString();
+
+            CreateTeleportCoordinates(firstObjectId, true, positionX, positionY, positionZ, rotationX, rotationY, rotationZ, scaleX, scaleY, scaleZ);
+
+            addingChain = true;
+            window = EWindowView.CREATE_BEHAVIOUR;
+        }
+
+        if (GUILayout.Button("No", GUILayout.Height(30), GUILayout.Width(40)))
+        {
+            string firstObject = objectIds[selectedTrigger].ToString();
+
+            CreateTeleportCoordinates(firstObject, true, positionX, positionY, positionZ, rotationX, rotationY, rotationZ, scaleX, scaleY, scaleZ);
+
+            addingChain = false;
+            showAllOptions = false;
+            window = EWindowView.PROJECT_HUB;
+        }
+
+        GUILayout.EndHorizontal();
+        GUILayout.EndVertical();
+    }
+
+
+    /// <summary>
+    /// If not adding on to the behaviour chain, then sends a CreateBehaviour request to server.
+    /// If adding on to the behaviour chain, then adds the flowBehaviour to the end of the current chain
+    /// </summary>
+    /// <param name="flowbehaviour"></param>
+    private void AddBehaviour(FlowBehaviour newFlowBehaviour)
+    {
+        Debug.Log("About to add behaviour");
+        // Create the list of behaviours that need to add newFlowBehaviour to their chain 
+        List<string> behavioursToLinkTo = new List<string>();
+        if(BehaviourEventManager.PreviousBehaviourId != null)
+        {
+            behavioursToLinkTo.Add(BehaviourEventManager.PreviousBehaviourId);
+        }
+
+        // Create the new behaviour
+        Operations.CreateBehaviour(newFlowBehaviour, ConfigurationSingleton.SingleInstance.CurrentProject.Id, behavioursToLinkTo, (sender, e) =>
+        {
+            if(e.message.WasSuccessful == true)
+            {
+                // Update the Previous behaviour Id
+                BehaviourEventManager.PreviousBehaviourId = e.message.flowBehaviour.Id;
+            }
+
+            else
+            {
+                Debug.LogWarning("Failed to create behaviour");
+            }
+        });
+    }
 }
+

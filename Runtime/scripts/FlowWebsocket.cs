@@ -23,7 +23,8 @@ namespace Packages.realityflow_package.Runtime.scripts
     /// a message is received over a websocket connection)
     /// </summary>
     [ExecuteAlways]
-    public class FlowWebsocket : MonoBehaviour
+    [Serializable]
+    public class FlowWebsocket
     {
         /// <summary>
         /// A message parser is the part of the program that interprets and brings
@@ -34,6 +35,8 @@ namespace Packages.realityflow_package.Runtime.scripts
         public MessageParser messageParser;
 
         public static List<String> ReceivedMessages = new List<string>();
+
+        [NonSerialized]
         public static WebSocketSharp.WebSocket websocket;
 
         public bool IsConnected { get; private set; }
@@ -83,22 +86,22 @@ namespace Packages.realityflow_package.Runtime.scripts
             }
         }
 
-        /// <summary>
-        /// Send a message
-        /// </summary>
-        /// <param name="message">Message to send</param>
-        public new void SendMessage(string message)
-        {
-            Debug.Log("Sending message: " + message);
-            websocket.Send(message);
-        }
+        ///// <summary>
+        ///// Send a message
+        ///// </summary>
+        ///// <param name="message">Message to send</param>
+        //public new void SendMessage(string message)
+        //{
+        //    Debug.Log("Sending message: " + message);
+        //    websocket.Send(message);
+        //}
 
         /// <summary>
         /// Send a message
         /// </summary>
         /// <typeparam name="T">Type of message that should be sent (Needs to inherit from base message)</typeparam>
         /// <param name="message">The message object that should be sent</param>
-        public void SendMessage<T>(T message) where T : BaseMessage
+        public static void SendMessage<T>(T message) where T : BaseMessage
         {
             string sentMessage = MessageSerializer.SerializeMessage(message);
 
@@ -149,17 +152,21 @@ namespace Packages.realityflow_package.Runtime.scripts
         {
             try
             {
-                foreach (string message in ReceivedMessages)
+                for(int i = 0; i < ReceivedMessages.Count; i++)
                 {
-                    Debug.Log("Received message: " + message);
-                    messageParser(message);
-                    //GameObject.CreatePrimitive(PrimitiveType.Cube);
+                    Debug.Log("Received message: " + ReceivedMessages[i]);
+                    messageParser(ReceivedMessages[i]);
                 }
+                //foreach (string message in ReceivedMessages)
+                //{
+                //    //GameObject.CreatePrimitive(PrimitiveType.Cube);
+                //}
             }
             catch (Exception e)
             {
-                Debug.LogError(e);
+                Debug.LogWarning(e);
             }
+
 
             ReceivedMessages.RemoveAll((o) => true); // Remove everything from the list
 

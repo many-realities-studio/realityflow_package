@@ -9,15 +9,16 @@ using System.Threading.Tasks;
 
 namespace Packages.realityflow_package.Runtime.scripts.Messages.RoomMessages
 {
-    public class JoinRoom_Received : ReceivedMessage
+    public class UserLeftRoom_Received : ReceivedMessage
     {
-        [JsonProperty("flowProject")]
-        public FlowProject flowProject { get; set; }
+        [JsonProperty("Message")]
+        public string leftRoomMessage { get; set; }
 
-        public JoinRoom_Received(FlowProject flowProject) : base(typeof(JoinRoom_Received))
+        public UserLeftRoom_Received(string Message) : base(typeof(UserLeftRoom_Received))
         {
-            this.flowProject = flowProject;
-            this.MessageType = "JoinRoom";
+            this.leftRoomMessage = Message;
+            this.MessageType = "UserLeftRoom";
+
         }
     }
 }

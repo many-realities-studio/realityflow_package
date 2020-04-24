@@ -21,7 +21,7 @@ namespace Packages.realityflow_package.Runtime.scripts
 
         private void OnValidate()
         {
-            Debug.Log("OnValidate");
+            //Debug.Log("OnValidate");
         }
 
         public void Update()
