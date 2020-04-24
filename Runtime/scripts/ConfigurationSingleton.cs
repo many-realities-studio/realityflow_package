@@ -1,10 +1,5 @@
 ﻿using RealityFlow.Plugin.Scripts;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEditor;
 using UnityEngine;
 
 namespace Packages.realityflow_package.Runtime.scripts
@@ -14,12 +9,13 @@ namespace Packages.realityflow_package.Runtime.scripts
     public class ConfigurationSingleton : ScriptableObject
     {
         private static ConfigurationSingleton _SingleInstance = null;
-        public static ConfigurationSingleton SingleInstance 
-        { 
-            get => _SingleInstance is null ? _SingleInstance = new ConfigurationSingleton() : _SingleInstance; 
-            set => _SingleInstance = value; 
+
+        public static ConfigurationSingleton SingleInstance
+        {
+            get => _SingleInstance is null ? _SingleInstance = new ConfigurationSingleton() : _SingleInstance;
+            set => _SingleInstance = value;
         }
- 
+
         [SerializeField]
         private FlowProject s_currentProject;
 

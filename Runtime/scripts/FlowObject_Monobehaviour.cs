@@ -1,9 +1,5 @@
 ﻿using RealityFlow.Plugin.Scripts;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 
 namespace Packages.realityflow_package.Runtime.scripts
@@ -16,7 +12,6 @@ namespace Packages.realityflow_package.Runtime.scripts
 
         private void OnEnable()
         {
-
         }
 
         private void OnValidate()

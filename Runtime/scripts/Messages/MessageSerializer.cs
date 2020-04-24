@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.Serialization.Json;
-using System.Text;
-using System.Threading.Tasks;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
+using System;
 
 namespace Packages.realityflow_package.Runtime.scripts.Messages
 {
@@ -18,63 +12,17 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages
     /// </summary>
     public static class MessageSerializer
     {
-        /// <summary>
-        /// Gets all classes that inherit from <see cref="BaseMessage"/>
-        /// <Found from: https://stackoverflow.com/questions/857705/get-all-derived-types-of-a-type
-        /// </summary>
-        private static Type[] messageTypes = (
-                    from domainAssembly in AppDomain.CurrentDomain.GetAssemblies()
-                    from assemblyType in domainAssembly.GetTypes()
-                    where typeof(BaseMessage).IsAssignableFrom(assemblyType)
-                    && !assemblyType.IsAbstract
-                    select assemblyType).ToArray();
-
-        /// <summary>
-        /// Handles serialization and de-serialization of classes that inherit from <see cref="BaseMessage"/>
-        /// </summary>
-        private static DataContractJsonSerializer JsonSerializer = new DataContractJsonSerializer(typeof(Messages.BaseMessage), messageTypes);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <typeparam name="T">The type of message you are trying to serialize</typeparam>
-        /// <param name="messageToSerialize">The message object that you want to serialize</param>
-        /// <returns></returns>
         public static string SerializeMessage<T>(T messageToSerialize) where T : BaseMessage
         {
             return JsonConvert.SerializeObject(messageToSerialize, new JsonSerializerSettings()
             {
                 ReferenceLoopHandling = ReferenceLoopHandling.Ignore
             });
-
-            //MemoryStream memoryStream = new MemoryStream();
-
-            //JsonSerializer.WriteObject(memoryStream, messageToSerialize);
-
-            //memoryStream.Position = 0;
-
-            //return memoryStream;
         }
 
         public static dynamic DesearializeObject(string messageToDeserialize, Type type)
         {
             return JsonConvert.DeserializeObject(messageToDeserialize, type);
-
-            //MemoryStream memoryStream = new MemoryStream(Encoding.UTF8.GetBytes(messageToDeserialize));
-            //memoryStream.Position = 0;
-
-            //return (T)JsonSerializer.ReadObject(memoryStream);
-        }
-
-        public static string ConvertToString<T>(T messageToSerialize) where T : BaseMessage
-        {
-            //MemoryStream memoryStream = SerializeMessage<T>(messageToSerialize);
-
-            //memoryStream.Position = 0;
-            //var sr = new StreamReader(memoryStream);
-            //string sentMessage = sr.ReadToEnd();
-
-            return SerializeMessage(messageToSerialize);
         }
     }
 }

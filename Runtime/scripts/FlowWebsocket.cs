@@ -1,16 +1,8 @@
 ﻿using Packages.realityflow_package.Runtime.scripts.Messages;
-using Packages.realityflow_package.Runtime.scripts.Messages.ObjectMessages;
-using Packages.realityflow_package.Runtime.scripts.Messages.UserMessages;
 using RealityFlow.Plugin.Scripts;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.Serialization;
-using System.Runtime.Serialization.Json;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 using WebSocketSharp;
 
@@ -18,7 +10,7 @@ namespace Packages.realityflow_package.Runtime.scripts
 {
     /// <summary>
     /// The purpose of this class is to provide a wrapper for websockets that
-    /// allows for the use of websockets with Unity. The reason this is necessary is because 
+    /// allows for the use of websockets with Unity. The reason this is necessary is because
     /// Unity cannot be interacted with from within a event (the event that gets fired when
     /// a message is received over a websocket connection)
     /// </summary>
@@ -32,6 +24,7 @@ namespace Packages.realityflow_package.Runtime.scripts
         /// </summary>
         /// <param name="message"></param>
         public delegate void MessageParser(string message);
+
         public MessageParser messageParser;
 
         public static List<String> ReceivedMessages = new List<string>();
@@ -66,7 +59,6 @@ namespace Packages.realityflow_package.Runtime.scripts
                 websocket.SetCredentials(username, password, true);
                 websocket.Connect();
 
-
                 IsConnected = true;
             }
             catch (Exception e)
@@ -75,26 +67,15 @@ namespace Packages.realityflow_package.Runtime.scripts
                 Debug.LogError("Failed to establish connection to: " + url + ", " + e);
             }
 
-
             if (websocket.ReadyState == WebSocketState.Open)
             {
-                Debug.Log("Connection is open with: " + url); 
+                Debug.Log("Connection is open with: " + url);
             }
             else
             {
                 Debug.LogError("Failed to open connection with: " + url);
             }
         }
-
-        ///// <summary>
-        ///// Send a message
-        ///// </summary>
-        ///// <param name="message">Message to send</param>
-        //public new void SendMessage(string message)
-        //{
-        //    Debug.Log("Sending message: " + message);
-        //    websocket.Send(message);
-        //}
 
         /// <summary>
         /// Send a message
@@ -115,23 +96,8 @@ namespace Packages.realityflow_package.Runtime.scripts
             {
                 Debug.LogError("Failed to send message: " + sentMessage + " " + e);
             }
-
-            //System.IO.File.WriteAllText(@"C:\Users\Matthew Kurtz\Desktop\FlowTests\SentCommands\" + typeof(T).ToString() + ".json", sentMessage);
-
-            // Deserialization (for debbugging purposes)
-            //CreateObject_SendToServer response = MessageSerializer.DesearializeObject<CreateObject_SendToServer>(sentMessage);
-
-            //Debug.Log(response.ToString());
         }
 
-        //public void SendMessage(FlowEvent flowEvent)
-        //{
-        //    string messageToSend = JsonUtility.ToJson(flowEvent);
-
-        //    Debug.Log("Sending message: " + messageToSend);
-        //    websocket.Send(messageToSend);
-        //}
-        
         /// <summary>
         /// This is the callback function for when a message is received over a websocket connection
         /// </summary>
@@ -152,21 +118,16 @@ namespace Packages.realityflow_package.Runtime.scripts
         {
             try
             {
-                for(int i = 0; i < ReceivedMessages.Count; i++)
+                for (int i = 0; i < ReceivedMessages.Count; i++)
                 {
                     Debug.Log("Received message: " + ReceivedMessages[i]);
                     messageParser(ReceivedMessages[i]);
                 }
-                //foreach (string message in ReceivedMessages)
-                //{
-                //    //GameObject.CreatePrimitive(PrimitiveType.Cube);
-                //}
             }
             catch (Exception e)
             {
                 Debug.LogWarning(e);
             }
-
 
             ReceivedMessages.RemoveAll((o) => true); // Remove everything from the list
 

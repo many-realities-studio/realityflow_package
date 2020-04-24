@@ -1,21 +1,16 @@
 ﻿//using Newtonsoft.Json;
 using Packages.realityflow_package.Runtime.scripts.Messages;
-using Packages.realityflow_package.Runtime.scripts.Messages.UserMessages;
-//using RealityFlow.Plugin.Scripts.Events;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.Serialization;
-using System.Runtime.Serialization.Json;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine;
+using Packages.realityflow_package.Runtime.scripts.Messages.BehaviourMessages;
+using Packages.realityflow_package.Runtime.scripts.Messages.CheckoutMessages;
 using Packages.realityflow_package.Runtime.scripts.Messages.ObjectMessages;
 using Packages.realityflow_package.Runtime.scripts.Messages.ProjectMessages;
 using Packages.realityflow_package.Runtime.scripts.Messages.RoomMessages;
-using Packages.realityflow_package.Runtime.scripts.Messages.BehaviourMessages;
-using Packages.realityflow_package.Runtime.scripts.Messages.CheckoutMessages;
+using Packages.realityflow_package.Runtime.scripts.Messages.UserMessages;
+
+//using RealityFlow.Plugin.Scripts.Events;
+using System;
+using System.Collections.Generic;
+using UnityEngine;
 
 namespace Packages.realityflow_package.Runtime.scripts
 {
@@ -25,14 +20,14 @@ namespace Packages.realityflow_package.Runtime.scripts
     /// </summary>
     public class ReceivedMessageParser
     {
-        public static Dictionary<string, Type> messageRouter = new Dictionary<string,Type>();
+        public static Dictionary<string, Type> messageRouter = new Dictionary<string, Type>();
 
         /// <summary>
-        /// Links all message types to their respective function. Note that this can be improved 
+        /// Links all message types to their respective function. Note that this can be improved
         /// such that each message object adds themself to the dictionary
         /// </summary>
         static ReceivedMessageParser()
-        {            
+        {
             // Object Messages
             messageRouter.Add("CreateObject", typeof(CreateObject_Received));
             messageRouter.Add("DeleteObject", typeof(DeleteObject_Received));
@@ -63,7 +58,6 @@ namespace Packages.realityflow_package.Runtime.scripts
             // Checkout system messages
             messageRouter.Add("CheckinObject", typeof(CheckinObject_Received));
             messageRouter.Add("CheckoutObject", typeof(CheckoutObject_Received));
-
         }
 
         /// <summary>
@@ -73,7 +67,7 @@ namespace Packages.realityflow_package.Runtime.scripts
         public static void Parse(string message)
         {
             string messageType = GetMessageType(message);
-            if(messageRouter.ContainsKey(messageType))
+            if (messageRouter.ContainsKey(messageType))
             {
                 dynamic obj = MessageSerializer.DesearializeObject(message, messageRouter[messageType]);
                 obj.RaiseEvent();

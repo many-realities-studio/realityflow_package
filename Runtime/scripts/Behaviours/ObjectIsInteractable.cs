@@ -1,10 +1,10 @@
-﻿using System;
+﻿using Microsoft.MixedReality.Toolkit.UI;
+using Microsoft.MixedReality.Toolkit.Utilities;
+using RealityFlow.Plugin.Scripts;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
-using Microsoft.MixedReality.Toolkit.UI;
 using UnityEngine.EventSystems;
-using RealityFlow.Plugin.Scripts;
-using Microsoft.MixedReality.Toolkit.Utilities;
 
 namespace Behaviours
 {
@@ -24,7 +24,6 @@ namespace Behaviours
 
         private string objectId;
 
-
         #region Monobehaviour Methods
 
         /// <summary>
@@ -35,8 +34,7 @@ namespace Behaviours
             return objectId;
         }
 
-
-        #endregion // Monobehaviour Methods
+        #endregion Monobehaviour Methods
 
         #region Trigger Methods
 
@@ -51,16 +49,6 @@ namespace Behaviours
                 SetEventTrigger.Invoke();
             }
         }
-
-        //private void OnMouseDown()
-        //{
-        //    Debug.Log("clicked");
-        //    if (interactableEvents.ContainsValue("Click"))
-        //    {
-        //        SetEventTrigger.Invoke();
-        //    }
-        //}
-
 
         public void OnPointerClick(PointerEventData eventData)
         {
@@ -111,8 +99,6 @@ namespace Behaviours
             {
                 interactableScript = gameObject.AddComponent<Interactable>();
 
-               // interactableScript.Profiles[0].Target = gameObject;
-                //interactableScript.Profiles[0].Themes.Add(new Theme());
                 interactableScript.IsEnabled = true;
                 interactableScript.States = BehaviourEventManager.DefaultInteractableStates;
                 interactableScript.OnClick.AddListener(() => OnSelect());
@@ -123,7 +109,6 @@ namespace Behaviours
                 {
                     Camera.main.gameObject.AddComponent<PhysicsRaycaster>();
                 }
-                
             }
         }
 
@@ -136,7 +121,7 @@ namespace Behaviours
             CurrentEvent = null;
         }
 
-        #endregion // Trigger Methods
+        #endregion Trigger Methods
 
         #region Custom Methods
 
@@ -175,11 +160,11 @@ namespace Behaviours
         /// <param name="e"></param>
         public void AddInteractableEvent(FlowBehaviour e)
         {
-            if(interactableEvents == null)
+            if (interactableEvents == null)
             {
                 interactableEvents = new SerializableDictionary<FlowBehaviour, string>();
             }
-            
+
             if (!interactableEvents.ContainsKey(e))
             {
                 SetEventTrigger += e.EventTrigger;
@@ -261,7 +246,7 @@ namespace Behaviours
             }
         }
 
-        #endregion // Custom Methods
+        #endregion Custom Methods
 
         #region Interactablility Bools
 
@@ -291,7 +276,6 @@ namespace Behaviours
             return false;
         }
 
-        #endregion // Interactability Bools
+        #endregion Interactablility Bools
     }
-
 }

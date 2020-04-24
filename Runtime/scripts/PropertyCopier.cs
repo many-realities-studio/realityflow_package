@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Packages.realityflow_package.Runtime.scripts
+﻿namespace Packages.realityflow_package.Runtime.scripts
 {
     /// <summary>
     /// The purpose of this class is to copy the properties of one object into another

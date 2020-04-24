@@ -1,8 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
 using System.Runtime.Serialization;
-using UnityEngine;
-
 
 namespace RealityFlow.Plugin.Scripts
 {
@@ -11,8 +7,10 @@ namespace RealityFlow.Plugin.Scripts
     {
         [DataMember]
         public string Username { get; set; }
+
         [DataMember]
         public string Password { get; set; }
+
         [DataMember]
         public string Id { get; set; }
 
@@ -21,6 +19,5 @@ namespace RealityFlow.Plugin.Scripts
             this.Username = username;
             this.Password = password;
         }
-
     }
 }

@@ -1,25 +1,19 @@
 ﻿using Newtonsoft.Json;
 using RealityFlow.Plugin.Scripts;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.Serialization;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Packages.realityflow_package.Runtime.scripts.Messages.ProjectMessages
 {
     /// <summary>
-    /// Create project request message format 
+    /// Create project request message format
     /// Receive: <see cref="CreateProject_Received"/>
     /// </summary>
     public class CreateProject_SendToServer : BaseMessage
     {
         [JsonProperty("FlowProject")]
-        FlowProject flowProject { get; set; }
+        private FlowProject flowProject { get; set; }
 
         [JsonProperty("FlowUser")]
-        FlowUser flowUser { get; set; }
+        private FlowUser flowUser { get; set; }
 
         public CreateProject_SendToServer(FlowProject flowProject, FlowUser flowUser)
         {
@@ -30,16 +24,16 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.ProjectMessages
     }
 
     /// <summary>
-    /// Delete project request message format 
+    /// Delete project request message format
     /// Receive: <see cref="DeleteProject_Received"/>
     /// </summary>
     public class DeleteProject_SendToServer : BaseMessage
     {
         [JsonProperty("FlowProject")]
-        FlowProject flowProject { get; set; }
+        private FlowProject flowProject { get; set; }
 
         [JsonProperty("FlowUser")]
-        FlowUser flowUser { get; set; }
+        private FlowUser flowUser { get; set; }
 
         public DeleteProject_SendToServer(FlowProject flowProject, FlowUser flowUser)
         {
@@ -50,16 +44,16 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.ProjectMessages
     }
 
     /// <summary>
-    /// Open project request message format 
+    /// Open project request message format
     /// <see cref="OpenProject_Received"/>
     /// </summary>
     public class OpenProject_SendToServer : BaseMessage
     {
         [JsonProperty("ProjectId")]
-        string projectId { get; set; }
+        private string projectId { get; set; }
 
         [JsonProperty("FlowUser")]
-        FlowUser flowUser { get; set; }
+        private FlowUser flowUser { get; set; }
 
         public OpenProject_SendToServer(string projectId, FlowUser flowUser)
         {
@@ -70,16 +64,16 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.ProjectMessages
     }
 
     /// <summary>
-    /// Leave project request message format 
+    /// Leave project request message format
     /// <see cref="LeaveProject_Received"/>
     /// </summary>
     public class LeaveProject_SendToServer : BaseMessage
     {
         [JsonProperty("ProjectId")]
-        string projectId { get; set; }
+        private string projectId { get; set; }
 
         [JsonProperty("FlowUser")]
-        FlowUser flowUser { get; set; }
+        private FlowUser flowUser { get; set; }
 
         public LeaveProject_SendToServer(string projectId, FlowUser flowUser)
         {
@@ -90,13 +84,13 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.ProjectMessages
     }
 
     /// <summary>
-    /// Message format to request a list of all projects that the user has 
+    /// Message format to request a list of all projects that the user has
     /// <see cref="GetAllUserProjects_Received"/>
     /// </summary>
     public class GetAllUserProjects_SendToServer : BaseMessage
     {
         [JsonProperty("FlowUser")]
-        FlowUser flowUser { get; set; }
+        private FlowUser flowUser { get; set; }
 
         public GetAllUserProjects_SendToServer(FlowUser flowUser)
         {

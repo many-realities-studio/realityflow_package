@@ -5,7 +5,6 @@ namespace Behaviours
 {
     public class TeleportCoordinates
     {
-
         public Vector3 coordinates = Vector3.zero;
         public Quaternion rotation = Quaternion.identity;
         public Vector3 scale = Vector3.one;
@@ -57,10 +56,12 @@ namespace Behaviours
         {
             coordinates = newCoordinates;
         }
+
         public void SetScale(Vector3 newScale)
         {
             scale = newScale;
         }
+
         public void SetRotation(Quaternion newRot)
         {
             rotation = newRot;
