@@ -140,10 +140,10 @@ namespace Packages.realityflow_package.Runtime.scripts
         }
 
 
-        public static void DeleteBehaviour(List<string> behaviourIds, string projectId, DeleteBehaviour_Received.DeleteBehaviourReceived_EventHandler callbackFunction)
+        public static void DeleteBehaviour(List<string> behaviourIds, string projectId, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
         {
             DeleteBehaviour_SendToServer deleteBehaviour = new DeleteBehaviour_SendToServer(behaviourIds, projectId);
-            _FlowWebsocket.SendMessage(deleteBehaviour);
+            FlowWebsocket.SendMessage(deleteBehaviour);
 
             ReceivedMessage.AddEventHandler(typeof(DeleteBehaviour_Received), true, callbackFunction);
         }
