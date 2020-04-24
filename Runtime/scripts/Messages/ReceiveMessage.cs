@@ -1,15 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.Serialization;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Packages.realityflow_package.Runtime.scripts.Messages
 {
     public abstract class ReceivedMessage : BaseMessage
     {
         private static Dictionary<Type, List<ReceivedMessageEventHandler>> receivedMessageEventHandlers_ToBeRemovedAfterInvoke = new Dictionary<Type, List<ReceivedMessageEventHandler>>();
+
         public ReceivedMessage(Type typeOfObject)
         {
             if (receivedMessageEventHandlers.ContainsKey(typeOfObject) == false)
@@ -69,6 +66,7 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages
     {
         public dynamic message;
         public Type typeOfMessage;
+
         public BaseReceivedEventArgs(dynamic receivedMessage, Type typeOfMessage)
         {
             message = receivedMessage;

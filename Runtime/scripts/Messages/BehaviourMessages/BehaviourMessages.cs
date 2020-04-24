@@ -1,31 +1,23 @@
 ﻿using Newtonsoft.Json;
 using RealityFlow.Plugin.Scripts;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.Serialization;
-using System.Text;
-using System.Threading.Tasks;
-using Behaviours;
 
 namespace Packages.realityflow_package.Runtime.scripts.Messages.BehaviourMessages
 {
     /// <summary>
-    /// Create behaviour request message format 
+    /// Create behaviour request message format
     /// Receive: <see cref="CreateBehaviour_Received"/>
     /// </summary>
     public class CreateBehaviour_SendToServer : BaseMessage
     {
         [JsonProperty("FlowBehaviour")]
-        FlowBehaviour FlowBehaviour { get; set; }
+        private FlowBehaviour FlowBehaviour { get; set; }
 
         [JsonProperty("ProjectId")]
-        string ProjectId { get; set; }
-
+        private string ProjectId { get; set; }
 
         [JsonProperty("BehaviorsToLinkTo")]
-        List<string> BehavioursToLinkTo { get; set; } 
-
+        private List<string> BehavioursToLinkTo { get; set; }
 
         public CreateBehaviour_SendToServer(FlowBehaviour behaviour, string projectId, List<string> behavioursToLinkTo)
         {
@@ -38,17 +30,16 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.BehaviourMessage
     }
 
     /// <summary>
-    /// Delete project request message format 
+    /// Delete project request message format
     /// Receive: <see cref="DeleteBehaviour_Received"/>
     /// </summary>
     public class DeleteBehaviour_SendToServer : BaseMessage
     {
         [JsonProperty("ProjectId")]
-        string ProjectId { get; set; }
+        private string ProjectId { get; set; }
 
         [JsonProperty("BehaviourIds")]
-        List<string> behaviourIds { get; set; }
-
+        private List<string> behaviourIds { get; set; }
 
         public DeleteBehaviour_SendToServer(List<string> behaviourIds, string projectId)
         {
@@ -58,20 +49,17 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.BehaviourMessage
         }
     }
 
-
-
     /// <summary>
-    /// Update behaviour request message format 
+    /// Update behaviour request message format
     /// Receive: <see cref="UpdateBehaviour_Received"/>
     /// </summary>
     public class UpdateBehaviour_SendToServer : BaseMessage
     {
         [JsonProperty("FlowBehaviour")]
-        FlowBehaviour FlowBehaviour { get; set; }
+        private FlowBehaviour FlowBehaviour { get; set; }
 
         [JsonProperty("ProjectId")]
-        string ProjectId { get; set; }
-
+        private string ProjectId { get; set; }
 
         public UpdateBehaviour_SendToServer(FlowBehaviour behaviour, string projectId)
         {

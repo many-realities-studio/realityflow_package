@@ -1,17 +1,12 @@
 ﻿using Behaviours;
 using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Packages.realityflow_package.Runtime.scripts.Structures.Actions
 {
     public class TeleportAction : FlowAction
     {
         public TeleportCoordinates teleportCoordinates;
-
 
         [JsonConstructor]
         public TeleportAction(TeleportCoordinates teleportCoordinates, string Id, string ActionType)
