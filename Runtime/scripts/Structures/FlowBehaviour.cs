@@ -146,9 +146,6 @@ namespace RealityFlow.Plugin.Scripts
         {
             Debug.Log("Inside OnCallDown");
 
-            GameObject triggerObject = FlowTObject.idToGameObjectMapping[TriggerObjectId].AttachedGameObject;//BehaviourEventManager.GetGoFromGuid(TriggerObjectId);
-            GameObject targetObject = FlowTObject.idToGameObjectMapping[TargetObjectId].AttachedGameObject;//BehaviourEventManager.GetGoFromGuid(TargetObjectId);
-
             // If it's a click event, just trigger the behaviours in its next behaviour list
             if (scriptName.Equals("Click"))
             {
@@ -168,6 +165,9 @@ namespace RealityFlow.Plugin.Scripts
                 return;
             }
 
+            GameObject triggerObject = FlowTObject.idToGameObjectMapping[TriggerObjectId].AttachedGameObject;//BehaviourEventManager.GetGoFromGuid(TriggerObjectId);
+            GameObject targetObject = FlowTObject.idToGameObjectMapping[TargetObjectId].AttachedGameObject;//BehaviourEventManager.GetGoFromGuid(TargetObjectId);
+
             // is meant to communicate with the server
            // CallBehaviourEvent();
 
@@ -185,7 +185,7 @@ namespace RealityFlow.Plugin.Scripts
                     return;
                 case "SnapZone":
                     // take in more info than teleport, but basically acts as a teleport within the other object
-                    if (targetObject.GetComponent<TeleportCoordinates>().IsSnapZone)
+                    if (flowAction.teleportCoordinates.IsSnapZone)
                     {
                         //triggerObject.transform.position = targetObject.transform.position + targetObject.GetComponent<TeleportCoordinates>().GetCoordinates();
                         triggerObject.transform.position = targetObject.transform.position + flowAction.teleportCoordinates.GetCoordinates();
@@ -210,7 +210,6 @@ namespace RealityFlow.Plugin.Scripts
                     return;
 
             }
-
         }
     }
 }
