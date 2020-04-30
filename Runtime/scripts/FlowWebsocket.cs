@@ -64,7 +64,7 @@ namespace Packages.realityflow_package.Runtime.scripts
             catch (Exception e)
             {
                 IsConnected = false;
-                Debug.LogError("Failed to establish connection to: " + url + ", " + e);
+                Debug.LogWarning("Failed to establish connection to: " + url + ", " + e);
             }
 
             if (websocket.ReadyState == WebSocketState.Open)
@@ -73,7 +73,7 @@ namespace Packages.realityflow_package.Runtime.scripts
             }
             else
             {
-                Debug.LogError("Failed to open connection with: " + url);
+                Debug.LogWarning("Failed to open connection with: " + url);
             }
         }
 
