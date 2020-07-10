@@ -1,13 +1,10 @@
-﻿using Newtonsoft.Json;
-using System;
-using System.Linq;
-using System.Collections.Generic;
-using System.Runtime.Serialization;
-using UnityEngine;
-using Packages.realityflow_package.Runtime.scripts.Structures.Actions;
-using Behaviours;
+﻿using Behaviours;
+using Newtonsoft.Json;
 using Packages.realityflow_package.Runtime.scripts.Messages;
-using Newtonsoft.Json.Linq;
+using Packages.realityflow_package.Runtime.scripts.Structures.Actions;
+using System;
+using System.Collections.Generic;
+using UnityEngine;
 
 namespace RealityFlow.Plugin.Scripts
 {
@@ -46,14 +43,13 @@ namespace RealityFlow.Plugin.Scripts
             get => _flowAction;
             set
             {
-
-                if(value == null || (value.GetType() == typeof(string) && value == "null"))
+                if (value == null || (value.GetType() == typeof(string) && value == "null"))
                 {
                     _flowAction = new FlowAction(true);
                 }
                 else if (value.GetType().IsSubclassOf(typeof(FlowAction)) == false && value.GetType() != typeof(FlowAction))
                 {
-                    FlowAction baseAction = MessageSerializer.DesearializeObject<FlowAction>(value);
+                    FlowAction baseAction = MessageSerializer.DesearializeObject(value, typeof(FlowAction));
                     _flowAction = FlowAction.ConvertToChildClass(value, baseAction.ActionType);
                 }
                 else
@@ -63,11 +59,7 @@ namespace RealityFlow.Plugin.Scripts
             }
         }
 
-        // public delegate void ParseMessage(string message); // Definition of a parse message method
-
-        // public static Dictionary<string, ParseMessage> messageRouter = new Dictionary<string, ParseMessage>();
-
-        [JsonConstructor] 
+        [JsonConstructor]
         public FlowBehaviour(string typeOfTrigger, string id, string triggerObjectId, string targetObjectId, List<string> nextBehaviour, dynamic flowAction)
         {
             TypeOfTrigger = typeOfTrigger;
@@ -75,21 +67,6 @@ namespace RealityFlow.Plugin.Scripts
             TriggerObjectId = triggerObjectId;
             TargetObjectId = targetObjectId;
             NextBehaviour = nextBehaviour;
-
-            //NextBehaviour = new List<string>();
-            //if (nextBehaviour is String)
-            //{
-            //    if(nextBehaviour.Equals("[]"))
-            //    Debug.Log("it's zero");
-            //    NextBehaviour = new List<string>();
-            //}
-            //else
-            //{
-            //    if(nextBehaviour.Count > 0)
-            //    {
-            //        NextBehaviour.Add(nextBehaviour);
-            //    }
-            //}
 
             this.flowAction = flowAction;
             EventCalled += BehaviourEventManager.ListenToEvents;
@@ -115,7 +92,6 @@ namespace RealityFlow.Plugin.Scripts
             OnCallDown(BehaviourName);
         }
 
-
         /// <summary>
         /// Invokes event for this behaviour - subscribed to by BEM
         /// </summary>
@@ -123,7 +99,6 @@ namespace RealityFlow.Plugin.Scripts
         {
             EventCalled.Invoke(BehaviourName, TriggerObjectId, TargetObjectId, NextBehaviour);
         }
-
 
         public string GetBehaviourName()
         {
@@ -137,7 +112,6 @@ namespace RealityFlow.Plugin.Scripts
             return flowBehaviourName;
         }
 
-
         /// <summary>
         /// Determines logic based on scriptName to decide on what should be done on event call
         /// </summary>
@@ -145,9 +119,6 @@ namespace RealityFlow.Plugin.Scripts
         private void OnCallDown(string scriptName)
         {
             Debug.Log("Inside OnCallDown");
-
-            GameObject triggerObject = BehaviourEventManager.GetGoFromGuid(TriggerObjectId);
-            GameObject targetObject = BehaviourEventManager.GetGoFromGuid(TargetObjectId);
 
             // If it's a click event, just trigger the behaviours in its next behaviour list
             if (scriptName.Equals("Click"))
@@ -168,49 +139,44 @@ namespace RealityFlow.Plugin.Scripts
                 return;
             }
 
-            // is meant to communicate with the server
-           // CallBehaviourEvent();
+            GameObject triggerObject = FlowTObject.idToGameObjectMapping[TriggerObjectId].AttachedGameObject;
+            GameObject targetObject = FlowTObject.idToGameObjectMapping[TargetObjectId].AttachedGameObject;
 
             // figure out how to add specific code to each script here
             switch (scriptName)
             {
                 case "Teleport":
                     // take in input from colliding object that determines teleport coordinates (teleport nodes)
-
-                    /*** Fix this so that it gets the teleport coordinates from the flowaction ***/
-                    //Vector3 coords = targetObject.GetComponent<TeleportCoordinates>().GetCoordinates();
                     Vector3 coords = flowAction.teleportCoordinates.GetCoordinates();
+
                     triggerObject.transform.position = coords;
-                    // Set teleport rest for 5 seconds
                     return;
+
                 case "SnapZone":
+
                     // take in more info than teleport, but basically acts as a teleport within the other object
-                    if (targetObject.GetComponent<TeleportCoordinates>().IsSnapZone)
+                    if (flowAction.teleportCoordinates.IsSnapZone)
                     {
-                        //triggerObject.transform.position = targetObject.transform.position + targetObject.GetComponent<TeleportCoordinates>().GetCoordinates();
                         triggerObject.transform.position = targetObject.transform.position + flowAction.teleportCoordinates.GetCoordinates();
                         triggerObject.transform.localScale = flowAction.teleportCoordinates.GetScale();
                         triggerObject.transform.rotation = flowAction.teleportCoordinates.GetRotation();
-
-                        //triggerObject.transform.localScale = targetObject.GetComponent<TeleportCoordinates>().GetScale();
-                        //triggerObject.transform.rotation = targetObject.GetComponent<TeleportCoordinates>().GetRotation();
-                        // set snap zone rest until leaves snap zone
                     }
                     return;
+
                 case "Enable":
                     // enable second object and all related scripts
                     targetObject.SetActive(true);
                     return;
+
                 case "Disable":
                     // disable second object and all related scripts
                     targetObject.SetActive(false);
                     return;
+
                 default:
                     Debug.LogError("BehaviourEvent.OnCallDown returned no matching script name for " + scriptName);
                     return;
-
             }
-
         }
     }
 }

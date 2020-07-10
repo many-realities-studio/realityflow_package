@@ -1,11 +1,5 @@
 ﻿using Newtonsoft.Json;
 using RealityFlow.Plugin.Scripts;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.Serialization;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Packages.realityflow_package.Runtime.scripts.Messages.ObjectMessages
 {
@@ -26,7 +20,6 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.ObjectMessages
         public CreateObject_SendToServer(FlowTObject flowObject, /*FlowUser flowUser,*/ string projectId)
         {
             this.flowObject = flowObject;
-            //this.flowUser = flowUser;
             this.projectId = projectId;
 
             this.MessageType = "CreateObject";
@@ -36,7 +29,6 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.ObjectMessages
     /// <summary>
     /// Response: <see cref="UpdateObject_Received"/>
     /// </summary>
-    
     public class UpdateObject_SendToServer : BaseMessage
     {
         [JsonProperty("FlowObject")]

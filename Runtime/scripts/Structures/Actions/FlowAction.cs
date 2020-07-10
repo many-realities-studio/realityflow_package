@@ -1,10 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Packages.realityflow_package.Runtime.scripts.Messages;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 
 namespace Packages.realityflow_package.Runtime.scripts.Structures.Actions
@@ -13,7 +9,6 @@ namespace Packages.realityflow_package.Runtime.scripts.Structures.Actions
     {
         public string Id;
         public string ActionType;
-
 
         [JsonConstructor]
         public FlowAction(string ActionType)
@@ -25,27 +20,18 @@ namespace Packages.realityflow_package.Runtime.scripts.Structures.Actions
 
         public FlowAction()
         {
-
         }
 
-        
         public FlowAction(string ActionType, string Id)
         {
             Debug.Log("in here");
             this.ActionType = ActionType;
             this.Id = Id;
-            //Id = Guid.NewGuid().ToString();
         }
 
-        /*
-        public FlowAction(string id)
-        {
-            Id = id;
-        }
-        */
         public FlowAction(bool noAction)
-        {           
-            if(noAction == true)
+        {
+            if (noAction == true)
             {
                 ActionType = "NoAction";
             }
@@ -53,21 +39,22 @@ namespace Packages.realityflow_package.Runtime.scripts.Structures.Actions
             Id = Guid.NewGuid().ToString();
         }
 
-        
-        
-
         public static dynamic ConvertToChildClass(string JsonObject, string actionType)
         {
-            switch(actionType)
+            switch (actionType)
             {
                 case "Teleport":
-                    return MessageSerializer.DesearializeObject<TeleportAction>(JsonObject);
+                    return MessageSerializer.DesearializeObject(JsonObject, typeof(TeleportAction));
+
                 case "SnapZone":
-                    return MessageSerializer.DesearializeObject<TeleportAction>(JsonObject);
+                    return MessageSerializer.DesearializeObject(JsonObject, typeof(TeleportAction));
+
                 case "Enable":
-                    return MessageSerializer.DesearializeObject<FlowAction>(JsonObject);
+                    return MessageSerializer.DesearializeObject(JsonObject, typeof(FlowAction));
+
                 case "Disable":
-                    return MessageSerializer.DesearializeObject<FlowAction>(JsonObject);
+                    return MessageSerializer.DesearializeObject(JsonObject, typeof(FlowAction));
+
                 default:
                     return new FlowAction(true);
             }

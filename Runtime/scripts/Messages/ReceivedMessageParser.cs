@@ -1,21 +1,16 @@
 ﻿//using Newtonsoft.Json;
 using Packages.realityflow_package.Runtime.scripts.Messages;
-using Packages.realityflow_package.Runtime.scripts.Messages.UserMessages;
-//using RealityFlow.Plugin.Scripts.Events;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.Serialization;
-using System.Runtime.Serialization.Json;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine;
+using Packages.realityflow_package.Runtime.scripts.Messages.BehaviourMessages;
+using Packages.realityflow_package.Runtime.scripts.Messages.CheckoutMessages;
 using Packages.realityflow_package.Runtime.scripts.Messages.ObjectMessages;
 using Packages.realityflow_package.Runtime.scripts.Messages.ProjectMessages;
 using Packages.realityflow_package.Runtime.scripts.Messages.RoomMessages;
-using Packages.realityflow_package.Runtime.scripts.Messages.BehaviourMessages;
-using Packages.realityflow_package.Runtime.scripts.Messages.CheckoutMessages;
+using Packages.realityflow_package.Runtime.scripts.Messages.UserMessages;
+
+//using RealityFlow.Plugin.Scripts.Events;
+using System;
+using System.Collections.Generic;
+using UnityEngine;
 
 namespace Packages.realityflow_package.Runtime.scripts
 {
@@ -25,53 +20,45 @@ namespace Packages.realityflow_package.Runtime.scripts
     /// </summary>
     public class ReceivedMessageParser
     {
-        public static Dictionary<string, BaseMessage.ParseMessage> messageRouter = new Dictionary<string, BaseMessage.ParseMessage>();
+        public static Dictionary<string, Type> messageRouter = new Dictionary<string, Type>();
 
         /// <summary>
-        /// Links all message types to their respective function. Note that this can be improved 
+        /// Links all message types to their respective function. Note that this can be improved
         /// such that each message object adds themself to the dictionary
         /// </summary>
         static ReceivedMessageParser()
-        {            
+        {
             // Object Messages
-            messageRouter.Add("CreateObject", CreateObject_Received.ReceiveMessage);
-            messageRouter.Add("DeleteObject", DeleteObject_Received.ReceiveMessage);
-            messageRouter.Add("UpdateObject", UpdateObject_Received.ReceiveMessage);
-            messageRouter.Add("FinalizedUpdateObject", FinalizedUpdateObject_Received.ReceiveMessage);
+            messageRouter.Add("CreateObject", typeof(CreateObject_Received));
+            messageRouter.Add("DeleteObject", typeof(DeleteObject_Received));
+            messageRouter.Add("UpdateObject", typeof(UpdateObject_Received));
 
             // Project Messages
-            messageRouter.Add("CreateProject", CreateProject_Received.ReceiveMessage);
-            messageRouter.Add("DeleteProject", DeleteProject_Received.ReceiveMessage);
-            messageRouter.Add("FetchProjects", GetAllUserProjects_Received.ReceiveMessage);
-            messageRouter.Add("OpenProject", OpenProject_Received.ReceiveMessage);
-            messageRouter.Add("LeaveProject", LeaveProject_Received.ReceiveMessage);
+            messageRouter.Add("CreateProject", typeof(CreateProject_Received));
+            messageRouter.Add("DeleteProject", typeof(DeleteProject_Received));
+            messageRouter.Add("FetchProjects", typeof(GetAllUserProjects_Received));
+            messageRouter.Add("OpenProject", typeof(OpenProject_Received));
+            messageRouter.Add("LeaveProject", typeof(LeaveProject_Received));
 
             // Room Messages
-            messageRouter.Add("JoinRoom", JoinRoom_Received.ReceiveMessage);
-            messageRouter.Add("UserJoinedRoom", DoNothing);
-            messageRouter.Add("UserLeftRoom", UserLeftRoom_Received.ReceiveMessage);
+            messageRouter.Add("JoinRoom", typeof(JoinRoom_Received));
+            messageRouter.Add("UserJoinedRoom", typeof(JoinRoom_Received));
+            messageRouter.Add("UserLeftRoom", typeof(UserLeftRoom_Received));
 
             // User Messages
-            messageRouter.Add("LoginUser", LoginUser_Received.ReceiveMessage);
-            messageRouter.Add("LogoutUser", LogoutUser_Received.ReceiveMessage);
-            messageRouter.Add("CreateUser", RegisterUser_Received.ReceiveMessage);
+            messageRouter.Add("LoginUser", typeof(LoginUser_Received));
+            messageRouter.Add("LogoutUser", typeof(LogoutUser_Received));
+            messageRouter.Add("CreateUser", typeof(RegisterUser_Received));
 
             // Behaviour Messages
-            messageRouter.Add("CreateBehaviour", CreateBehaviour_Received.ReceiveMessage);
-            messageRouter.Add("UpdateBehaviour", UpdateBehaviour_Received.ReceiveMessage);
-            messageRouter.Add("DeleteBehaviour", DeleteBehaviour_Received.ReceiveMessage);
+            messageRouter.Add("CreateBehaviour", typeof(CreateBehaviour_Received));
+            messageRouter.Add("UpdateBehaviour", typeof(UpdateBehaviour_Received));
+            messageRouter.Add("DeleteBehaviour", typeof(DeleteBehaviour_Received));
 
             // Checkout system messages
-            messageRouter.Add("CheckinObject", CheckinObject_Received.ReceiveMessage);
-            messageRouter.Add("CheckoutObject", CheckoutObject_Received.ReceiveMessage);
-
+            messageRouter.Add("CheckinObject", typeof(CheckinObject_Received));
+            messageRouter.Add("CheckoutObject", typeof(CheckoutObject_Received));
         }
-
-        public static void DoNothing(string message)
-        {
-
-        }
-
 
         /// <summary>
         /// Request to parse a message from a server into its respective c# representation
@@ -80,7 +67,15 @@ namespace Packages.realityflow_package.Runtime.scripts
         public static void Parse(string message)
         {
             string messageType = GetMessageType(message);
-            messageRouter[messageType](message); // Perform the action associated with the message
+            if (messageRouter.ContainsKey(messageType))
+            {
+                dynamic obj = MessageSerializer.DesearializeObject(message, messageRouter[messageType]);
+                obj.RaiseEvent();
+            }
+            else
+            {
+                Debug.LogError("Unknown received message type: " + messageType);
+            }
         }
 
         /// <summary>
@@ -90,7 +85,7 @@ namespace Packages.realityflow_package.Runtime.scripts
         /// <returns></returns>
         public static string GetMessageType(string messageToConvert)
         {
-            var deserializedObject = MessageSerializer.DesearializeObject<BaseMessage>(messageToConvert);
+            var deserializedObject = MessageSerializer.DesearializeObject(messageToConvert, typeof(BaseMessage));
 
             Debug.Log("Getting message type: " + deserializedObject.MessageType);
 

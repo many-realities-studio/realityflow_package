@@ -97,27 +97,5 @@ namespace RealityFlow.Plugin.Tests
         //    Debug.Log("actual = " + actual?.ToString());
         //    Assert.AreEqual(expected, actual);
         //}
-
-        [Test]
-        public void FinalizedUpdateObjectTest()
-        {
-            // Arrange
-            AutoResetEvent autoResetEvent = new AutoResetEvent(false);
-            FinalizedUpdateObject_Received expected = new FinalizedUpdateObject_Received(testObject);
-
-            // Act (and assert)
-            FinalizedUpdateObject_Received actual = null;
-            Operations.FinalizedUpdateObject(testObject, testUser, "projectId", (sender, e) =>
-            {
-                Debug.Log("Received message: " + e.message.ToString());
-                actual = e.message;
-                autoResetEvent.Set();
-            });
-
-            // Wait for 3 seconds for a response
-            Assert.IsTrue(autoResetEvent.WaitOne(messageTimeout));
-            Debug.Log("actual = " + actual?.ToString());
-            Assert.AreEqual(expected, actual);
-        }
     }
 }

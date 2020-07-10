@@ -1,11 +1,4 @@
 ﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.Serialization;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine;
 
 namespace Packages.realityflow_package.Runtime.scripts.Messages
 {
@@ -16,18 +9,10 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages
     {
         [JsonProperty("WasSuccessful")]
         public bool WasSuccessful { get; set; }
-    }
 
-    /// <summary>
-    /// The event arguments that get passed back to the callback functions as the second parameter
-    /// </summary>
-    public class ConfirmationMessageEventArgs : EventArgs
-    {
-        public ConfirmationMessage_Received message { get; set; }
-
-        public ConfirmationMessageEventArgs(ConfirmationMessage_Received message)
+        protected ConfirmationMessage_Received(bool wasSuccessful) : base(typeof(ConfirmationMessage_Received))
         {
-            this.message = message;
+            WasSuccessful = wasSuccessful;
         }
     }
 }

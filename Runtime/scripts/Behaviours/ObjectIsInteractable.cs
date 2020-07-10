@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Linq;
+using Microsoft.MixedReality.Toolkit.UI;
+using Microsoft.MixedReality.Toolkit.Utilities;
+using RealityFlow.Plugin.Scripts;
 using System.Collections.Generic;
 using UnityEngine;
-using Microsoft.MixedReality.Toolkit.UI;
 using UnityEngine.EventSystems;
-using RealityFlow.Plugin.Scripts;
 
 namespace Behaviours
 {
@@ -13,8 +14,8 @@ namespace Behaviours
     /// </summary>
     public class ObjectIsInteractable : MonoBehaviour, IPointerClickHandler
     {
-        private Dictionary<string, bool> interactableWith;
-        private Dictionary<FlowBehaviour, string> interactableEvents;
+        private static SerializableDictionary<string, bool> interactableWith;
+        private static SerializableDictionary<FlowBehaviour, string> interactableEvents;
 
         public event Action SetEventTrigger;
 
@@ -23,7 +24,6 @@ namespace Behaviours
         private string CurrentEvent = null;
 
         private string objectId;
-
 
         #region Monobehaviour Methods
 
@@ -41,8 +41,7 @@ namespace Behaviours
             return interactableEvents.Keys.ToList();
         }
 
-
-        #endregion // Monobehaviour Methods
+        #endregion Monobehaviour Methods
 
         #region Trigger Methods
 
@@ -58,19 +57,9 @@ namespace Behaviours
             }
         }
 
-        //private void OnMouseDown()
-        //{
-        //    Debug.Log("clicked");
-        //    if (interactableEvents.ContainsValue("Click"))
-        //    {
-        //        SetEventTrigger.Invoke();
-        //    }
-        //}
-
-
         public void OnPointerClick(PointerEventData eventData)
         {
-            Debug.Log("It's clicked");
+            Debug.Log("Pointer clicked");
             if (eventData.pointerPressRaycast.gameObject == gameObject)
             {
                 Debug.Log("clicked");
@@ -110,15 +99,13 @@ namespace Behaviours
         public void Initialize(string objectId)
         {
             this.objectId = objectId;
-            interactableWith = new Dictionary<string, bool>();
-            interactableEvents = new Dictionary<FlowBehaviour, string>();
+            interactableWith = new SerializableDictionary<string, bool>();
+            interactableEvents = new SerializableDictionary<FlowBehaviour, string>();
 
             if (!(SystemInfo.deviceType == DeviceType.Desktop || SystemInfo.deviceType == DeviceType.Handheld))
             {
                 interactableScript = gameObject.AddComponent<Interactable>();
 
-               // interactableScript.Profiles[0].Target = gameObject;
-                //interactableScript.Profiles[0].Themes.Add(new Theme());
                 interactableScript.IsEnabled = true;
                 interactableScript.States = BehaviourEventManager.DefaultInteractableStates;
                 interactableScript.OnClick.AddListener(() => OnSelect());
@@ -129,7 +116,6 @@ namespace Behaviours
                 {
                     Camera.main.gameObject.AddComponent<PhysicsRaycaster>();
                 }
-                
             }
         }
 
@@ -142,7 +128,7 @@ namespace Behaviours
             CurrentEvent = null;
         }
 
-        #endregion // Trigger Methods
+        #endregion Trigger Methods
 
         #region Custom Methods
 
@@ -181,11 +167,11 @@ namespace Behaviours
         /// <param name="e"></param>
         public void AddInteractableEvent(FlowBehaviour e)
         {
-            if(interactableEvents == null)
+            if (interactableEvents == null)
             {
-                interactableEvents = new Dictionary<FlowBehaviour, string>();
+                interactableEvents = new SerializableDictionary<FlowBehaviour, string>();
             }
-            
+
             if (!interactableEvents.ContainsKey(e))
             {
                 SetEventTrigger += e.EventTrigger;
@@ -267,7 +253,7 @@ namespace Behaviours
             }
         }
 
-        #endregion // Custom Methods
+        #endregion Custom Methods
 
         #region Interactablility Bools
 
@@ -297,7 +283,6 @@ namespace Behaviours
             return false;
         }
 
-        #endregion // Interactability Bools
+        #endregion Interactablility Bools
     }
-
 }
