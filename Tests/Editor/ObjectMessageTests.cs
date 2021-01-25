@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.Threading;
 using NUnit.Framework;
 using Packages.realityflow_package.Runtime.scripts;
@@ -6,12 +7,13 @@ using Packages.realityflow_package.Runtime.scripts.Messages;
 using Packages.realityflow_package.Runtime.scripts.Messages.ObjectMessages;
 using RealityFlow.Plugin.Scripts;
 using UnityEngine;
+using UnityEngine.TestTools;
 
 namespace RealityFlow.Plugin.Tests
 {
     public class ObjectMessageTests
     {
-        const int messageTimeout = 3000; // Timeout for a response from the server in milliseconds
+        const int messageTimeout = 4000; // Timeout for a response from the server in milliseconds
         FlowTObject testObject;
         FlowUser testUser;
         FlowProject testProject;
@@ -19,38 +21,48 @@ namespace RealityFlow.Plugin.Tests
         [OneTimeSetUp]
         public void Setup()
         {
-            string url = "ws://echo.websocket.org";
-            Operations.ConnectToServer(url);
+            // string url = "ws://localhost:8999";
+            // Operations.ConnectToServer(url);
 
-            testObject = new FlowTObject("id", 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, "name", "");
-            testUser = new FlowUser("user", "pass");
-            testProject = new FlowProject("FlowProjectId", "Description", 0, "TestProject");
+            testObject = new FlowTObject("id", 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, "name", "Pig");
+            testUser = new FlowUser("owen", "password");
+            testProject = new FlowProject("noRoom", "Description", 0, "TestProject");
+        }
+        
+        [OneTimeTearDown]
+        public void TearDown()
+        {
+            
         }
 
 
         /// <summary>
         /// This test verifies that the server reponds with the expected answer
         /// </summary>
-        [Test]
-        public void CreateObjectTest()
+        [UnityTest]
+        public IEnumerator CreateObjectTest()
         {
             // Arrange
-            AutoResetEvent autoResetEvent = new AutoResetEvent(false);
             CreateObject_Received expected = new CreateObject_Received(testObject);
-
             // Act (and assert)
             CreateObject_Received actual = null;
-            Operations.CreateObject(testObject, /*testUser,*/ "projectId", (sender, e) =>
+            string projectId = "e9587bf0-4c39-4d78-9538-d99d7df956b8";
+            Debug.Log(projectId);
+            Operations.CreateObject(testObject,projectId, (sender, e) =>
             {
                 Debug.Log("Received message: " + e.message.ToString());
                 actual = e.message;
-                autoResetEvent.Set();
             });
-
+            while(actual == null) {
+                Debug.Log(actual);
+                yield return null;
+            }
             // Wait for 3 seconds for a response
-            Assert.IsTrue(autoResetEvent.WaitOne(messageTimeout));
-            Debug.Log("actual = " + actual?.ToString());
-            Assert.AreEqual(expected, actual);
+            string jsonActual = MessageSerializer.SerializeMessage(actual);
+            string jsonExpected = MessageSerializer.SerializeMessage(expected);
+            Debug.Log("actual " + jsonActual);
+            Debug.Log("expected " + jsonExpected);
+            Assert.AreEqual(jsonExpected, jsonActual);
         }
 
         [Test]
