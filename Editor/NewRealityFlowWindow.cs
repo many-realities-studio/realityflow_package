@@ -14,7 +14,8 @@ using UnityEngine;
 [CustomEditor(typeof(FlowWebsocket))]
 public class FlowNetworkManagerEditor : EditorWindow
 {
-    private string _Url = "ws://plato.mrl.ai:8999";
+    //private string _Url = "ws://plato.mrl.ai:8999";
+    private string _Url = "ws://localhost:8999";
     private const string Url = "ws://a73c9fa8.ngrok.io";
 
     // View parameters
@@ -77,7 +78,8 @@ public class FlowNetworkManagerEditor : EditorWindow
         CREATE_SNAPZONE = 11,
         CREATE_ENABLE = 12,
         CREATE_DISABLE = 13,
-        DELETE_BEHAVIOUR = 14
+        DELETE_BEHAVIOUR = 14,
+        DELETE_PROJECT_CONFIRMATION = 15
     }
 
     // Add menu named "My Window" to the Window menu
@@ -104,6 +106,7 @@ public class FlowNetworkManagerEditor : EditorWindow
         _ViewDictionary.Add(EWindowView.PROJECT_HUB, _CreateProjectHubView);
         _ViewDictionary.Add(EWindowView.DELETE_OBJECT, _CreateDeleteObjectView);
         _ViewDictionary.Add(EWindowView.LOAD_PROJECT, _CreateLoadProjectView);
+        _ViewDictionary.Add(EWindowView.DELETE_PROJECT_CONFIRMATION, _CreateDeleteProjectConfirmationView);
         _ViewDictionary.Add(EWindowView.PROJECT_CREATION, _CreateProjectCreationView);
         _ViewDictionary.Add(EWindowView.INVITE_USER, _CreateInviteUserView); // not implementec
         _ViewDictionary.Add(EWindowView.PROJECT_IMPORT, _CreateProjectImportView);
@@ -289,6 +292,13 @@ public class FlowNetworkManagerEditor : EditorWindow
             window = EWindowView.LOAD_PROJECT;
         }
 
+        // // Create "Delete Project" Button and define onClick action
+        // if (GUILayout.Button("Delete Project", GUILayout.Height(40)))
+        // {
+        //     // Send the user to the load project screen
+        //     window = EWindowView.DELETE_PROJECT;
+        // }
+
         EditorGUILayout.BeginHorizontal();
 
         openProjectId = EditorGUILayout.TextField(openProjectId);
@@ -378,6 +388,13 @@ public class FlowNetworkManagerEditor : EditorWindow
         EditorGUILayout.EndHorizontal();
 
         EditorGUILayout.TextArea("Project code: " + ConfigurationSingleton.SingleInstance.CurrentProject.Id);
+
+        // Create "Delete This Project" Button and define onClick action
+        if (GUILayout.Button("Delete This Project", GUILayout.Height(40)))
+        {
+            // Send user to Delete Project screen
+            window = EWindowView.DELETE_PROJECT_CONFIRMATION;
+        }
     }
 
     private void _CreateDeleteObjectView()
@@ -432,6 +449,59 @@ public class FlowNetworkManagerEditor : EditorWindow
                     });
                 }
             }
+        }
+    }
+
+    // Currently not used
+    private void _CreateDeleteProjectView()
+    {
+        // Create "Back" Button and define onClick action
+        EditorGUILayout.BeginHorizontal();
+        if (GUILayout.Button("Back", GUILayout.Height(20)))
+        {
+            // Send the user to the User Hub screen
+            window = EWindowView.USER_HUB;
+        }
+        EditorGUILayout.EndHorizontal();
+
+        if (_ProjectList != null)
+        {
+            foreach (FlowProject project in _ProjectList)
+            {
+                if (GUILayout.Button(project.ProjectName, GUILayout.Height(30)))
+                {
+                    Operations.DeleteProject(project, ConfigurationSingleton.SingleInstance.CurrentUser, (_, e) =>
+                    {
+                        Debug.Log(e.message);
+                        if (e.message.WasSuccessful == true)
+                        {
+                            window = EWindowView.USER_HUB;
+                        }
+                    });
+                }
+            }
+        }
+    }
+
+    private void _CreateDeleteProjectConfirmationView()
+    {
+        GUILayout.Label("Are you sure you want to delete the current project?");
+        // Create "Confirm Project Deletion" Button and define onClick action
+        if (GUILayout.Button("Confirm Project Deletion", GUILayout.Height(40)))
+        {
+            Operations.DeleteProject(ConfigurationSingleton.SingleInstance.CurrentProject, ConfigurationSingleton.SingleInstance.CurrentUser, (_, e) =>
+            {
+                Debug.Log(e.message);
+                if (e.message.WasSuccessful == true)
+                {
+                    window = EWindowView.USER_HUB;
+                    ConfigurationSingleton.SingleInstance.CurrentProject = null;
+                }
+            });
+        }
+        if (GUILayout.Button("Cancel", GUILayout.Height(40)))
+        {
+            window = EWindowView.PROJECT_HUB;
         }
     }
 
