@@ -4,8 +4,7 @@
         "RealityFlowScripts",
         "RealityFlowObjectData",
         "com.RealityFlow.Resources",
-        "com.RealityFlow",
-        "Microsoft.MixedReality.Toolkit.Editor.Utilities"
+        "com.RealityFlow"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
