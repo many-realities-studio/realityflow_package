@@ -1,8 +1,6 @@
 {
     "name": "com.RealityFlow.Editor",
     "references": [
-        "RealityFlowScripts",
-        "RealityFlowObjectData",
         "com.RealityFlow.Resources",
         "com.RealityFlow"
     ],

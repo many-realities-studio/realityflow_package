@@ -1,6 +1,7 @@
-﻿//using Microsoft.MixedReality.Toolkit.UI;
+﻿
 //using Microsoft.MixedReality.Toolkit.Utilities;
 using RealityFlow.Plugin.Scripts;
+using RealityFlow.Plugin.Contrib;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -18,7 +19,8 @@ namespace Behaviours
 
         public event Action SetEventTrigger;
 
-        private Interactable interactableScript;
+// TODO Fix Interactables by creating API between MRTK & RF that is loosely coupled
+        // private Interactable interactableScript;
 
         private string CurrentEvent = null;
 
@@ -97,11 +99,12 @@ namespace Behaviours
 
             if (!(SystemInfo.deviceType == DeviceType.Desktop || SystemInfo.deviceType == DeviceType.Handheld))
             {
-                interactableScript = gameObject.AddComponent<Interactable>();
+                // TODO Disabled
+                // interactableScript = gameObject.AddComponent<Interactable>();
 
-                interactableScript.IsEnabled = true;
-                interactableScript.States = BehaviourEventManager.DefaultInteractableStates;
-                interactableScript.OnClick.AddListener(() => OnSelect());
+                // interactableScript.IsEnabled = true;
+                // interactableScript.States = BehaviourEventManager.DefaultInteractableStates;
+                // interactableScript.OnClick.AddListener(() => OnSelect());
             }
             else
             {
