@@ -1,6 +1,6 @@
 using Newtonsoft.Json;
 using RealityFlow.Plugin.Scripts;
-using GraphProcessor; // TODO: fix reference
+using RealityFlow.Plugin.Contrib; // TODO: fix reference
 
 namespace Packages.realityflow_package.Runtime.scripts.Messages.VSGraphMessages
 {

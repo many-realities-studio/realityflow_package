@@ -2,7 +2,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using GraphProcessor; // TODO: Fix reference
+using RealityFlow.Plugin.Contrib; // TODO: Fix reference
 
 namespace RealityFlow.Plugin.Scripts
 {

@@ -2,7 +2,7 @@ using Packages.realityflow_package.Runtime.scripts;
 using RealityFlow.Plugin.Scripts;
 using UnityEditor;
 using UnityEngine;
-using GraphProcessor; // TODO: Fix reference
+using RealityFlow.Plugin.Contrib; // TODO: Fix reference
 
 namespace RealityFlow.Plugin.Editor
 {
