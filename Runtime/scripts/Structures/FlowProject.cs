@@ -2,6 +2,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using GraphProcessor; // TODO: Fix reference
 
 namespace RealityFlow.Plugin.Scripts
 {
@@ -43,6 +44,9 @@ namespace RealityFlow.Plugin.Scripts
 
         [JsonProperty("_ObjectList")]
         public IEnumerable<FlowTObject> _ObjectList { get => _objectList; set => _objectList = value; }
+
+        [JsonProperty("_VSGraphList")]
+        public IEnumerable<BaseGraph> _VSGraphList { get => _vsGraphList; set => _vsGraphList = value; }
 
         [JsonProperty("_BehaviourList")]
         public List<FlowBehaviour> behaviourList { get; set; }

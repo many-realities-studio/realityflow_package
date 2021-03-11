@@ -8,6 +8,7 @@ using Packages.realityflow_package.Runtime.scripts.Messages.ProjectMessages;
 using Packages.realityflow_package.Runtime.scripts.Messages.RoomMessages;
 using Packages.realityflow_package.Runtime.scripts.Messages.UserMessages;
 using RealityFlow.Plugin.Scripts;
+using GraphProcessor; // TODO: Fix reference
 
 //using RealityFlow.Plugin.Scripts.Events;
 using System.Collections.Generic;
@@ -48,6 +49,9 @@ namespace Packages.realityflow_package.Runtime.scripts
             ReceivedMessage.AddEventHandler(typeof(CreateBehaviour_Received), false, _CreateBehaviour);
             ReceivedMessage.AddEventHandler(typeof(DeleteBehaviour_Received), false, _DeleteBehaviour);
             ReceivedMessage.AddEventHandler(typeof(UpdateBehaviour_Received), false, _UpdateBehaviour);
+
+            // Set up Graph updates
+            ReceivedMessage.AddEventHandler(typeof(CreateVSGraph_Received), false, _CreateVSGraph);
         }
 
         #region UserOperations
@@ -119,6 +123,27 @@ namespace Packages.realityflow_package.Runtime.scripts
         }
 
         #endregion ObjectOperations
+
+        #region VSGraphOperations
+
+        // Temporary debugging function
+        // public static void CreateVSGraph(string msg)
+        // {
+        //     FlowWebsocket.SendStringMessage(msg);
+
+        //     //ReceivedMessage.AddEventHandler(typeof(CreateObject_Received), true, callbackFunction);
+        // }
+
+        public static void CreateVSGraph(BaseGraph flowVSGraph, /*FlowUser flowUser,*/ string projectId, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
+        {
+            CreateVSGraph_SendToServer createVSGraph =
+                new CreateVSGraph_SendToServer(flowVSGraph, /*flowUser,*/ projectId);
+            FlowWebsocket.SendMessage(createVSGraph);
+
+            ReceivedMessage.AddEventHandler(typeof(CreateVSGraph_Received), true, callbackFunction);
+        }
+
+        #endregion VSGraphOperations
 
         #region BehaviourOperations
 

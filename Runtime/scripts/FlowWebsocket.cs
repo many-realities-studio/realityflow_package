@@ -134,6 +134,24 @@ namespace Packages.realityflow_package.Runtime.scripts
             yield return null;
         }
 
+        /// <summary>
+        /// Send a string message. FOR TESTING/DEBUGGING
+        /// </summary>
+        /// <param name="message">The message string that should be sent</param>
+        public static void SendStringMessage(string message)
+        {
+            try
+            {
+                Debug.Log("Sending STRING message: " + message);
+
+                websocket.Send(message);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError("Failed to send message: " + message + " " + e);
+            }
+        }
+
         internal void Disconnect()
         {
             websocket.Close();

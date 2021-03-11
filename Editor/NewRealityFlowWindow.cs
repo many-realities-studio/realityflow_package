@@ -28,6 +28,7 @@ public class FlowNetworkManagerEditor : EditorWindow
     private Color headerSectionColor = new Color(13f / 255f, 32f / 255f, 44f / 255f, 1f);
     private Color bodySectionColor = new Color(150 / 255f, 150 / 255f, 150 / 255f, 1f);
     private string uName;
+    private string graphName;
     private string pWord;
     private EWindowView window = EWindowView.LOGIN;
     private string projectName;
@@ -79,7 +80,8 @@ public class FlowNetworkManagerEditor : EditorWindow
         CREATE_ENABLE = 12,
         CREATE_DISABLE = 13,
         DELETE_BEHAVIOUR = 14,
-        DELETE_PROJECT_CONFIRMATION = 15
+        DELETE_PROJECT_CONFIRMATION = 15,
+        DELETE_VSGRAPH = 16
     }
 
     // Add menu named "My Window" to the Window menu
@@ -117,6 +119,7 @@ public class FlowNetworkManagerEditor : EditorWindow
         _ViewDictionary.Add(EWindowView.CREATE_DISABLE, _CreateDisableView);
         _ViewDictionary.Add(EWindowView.CREATE_SNAPZONE, _CreateSnapZoneView);
         _ViewDictionary.Add(EWindowView.DELETE_BEHAVIOUR, _DeleteBehaviourView);
+        _ViewDictionary.Add(EWindowView.DELETE_VSGRAPH, _CreateDeleteVSGraphView);
     }
 
     public void OnGUI()
@@ -387,6 +390,23 @@ public class FlowNetworkManagerEditor : EditorWindow
 
         EditorGUILayout.EndHorizontal();
 
+        EditorGUILayout.BeginHorizontal();
+
+        // Create "Create Visual Scripting Graph" Button and define onClick action
+        if (GUILayout.Button("Create Visual Scripting Graph", GUILayout.Height(40)))
+        {
+            VSGraphSettings.OpenWindow();;
+        }
+
+        // Create "Delete Visual Scripting Graph" Button and define onClick action
+        if (GUILayout.Button("Delete Visual Scripting Graph", GUILayout.Height(40)))
+        {
+            // TODO: Send user to screen that displays all graphs in the project for them to delete from.
+            window = EWindowView.DELETE_VSGRAPH;
+        }
+
+        EditorGUILayout.EndHorizontal();
+
         EditorGUILayout.TextArea("Project code: " + ConfigurationSingleton.SingleInstance.CurrentProject.Id);
 
         // Create "Delete This Project" Button and define onClick action
@@ -394,6 +414,13 @@ public class FlowNetworkManagerEditor : EditorWindow
         {
             // Send user to Delete Project screen
             window = EWindowView.DELETE_PROJECT_CONFIRMATION;
+        }
+
+        // Graph Message testing button to open testing window
+        if (GUILayout.Button("GRAPH MESSAGE TESTING", GUILayout.Height(40)))
+        {
+            // Opens a new window/unity utility tab to create an object
+            GraphMessageTesting.OpenWindow();
         }
     }
 
@@ -481,6 +508,27 @@ public class FlowNetworkManagerEditor : EditorWindow
                 }
             }
         }
+    }
+
+    private void _CreateDeleteVSGraphView()
+    {
+        // Create "Back" Button and define onClick action
+        EditorGUILayout.BeginHorizontal();
+        if (GUILayout.Button("Back", GUILayout.Height(20)))
+        {
+            // Send the user to the Project Hub screen
+            window = EWindowView.PROJECT_HUB;
+        }
+        EditorGUILayout.EndHorizontal();
+
+        // TODO: This info is likely incorrect for graphs, needs to be thought about
+        // foreach (FlowVSGraph currentFlowVSGraph in FlowVSGraph.idToGameObjectMapping.Values)
+        // {
+        //     if (GUILayout.Button(currentFlowVSGraph.Name, GUILayout.Height(30)))
+        //     {
+        //         Operations.DeleteVSGraph(currentFlowVSGraph.Id, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) => { Debug.Log("Deleted VSGraph " + e.message); });
+        //     }
+        // }
     }
 
     private void _CreateDeleteProjectConfirmationView()
