@@ -7,6 +7,7 @@ using Packages.realityflow_package.Runtime.scripts.Messages.ObjectMessages;
 using Packages.realityflow_package.Runtime.scripts.Messages.ProjectMessages;
 using Packages.realityflow_package.Runtime.scripts.Messages.RoomMessages;
 using Packages.realityflow_package.Runtime.scripts.Messages.UserMessages;
+using Packages.realityflow_package.Runtime.scripts.Messages.VSGraphMessages;
 using RealityFlow.Plugin.Scripts;
 using RealityFlow.Plugin.Contrib; // TODO: Fix reference
 
@@ -307,7 +308,13 @@ namespace Packages.realityflow_package.Runtime.scripts
 
         #endregion Object messages received
 
+        #region VSGraph messages received
 
+        private static void _CreateVSGraph(object sender, BaseReceivedEventArgs eventArgs)
+        {
+        }
+
+        #endregion VSGraph messages received
 
         #region Behaviour messages received
 

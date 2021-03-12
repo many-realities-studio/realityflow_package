@@ -30,6 +30,9 @@ namespace RealityFlow.Plugin.Scripts
         [SerializeField]
         private IEnumerable<FlowTObject> _objectList;
 
+        [SerializeField]
+        private IEnumerable<BaseGraph> _vsGraphList;
+
         [JsonProperty("Id")]
         public string Id { get => _id; set => _id = value; } // The unique ID of the project
 

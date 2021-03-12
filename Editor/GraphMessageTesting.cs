@@ -40,7 +40,7 @@ namespace RealityFlow.Plugin.Editor
             // TODO: Add extra else if case to check if the name already exists in the project
                 if (GUILayout.Button("Send testing CreateVSGraph message", GUILayout.Height(30)))
                 {
-                    Operations.CreateVSGraph(CreateGraphMessage);
+                    // Operations.CreateVSGraph(CreateGraphMessage);
 
                     //window.Close();
                 }
