@@ -44,11 +44,15 @@ namespace RealityFlow.Plugin.Editor
             {
                 if (GUILayout.Button("Create", GUILayout.Height(30)))
                 {
+                    RealityFlowGraphView RunTimeGraph = new RealityFlowGraphView();
                     //BaseGraph createdVSGraph;
+                    //RunTimeGraph = new RealityFlowGraphView();
+                    RunTimeGraph.graph.name = VSGraphName;
+                    //RunTimeGraph.graph.guid = Guid.NewGuid().ToString();
 
                     // TODO: Stuff to initialize graph
 
-                    //Operations.CreateVSGraph(createdVSGraph, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) => Debug.Log(e.message));
+                    Operations.CreateVSGraph(RunTimeGraph.graph, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) => Debug.Log(e.message));
 
                     window.Close();
                 }
