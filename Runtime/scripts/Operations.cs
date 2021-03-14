@@ -137,9 +137,15 @@ namespace Packages.realityflow_package.Runtime.scripts
 
         public static void CreateVSGraph(BaseGraph flowVSGraph, /*FlowUser flowUser,*/ string projectId, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
         {
-            CreateVSGraph_SendToServer createVSGraph =
-                new CreateVSGraph_SendToServer(flowVSGraph, /*flowUser,*/ projectId);
-            FlowWebsocket.SendMessage(createVSGraph);
+            // CreateVSGraph_SendToServer createVSGraph =
+            //     new CreateVSGraph_SendToServer(flowVSGraph, /*flowUser,*/ projectId);
+            string message = ("{\"FlowVSGraph\":" + JsonUtility.ToJson(flowVSGraph) + ",\"ProjectId\":\"" + projectId + "\",\"MessageType\":\"CreateVSGraph\"}");
+            // json.FlowVSGraph = flowVSGraph;
+            // json.MessageType = "CreateVSGraph";
+            // json.ProjectId = projectId;
+            Debug.Log(message);
+
+            FlowWebsocket.SendStringMessage(message);
 
             ReceivedMessage.AddEventHandler(typeof(CreateVSGraph_Received), true, callbackFunction);
         }

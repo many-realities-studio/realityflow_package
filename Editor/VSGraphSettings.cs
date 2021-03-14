@@ -45,11 +45,11 @@ namespace RealityFlow.Plugin.Editor
                 if (GUILayout.Button("Create", GUILayout.Height(30)))
                 {
                     Debug.Log("Hit create");
-                    GameObject Canvas = Resources.Load("prefabs/Canvas") as GameObject;
-                    GameObject WhiteBoard = Instantiate(Canvas, Canvas.transform.position, Canvas.transform.rotation);
-                    GameObject rfgvGameObject = GameObject.FindGameObjectWithTag("Canvas").transform.GetChild(5).gameObject;
-                    RealityFlowGraphView rfgv = rfgvGameObject.GetComponent<RealityFlowGraphView>();
-                    rfgv.InitializeGraph();
+                    // GameObject Canvas = Resources.Load("prefabs/Canvas") as GameObject;
+                    // GameObject WhiteBoard = Instantiate(Canvas, Canvas.transform.position, Canvas.transform.rotation);
+                    // GameObject rfgvGameObject = GameObject.FindGameObjectWithTag("Canvas").transform.GetChild(5).gameObject;
+                    // RealityFlowGraphView rfgv = rfgvGameObject.GetComponent<RealityFlowGraphView>();
+                    // rfgv.InitializeGraph();
                     //RealityFlowGraphView RunTimeGraph = new RealityFlowGraphView();
                     //BaseGraph createdVSGraph;
                     //RunTimeGraph = new RealityFlowGraphView();
@@ -57,8 +57,13 @@ namespace RealityFlow.Plugin.Editor
                     //RunTimeGraph.graph.guid = Guid.NewGuid().ToString();
 
                     // TODO: Stuff to initialize graph
+                    BaseGraph graph = ScriptableObject.CreateInstance<BaseGraph>();
+                    Debug.Log(graph.Name);
+                    graph.Name = VSGraphName;
+                    Debug.Log(graph);
+                    Debug.Log(JsonUtility.ToJson(graph));
 
-                    Operations.CreateVSGraph(rfgv.graph, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) => Debug.Log(e.message));
+                    Operations.CreateVSGraph(graph, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) => Debug.Log(e.message));
 
                     window.Close();
                 }
