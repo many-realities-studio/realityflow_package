@@ -49,7 +49,8 @@ public class NodeManipulation : MonoBehaviour//,IMixedRealityPointerHandler
 
     public void AttachNodeToGraph(Vector3 pos)
     {
-        rfgv.AddNodeCommand(this.transform.GetChild(0).tag, this.transform.GetChild(0).GetComponent<RectTransform>().anchoredPosition);
+        //rfgv.AddNodeCommand(this.transform.GetChild(0).tag, this.transform.GetChild(0).GetComponent<RectTransform>().anchoredPosition);
+        rfgv.AddNodeCommand(this.transform.GetChild(0).tag);
         Destroy(this.gameObject);
     }
     public void RefreshPalette()
