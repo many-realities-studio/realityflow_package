@@ -8,6 +8,10 @@ using UnityEngine.UI;
 using UnityEngine.UIElements;
 using System.Linq;
 
+public struct Edge {
+	NodePort input;
+	NodePort output;
+};
 
 public class RealityFlowGraphView : MonoBehaviour {
 	public BaseGraph graph;
@@ -16,8 +20,9 @@ public class RealityFlowGraphView : MonoBehaviour {
 	// public bool inputGraph;
 	public ProcessGraphProcessor processor;
 
+	public EdgeListener connectorListener;
+
 	public static CommandPalette commandPalette;
-	public EdgeListener listener; // create a variable for edge listening
 
 	public GameObject Labeled;
 	public GameObject contentPanel;
@@ -29,9 +34,10 @@ public class RealityFlowGraphView : MonoBehaviour {
 	public List<NodeUI> selectedNV = new List<NodeUI>();
 	public List<BaseNode> selected = new List<BaseNode>();
 
+	public List<Edge> edges = new List<Edge>();
 
 	// protected virtual EdgeListener CreateEdgeConnectorListener()
-		//  => new EdgeListener(this);
+	// 	 => new EdgeListener(this);
 
     //public RealityFlowGraphView instance;
 
@@ -42,7 +48,8 @@ public class RealityFlowGraphView : MonoBehaviour {
 
 	void InitializeGraph(){
 
-		// listener = CreateEdgeConnectorListener();
+		// connectorListener = new EdgeListener(this);
+		// Debug.Log(connectorListener);
 		//instance = this;
 		// if (inputGraph) {
 		// 	// graph1.AddExposedParameter ("LabelContainer", typeof (GameObject), Labeled);
@@ -56,6 +63,7 @@ public class RealityFlowGraphView : MonoBehaviour {
 		// commandPalette = new CommandPalette();
         graph.onGraphChanges += GraphChangesCallback;
 		savePoint = JsonSerializer.Serialize(graph);
+		
 		// selected =
 		Debug.Log("hello");
 		// NodeView.instance.LoadGraph(graph);
@@ -64,7 +72,7 @@ public class RealityFlowGraphView : MonoBehaviour {
 
 	protected void LoadGraph(BaseGraph graph){
 		foreach (BaseNode node in graph.nodes ){
-			StartCoroutine (AddNodeCoroutine(node));        }
+			StartCoroutine (AddNodeCoroutine(node, new Vector3()));        }
 	}
 
     void GraphChangesCallback(GraphChanges changes)
@@ -104,7 +112,7 @@ public class RealityFlowGraphView : MonoBehaviour {
 		graph.Deserialize();
 	}
  
-	public void AddNodeCommand(string nodeTag){
+	public void AddNodeCommand(string nodeTag, Vector3 nodePos){
 		// serialize the current version of the graph
 		// savePoint = JsonSerializer.Serialize(graph);
 		string tmp = JsonUtility.ToJson(graph);
@@ -121,30 +129,30 @@ public class RealityFlowGraphView : MonoBehaviour {
 				TextNode tn = BaseNode.CreateFromType<TextNode> (new Vector2 ());
 				graph.AddNode (tn);
 				tn.output = "Hello World";
-				StartCoroutine (AddNodeCoroutine(tn));
+				StartCoroutine (AddNodeCoroutine(tn, nodePos));
 				break;
 			case "FloatNode":
 				FloatNode fn = BaseNode.CreateFromType<FloatNode> (new Vector2 ());
 				graph.AddNode (fn);
 				fn.output = 0.5f;
-				StartCoroutine (AddNodeCoroutine(fn));
+				StartCoroutine (AddNodeCoroutine(fn, nodePos));
 				break;
 			case "IntNode":
 				IntNode intn = BaseNode.CreateFromType<IntNode> (new Vector2 ());
 				graph.AddNode (intn);
 				intn.output = 1;
-				StartCoroutine (AddNodeCoroutine(intn));
+				StartCoroutine (AddNodeCoroutine(intn, nodePos));
 				break;
 			case "BoolNode":
 				BoolNode bn = BaseNode.CreateFromType<BoolNode> (new Vector2 ());
 				graph.AddNode(bn);
 				bn.output = true;
-				StartCoroutine (AddNodeCoroutine(bn));
+				StartCoroutine (AddNodeCoroutine(bn, nodePos));
 				break;
 			case "ConditionalNode":
 				IfNode cn = BaseNode.CreateFromType<IfNode> (new Vector2 ());
 				graph.AddNode(cn);
-				StartCoroutine (AddNodeCoroutine(cn));
+				StartCoroutine (AddNodeCoroutine(cn, nodePos));
 				break;
 			default:
 				Debug.Log("This case of addnode did not use a tag");
@@ -205,24 +213,26 @@ public class RealityFlowGraphView : MonoBehaviour {
 		TextNode tn = BaseNode.CreateFromType<TextNode> (new Vector2 ());
 		graph.AddNode (tn);
 		tn.output = "Hello World";
-		StartCoroutine (AddNodeCoroutine(tn));
+		StartCoroutine (AddNodeCoroutine(tn, new Vector3()));
 		SetLabelNode sln = BaseNode.CreateFromType<SetLabelNode> (new Vector2 ());
 		graph.AddNode (sln);
 		graph.Connect (sln.GetPort ("newLabel", null), tn.GetPort ("output", null));
-		StartCoroutine (AddNodeCoroutine(sln));
+		StartCoroutine (AddNodeCoroutine(sln, new Vector3()));
 		ParameterNode pn = BaseNode.CreateFromType<ParameterNode> (new Vector2 ());
 
 		pn.parameterGUID = graph.GetExposedParameter ("LabelContainer").guid;
 		graph.AddNode (pn);
 		graph.Connect (sln.GetPort ("input", ""), pn.GetPort ("output", "output"));
-		StartCoroutine (AddNodeCoroutine(pn));
+		StartCoroutine (AddNodeCoroutine(pn, new Vector3()));
 		graph.UpdateComputeOrder ();
 		// graph.ed
 		// graph.SetParameterValue ("LabelContainer", Labeled);
 		processor = new ProcessGraphProcessor (graph);
     }
 	
-
+	public void ConnectEdges(NodePort input, NodePort output){
+		graph.Connect(input, output, true);
+	}
 	
 	public void ClearGraph () {
 
@@ -249,9 +259,9 @@ public class RealityFlowGraphView : MonoBehaviour {
 	}
 
 
-	public IEnumerator AddNodeCoroutine (BaseNode node) {
+	public IEnumerator AddNodeCoroutine (BaseNode node, Vector3 nodePos) {
         //NodeUI newView = new NodeUI(node.name,node,node.GUID.Substring (node.GUID.Length - 5));
-        NodeUI newView = Instantiate (nodeView, new Vector3 (), Quaternion.identity).GetComponent<NodeUI> ();
+        NodeUI newView = Instantiate (nodeView, nodePos, Quaternion.identity).GetComponent<NodeUI> ();
         newView.gameObject.transform.SetParent (contentPanel.transform, false);
         newView.title.text = node.name;
         newView.node = node;
@@ -263,16 +273,21 @@ public class RealityFlowGraphView : MonoBehaviour {
             NodePortView npv = Instantiate (nodePortView).GetComponent<NodePortView> ();
             npv.gameObject.transform.SetParent (newView.inputPanel.transform, false);
             npv.gameObject.GetComponent<RectTransform> ().SetAsLastSibling ();
+			npv.listener = connectorListener;
+			npv.type = "input";
             yield return new WaitForSeconds (.01f);
             npv.Init (input);
             LayoutRebuilder.MarkLayoutForRebuild ((RectTransform) newView.transform);
             newView.GetComponent<ContentSizeFitter>().enabled = true;
         }
         foreach (NodePort output in node.outputPorts) {
+			Debug.Log(output.portData);
             newView.GetComponent<ContentSizeFitter>().enabled = false;
             NodePortView npv = Instantiate (nodePortView).GetComponent<NodePortView> ();
             npv.gameObject.transform.SetParent (newView.outputPanel.transform,false);
             npv.gameObject.GetComponent<RectTransform> ().SetAsLastSibling ();
+			npv.listener = connectorListener;
+			npv.type = "output";
             yield return new WaitForSeconds (.01f);
             npv.Init (output);
             LayoutRebuilder.MarkLayoutForRebuild ((RectTransform) newView.transform);
