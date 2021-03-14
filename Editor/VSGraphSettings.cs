@@ -44,15 +44,21 @@ namespace RealityFlow.Plugin.Editor
             {
                 if (GUILayout.Button("Create", GUILayout.Height(30)))
                 {
-                    RealityFlowGraphView RunTimeGraph = new RealityFlowGraphView();
+                    Debug.Log("Hit create");
+                    GameObject Canvas = Resources.Load("prefabs/Canvas") as GameObject;
+                    GameObject WhiteBoard = Instantiate(Canvas, Canvas.transform.position, Canvas.transform.rotation);
+                    GameObject rfgvGameObject = GameObject.FindGameObjectWithTag("Canvas").transform.GetChild(5).gameObject;
+                    RealityFlowGraphView rfgv = rfgvGameObject.GetComponent<RealityFlowGraphView>();
+                    rfgv.InitializeGraph();
+                    //RealityFlowGraphView RunTimeGraph = new RealityFlowGraphView();
                     //BaseGraph createdVSGraph;
                     //RunTimeGraph = new RealityFlowGraphView();
-                    RunTimeGraph.graph.name = VSGraphName;
+                    //RunTimeGraph.graph.name = VSGraphName;
                     //RunTimeGraph.graph.guid = Guid.NewGuid().ToString();
 
                     // TODO: Stuff to initialize graph
 
-                    Operations.CreateVSGraph(RunTimeGraph.graph, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) => Debug.Log(e.message));
+                    Operations.CreateVSGraph(rfgv.graph, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) => Debug.Log(e.message));
 
                     window.Close();
                 }
