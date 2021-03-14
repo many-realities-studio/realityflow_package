@@ -6,6 +6,7 @@ using Packages.realityflow_package.Runtime.scripts.Messages.ObjectMessages;
 using Packages.realityflow_package.Runtime.scripts.Messages.ProjectMessages;
 using Packages.realityflow_package.Runtime.scripts.Messages.RoomMessages;
 using Packages.realityflow_package.Runtime.scripts.Messages.UserMessages;
+using Packages.realityflow_package.Runtime.scripts.Messages.VSGraphMessages;
 
 //using RealityFlow.Plugin.Scripts.Events;
 using System;
@@ -58,6 +59,9 @@ namespace Packages.realityflow_package.Runtime.scripts
             // Checkout system messages
             messageRouter.Add("CheckinObject", typeof(CheckinObject_Received));
             messageRouter.Add("CheckoutObject", typeof(CheckoutObject_Received));
+
+            // Visual Scripting Graph messages
+            messageRouter.Add("CreateVSGraph", typeof(CreateVSGraph_Received));
         }
 
         /// <summary>

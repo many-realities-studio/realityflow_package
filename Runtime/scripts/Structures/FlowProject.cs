@@ -2,6 +2,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using RealityFlow.Plugin.Contrib; // TODO: Fix reference
 
 namespace RealityFlow.Plugin.Scripts
 {
@@ -29,6 +30,9 @@ namespace RealityFlow.Plugin.Scripts
         [SerializeField]
         private IEnumerable<FlowTObject> _objectList;
 
+        [SerializeField]
+        private IEnumerable<BaseGraph> _vsGraphList;
+
         [JsonProperty("Id")]
         public string Id { get => _id; set => _id = value; } // The unique ID of the project
 
@@ -43,6 +47,9 @@ namespace RealityFlow.Plugin.Scripts
 
         [JsonProperty("_ObjectList")]
         public IEnumerable<FlowTObject> _ObjectList { get => _objectList; set => _objectList = value; }
+
+        [JsonProperty("_VSGraphList")]
+        public IEnumerable<BaseGraph> _VSGraphList { get => _vsGraphList; set => _vsGraphList = value; }
 
         [JsonProperty("_BehaviourList")]
         public List<FlowBehaviour> behaviourList { get; set; }

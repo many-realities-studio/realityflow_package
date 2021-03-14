@@ -1,8 +1,10 @@
 {
     "name": "com.RealityFlow.Editor",
+    "rootNamespace": "",
     "references": [
         "com.RealityFlow.Resources",
-        "com.RealityFlow"
+        "com.RealityFlow",
+        "com.alelievr.NodeGraphProcessor.Runtime"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

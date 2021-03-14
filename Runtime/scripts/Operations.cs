@@ -7,7 +7,9 @@ using Packages.realityflow_package.Runtime.scripts.Messages.ObjectMessages;
 using Packages.realityflow_package.Runtime.scripts.Messages.ProjectMessages;
 using Packages.realityflow_package.Runtime.scripts.Messages.RoomMessages;
 using Packages.realityflow_package.Runtime.scripts.Messages.UserMessages;
+using Packages.realityflow_package.Runtime.scripts.Messages.VSGraphMessages;
 using RealityFlow.Plugin.Scripts;
+using RealityFlow.Plugin.Contrib; // TODO: Fix reference
 
 //using RealityFlow.Plugin.Scripts.Events;
 using System.Collections.Generic;
@@ -48,6 +50,9 @@ namespace Packages.realityflow_package.Runtime.scripts
             ReceivedMessage.AddEventHandler(typeof(CreateBehaviour_Received), false, _CreateBehaviour);
             ReceivedMessage.AddEventHandler(typeof(DeleteBehaviour_Received), false, _DeleteBehaviour);
             ReceivedMessage.AddEventHandler(typeof(UpdateBehaviour_Received), false, _UpdateBehaviour);
+
+            // Set up Graph updates
+            ReceivedMessage.AddEventHandler(typeof(CreateVSGraph_Received), false, _CreateVSGraph);
         }
 
         #region UserOperations
@@ -119,6 +124,33 @@ namespace Packages.realityflow_package.Runtime.scripts
         }
 
         #endregion ObjectOperations
+
+        #region VSGraphOperations
+
+        // Temporary debugging function
+        // public static void CreateVSGraph(string msg)
+        // {
+        //     FlowWebsocket.SendStringMessage(msg);
+
+        //     //ReceivedMessage.AddEventHandler(typeof(CreateObject_Received), true, callbackFunction);
+        // }
+
+        public static void CreateVSGraph(BaseGraph flowVSGraph, /*FlowUser flowUser,*/ string projectId, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
+        {
+            // CreateVSGraph_SendToServer createVSGraph =
+            //     new CreateVSGraph_SendToServer(flowVSGraph, /*flowUser,*/ projectId);
+            string message = ("{\"FlowVSGraph\":" + JsonUtility.ToJson(flowVSGraph) + ",\"ProjectId\":\"" + projectId + "\",\"MessageType\":\"CreateVSGraph\"}");
+            // json.FlowVSGraph = flowVSGraph;
+            // json.MessageType = "CreateVSGraph";
+            // json.ProjectId = projectId;
+            Debug.Log(message);
+
+            FlowWebsocket.SendStringMessage(message);
+
+            ReceivedMessage.AddEventHandler(typeof(CreateVSGraph_Received), true, callbackFunction);
+        }
+
+        #endregion VSGraphOperations
 
         #region BehaviourOperations
 
@@ -282,7 +314,13 @@ namespace Packages.realityflow_package.Runtime.scripts
 
         #endregion Object messages received
 
+        #region VSGraph messages received
 
+        private static void _CreateVSGraph(object sender, BaseReceivedEventArgs eventArgs)
+        {
+        }
+
+        #endregion VSGraph messages received
 
         #region Behaviour messages received
 
