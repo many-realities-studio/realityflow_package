@@ -27,12 +27,18 @@ public class RealityFlowGraphView : MonoBehaviour {
 	public GameObject Labeled;
 	public GameObject contentPanel;
 
+	public GameObject parameterContent;
+
 	public GameObject nodePortView;
 	public GameObject nodeView;
+	public GameObject paramView;
 
 	public List<NodeUI> nodeViewList = new List<NodeUI> ();
 	public List<NodeUI> selectedNV = new List<NodeUI>();
 	public List<BaseNode> selected = new List<BaseNode>();
+
+	public Dictionary<string,ExposedParameter> paramDict = new Dictionary<string, ExposedParameter>();
+	public List<ExposedParameter> paramList = new List<ExposedParameter>();
 
 	public List<Edge> edges = new List<Edge>();
 
@@ -65,7 +71,6 @@ public class RealityFlowGraphView : MonoBehaviour {
 		savePoint = JsonSerializer.Serialize(graph);
 		
 		// selected =
-		Debug.Log("hello");
 		// NodeView.instance.LoadGraph(graph);
 		LoadGraph(graph);
 	}
@@ -253,6 +258,37 @@ public class RealityFlowGraphView : MonoBehaviour {
 
 	public void AddToSelectionNV(NodeUI n){
 		selectedNV.Add(n);
+	}
+
+	public void AddParameter(){
+		string tmp = JsonUtility.ToJson(graph);
+		// get name of parameter from user input via mtrk keyboard (probably)
+		string name = "autofill";
+		Type type = typeof(string);
+		//Debug.Log(type.AssemblyQualifiedName);
+		// make sure it's not a duplicate name
+		// add parameter to a list that is drag and droppable
+		ParameterNode pn = BaseNode.CreateFromType<ParameterNode> (new Vector2 ());
+		graph.AddExposedParameter (name, type, Labeled);
+		ExposedParameter epn = graph.GetExposedParameter (name);
+		pn.parameterGUID = epn.guid;
+		//paramDict.Add(epn.guid,epn);
+		paramList.Add(epn);
+		// instantiate paramView
+		ParameterView newParamView = Instantiate(paramView,new Vector3(),Quaternion.identity).GetComponent<ParameterView> ();
+		newParamView.gameObject.transform.SetParent (parameterContent.transform, false);
+		newParamView.title.text = epn.name;
+		newParamView.type.text = epn.type;
+        newParamView.guid.text = epn.guid.Substring (epn.guid.Length - 5);
+		newParamView.rfgv = this;
+		newParamView.pn = epn;
+		// add paramView to content panel
+	}
+
+	public void RemoveParameter(ExposedParameter pn)
+	{
+		graph.RemoveExposedParameter(pn);
+		paramList.Remove(pn);
 	}
 
 	public void CreateGraph () {
