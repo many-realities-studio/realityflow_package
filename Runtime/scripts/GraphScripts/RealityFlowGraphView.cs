@@ -72,7 +72,7 @@ public class RealityFlowGraphView : MonoBehaviour {
 
 	protected void LoadGraph(BaseGraph graph){
 		foreach (BaseNode node in graph.nodes ){
-			StartCoroutine (AddNodeCoroutine(node, new Vector3()));        }
+			StartCoroutine (AddNodeCoroutine(node));        }
 	}
 
     void GraphChangesCallback(GraphChanges changes)
@@ -111,54 +111,54 @@ public class RealityFlowGraphView : MonoBehaviour {
 		JsonUtility.FromJsonOverwrite(cmd.GetGraphState(), graph);
 		graph.Deserialize();
 	}
- 
-	public void AddNodeCommand(string nodeTag, Vector3 nodePos){
-		// serialize the current version of the graph
-		// savePoint = JsonSerializer.Serialize(graph);
-		string tmp = JsonUtility.ToJson(graph);
 
-		// send this to the command palette
-		commandPalette.AddCommandToStack(new AddNodeCommand("Add Node", tmp));
+	// 	public void AddNodeCommand(string nodeTag, Vector3 nodePos){
+	// 	// serialize the current version of the graph
+	// 	// savePoint = JsonSerializer.Serialize(graph);
+	// 	string tmp = JsonUtility.ToJson(graph);
 
-		// perform the actual command action
-        //TextNode tn = BaseNode.CreateFromType<TextNode> (new Vector2 ());
-		BaseNode node;
-		switch(nodeTag)
-		{
-			case "TextNode":
-				TextNode tn = BaseNode.CreateFromType<TextNode> (new Vector2 ());
-				graph.AddNode (tn);
-				tn.output = "Hello World";
-				StartCoroutine (AddNodeCoroutine(tn, nodePos));
-				break;
-			case "FloatNode":
-				FloatNode fn = BaseNode.CreateFromType<FloatNode> (new Vector2 ());
-				graph.AddNode (fn);
-				fn.output = 0.5f;
-				StartCoroutine (AddNodeCoroutine(fn, nodePos));
-				break;
-			case "IntNode":
-				IntNode intn = BaseNode.CreateFromType<IntNode> (new Vector2 ());
-				graph.AddNode (intn);
-				intn.output = 1;
-				StartCoroutine (AddNodeCoroutine(intn, nodePos));
-				break;
-			case "BoolNode":
-				BoolNode bn = BaseNode.CreateFromType<BoolNode> (new Vector2 ());
-				graph.AddNode(bn);
-				bn.output = true;
-				StartCoroutine (AddNodeCoroutine(bn, nodePos));
-				break;
-			case "ConditionalNode":
-				IfNode cn = BaseNode.CreateFromType<IfNode> (new Vector2 ());
-				graph.AddNode(cn);
-				StartCoroutine (AddNodeCoroutine(cn, nodePos));
-				break;
-			default:
-				Debug.Log("This case of addnode did not use a tag");
-				break; 
-		}		
-	}
+	// 	// send this to the command palette
+	// 	commandPalette.AddCommandToStack(new AddNodeCommand("Add Node", tmp));
+
+	// 	// perform the actual command action
+    //     //TextNode tn = BaseNode.CreateFromType<TextNode> (new Vector2 ());
+	// 	BaseNode node;
+	// 	switch(nodeTag)
+	// 	{
+	// 		case "TextNode":
+	// 			TextNode tn = BaseNode.CreateFromType<TextNode> (new Vector2 ());
+	// 			graph.AddNode (tn);
+	// 			tn.output = "Hello World";
+	// 			StartCoroutine (AddNodeCoroutine(tn, nodePos));
+	// 			break;
+	// 		case "FloatNode":
+	// 			FloatNode fn = BaseNode.CreateFromType<FloatNode> (new Vector2 ());
+	// 			graph.AddNode (fn);
+	// 			fn.output = 0.5f;
+	// 			StartCoroutine (AddNodeCoroutine(fn, nodePos));
+	// 			break;
+	// 		case "IntNode":
+	// 			IntNode intn = BaseNode.CreateFromType<IntNode> (new Vector2 ());
+	// 			graph.AddNode (intn);
+	// 			intn.output = 1;
+	// 			StartCoroutine (AddNodeCoroutine(intn, nodePos));
+	// 			break;
+	// 		case "BoolNode":
+	// 			BoolNode bn = BaseNode.CreateFromType<BoolNode> (new Vector2 ());
+	// 			graph.AddNode(bn);
+	// 			bn.output = true;
+	// 			StartCoroutine (AddNodeCoroutine(bn, nodePos));
+	// 			break;
+	// 		case "ConditionalNode":
+	// 			IfNode cn = BaseNode.CreateFromType<IfNode> (new Vector2 ());
+	// 			graph.AddNode(cn);
+	// 			StartCoroutine (AddNodeCoroutine(cn, nodePos));
+	// 			break;
+	// 		default:
+	// 			Debug.Log("This case of addnode did not use a tag");
+	// 			break; 
+	// 	}		
+	// }
 
 	public void DeleteSelection(){
 		// serialize the current version of the graph
@@ -193,6 +193,54 @@ public class RealityFlowGraphView : MonoBehaviour {
 			// remove all their edges
 			// remove any selected exposed params
 	}
+ 
+	public void AddNodeCommand(string nodeTag){
+		// serialize the current version of the graph
+		// savePoint = JsonSerializer.Serialize(graph);
+		string tmp = JsonUtility.ToJson(graph);
+
+		// send this to the command palette
+		commandPalette.AddCommandToStack(new AddNodeCommand("Add Node", tmp));
+
+		// perform the actual command action
+        //TextNode tn = BaseNode.CreateFromType<TextNode> (new Vector2 ());
+		BaseNode node;
+		switch(nodeTag)
+		{
+			case "TextNode":
+				TextNode tn = BaseNode.CreateFromType<TextNode> (new Vector2 ());
+				graph.AddNode (tn);
+				tn.output = "Hello World";
+				StartCoroutine (AddNodeCoroutine(tn));
+				break;
+			case "FloatNode":
+				FloatNode fn = BaseNode.CreateFromType<FloatNode> (new Vector2 ());
+				graph.AddNode (fn);
+				fn.output = 0.5f;
+				StartCoroutine (AddNodeCoroutine(fn));
+				break;
+			case "IntNode":
+				IntNode intn = BaseNode.CreateFromType<IntNode> (new Vector2 ());
+				graph.AddNode (intn);
+				intn.output = 1;
+				StartCoroutine (AddNodeCoroutine(intn));
+				break;
+			case "BoolNode":
+				BoolNode bn = BaseNode.CreateFromType<BoolNode> (new Vector2 ());
+				graph.AddNode(bn);
+				bn.output = true;
+				StartCoroutine (AddNodeCoroutine(bn));
+				break;
+			case "ConditionalNode":
+				IfNode cn = BaseNode.CreateFromType<IfNode> (new Vector2 ());
+				graph.AddNode(cn);
+				StartCoroutine (AddNodeCoroutine(cn));
+				break;
+			default:
+				Debug.Log("This case of addnode did not use a tag");
+				break; 
+		}		
+	}
 
 	public void PrintCommandStack(){
 		// Debug.Log("Print stack disabled until we get UI elements in vr");
@@ -213,17 +261,17 @@ public class RealityFlowGraphView : MonoBehaviour {
 		TextNode tn = BaseNode.CreateFromType<TextNode> (new Vector2 ());
 		graph.AddNode (tn);
 		tn.output = "Hello World";
-		StartCoroutine (AddNodeCoroutine(tn, new Vector3()));
+		StartCoroutine (AddNodeCoroutine(tn));
 		SetLabelNode sln = BaseNode.CreateFromType<SetLabelNode> (new Vector2 ());
 		graph.AddNode (sln);
 		graph.Connect (sln.GetPort ("newLabel", null), tn.GetPort ("output", null));
-		StartCoroutine (AddNodeCoroutine(sln, new Vector3()));
+		StartCoroutine (AddNodeCoroutine(sln));
 		ParameterNode pn = BaseNode.CreateFromType<ParameterNode> (new Vector2 ());
 
 		pn.parameterGUID = graph.GetExposedParameter ("LabelContainer").guid;
 		graph.AddNode (pn);
 		graph.Connect (sln.GetPort ("input", ""), pn.GetPort ("output", "output"));
-		StartCoroutine (AddNodeCoroutine(pn, new Vector3()));
+		StartCoroutine (AddNodeCoroutine(pn));
 		graph.UpdateComputeOrder ();
 		// graph.ed
 		// graph.SetParameterValue ("LabelContainer", Labeled);
@@ -259,9 +307,9 @@ public class RealityFlowGraphView : MonoBehaviour {
 	}
 
 
-	public IEnumerator AddNodeCoroutine (BaseNode node, Vector3 nodePos) {
+	public IEnumerator AddNodeCoroutine (BaseNode node) {
         //NodeUI newView = new NodeUI(node.name,node,node.GUID.Substring (node.GUID.Length - 5));
-        NodeUI newView = Instantiate (nodeView, nodePos, Quaternion.identity).GetComponent<NodeUI> ();
+        NodeUI newView = Instantiate (nodeView, new Vector3(), Quaternion.identity).GetComponent<NodeUI> ();
         newView.gameObject.transform.SetParent (contentPanel.transform, false);
         newView.title.text = node.name;
         newView.node = node;
