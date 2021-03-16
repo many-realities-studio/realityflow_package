@@ -45,6 +45,7 @@ namespace Packages.realityflow_package.Runtime.scripts
             // Set up User updates
             ReceivedMessage.AddEventHandler(typeof(LogoutUser_Received), false, _LogoutUser);
             ReceivedMessage.AddEventHandler(typeof(RegisterUser_Received), false, _RegisterUser);
+            ReceivedMessage.AddEventHandler(typeof(DeleteUser_Received), false, _DeleteUser);
 
             // Set up Behaviour updates
             ReceivedMessage.AddEventHandler(typeof(CreateBehaviour_Received), false, _CreateBehaviour);
@@ -80,6 +81,14 @@ namespace Packages.realityflow_package.Runtime.scripts
             _FlowWebsocket.Disconnect();
         }
 
+        // public static void LogoutGuest(FlowUser flowUser)
+        // {
+        //     LogoutGuest_SendToServer logoutGuestMessage = new LogoutGuest_SendToServer(flowUser);
+        //     FlowWebsocket.SendMessage(logoutGuestMessage);
+
+        //     _FlowWebsocket.Disconnect();
+        // }
+
         public static void Register(string username, string password, string url, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
         {
             bool connectionSuccssfull = ConnectToServer(url);
@@ -91,6 +100,14 @@ namespace Packages.realityflow_package.Runtime.scripts
 
                 ReceivedMessage.AddEventHandler(typeof(RegisterUser_Received), true, callbackFunction);
             }
+        }
+
+        public static void DeleteUser(FlowUser flowUser)
+        {
+            DeleteUser_SendToServer deleteUserMessage = new DeleteUser_SendToServer(flowUser);
+            FlowWebsocket.SendMessage(deleteUserMessage);
+
+            //_FlowWebsocket.Disconnect();
         }
 
         #endregion UserOperations
@@ -450,6 +467,13 @@ namespace Packages.realityflow_package.Runtime.scripts
         {
             ConfigurationSingleton.SingleInstance.CurrentProject = null;
             ConfigurationSingleton.SingleInstance.CurrentUser = null;
+        }
+
+        private static void _DeleteUser(object sender, BaseReceivedEventArgs eventArgs)
+        {
+            ConfigurationSingleton.SingleInstance.CurrentProject = null;
+            ConfigurationSingleton.SingleInstance.CurrentUser = null;
+            _FlowWebsocket.Disconnect();
         }
 
         private static void _RegisterUser(object sender, BaseReceivedEventArgs eventArgs)
