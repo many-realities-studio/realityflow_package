@@ -42,6 +42,9 @@ public class RealityFlowGraphView : MonoBehaviour {
 
 	public List<Edge> edges = new List<Edge>();
 
+	Vector2 newNodePosition = new Vector2();
+	public Vector2 canvasDimensions = new Vector2(2560, 1080); // FOR NOW, dont have these hardcoded in final demo
+
 	// protected virtual EdgeListener CreateEdgeConnectorListener()
 	// 	 => new EdgeListener(this);
 
@@ -198,6 +201,11 @@ public class RealityFlowGraphView : MonoBehaviour {
 			// remove all their edges
 			// remove any selected exposed params
 	}
+
+	public void SetNewNodeLocation(Vector2 pos2D){
+		newNodePosition = pos2D;
+		Debug.Log("New Node position in RFGV: "+newNodePosition);
+	}
  
 	public void AddNodeCommand(string nodeTag){
 		// serialize the current version of the graph
@@ -345,8 +353,9 @@ public class RealityFlowGraphView : MonoBehaviour {
 
 	public IEnumerator AddNodeCoroutine (BaseNode node) {
         //NodeUI newView = new NodeUI(node.name,node,node.GUID.Substring (node.GUID.Length - 5));
-        NodeUI newView = Instantiate (nodeView, new Vector3(), Quaternion.identity).GetComponent<NodeUI> ();
+        NodeUI newView = Instantiate (nodeView, newNodePosition, Quaternion.identity).GetComponent<NodeUI> ();
         newView.gameObject.transform.SetParent (contentPanel.transform, false);
+		// Set the rectTransform position here after we've set the parent
         newView.title.text = node.name;
         newView.node = node;
         newView.GUID.text = node.GUID.Substring (node.GUID.Length - 5);
@@ -379,7 +388,10 @@ public class RealityFlowGraphView : MonoBehaviour {
         }
         nodeViewList.Add (newView);
         // LayoutRebuilder.MarkLayoutForRebuild ((RectTransform) newView.transform);
-        newView.gameObject.GetComponent<RectTransform> ().SetAsLastSibling ();
+		RectTransform rect = newView.gameObject.GetComponent<RectTransform> ();
+        rect.SetAsLastSibling ();
+		rect.anchoredPosition = canvasDimensions*newNodePosition;
+		// rect.anchoredPosition = new Vector2(canvasDimensions*newNodePosition);
         // contentPanel.GetComponent<VerticalLayoutGroup>().enabled = false;
         yield return new WaitForSeconds (.01f);
         // contentPanel.GetComponent<VerticalLayoutGroup>().enabled = true;

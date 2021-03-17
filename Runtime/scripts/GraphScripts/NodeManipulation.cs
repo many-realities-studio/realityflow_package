@@ -45,9 +45,16 @@ public class NodeManipulation : MonoBehaviour//,IMixedRealityPointerHandler
                 Debug.Log(corner);
             }
             Debug.Log("Hit "+node.transform.position);
-            Vector2 newPos = cornerPos[0];
+            Vector3 worldNode = node.transform.position;
+            Vector2 newPos;
+            newPos = (worldNode - cornerPos[1]);
+            Vector2 canvasDimensions = (cornerPos[2] - cornerPos[0]);
+            Vector2 distFromUpperLeftCorner = newPos / canvasDimensions;
+            Debug.Log("newPos:"+newPos);
+            Debug.Log("canvasDimensions:"+canvasDimensions);
+            Debug.Log("upper left:"+distFromUpperLeftCorner);
             //node.transform.GetComponent<RectTransform>()
-            AttachNodeToGraph();
+            AttachNodeToGraph(distFromUpperLeftCorner);
         }
         else
         {
@@ -57,9 +64,10 @@ public class NodeManipulation : MonoBehaviour//,IMixedRealityPointerHandler
         }
     }
 
-    public void AttachNodeToGraph()
+    public void AttachNodeToGraph(Vector2 dist)
     {
         //rfgv.AddNodeCommand(this.transform.GetChild(0).tag, this.transform.GetChild(0).GetComponent<RectTransform>().anchoredPosition);
+        rfgv.SetNewNodeLocation(dist);
         rfgv.AddNodeCommand(this.transform.GetChild(0).tag);
         Destroy(this.gameObject);
     }
