@@ -8,10 +8,10 @@ using UnityEngine.UI;
 using UnityEngine.UIElements;
 using System.Linq;
 
-public struct Edge {
-	NodePort input;
-	NodePort output;
-};
+// public struct Edge {
+// 	NodePort input;
+// 	NodePort output;
+// };
 
 public class RealityFlowGraphView : MonoBehaviour {
 	public BaseGraph graph;
@@ -32,9 +32,10 @@ public class RealityFlowGraphView : MonoBehaviour {
 	public GameObject nodePortView;
 	public GameObject nodeView;
 	public GameObject paramView;
+	public GameObject edgeView;
 
-	public List<NodeUI> nodeViewList = new List<NodeUI> ();
-	public List<NodeUI> selectedNV = new List<NodeUI>();
+	public List<NodeView> nodeViewList = new List<NodeView> ();
+	public List<NodeView> selectedNV = new List<NodeView>();
 	public List<BaseNode> selected = new List<BaseNode>();
 
 	public Dictionary<string,ExposedParameter> paramDict = new Dictionary<string, ExposedParameter>();
@@ -187,8 +188,8 @@ public class RealityFlowGraphView : MonoBehaviour {
 		// 	graph.RemoveNode(n);
 		// }
 		// selected.Clear();
-		// TODO: Change deletion process so we use the NodeUI.guid to delete specific dictionary indicies instead of using a list (Requires we change our NodeView List into a dictionary).
-		foreach( NodeUI n in selectedNV){
+		// TODO: Change deletion process so we use the NodeView.guid to delete specific dictionary indicies instead of using a list (Requires we change our NodeView List into a dictionary).
+		foreach( NodeView n in selectedNV){
 			n.Delete();
 		}
 		selectedNV.Clear();
@@ -264,7 +265,7 @@ public class RealityFlowGraphView : MonoBehaviour {
 		selected.Add(n);
 	}
 
-	public void AddToSelectionNV(NodeUI n){
+	public void AddToSelectionNV(NodeView n){
 		selectedNV.Add(n);
 	}
 
@@ -324,6 +325,7 @@ public class RealityFlowGraphView : MonoBehaviour {
 	
 	public void ConnectEdges(NodePort input, NodePort output){
 		graph.Connect(input, output, true);
+		// StartCoroutine(AddEdgeCoroutine());
 	}
 	
 	public void ClearGraph () {
@@ -350,10 +352,12 @@ public class RealityFlowGraphView : MonoBehaviour {
 		processor.Run ();
 	}
 
+	// public IEnumerator AddEdgeCoroutine (){
+	// 	EdgeView newEdge = Instantiate( edgeView, new Vector3(), Quaternion.identity).GetComponent<EdgeView>();
+	// }
 
 	public IEnumerator AddNodeCoroutine (BaseNode node) {
-        //NodeUI newView = new NodeUI(node.name,node,node.GUID.Substring (node.GUID.Length - 5));
-        NodeUI newView = Instantiate (nodeView, newNodePosition, Quaternion.identity).GetComponent<NodeUI> ();
+        NodeView newView = Instantiate (nodeView, newNodePosition, Quaternion.identity).GetComponent<NodeView> ();
         newView.gameObject.transform.SetParent (contentPanel.transform, false);
 		// Set the rectTransform position here after we've set the parent
         newView.title.text = node.name;

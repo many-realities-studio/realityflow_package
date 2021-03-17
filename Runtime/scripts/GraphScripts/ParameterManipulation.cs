@@ -12,7 +12,7 @@ public class ParameterManipulation : MonoBehaviour//,IMixedRealityPointerHandler
     Quaternion rotation;
     public static ParameterManipulation instance;
     public GameObject nodeObject;
-    public NodeUI nodeUI;
+    public NodeView nodeView;
     void Awake()
     {
         instance = this;
@@ -31,7 +31,7 @@ public class ParameterManipulation : MonoBehaviour//,IMixedRealityPointerHandler
             //Debug.DrawRay(node.transform.position, node.transform.TransformDirection(Vector3.forward) * hit.distance, Color.green);
             Debug.Log("Did Hit");
             nodeObject = hit.collider.gameObject;
-            nodeUI = nodeObject.GetComponent<NodeUI>();
+            nodeView = nodeObject.GetComponent<NodeView>();
             AttachParameterToNode(this.gameObject.transform.GetComponent<RectTransform>().anchoredPosition);
         }
         else
@@ -44,7 +44,7 @@ public class ParameterManipulation : MonoBehaviour//,IMixedRealityPointerHandler
 
     public void AttachParameterToNode(Vector3 pos)
     {
-        // TODO: Attach the parameter to the node via a new function in NodeUI
+        // TODO: Attach the parameter to the node via a new function in NodeView
         Destroy(this.gameObject);
     }
     public void RefreshPalette()
