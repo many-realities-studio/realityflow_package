@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using RealityFlow.Plugin.Contrib;
+using GraphProcessor;
 public class NodeUI : MonoBehaviour
 {
     public Text title;
