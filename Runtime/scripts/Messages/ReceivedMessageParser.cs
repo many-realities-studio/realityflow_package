@@ -50,6 +50,7 @@ namespace Packages.realityflow_package.Runtime.scripts
             messageRouter.Add("LoginUser", typeof(LoginUser_Received));
             messageRouter.Add("LogoutUser", typeof(LogoutUser_Received));
             messageRouter.Add("CreateUser", typeof(RegisterUser_Received));
+            messageRouter.Add("DeleteUser", typeof(DeleteUser_Received));
 
             // Behaviour Messages
             messageRouter.Add("CreateBehaviour", typeof(CreateBehaviour_Received));
