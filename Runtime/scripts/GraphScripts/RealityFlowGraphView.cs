@@ -351,9 +351,9 @@ public class RealityFlowGraphView : MonoBehaviour {
         newView.node = node;
         newView.GUID.text = node.GUID.Substring (node.GUID.Length - 5);
 		newView.rfgv = this;
-        contentPanel.GetComponent<ContentSizeFitter>().enabled = false;
+        // contentPanel.GetComponent<ContentSizeFitter>().enabled = false;
         foreach (NodePort input in node.inputPorts) {
-            newView.GetComponent<ContentSizeFitter>().enabled = false;
+            // newView.GetComponent<ContentSizeFitter>().enabled = false/;
             NodePortView npv = Instantiate (nodePortView).GetComponent<NodePortView> ();
             npv.gameObject.transform.SetParent (newView.inputPanel.transform, false);
             npv.gameObject.GetComponent<RectTransform> ().SetAsLastSibling ();
@@ -361,12 +361,12 @@ public class RealityFlowGraphView : MonoBehaviour {
 			npv.type = "input";
             yield return new WaitForSeconds (.01f);
             npv.Init (input);
-            LayoutRebuilder.MarkLayoutForRebuild ((RectTransform) newView.transform);
-            newView.GetComponent<ContentSizeFitter>().enabled = true;
+            // LayoutRebuilder.MarkLayoutForRebuild ((RectTransform) newView.transform);
+            // newView.GetComponent<ContentSizeFitter>().enabled = true;
         }
         foreach (NodePort output in node.outputPorts) {
 			Debug.Log(output.portData);
-            newView.GetComponent<ContentSizeFitter>().enabled = false;
+            // newView.GetComponent<ContentSizeFitter>().enabled = false;
             NodePortView npv = Instantiate (nodePortView).GetComponent<NodePortView> ();
             npv.gameObject.transform.SetParent (newView.outputPanel.transform,false);
             npv.gameObject.GetComponent<RectTransform> ().SetAsLastSibling ();
@@ -374,17 +374,17 @@ public class RealityFlowGraphView : MonoBehaviour {
 			npv.type = "output";
             yield return new WaitForSeconds (.01f);
             npv.Init (output);
-            LayoutRebuilder.MarkLayoutForRebuild ((RectTransform) newView.transform);
-            newView.GetComponent<ContentSizeFitter>().enabled = true;
+            // LayoutRebuilder.MarkLayoutForRebuild ((RectTransform) newView.transform);
+            // newView.GetComponent<ContentSizeFitter>().enabled = true;
         }
         nodeViewList.Add (newView);
-        LayoutRebuilder.MarkLayoutForRebuild ((RectTransform) newView.transform);
+        // LayoutRebuilder.MarkLayoutForRebuild ((RectTransform) newView.transform);
         newView.gameObject.GetComponent<RectTransform> ().SetAsLastSibling ();
-        contentPanel.GetComponent<VerticalLayoutGroup>().enabled = false;
+        // contentPanel.GetComponent<VerticalLayoutGroup>().enabled = false;
         yield return new WaitForSeconds (.01f);
-        contentPanel.GetComponent<VerticalLayoutGroup>().enabled = true;
-        contentPanel.GetComponent<ContentSizeFitter>().enabled = true;
-        LayoutRebuilder.MarkLayoutForRebuild ((RectTransform) contentPanel.transform);
+        // contentPanel.GetComponent<VerticalLayoutGroup>().enabled = true;
+        // contentPanel.GetComponent<ContentSizeFitter>().enabled = true;
+        // LayoutRebuilder.MarkLayoutForRebuild ((RectTransform) contentPanel.transform);
     }
 
 }
