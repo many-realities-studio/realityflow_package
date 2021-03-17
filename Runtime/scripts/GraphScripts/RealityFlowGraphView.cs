@@ -121,54 +121,6 @@ public class RealityFlowGraphView : MonoBehaviour {
 		graph.Deserialize();
 	}
 
-	// 	public void AddNodeCommand(string nodeTag, Vector3 nodePos){
-	// 	// serialize the current version of the graph
-	// 	// savePoint = JsonSerializer.Serialize(graph);
-	// 	string tmp = JsonUtility.ToJson(graph);
-
-	// 	// send this to the command palette
-	// 	commandPalette.AddCommandToStack(new AddNodeCommand("Add Node", tmp));
-
-	// 	// perform the actual command action
-    //     //TextNode tn = BaseNode.CreateFromType<TextNode> (new Vector2 ());
-	// 	BaseNode node;
-	// 	switch(nodeTag)
-	// 	{
-	// 		case "TextNode":
-	// 			TextNode tn = BaseNode.CreateFromType<TextNode> (new Vector2 ());
-	// 			graph.AddNode (tn);
-	// 			tn.output = "Hello World";
-	// 			StartCoroutine (AddNodeCoroutine(tn, nodePos));
-	// 			break;
-	// 		case "FloatNode":
-	// 			FloatNode fn = BaseNode.CreateFromType<FloatNode> (new Vector2 ());
-	// 			graph.AddNode (fn);
-	// 			fn.output = 0.5f;
-	// 			StartCoroutine (AddNodeCoroutine(fn, nodePos));
-	// 			break;
-	// 		case "IntNode":
-	// 			IntNode intn = BaseNode.CreateFromType<IntNode> (new Vector2 ());
-	// 			graph.AddNode (intn);
-	// 			intn.output = 1;
-	// 			StartCoroutine (AddNodeCoroutine(intn, nodePos));
-	// 			break;
-	// 		case "BoolNode":
-	// 			BoolNode bn = BaseNode.CreateFromType<BoolNode> (new Vector2 ());
-	// 			graph.AddNode(bn);
-	// 			bn.output = true;
-	// 			StartCoroutine (AddNodeCoroutine(bn, nodePos));
-	// 			break;
-	// 		case "ConditionalNode":
-	// 			IfNode cn = BaseNode.CreateFromType<IfNode> (new Vector2 ());
-	// 			graph.AddNode(cn);
-	// 			StartCoroutine (AddNodeCoroutine(cn, nodePos));
-	// 			break;
-	// 		default:
-	// 			Debug.Log("This case of addnode did not use a tag");
-	// 			break; 
-	// 	}		
-	// }
-
 	public void DeleteSelection(){
 		// serialize the current version of the graph
 		string tmp;
@@ -324,7 +276,15 @@ public class RealityFlowGraphView : MonoBehaviour {
     }
 	
 	public void ConnectEdges(NodePort input, NodePort output){
-		graph.Connect(input, output, true);
+		// graph.Connect(input, output, true);
+		SerializableEdge newEdge = graph.Connect(input, output, true);
+		/* Backend:
+		 - Create an Edge
+		 - Store this edge into the list
+
+		 Frontend:
+		 - Create an EdgeView with the edge
+		  */
 		// StartCoroutine(AddEdgeCoroutine());
 	}
 	
