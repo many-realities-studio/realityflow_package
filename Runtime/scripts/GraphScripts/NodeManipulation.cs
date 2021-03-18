@@ -7,7 +7,7 @@ using Microsoft.MixedReality.Toolkit.Input;
 
 public class NodeManipulation : MonoBehaviour//,IMixedRealityPointerHandler
 {
-    // Start is called before the first frame update
+    //public LayerMask layerMask;
     Vector3 position;
     Quaternion rotation;
     public static NodeManipulation instance;
@@ -28,7 +28,7 @@ public class NodeManipulation : MonoBehaviour//,IMixedRealityPointerHandler
         RaycastHit hit;
         if(Physics.Raycast(node.transform.position, 
         node.transform.TransformDirection(Vector3.forward), 
-        out hit, Mathf.Infinity,1<<6))
+        out hit, 1<<6))
         {
             //Debug.DrawRay(node.transform.position, node.transform.TransformDirection(Vector3.forward) * hit.distance, Color.green);
             Debug.Log("Did Hit");
@@ -37,7 +37,24 @@ public class NodeManipulation : MonoBehaviour//,IMixedRealityPointerHandler
             Debug.Log("rfgv object name is "+rfgvGameObject.name);
             rfgv = rfgvGameObject.GetComponent<RealityFlowGraphView>();
             graph = rfgv.graph;
-            AttachNodeToGraph(node.transform.GetComponent<RectTransform>().anchoredPosition);
+
+            Vector3 [] cornerPos = new Vector3[4];
+            hit.collider.gameObject.GetComponent<RectTransform>().GetWorldCorners(cornerPos);
+            Debug.Log("Corners for Graph");
+            foreach(Vector3 corner in cornerPos){
+                Debug.Log(corner);
+            }
+            Debug.Log("Hit "+node.transform.position);
+            Vector3 worldNode = node.transform.position;
+            Vector2 newPos;
+            newPos = (worldNode - cornerPos[1]);
+            Vector2 canvasDimensions = (cornerPos[2] - cornerPos[0]);
+            Vector2 distFromUpperLeftCorner = newPos / canvasDimensions;
+            Debug.Log("newPos:"+newPos);
+            Debug.Log("canvasDimensions:"+canvasDimensions);
+            Debug.Log("upper left:"+distFromUpperLeftCorner);
+            //node.transform.GetComponent<RectTransform>()
+            AttachNodeToGraph(distFromUpperLeftCorner);
         }
         else
         {
@@ -47,9 +64,10 @@ public class NodeManipulation : MonoBehaviour//,IMixedRealityPointerHandler
         }
     }
 
-    public void AttachNodeToGraph(Vector3 pos)
+    public void AttachNodeToGraph(Vector2 dist)
     {
         //rfgv.AddNodeCommand(this.transform.GetChild(0).tag, this.transform.GetChild(0).GetComponent<RectTransform>().anchoredPosition);
+        rfgv.SetNewNodeLocation(dist);
         rfgv.AddNodeCommand(this.transform.GetChild(0).tag);
         Destroy(this.gameObject);
     }

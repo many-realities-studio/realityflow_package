@@ -8,10 +8,10 @@ using UnityEngine.UI;
 using UnityEngine.UIElements;
 using System.Linq;
 
-public struct Edge {
-	NodePort input;
-	NodePort output;
-};
+// public struct Edge {
+// 	NodePort input;
+// 	NodePort output;
+// };
 
 public class RealityFlowGraphView : MonoBehaviour {
 	public BaseGraph graph;
@@ -27,14 +27,24 @@ public class RealityFlowGraphView : MonoBehaviour {
 	public GameObject Labeled;
 	public GameObject contentPanel;
 
+	public GameObject parameterContent;
+
 	public GameObject nodePortView;
 	public GameObject nodeView;
+	public GameObject paramView;
+	public GameObject edgeView;
 
-	public List<NodeUI> nodeViewList = new List<NodeUI> ();
-	public List<NodeUI> selectedNV = new List<NodeUI>();
+	public List<NodeView> nodeViewList = new List<NodeView> ();
+	public List<NodeView> selectedNV = new List<NodeView>();
 	public List<BaseNode> selected = new List<BaseNode>();
 
+	public Dictionary<string,ExposedParameter> paramDict = new Dictionary<string, ExposedParameter>();
+	public List<ExposedParameter> paramList = new List<ExposedParameter>();
+
 	public List<Edge> edges = new List<Edge>();
+
+	Vector2 newNodePosition = new Vector2();
+	public Vector2 canvasDimensions = new Vector2(2560, 1080); // FOR NOW, dont have these hardcoded in final demo
 
 	// protected virtual EdgeListener CreateEdgeConnectorListener()
 	// 	 => new EdgeListener(this);
@@ -65,7 +75,6 @@ public class RealityFlowGraphView : MonoBehaviour {
 		savePoint = JsonSerializer.Serialize(graph);
 		
 		// selected =
-		Debug.Log("hello");
 		// NodeView.instance.LoadGraph(graph);
 		LoadGraph(graph);
 	}
@@ -112,54 +121,6 @@ public class RealityFlowGraphView : MonoBehaviour {
 		graph.Deserialize();
 	}
 
-	// 	public void AddNodeCommand(string nodeTag, Vector3 nodePos){
-	// 	// serialize the current version of the graph
-	// 	// savePoint = JsonSerializer.Serialize(graph);
-	// 	string tmp = JsonUtility.ToJson(graph);
-
-	// 	// send this to the command palette
-	// 	commandPalette.AddCommandToStack(new AddNodeCommand("Add Node", tmp));
-
-	// 	// perform the actual command action
-    //     //TextNode tn = BaseNode.CreateFromType<TextNode> (new Vector2 ());
-	// 	BaseNode node;
-	// 	switch(nodeTag)
-	// 	{
-	// 		case "TextNode":
-	// 			TextNode tn = BaseNode.CreateFromType<TextNode> (new Vector2 ());
-	// 			graph.AddNode (tn);
-	// 			tn.output = "Hello World";
-	// 			StartCoroutine (AddNodeCoroutine(tn, nodePos));
-	// 			break;
-	// 		case "FloatNode":
-	// 			FloatNode fn = BaseNode.CreateFromType<FloatNode> (new Vector2 ());
-	// 			graph.AddNode (fn);
-	// 			fn.output = 0.5f;
-	// 			StartCoroutine (AddNodeCoroutine(fn, nodePos));
-	// 			break;
-	// 		case "IntNode":
-	// 			IntNode intn = BaseNode.CreateFromType<IntNode> (new Vector2 ());
-	// 			graph.AddNode (intn);
-	// 			intn.output = 1;
-	// 			StartCoroutine (AddNodeCoroutine(intn, nodePos));
-	// 			break;
-	// 		case "BoolNode":
-	// 			BoolNode bn = BaseNode.CreateFromType<BoolNode> (new Vector2 ());
-	// 			graph.AddNode(bn);
-	// 			bn.output = true;
-	// 			StartCoroutine (AddNodeCoroutine(bn, nodePos));
-	// 			break;
-	// 		case "ConditionalNode":
-	// 			IfNode cn = BaseNode.CreateFromType<IfNode> (new Vector2 ());
-	// 			graph.AddNode(cn);
-	// 			StartCoroutine (AddNodeCoroutine(cn, nodePos));
-	// 			break;
-	// 		default:
-	// 			Debug.Log("This case of addnode did not use a tag");
-	// 			break; 
-	// 	}		
-	// }
-
 	public void DeleteSelection(){
 		// serialize the current version of the graph
 		string tmp;
@@ -179,8 +140,8 @@ public class RealityFlowGraphView : MonoBehaviour {
 		// 	graph.RemoveNode(n);
 		// }
 		// selected.Clear();
-		// TODO: Change deletion process so we use the NodeUI.guid to delete specific dictionary indicies instead of using a list (Requires we change our NodeView List into a dictionary).
-		foreach( NodeUI n in selectedNV){
+		// TODO: Change deletion process so we use the NodeView.guid to delete specific dictionary indicies instead of using a list (Requires we change our NodeView List into a dictionary).
+		foreach( NodeView n in selectedNV){
 			n.Delete();
 		}
 		selectedNV.Clear();
@@ -192,6 +153,11 @@ public class RealityFlowGraphView : MonoBehaviour {
 			// remove all nodes from the graph.
 			// remove all their edges
 			// remove any selected exposed params
+	}
+
+	public void SetNewNodeLocation(Vector2 pos2D){
+		newNodePosition = pos2D;
+		Debug.Log("New Node position in RFGV: "+newNodePosition);
 	}
  
 	public void AddNodeCommand(string nodeTag){
@@ -251,8 +217,39 @@ public class RealityFlowGraphView : MonoBehaviour {
 		selected.Add(n);
 	}
 
-	public void AddToSelectionNV(NodeUI n){
+	public void AddToSelectionNV(NodeView n){
 		selectedNV.Add(n);
+	}
+
+	public void AddParameter(){
+		string tmp = JsonUtility.ToJson(graph);
+		// get name of parameter from user input via mtrk keyboard (probably)
+		string name = "autofill";
+		Type type = typeof(string);
+		//Debug.Log(type.AssemblyQualifiedName);
+		// make sure it's not a duplicate name
+		// add parameter to a list that is drag and droppable
+		ParameterNode pn = BaseNode.CreateFromType<ParameterNode> (new Vector2 ());
+		graph.AddExposedParameter (name, type, Labeled);
+		ExposedParameter epn = graph.GetExposedParameter (name);
+		pn.parameterGUID = epn.guid;
+		//paramDict.Add(epn.guid,epn);
+		paramList.Add(epn);
+		// instantiate paramView
+		ParameterView newParamView = Instantiate(paramView,new Vector3(),Quaternion.identity).GetComponent<ParameterView> ();
+		newParamView.gameObject.transform.SetParent (parameterContent.transform, false);
+		newParamView.title.text = epn.name;
+		newParamView.type.text = epn.type;
+        newParamView.guid.text = epn.guid.Substring (epn.guid.Length - 5);
+		newParamView.rfgv = this;
+		newParamView.pn = epn;
+		// add paramView to content panel
+	}
+
+	public void RemoveParameter(ExposedParameter pn)
+	{
+		graph.RemoveExposedParameter(pn);
+		paramList.Remove(pn);
 	}
 
 	public void CreateGraph () {
@@ -278,8 +275,19 @@ public class RealityFlowGraphView : MonoBehaviour {
 		processor = new ProcessGraphProcessor (graph);
     }
 	
-	public void ConnectEdges(NodePort input, NodePort output){
-		graph.Connect(input, output, true);
+	// public void ConnectEdges(NodePort input, NodePort output){
+	public void ConnectEdges(NodePortView input, NodePortView output){ // Replacing arguments w/ NodePortViews
+		// graph.Connect(input, output, true);
+		SerializableEdge newEdge = graph.Connect(input.port, output.port, true);
+
+		/* Backend:
+		 - Create an Edge
+		 - Store this edge into the list
+
+		 Frontend:
+		 - Create an EdgeView with the edge
+		  */
+		// StartCoroutine(AddEdgeCoroutine());
 	}
 	
 	public void ClearGraph () {
@@ -306,18 +314,22 @@ public class RealityFlowGraphView : MonoBehaviour {
 		processor.Run ();
 	}
 
+	// This couroutine is in charge of asynchronously making the EdgeView Prefab
+	// public IEnumerator AddEdgeCoroutine (SerializableEdge edge){
+	// 	EdgeView newEdge = Instantiate( edgeView, new Vector3(), Quaternion.identity).GetComponent<EdgeView>();
+	// }
 
 	public IEnumerator AddNodeCoroutine (BaseNode node) {
-        //NodeUI newView = new NodeUI(node.name,node,node.GUID.Substring (node.GUID.Length - 5));
-        NodeUI newView = Instantiate (nodeView, new Vector3(), Quaternion.identity).GetComponent<NodeUI> ();
+        NodeView newView = Instantiate (nodeView, new Vector3(), Quaternion.identity).GetComponent<NodeView> ();
         newView.gameObject.transform.SetParent (contentPanel.transform, false);
+		// Set the rectTransform position here after we've set the parent
         newView.title.text = node.name;
         newView.node = node;
         newView.GUID.text = node.GUID.Substring (node.GUID.Length - 5);
 		newView.rfgv = this;
-        contentPanel.GetComponent<ContentSizeFitter>().enabled = false;
+        // contentPanel.GetComponent<ContentSizeFitter>().enabled = false;
         foreach (NodePort input in node.inputPorts) {
-            newView.GetComponent<ContentSizeFitter>().enabled = false;
+            // newView.GetComponent<ContentSizeFitter>().enabled = false/;
             NodePortView npv = Instantiate (nodePortView).GetComponent<NodePortView> ();
             npv.gameObject.transform.SetParent (newView.inputPanel.transform, false);
             npv.gameObject.GetComponent<RectTransform> ().SetAsLastSibling ();
@@ -325,12 +337,12 @@ public class RealityFlowGraphView : MonoBehaviour {
 			npv.type = "input";
             yield return new WaitForSeconds (.01f);
             npv.Init (input);
-            LayoutRebuilder.MarkLayoutForRebuild ((RectTransform) newView.transform);
-            newView.GetComponent<ContentSizeFitter>().enabled = true;
+            // LayoutRebuilder.MarkLayoutForRebuild ((RectTransform) newView.transform);
+            // newView.GetComponent<ContentSizeFitter>().enabled = true;
         }
         foreach (NodePort output in node.outputPorts) {
 			Debug.Log(output.portData);
-            newView.GetComponent<ContentSizeFitter>().enabled = false;
+            // newView.GetComponent<ContentSizeFitter>().enabled = false;
             NodePortView npv = Instantiate (nodePortView).GetComponent<NodePortView> ();
             npv.gameObject.transform.SetParent (newView.outputPanel.transform,false);
             npv.gameObject.GetComponent<RectTransform> ().SetAsLastSibling ();
@@ -338,17 +350,20 @@ public class RealityFlowGraphView : MonoBehaviour {
 			npv.type = "output";
             yield return new WaitForSeconds (.01f);
             npv.Init (output);
-            LayoutRebuilder.MarkLayoutForRebuild ((RectTransform) newView.transform);
-            newView.GetComponent<ContentSizeFitter>().enabled = true;
+            // LayoutRebuilder.MarkLayoutForRebuild ((RectTransform) newView.transform);
+            // newView.GetComponent<ContentSizeFitter>().enabled = true;
         }
         nodeViewList.Add (newView);
-        LayoutRebuilder.MarkLayoutForRebuild ((RectTransform) newView.transform);
-        newView.gameObject.GetComponent<RectTransform> ().SetAsLastSibling ();
-        contentPanel.GetComponent<VerticalLayoutGroup>().enabled = false;
+        // LayoutRebuilder.MarkLayoutForRebuild ((RectTransform) newView.transform);
+		RectTransform rect = newView.gameObject.GetComponent<RectTransform> ();
+        rect.SetAsLastSibling ();
+		rect.anchoredPosition = canvasDimensions*newNodePosition;
+		// rect.anchoredPosition = new Vector2(canvasDimensions*newNodePosition);
+        // contentPanel.GetComponent<VerticalLayoutGroup>().enabled = false;
         yield return new WaitForSeconds (.01f);
-        contentPanel.GetComponent<VerticalLayoutGroup>().enabled = true;
-        contentPanel.GetComponent<ContentSizeFitter>().enabled = true;
-        LayoutRebuilder.MarkLayoutForRebuild ((RectTransform) contentPanel.transform);
+        // contentPanel.GetComponent<VerticalLayoutGroup>().enabled = true;
+        // contentPanel.GetComponent<ContentSizeFitter>().enabled = true;
+        // LayoutRebuilder.MarkLayoutForRebuild ((RectTransform) contentPanel.transform);
     }
 
 }
