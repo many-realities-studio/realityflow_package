@@ -12,6 +12,8 @@ public class NodePortView : MonoBehaviour
     public EdgeListener listener;
     public string type;
 
+    // public NodeView parentNodeView; // Allows the NodePortView to have a ref to the NodeView, which can help us later draw edges between nodes
+
     void RebuildUI(){
         fieldName.text = port.fieldName;
         string inputGUID, outputGUID;

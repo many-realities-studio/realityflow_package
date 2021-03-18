@@ -275,9 +275,11 @@ public class RealityFlowGraphView : MonoBehaviour {
 		processor = new ProcessGraphProcessor (graph);
     }
 	
-	public void ConnectEdges(NodePort input, NodePort output){
+	// public void ConnectEdges(NodePort input, NodePort output){
+	public void ConnectEdges(NodePortView input, NodePortView output){ // Replacing arguments w/ NodePortViews
 		// graph.Connect(input, output, true);
-		SerializableEdge newEdge = graph.Connect(input, output, true);
+		SerializableEdge newEdge = graph.Connect(input.port, output.port, true);
+
 		/* Backend:
 		 - Create an Edge
 		 - Store this edge into the list
@@ -312,12 +314,13 @@ public class RealityFlowGraphView : MonoBehaviour {
 		processor.Run ();
 	}
 
-	// public IEnumerator AddEdgeCoroutine (){
+	// This couroutine is in charge of asynchronously making the EdgeView Prefab
+	// public IEnumerator AddEdgeCoroutine (SerializableEdge edge){
 	// 	EdgeView newEdge = Instantiate( edgeView, new Vector3(), Quaternion.identity).GetComponent<EdgeView>();
 	// }
 
 	public IEnumerator AddNodeCoroutine (BaseNode node) {
-        NodeView newView = Instantiate (nodeView, newNodePosition, Quaternion.identity).GetComponent<NodeView> ();
+        NodeView newView = Instantiate (nodeView, new Vector3(), Quaternion.identity).GetComponent<NodeView> ();
         newView.gameObject.transform.SetParent (contentPanel.transform, false);
 		// Set the rectTransform position here after we've set the parent
         newView.title.text = node.name;
