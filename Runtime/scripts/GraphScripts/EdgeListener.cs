@@ -40,7 +40,7 @@ public class EdgeListener : MonoBehaviour
 
     private void CheckForConnection(){
         // TODO: We need to make sure this is a valid connection (get the port types and make sure they can be connected)
-        if ( inputView.port != null && outputView.port != null){ // use the NodePortViews instead
+        if ( inputView != null && outputView != null ){ // use the NodePortViews instead
         // if ( input != null && output != null){
             Debug.Log("Both ports are filled");
             // TODO: Update this, this only takes in the type of the node and not necessarily a type that can be cast to this node
