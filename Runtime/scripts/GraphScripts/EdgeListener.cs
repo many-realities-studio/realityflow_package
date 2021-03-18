@@ -11,6 +11,8 @@ public class EdgeListener : MonoBehaviour
     public RealityFlowGraphView graphView;
 
     // TODO: add dictionary or list to create edges
+    // Save the NodePortViews instead of just the NodePort(s), so we can access the NodeViews for drawing the edges
+    NodePortView inputView, outputView;
     NodePort input, output;
 
     // Constructor
@@ -24,26 +26,34 @@ public class EdgeListener : MonoBehaviour
     }
 
     public void SelectInputPort(NodePortView input){
-        this.input = input.port;
+        this.inputView = input;
+        // this.input = input.port;
         Debug.Log(input.port.portData);
         CheckForConnection();
     }
 
     public void SelectOutputPort(NodePortView output){
-        this.output = output.port;        
+        this.outputView = output;        
+        // this.output = output.port;        
         CheckForConnection();
     }
 
     private void CheckForConnection(){
         // TODO: We need to make sure this is a valid connection (get the port types and make sure they can be connected)
-        if ( input != null && output != null){
+        if ( inputView != null && outputView != null ){ // use the NodePortViews instead
+        // if ( input != null && output != null){
             Debug.Log("Both ports are filled");
             // TODO: Update this, this only takes in the type of the node and not necessarily a type that can be cast to this node
-            if (this.input.owner.name == this.output.owner.name)
-                graphView.ConnectEdges(input, output);
+            // if (this.input.owner.name == this.output.owner.name)
+            if (this.inputView.port.owner.name == this.outputView.port.owner.name) // using NodePortViews instead
+                // graphView.ConnectEdges(input, output);
+                graphView.ConnectEdges(inputView, outputView);
             else
                 Debug.Log("The types of ports are not connectable");
+            inputView = null;
+            outputView = null;
         }
+        // Set the views to be null so we don't keep drawing lines between the previously clicked nodes
     }
 
 }
