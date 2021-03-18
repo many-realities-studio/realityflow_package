@@ -4,6 +4,7 @@ using Packages.realityflow_package.Runtime.scripts.Structures.Actions;
 using RealityFlow.Plugin.Editor;
 using RealityFlow.Plugin.Scripts;
 using System;
+//using System.Web.Security;
 using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
@@ -30,9 +31,12 @@ public class FlowNetworkManagerEditor : EditorWindow
     private string uName;
     private string graphName;
     private string pWord;
+    private string tempUName;
+    private string tempPWord;
     private EWindowView window = EWindowView.LOGIN;
     private string projectName;
     private string userToInvite;
+    private bool userIsGuest = false;
 
     private Dictionary<EWindowView, ChangeView> _ViewDictionary = new Dictionary<EWindowView, ChangeView>();
 
@@ -81,7 +85,10 @@ public class FlowNetworkManagerEditor : EditorWindow
         CREATE_DISABLE = 13,
         DELETE_BEHAVIOUR = 14,
         DELETE_PROJECT_CONFIRMATION = 15,
-        DELETE_VSGRAPH = 16
+        DELETE_VSGRAPH = 16,
+        GUESTUSER_HUB = 17,
+        GUESTPROJECT_HUB = 18,
+        GUEST_CONFIRM_LOGIN = 19
     }
 
     // Add menu named "My Window" to the Window menu
@@ -120,6 +127,9 @@ public class FlowNetworkManagerEditor : EditorWindow
         _ViewDictionary.Add(EWindowView.CREATE_SNAPZONE, _CreateSnapZoneView);
         _ViewDictionary.Add(EWindowView.DELETE_BEHAVIOUR, _DeleteBehaviourView);
         _ViewDictionary.Add(EWindowView.DELETE_VSGRAPH, _CreateDeleteVSGraphView);
+        _ViewDictionary.Add(EWindowView.GUESTUSER_HUB, _CreateGuestUserHubView);
+        _ViewDictionary.Add(EWindowView.GUESTPROJECT_HUB, _CreateGuestProjectHubView);
+        _ViewDictionary.Add(EWindowView.GUEST_CONFIRM_LOGIN, _CreateGuestConfirmLoginView);
     }
 
     public void OnGUI()
@@ -129,7 +139,14 @@ public class FlowNetworkManagerEditor : EditorWindow
 
     private void OnDestroy()
     {
-        Operations.Logout(ConfigurationSingleton.SingleInstance.CurrentUser);
+        if (userIsGuest)
+        {
+            Operations.DeleteUser(new FlowUser(tempUName, tempPWord));
+        }
+        else
+        {
+            Operations.Logout(ConfigurationSingleton.SingleInstance.CurrentUser);
+        }
 
         FlowTObject.RemoveAllObjectsFromScene();
         ConfigurationSingleton.SingleInstance.CurrentProject = null;
@@ -271,6 +288,34 @@ public class FlowNetworkManagerEditor : EditorWindow
             Operations.Register(uName, pWord, _Url, (sender, e) => { Debug.Log(e.message); });
         }
 
+        // Create "Log in as guest user" Button and define onClick action
+        if (GUILayout.Button("Log in as guest user", GUILayout.Height(30)))
+        {
+            var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+            var uNameString = new char[8];
+            var pWordString = new char[8];
+
+            var rand = new System.Random();
+            
+            for (int i = 0; i < uNameString.Length; i++)
+            {
+                uNameString[i] = chars[rand.Next(chars.Length)];
+                pWordString[i] = chars[rand.Next(chars.Length)];
+            }
+
+            tempUName = ("Guest-" + new string(uNameString));
+            tempPWord = ("Guest-" + new string(pWordString));
+            //tempPWord = GeneratePassword(8, 0);
+
+            Debug.Log("Generated username: " + tempUName);
+            Debug.Log("Generated password: " + tempPWord);
+
+            Operations.Register(tempUName, tempPWord, _Url, (sender, e) => { Debug.Log(e.message); });
+
+            userIsGuest = true;
+            window = EWindowView.GUEST_CONFIRM_LOGIN;
+        }
+
         // Create "Import" Button and define onClick action
         if (GUILayout.Button("Import", GUILayout.Height(20)))
         {
@@ -278,6 +323,8 @@ public class FlowNetworkManagerEditor : EditorWindow
             window = EWindowView.PROJECT_IMPORT;
         }
     }
+
+
 
     private void _CreateUserHubView()
     {
@@ -329,6 +376,75 @@ public class FlowNetworkManagerEditor : EditorWindow
             if (ConfigurationSingleton.SingleInstance.CurrentUser != null)
             {
                 Operations.Logout(ConfigurationSingleton.SingleInstance.CurrentUser);
+                window = EWindowView.LOGIN;
+            }
+        }
+    }
+
+    private void _CreateGuestConfirmLoginView()
+    {
+        GUILayout.Label("A guest account has been generated. Please proceed to the guest hub.");
+
+        EditorGUILayout.BeginHorizontal();
+        if (GUILayout.Button("Continue", GUILayout.Height(20)))
+        {
+            // Send the user to the Guest User Hub screen by logging them into their guest account
+            ConfigurationSingleton.SingleInstance.CurrentUser = new FlowUser(tempUName, tempPWord);
+            Operations.Login(ConfigurationSingleton.SingleInstance.CurrentUser, _Url, (_, e) =>
+            {
+                Debug.Log("login callback: " + e.message.WasSuccessful.ToString());
+                if (e.message.WasSuccessful == true)
+                {
+                    Operations.GetAllUserProjects(ConfigurationSingleton.SingleInstance.CurrentUser, (__, _e) =>
+                    {
+                        // Project list should be empty, not sure if this is necessary.
+                        _ProjectList = _e.message.Projects;
+                        window = EWindowView.GUESTUSER_HUB;
+                    });
+                }
+                else
+                {
+                    //Operations.DeleteUser(new FlowUser(tempUName, tempPWord));
+                    ConfigurationSingleton.SingleInstance.CurrentUser = null;
+                }
+            });
+        }
+        EditorGUILayout.EndHorizontal();
+    }
+
+    private void _CreateGuestUserHubView()
+    {
+        EditorGUILayout.BeginHorizontal();
+
+        openProjectId = EditorGUILayout.TextField(openProjectId);
+        if (GUILayout.Button("Join project"))
+        {
+            Operations.OpenProject(openProjectId, ConfigurationSingleton.SingleInstance.CurrentUser, (_, e) =>
+            {
+                if (e.message.WasSuccessful == true)
+                {
+                    Debug.Log(e.message);
+                    if (e.message.WasSuccessful == true)
+                    {
+                        ConfigurationSingleton.SingleInstance.CurrentProject = e.message.flowProject;
+                        window = EWindowView.GUESTPROJECT_HUB;
+                    }
+                }
+            });
+        }
+        EditorGUILayout.EndHorizontal();
+
+        // Create "Logout" Button and define onClick action
+        if (GUILayout.Button("Logout", GUILayout.Height(20)))
+        {
+            // Send logout event to the server
+            if (ConfigurationSingleton.SingleInstance.CurrentUser != null)
+            {
+                // TODO: Logic for deleting user after logout
+                //FlowUser toDelete = ConfigurationSingleton.SingleInstance.CurrentUser;
+                Operations.DeleteUser(ConfigurationSingleton.SingleInstance.CurrentUser);
+
+                userIsGuest = false;
                 window = EWindowView.LOGIN;
             }
         }
@@ -424,6 +540,97 @@ public class FlowNetworkManagerEditor : EditorWindow
         }
     }
 
+    private void _CreateGuestProjectHubView()
+    {
+        // Create "Exit Project" Button and define onClick action
+        if (GUILayout.Button("Exit Project", GUILayout.Height(20)))
+        {
+            ExitProject(); // Deletes all local instances of the objects and restores the projectID to default value
+
+            // Send the user to the User Hub screen
+            window = EWindowView.GUESTUSER_HUB;
+        }
+
+        // Create "Create new object" Button and define onClick action
+        if (GUILayout.Button("Create new Object", GUILayout.Height(40)))
+        {
+            // Opens a new window/unity utility tab to create an object
+            ObjectSettings.OpenWindow();
+        }
+
+        // Create "Delete an object" Button and define onClick action
+        if (GUILayout.Button("Delete an Object", GUILayout.Height(40)))
+        {
+            // Send user to Delete Object screen
+            window = EWindowView.DELETE_OBJECT;
+        }
+
+        EditorGUILayout.BeginHorizontal();
+
+        if (GUILayout.Button("Add Interaction", GUILayout.Height(40)))
+        {
+            BehaviourEventManager.PreviousBehaviourId = null;
+
+            objectNames.Clear();
+            objectIds.Clear();
+
+            Dictionary<string, FlowTObject>.ValueCollection values = FlowTObject.idToGameObjectMapping.Values;
+
+            foreach (FlowTObject obj in values)
+            {
+                objectNames.Add(obj.Name);
+                objectIds.Add(obj.Id);
+            }
+
+            objectOptions = (string[])objectNames.ToArray(typeof(string));
+
+            // Send user to Create Behaviour Screen
+            addingChain = false;
+            window = EWindowView.CREATE_BEHAVIOUR;
+        }
+
+        if (GUILayout.Button("Delete Interaction", GUILayout.Height(40)))
+        {
+            window = EWindowView.DELETE_BEHAVIOUR;
+        }
+
+        EditorGUILayout.EndHorizontal();
+
+        EditorGUILayout.BeginHorizontal();
+
+        // Create "Create Visual Scripting Graph" Button and define onClick action
+        if (GUILayout.Button("Create Visual Scripting Graph", GUILayout.Height(40)))
+        {
+            VSGraphSettings.OpenWindow();;
+        }
+
+        // Create "Delete Visual Scripting Graph" Button and define onClick action
+        if (GUILayout.Button("Delete Visual Scripting Graph", GUILayout.Height(40)))
+        {
+            // TODO: Send user to screen that displays all graphs in the project for them to delete from.
+            window = EWindowView.DELETE_VSGRAPH;
+        }
+
+        EditorGUILayout.EndHorizontal();
+
+        // As user is a guest, I feel like they shouldn't be able to get a code to invite other users without owner's consent
+        // EditorGUILayout.TextArea("Project code: " + ConfigurationSingleton.SingleInstance.CurrentProject.Id);
+
+        // Create "Delete This Project" Button and define onClick action
+        // if (GUILayout.Button("Delete This Project", GUILayout.Height(40)))
+        // {
+        //     // Send user to Delete Project screen
+        //     window = EWindowView.DELETE_PROJECT_CONFIRMATION;
+        // }
+
+        // Graph Message testing button to open testing window
+        if (GUILayout.Button("GRAPH MESSAGE TESTING", GUILayout.Height(40)))
+        {
+            // Opens a new window/unity utility tab to create an object
+            GraphMessageTesting.OpenWindow();
+        }
+    }
+
     private void _CreateDeleteObjectView()
     {
         // Create "Back" Button and define onClick action
@@ -431,7 +638,14 @@ public class FlowNetworkManagerEditor : EditorWindow
         if (GUILayout.Button("Back", GUILayout.Height(20)))
         {
             // Send the user to the Project Hub screen
-            window = EWindowView.PROJECT_HUB;
+            if (userIsGuest)
+            {
+                window = EWindowView.GUESTPROJECT_HUB;
+            }
+            else
+            {
+                window = EWindowView.PROJECT_HUB;
+            }
         }
         EditorGUILayout.EndHorizontal();
 
@@ -517,7 +731,14 @@ public class FlowNetworkManagerEditor : EditorWindow
         if (GUILayout.Button("Back", GUILayout.Height(20)))
         {
             // Send the user to the Project Hub screen
-            window = EWindowView.PROJECT_HUB;
+            if (userIsGuest)
+            {
+                window = EWindowView.GUESTPROJECT_HUB;
+            }
+            else
+            {
+                window = EWindowView.PROJECT_HUB;
+            }
         }
         EditorGUILayout.EndHorizontal();
 
@@ -705,7 +926,14 @@ public class FlowNetworkManagerEditor : EditorWindow
     {
         if (GUILayout.Button("Back", GUILayout.Height(30), GUILayout.Width(40)))
         {
-            window = EWindowView.PROJECT_HUB;
+            if (userIsGuest)
+            {
+                window = EWindowView.GUESTPROJECT_HUB;
+            }
+            else
+            {
+                window = EWindowView.PROJECT_HUB;
+            }
         }
 
         GUILayout.Space(10f);
@@ -762,7 +990,14 @@ public class FlowNetworkManagerEditor : EditorWindow
                     });
 
                     // Change window back to Project hub
-                    window = EWindowView.PROJECT_HUB;
+                    if (userIsGuest)
+                    {
+                        window = EWindowView.GUESTPROJECT_HUB;
+                    }
+                    else
+                    {
+                        window = EWindowView.PROJECT_HUB;
+                    }
                 }
             }
         }
@@ -775,7 +1010,14 @@ public class FlowNetworkManagerEditor : EditorWindow
             // headBehaviour = null;
             addingChain = false;
             showAllOptions = false;
-            window = EWindowView.PROJECT_HUB;
+            if (userIsGuest)
+            {
+                window = EWindowView.GUESTPROJECT_HUB;
+            }
+            else
+            {
+                window = EWindowView.PROJECT_HUB;
+            }
         }
 
         GUILayout.Space(10f);
@@ -864,7 +1106,14 @@ public class FlowNetworkManagerEditor : EditorWindow
 
             addingChain = false;
             showAllOptions = false;
-            window = EWindowView.PROJECT_HUB;
+            if (userIsGuest)
+            {
+                window = EWindowView.GUESTPROJECT_HUB;
+            }
+            else
+            {
+                window = EWindowView.PROJECT_HUB;
+            }
         }
 
         GUILayout.EndHorizontal();
@@ -1047,7 +1296,14 @@ public class FlowNetworkManagerEditor : EditorWindow
 
             addingChain = false;
             showAllOptions = false;
-            window = EWindowView.PROJECT_HUB;
+            if (userIsGuest)
+            {
+                window = EWindowView.GUESTPROJECT_HUB;
+            }
+            else
+            {
+                window = EWindowView.PROJECT_HUB;
+            }
         }
 
         GUILayout.EndHorizontal();
@@ -1102,7 +1358,14 @@ public class FlowNetworkManagerEditor : EditorWindow
             AddBehaviour(fb);
 
             addingChain = false;
-            window = EWindowView.PROJECT_HUB;
+            if (userIsGuest)
+            {
+                window = EWindowView.GUESTPROJECT_HUB;
+            }
+            else
+            {
+                window = EWindowView.PROJECT_HUB;
+            }
         }
 
         GUILayout.EndHorizontal();
@@ -1154,7 +1417,14 @@ public class FlowNetworkManagerEditor : EditorWindow
 
             addingChain = false;
             showAllOptions = false;
-            window = EWindowView.PROJECT_HUB;
+            if (userIsGuest)
+            {
+                window = EWindowView.GUESTPROJECT_HUB;
+            }
+            else
+            {
+                window = EWindowView.PROJECT_HUB;
+            }
         }
 
         GUILayout.EndHorizontal();
