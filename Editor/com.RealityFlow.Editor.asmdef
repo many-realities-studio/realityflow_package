@@ -4,7 +4,8 @@
     "references": [
         "com.RealityFlow.Resources",
         "com.RealityFlow",
-        "com.alelievr.NodeGraphProcessor.Runtime"
+        "com.alelievr.NodeGraphProcessor.Runtime",
+        "com.RealityFlow.Contrib.MRTK"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

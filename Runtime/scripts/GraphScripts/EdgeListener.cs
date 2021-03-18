@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using RealityFlow.Plugin.Contrib;
+using GraphProcessor;
 
 
 /* This class is a refactor of EdgeConnectorListener from NGP.

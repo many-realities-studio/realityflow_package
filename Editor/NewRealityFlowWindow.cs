@@ -304,7 +304,7 @@ public class FlowNetworkManagerEditor : EditorWindow
             }
 
             tempUName = ("Guest-" + new string(uNameString));
-            tempPWord = ("Guest-" + new string(pWordString));
+            tempPWord = (new string(pWordString));
             //tempPWord = GeneratePassword(8, 0);
 
             Debug.Log("Generated username: " + tempUName);

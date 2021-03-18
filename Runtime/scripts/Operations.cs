@@ -9,7 +9,7 @@ using Packages.realityflow_package.Runtime.scripts.Messages.RoomMessages;
 using Packages.realityflow_package.Runtime.scripts.Messages.UserMessages;
 using Packages.realityflow_package.Runtime.scripts.Messages.VSGraphMessages;
 using RealityFlow.Plugin.Scripts;
-using RealityFlow.Plugin.Contrib; // TODO: Fix reference
+using GraphProcessor; // TODO: Fix reference
 
 //using RealityFlow.Plugin.Scripts.Events;
 using System.Collections.Generic;
