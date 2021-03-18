@@ -280,6 +280,7 @@ public class RealityFlowGraphView : MonoBehaviour {
 		// graph.Connect(input, output, true);
 		SerializableEdge newEdge = graph.Connect(input.port, output.port, true);
 
+		StartCoroutine(AddEdgeCoroutine(input,output));
 		/* Backend:
 		 - Create an Edge
 		 - Store this edge into the list
@@ -287,7 +288,6 @@ public class RealityFlowGraphView : MonoBehaviour {
 		 Frontend:
 		 - Create an EdgeView with the edge
 		  */
-		// StartCoroutine(AddEdgeCoroutine());
 	}
 	
 	public void ClearGraph () {
@@ -315,9 +315,15 @@ public class RealityFlowGraphView : MonoBehaviour {
 	}
 
 	// This couroutine is in charge of asynchronously making the EdgeView Prefab
-	// public IEnumerator AddEdgeCoroutine (SerializableEdge edge){
-	// 	EdgeView newEdge = Instantiate( edgeView, new Vector3(), Quaternion.identity).GetComponent<EdgeView>();
-	// }
+	public IEnumerator AddEdgeCoroutine (NodePortView input, NodePortView output){
+		EdgeView newEdge = Instantiate( edgeView, new Vector3(), Quaternion.identity).GetComponent<EdgeView>();
+		newEdge.gameObject.transform.SetParent (contentPanel.transform, false);
+		// Set the positions of the linerenderer
+		LineRenderer lr = newEdge.GetComponent<LineRenderer>();
+		Vector3 [] edgePoints = new [] {output.GetComponent<RectTransform>().transform.position,input.GetComponent<RectTransform>().transform.position};
+		lr.SetPositions(edgePoints);
+		yield return new WaitForSeconds (.01f);
+	}
 
 	public IEnumerator AddNodeCoroutine (BaseNode node) {
         NodeView newView = Instantiate (nodeView, new Vector3(), Quaternion.identity).GetComponent<NodeView> ();

@@ -27,14 +27,14 @@ public class EdgeListener : MonoBehaviour
 
     public void SelectInputPort(NodePortView input){
         this.inputView = input;
-        this.input = input.port;
+        // this.input = input.port;
         Debug.Log(input.port.portData);
         CheckForConnection();
     }
 
     public void SelectOutputPort(NodePortView output){
         this.outputView = output;        
-        this.output = output.port;        
+        // this.output = output.port;        
         CheckForConnection();
     }
 
@@ -50,7 +50,10 @@ public class EdgeListener : MonoBehaviour
                 graphView.ConnectEdges(inputView, outputView);
             else
                 Debug.Log("The types of ports are not connectable");
+            inputView = null;
+            outputView = null;
         }
+        // Set the views to be null so we don't keep drawing lines between the previously clicked nodes
     }
 
 }
