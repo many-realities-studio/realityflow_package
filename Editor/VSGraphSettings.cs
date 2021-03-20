@@ -57,11 +57,14 @@ namespace RealityFlow.Plugin.Editor
                     //RunTimeGraph.graph.guid = Guid.NewGuid().ToString();
 
                     // TODO: Stuff to initialize graph
-                    BaseGraph graph = ScriptableObject.CreateInstance<BaseGraph>();
+                    // BaseGraph graph = ScriptableObject.CreateInstance<BaseGraph>();
+                    FlowVSGraph graph = new FlowVSGraph(VSGraphName);
                     Debug.Log(graph.Name);
                     graph.Name = VSGraphName;
                     Debug.Log(graph);
                     Debug.Log(JsonUtility.ToJson(graph));
+                    // Debug.Log(graph.Id);
+                    // Debug.Log(graph._id);
 
                     Operations.CreateVSGraph(graph, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) => Debug.Log(e.message));
 

@@ -60,9 +60,13 @@ namespace Packages.realityflow_package.Runtime.scripts
             // Checkout system messages
             messageRouter.Add("CheckinObject", typeof(CheckinObject_Received));
             messageRouter.Add("CheckoutObject", typeof(CheckoutObject_Received));
+            messageRouter.Add("CheckinVSGraph", typeof(CheckinVSGraph_Received));
+            messageRouter.Add("CheckoutVSGraph", typeof(CheckoutVSGraph_Received));
 
             // Visual Scripting Graph messages
             messageRouter.Add("CreateVSGraph", typeof(CreateVSGraph_Received));
+            messageRouter.Add("DeleteVSGraph", typeof(DeleteVSGraph_Received));
+            messageRouter.Add("UpdateVSGraph", typeof(UpdateVSGraph_Received));
         }
 
         /// <summary>
@@ -74,8 +78,18 @@ namespace Packages.realityflow_package.Runtime.scripts
             string messageType = GetMessageType(message);
             if (messageRouter.ContainsKey(messageType))
             {
-                dynamic obj = MessageSerializer.DesearializeObject(message, messageRouter[messageType]);
-                obj.RaiseEvent();
+                if (messageType.Equals("CreateVSGraph"))
+                {
+                    dynamic graphobj = JsonUtility.FromJson<dynamic>(message);
+                    Debug.Log("Received graph message converted: " + Convert.ToString(graphobj));
+                    // write your raiseevent here
+                }
+                else
+                {
+                    dynamic obj = MessageSerializer.DesearializeObject(message, messageRouter[messageType]);
+                    // Debug.Log("Received message converted: " + Convert.ToString(obj));
+                    obj.RaiseEvent();
+                }
             }
             else
             {
