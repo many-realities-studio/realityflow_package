@@ -29,6 +29,8 @@ public class RealityFlowGraphView : MonoBehaviour {
 	public GameObject contentPanel;
 
 	public GameObject parameterContent;
+	public GameObject parameterCreationCanvas;
+	public GameObject SelectComparisonCanvas;
 
 	public GameObject nodePortView;
 	public GameObject nodeView;
@@ -44,6 +46,9 @@ public class RealityFlowGraphView : MonoBehaviour {
 
 	public List<Edge> edges = new List<Edge>();
 
+	public string comparisonFunction;
+	public string parameterType;
+
 	Vector2 newNodePosition = new Vector2();
 	public Vector2 canvasDimensions = new Vector2(2560, 1080); // FOR NOW, dont have these hardcoded in final demo
 
@@ -54,6 +59,8 @@ public class RealityFlowGraphView : MonoBehaviour {
 
 
 	private void Start () {
+		SelectComparisonCanvas.SetActive(false);
+		parameterCreationCanvas.SetActive(false);
 		InitializeGraph();
 	}
 
@@ -193,7 +200,15 @@ public class RealityFlowGraphView : MonoBehaviour {
 				StartCoroutine (AddNodeCoroutine(intn));
 				break;
 			case "BoolNode":
+				SelectComparisonCanvas.SetActive(true);
+				while(SelectComparisonCanvas.GetComponent<SelectComparison>().ready == false)
+				{
+					// wait until choice made
+				}
 				BoolNode bn = BaseNode.CreateFromType<BoolNode> (new Vector2 ());
+				bn.compareFunction = comparisonFunction;
+				bn.inA = 0f;
+				bn.inB = 0f;
 				graph.AddNode(bn);
 				StartCoroutine (AddNodeCoroutine(bn));
 				break;
@@ -206,6 +221,16 @@ public class RealityFlowGraphView : MonoBehaviour {
 				Debug.Log("This case of addnode did not use a tag");
 				break; 
 		}		
+	}
+
+	public void setComparison(string input)
+	{
+		comparisonFunction = input;
+	}
+
+	public void setParameterType(string input)
+	{
+		parameterType = input;
 	}
 
 	public void PrintCommandStack(){
@@ -222,10 +247,24 @@ public class RealityFlowGraphView : MonoBehaviour {
 	}
 
 	public void AddParameter(){
+		parameterCreationCanvas.SetActive(true);
+		while(parameterCreationCanvas.GetComponent<ParameterCreation>().ready == false)
+		{
+			// wait until choice made
+		}
 		string tmp = JsonUtility.ToJson(graph);
 		// get name of parameter from user input via mtrk keyboard (probably)
 		string name = "autofill";
-		Type type = typeof(string);
+		Type type;
+		switch(parameterType)
+		{
+			default:
+			case "GameObject": type = typeof(GameObject); break;
+			case "String": type = typeof(string); break;
+			case "Float": type = typeof(float); break;
+			case "Int": type = typeof(int); break;
+			case "Bool": type = typeof(bool); break;
+		}
 		//Debug.Log(type.AssemblyQualifiedName);
 		// make sure it's not a duplicate name
 		// add parameter to a list that is drag and droppable
