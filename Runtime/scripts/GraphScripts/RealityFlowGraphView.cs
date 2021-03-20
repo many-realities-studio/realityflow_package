@@ -195,7 +195,6 @@ public class RealityFlowGraphView : MonoBehaviour {
 			case "BoolNode":
 				BoolNode bn = BaseNode.CreateFromType<BoolNode> (new Vector2 ());
 				graph.AddNode(bn);
-				bn.output = true;
 				StartCoroutine (AddNodeCoroutine(bn));
 				break;
 			case "ConditionalNode":

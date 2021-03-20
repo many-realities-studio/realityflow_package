@@ -1,31 +1,36 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 using GraphProcessor;
-using System.Linq;
-using NodeGraphProcessor.Examples;
 using UnityEngine.Rendering;
-
-[System.Serializable, NodeMenuItem("Primitives/Bool")]
+using NodeGraphProcessor.Examples;
+[System.Serializable, NodeMenuItem("Conditional/BoolNode")]
 public class BoolNode : BaseNode
 {
-	[Input(name = "Value")]
-    public static bool value;
+    [Input(name = "In A")]
+    public float    inA;
 
-    public bool output;
-    public bool input;
+    [Input(name = "In B")]
+    public float    inB;
 
-	[Output(name = "True")]
-	public ConditionalLink	@true;
-	[Output(name = "False")]
-	public ConditionalLink	@false;
-    string fieldName = value ? nameof(@true) : nameof(@false);
-	public override string		name => "Bool";
+    [Output(name = "Out")]
+    public bool		compared;
 
-    protected override void Process() => output = input;
+    public CompareFunction		compareFunction = CompareFunction.LessEqual;
 
-    public bool getValue()
+    public override string		name => "Comparison";
+
+    protected override void Process()
     {
-        return value;
+        switch (compareFunction)
+        {
+            default:
+            case CompareFunction.Disabled:
+            case CompareFunction.Never: compared = false; break;
+            case CompareFunction.Always: compared = true; break;
+            case CompareFunction.Equal: compared = inA == inB; break;
+            case CompareFunction.Greater: compared = inA > inB; break;
+            case CompareFunction.GreaterEqual: compared = inA >= inB; break;
+            case CompareFunction.Less: compared = inA < inB; break;
+            case CompareFunction.LessEqual: compared = inA <= inB; break;
+            case CompareFunction.NotEqual: compared = inA != inB; break;
+        }
     }
 }
