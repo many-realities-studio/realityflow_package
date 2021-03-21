@@ -168,7 +168,7 @@ namespace Packages.realityflow_package.Runtime.scripts
             ReceivedMessage.AddEventHandler(typeof(CreateVSGraph_Received), true, callbackFunction);
         }
 
-        public static void UpdateVSGraph(BaseGraph flowVSGraph, string projectId, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
+        public static void UpdateVSGraph(FlowVSGraph flowVSGraph, FlowUser flowUser, string projectId, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
         {
             //UpdateVSGraph_SendToServer updateVSGraph = new UpdateVSGraph_SendToServer(flowVSGraph, /*flowUser,*/ projectId); // TODO: format string msg
             string message = ("{\"FlowVSGraph\":" + JsonUtility.ToJson(flowVSGraph) + ",\"ProjectId\":\"" + projectId + "\",\"MessageType\":\"UpdateVSGraph\"}");
