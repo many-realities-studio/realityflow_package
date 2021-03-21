@@ -38,11 +38,11 @@ public class RealityFlowGraphView : MonoBehaviour {
 	public List<NodeView> nodeViewList = new List<NodeView> ();
 	public List<NodeView> selectedNV = new List<NodeView>();
 	public List<BaseNode> selected = new List<BaseNode>();
+	public List<EdgeView> edgeViews = new List<EdgeView>();
 
 	public Dictionary<string,ExposedParameter> paramDict = new Dictionary<string, ExposedParameter>();
 	public List<ExposedParameter> paramList = new List<ExposedParameter>();
 
-	public List<Edge> edges = new List<Edge>();
 
 	Vector2 newNodePosition = new Vector2();
 	public Vector2 canvasDimensions = new Vector2(2560, 1080); // FOR NOW, dont have these hardcoded in final demo
@@ -69,6 +69,7 @@ public class RealityFlowGraphView : MonoBehaviour {
 		// }
 		// TODO: have it create a new empty graph and use that as the graph
 		graph = new BaseGraph();
+		Debug.Log(JsonUtility.ToJson(graph));
 		graph.name = "TEST GRAPH "+graph.GetInstanceID();
 		commandPalette = GameObject.Find("CommandPalette").GetComponent<CommandPalette>();
 		// commandPalette = new CommandPalette();
@@ -143,10 +144,11 @@ public class RealityFlowGraphView : MonoBehaviour {
 		// selected.Clear();
 		// TODO: Change deletion process so we use the NodeView.guid to delete specific dictionary indicies instead of using a list (Requires we change our NodeView List into a dictionary).
 		foreach( NodeView n in selectedNV){
+			nodeViewList.Remove(n);
 			n.Delete();
 		}
 		selectedNV.Clear();
-		nodeViewList.RemoveAll(nv => nv==null);
+		// nodeViewList.RemoveAll(nv => nv==null);
 		
 		// BaseGraph postCmd = graph;
 		// JsonUtility.FromJsonOverwrite(tmp, postCmd);
@@ -279,7 +281,7 @@ public class RealityFlowGraphView : MonoBehaviour {
 	// public void ConnectEdges(NodePort input, NodePort output){
 	public void ConnectEdges(NodePortView input, NodePortView output){ // Replacing arguments w/ NodePortViews
 		// graph.Connect(input, output, true);
-		SerializableEdge newEdge = graph.Connect(input.port, output.port, true);
+		// SerializableEdge newEdge = graph.Connect(input.port, output.port, true);
 
 		StartCoroutine(AddEdgeCoroutine(input,output));
 		/* Backend:
@@ -315,14 +317,26 @@ public class RealityFlowGraphView : MonoBehaviour {
 		processor.Run ();
 	}
 
+	public float padding = 0.1f;
 	// This couroutine is in charge of asynchronously making the EdgeView Prefab
 	public IEnumerator AddEdgeCoroutine (NodePortView input, NodePortView output){
+		SerializableEdge serializedEdge = graph.Connect(input.port, output.port, true);
 		EdgeView newEdge = Instantiate( edgeView, new Vector3(), Quaternion.identity).GetComponent<EdgeView>();
+		newEdge.rfgv = this;
+		newEdge.input = input;
+		newEdge.output = output;
+		// input.edges.Add(newEdge);
+		// output.edges.Add(newEdge);
 		newEdge.gameObject.transform.SetParent (contentPanel.transform, false);
 		// Set the positions of the linerenderer
+		newEdge.edge = serializedEdge;
 		LineRenderer lr = newEdge.GetComponent<LineRenderer>();
+		// calculate the extra points for a better looking circuit board line
 		Vector3 [] edgePoints = new [] {output.GetComponent<RectTransform>().transform.position,input.GetComponent<RectTransform>().transform.position};
 		lr.SetPositions(edgePoints);
+		// edgeViews.Add(newEdge);
+		input.edges.Add(newEdge);
+		output.edges.Add(newEdge);
 		yield return new WaitForSeconds (.01f);
 	}
 
@@ -344,6 +358,7 @@ public class RealityFlowGraphView : MonoBehaviour {
 			npv.type = "input";
             yield return new WaitForSeconds (.01f);
             npv.Init (input);
+			newView.inputPortViews.Add(npv);
             // LayoutRebuilder.MarkLayoutForRebuild ((RectTransform) newView.transform);
             // newView.GetComponent<ContentSizeFitter>().enabled = true;
         }
@@ -359,6 +374,7 @@ public class RealityFlowGraphView : MonoBehaviour {
             npv.Init (output);
             // LayoutRebuilder.MarkLayoutForRebuild ((RectTransform) newView.transform);
             // newView.GetComponent<ContentSizeFitter>().enabled = true;
+			newView.outputPortViews.Add(npv);
         }
         nodeViewList.Add (newView);
         // LayoutRebuilder.MarkLayoutForRebuild ((RectTransform) newView.transform);
