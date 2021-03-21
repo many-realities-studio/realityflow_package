@@ -201,10 +201,10 @@ public class RealityFlowGraphView : MonoBehaviour {
 				break;
 			case "BoolNode":
 				SelectComparisonCanvas.SetActive(true);
-				while(SelectComparisonCanvas.GetComponent<SelectComparison>().ready == false)
-				{
+				//while(SelectComparisonCanvas.GetComponent<SelectComparison>().ready == false)
+				//{ CAUSES INFINITE LOOP, REWORK
 					// wait until choice made
-				}
+				//}
 				BoolNode bn = BaseNode.CreateFromType<BoolNode> (new Vector2 ());
 				bn.compareFunction = comparisonFunction;
 				bn.inA = 0f;
@@ -248,10 +248,10 @@ public class RealityFlowGraphView : MonoBehaviour {
 
 	public void AddParameter(){
 		parameterCreationCanvas.SetActive(true);
-		while(parameterCreationCanvas.GetComponent<ParameterCreation>().ready == false)
-		{
+		//while(parameterCreationCanvas.GetComponent<ParameterCreation>().ready == false)
+		//{ CAUSES INFINITE LOOP, REWORK
 			// wait until choice made
-		}
+		//}
 		string tmp = JsonUtility.ToJson(graph);
 		// get name of parameter from user input via mtrk keyboard (probably)
 		string name = "autofill";
