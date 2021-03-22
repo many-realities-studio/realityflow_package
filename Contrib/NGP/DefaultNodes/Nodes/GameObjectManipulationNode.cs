@@ -47,7 +47,7 @@ public class GameObjectManipulationNode : BaseNode
 	[Input("Layer Mask"), ShowAsDrawer]
 	public LayerMask layerMask;
 
-	public override string name => "Drawer Field Test";
+	public override string name => "Game Object Manipulation";
 
 	protected override void Process() {
             gameObject.GetComponent<Renderer>().material.color = color;

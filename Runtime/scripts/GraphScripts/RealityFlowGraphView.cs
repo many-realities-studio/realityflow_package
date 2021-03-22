@@ -217,6 +217,11 @@ public class RealityFlowGraphView : MonoBehaviour {
 				graph.AddNode(cn);
 				StartCoroutine (AddNodeCoroutine(cn));
 				break;
+			case "GameObjectManipulationNode":
+				GameObjectManipulationNode gn = BaseNode.CreateFromType<GameObjectManipulationNode>(new Vector2());
+				graph.AddNode(gn);
+				StartCoroutine(AddNodeCoroutine(gn));
+				break;
 			default:
 				Debug.Log("This case of addnode did not use a tag");
 				break; 
