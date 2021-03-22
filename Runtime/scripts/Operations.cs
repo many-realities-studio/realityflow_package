@@ -9,7 +9,7 @@ using Packages.realityflow_package.Runtime.scripts.Messages.RoomMessages;
 using Packages.realityflow_package.Runtime.scripts.Messages.UserMessages;
 using Packages.realityflow_package.Runtime.scripts.Messages.VSGraphMessages;
 using RealityFlow.Plugin.Scripts;
-using GraphProcessor; // TODO: Fix reference
+using GraphProcessor;
 
 //using RealityFlow.Plugin.Scripts.Events;
 using System.Collections.Generic;
@@ -54,6 +54,7 @@ namespace Packages.realityflow_package.Runtime.scripts
 
             // Set up Graph updates
             ReceivedMessage.AddEventHandler(typeof(CreateVSGraph_Received), false, _CreateVSGraph);
+            ReceivedMessage.AddEventHandler(typeof(DeleteVSGraph_Received), false, _DeleteVSGraph);
         }
 
         #region UserOperations
@@ -152,7 +153,7 @@ namespace Packages.realityflow_package.Runtime.scripts
         //     //ReceivedMessage.AddEventHandler(typeof(CreateObject_Received), true, callbackFunction);
         // }
 
-        public static void CreateVSGraph(BaseGraph flowVSGraph, /*FlowUser flowUser,*/ string projectId, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
+        public static void CreateVSGraph(FlowVSGraph flowVSGraph, /*FlowUser flowUser,*/ string projectId, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
         {
             // CreateVSGraph_SendToServer createVSGraph =
             //     new CreateVSGraph_SendToServer(flowVSGraph, /*flowUser,*/ projectId);
@@ -162,9 +163,27 @@ namespace Packages.realityflow_package.Runtime.scripts
             // json.ProjectId = projectId;
             Debug.Log(message);
 
-            FlowWebsocket.SendStringMessage(message);
+            FlowWebsocket.SendGraphMessage(message);
 
             ReceivedMessage.AddEventHandler(typeof(CreateVSGraph_Received), true, callbackFunction);
+        }
+
+        public static void UpdateVSGraph(FlowVSGraph flowVSGraph, FlowUser flowUser, string projectId, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
+        {
+            //UpdateVSGraph_SendToServer updateVSGraph = new UpdateVSGraph_SendToServer(flowVSGraph, /*flowUser,*/ projectId); // TODO: format string msg
+            string message = ("{\"FlowVSGraph\":" + JsonUtility.ToJson(flowVSGraph) + ",\"ProjectId\":\"" + projectId + "\",\"MessageType\":\"UpdateVSGraph\"}");
+            FlowWebsocket.SendGraphMessage(message);
+
+            ReceivedMessage.AddEventHandler(typeof(UpdateVSGraph_Received), true, callbackFunction);
+        }
+
+        public static void DeleteVSGraph(string idOfVSGraphToDelete, string projectId, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
+        {
+            //DeleteVSGraph_SendToServer deleteVSGraph = new DeleteVSGraph_SendToServer(projectId, idOfVSGraphToDelete); // TODO: format string msg
+            string message = ("{\"VSGraphId\":" + idOfVSGraphToDelete + ",\"ProjectId\":\"" + projectId + "\",\"MessageType\":\"DeleteVSGraph\"}");
+            FlowWebsocket.SendGraphMessage(message);
+
+            ReceivedMessage.AddEventHandler(typeof(DeleteVSGraph_Received), true, callbackFunction);
         }
 
         #endregion VSGraphOperations
@@ -335,6 +354,11 @@ namespace Packages.realityflow_package.Runtime.scripts
 
         private static void _CreateVSGraph(object sender, BaseReceivedEventArgs eventArgs)
         {
+        }
+
+        private static void _DeleteVSGraph(object sender, BaseReceivedEventArgs eventArgs)
+        {
+            // TODO: Stuff to delete the graph in Unity goes here.
         }
 
         #endregion VSGraph messages received

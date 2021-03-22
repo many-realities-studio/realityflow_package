@@ -139,7 +139,7 @@ namespace Packages.realityflow_package.Runtime.scripts
         /// Send a graph message. FOR TESTING/DEBUGGING
         /// </summary>
         /// <param name="message">The message string that should be sent</param>
-        public static void SendGraphMessage<T>(T message) where T : BaseGraph
+        public static void SendGraphMessageTest<T>(T message) where T : FlowVSGraph
         {
             string sentMessage = JsonUtility.ToJson(message);
             //string sentMessage = MessageSerializer.SerializeMessage(message);
@@ -158,20 +158,21 @@ namespace Packages.realityflow_package.Runtime.scripts
         }
 
         /// <summary>
-        /// Send a string message. FOR TESTING/DEBUGGING
+        /// Send a graph message. 
+        /// Does not use the same message system as the rest of Reality Flow due to graph json serialization/deserialization requirements.
         /// </summary>
         /// <param name="message">The message string that should be sent</param>
-        public static void SendStringMessage(string message)
+        public static void SendGraphMessage(string message)
         {
             try
             {
-                Debug.Log("Sending STRING message: " + message);
+                Debug.Log("Sending graph message: " + message);
 
                 websocket.Send(message);
             }
             catch (Exception e)
             {
-                Debug.LogError("Failed to send message: " + message + " " + e);
+                Debug.LogError("Failed to send graph message: " + message + " " + e);
             }
         }
 
