@@ -8,6 +8,7 @@ using UnityEngine.UI;
 using UnityEngine.UIElements;
 using System.Linq;
 using RealityFlow.Plugin.Contrib;
+using RealityFlow.Plugin.Scripts;
 
 // public struct Edge {
 // 	NodePort input;
@@ -57,10 +58,10 @@ public class RealityFlowGraphView : MonoBehaviour {
 	private void Start () {
 		SelectComparisonCanvas.SetActive(false);
 		parameterCreationCanvas.SetActive(false);
-		InitializeGraph();
+		//InitializeGraph();
 	}
 
-	void InitializeGraph(){
+	public void InitializeGraph(FlowVSGraph VSGraph){
 
 		// connectorListener = new EdgeListener(this);
 		// Debug.Log(connectorListener);
@@ -71,9 +72,10 @@ public class RealityFlowGraphView : MonoBehaviour {
 		// 	// graph1.SetParameterValue ("LabelContainer", Labeled);
 		// }
 		// TODO: have it create a new empty graph and use that as the graph
-		graph = new BaseGraph();
-		Debug.Log(JsonUtility.ToJson(graph));
-		graph.name = "TEST GRAPH "+graph.GetInstanceID();
+		// graph = new BaseGraph();
+		// Debug.Log(JsonUtility.ToJson(graph));
+		// graph.name = "TEST GRAPH "+graph.GetInstanceID();
+		graph = (BaseGraph)VSGraph;
 		commandPalette = GameObject.Find("CommandPalette").GetComponent<CommandPalette>();
 		// commandPalette = new CommandPalette();
         graph.onGraphChanges += GraphChangesCallback;
