@@ -4,16 +4,14 @@ using GraphProcessor;
 
 namespace Packages.realityflow_package.Runtime.scripts.Messages.VSGraphMessages
 {
-    public class CreateVSGraph_Received : ReceivedMessage
+    public class UpdateVSGraph_Received : ReceivedMessage
     {
         [JsonProperty("flowVSGraph")]
         public FlowVSGraph flowVSGraph { get; set; }
-        // public FlowTObject flowObject { get; set; }
 
-        public CreateVSGraph_Received(FlowVSGraph flowVSGraph) : base(typeof(CreateVSGraph_Received))
+        public UpdateVSGraph_Received(FlowVSGraph flowVSGraph) : base(typeof(UpdateVSGraph_Received))
         {
             this.flowVSGraph = flowVSGraph;
-            this.MessageType = "CreateVSGraph";
         }
     }
 }
