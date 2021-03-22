@@ -149,6 +149,7 @@ public class FlowNetworkManagerEditor : EditorWindow
         }
 
         FlowTObject.RemoveAllObjectsFromScene();
+        FlowVSGraph.RemoveAllGraphsFromScene();
         ConfigurationSingleton.SingleInstance.CurrentProject = null;
         ConfigurationSingleton.SingleInstance.CurrentUser = null;
     }
@@ -861,6 +862,7 @@ public class FlowNetworkManagerEditor : EditorWindow
             {
                 ConfigurationSingleton.SingleInstance.CurrentProject = null;
                 FlowTObject.RemoveAllObjectsFromScene();
+                FlowVSGraph.RemoveAllGraphsFromScene();
             }
             else
             {

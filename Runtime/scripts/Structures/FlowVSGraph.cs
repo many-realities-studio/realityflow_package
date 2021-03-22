@@ -148,6 +148,29 @@ namespace RealityFlow.Plugin.Scripts
             }
         }
 
+        public static void DestroyVSGraph(string idOfObjectToDestroy)
+        {
+            try
+            {
+                GameObject objectToDestroy = idToVSGraphMapping[idOfObjectToDestroy].AttachedGameObject;
+                idToVSGraphMapping.Remove(idOfObjectToDestroy);
+                UnityEngine.Object.Destroy(objectToDestroy);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError(e.ToString());
+            }
+        }
+
+        public static void RemoveAllGraphsFromScene()
+        {
+            foreach (FlowVSGraph flowVSGraph in idToVSGraphMapping.Values)
+            {
+                UnityEngine.Object.DestroyImmediate(flowVSGraph.AttachedGameObject);
+            }
+            FlowVSGraph.idToVSGraphMapping = new SerializableDictionary<string, FlowVSGraph>();
+        }
+
         public void CopyFromOtherGraph(FlowVSGraph input){
             this.Name = input.name;
             this.serializedNodes = input.serializedNodes;

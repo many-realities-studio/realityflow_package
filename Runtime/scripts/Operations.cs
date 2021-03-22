@@ -359,6 +359,16 @@ namespace Packages.realityflow_package.Runtime.scripts
         private static void _DeleteVSGraph(object sender, BaseReceivedEventArgs eventArgs)
         {
             // TODO: Stuff to delete the graph in Unity goes here.
+            if (eventArgs.message.WasSuccessful == true)
+            {
+                GameObject gameObject = FlowVSGraph.idToVSGraphMapping[eventArgs.message.DeletedObjectId].AttachedGameObject;
+
+                FlowVSGraph.idToVSGraphMapping.Remove(eventArgs.message.DeletedObjectId);
+
+                UnityEngine.Object.DestroyImmediate(gameObject);
+            }
+
+            Debug.Log("Delete VSGraph: " + eventArgs.message.WasSuccessful);
         }
 
         #endregion VSGraph messages received
