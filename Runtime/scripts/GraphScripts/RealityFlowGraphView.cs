@@ -45,10 +45,6 @@ public class RealityFlowGraphView : MonoBehaviour {
 	public Dictionary<string,ExposedParameter> paramDict = new Dictionary<string, ExposedParameter>();
 	public List<ExposedParameter> paramList = new List<ExposedParameter>();
 
-
-	public string comparisonFunction;
-	public string parameterType;
-
 	Vector2 newNodePosition = new Vector2();
 	public Vector2 canvasDimensions = new Vector2(2560, 1080); // FOR NOW, dont have these hardcoded in final demo
 
@@ -207,12 +203,12 @@ public class RealityFlowGraphView : MonoBehaviour {
 				//{ CAUSES INFINITE LOOP, REWORK
 					// wait until choice made
 				//}
-				BoolNode bn = BaseNode.CreateFromType<BoolNode> (new Vector2 ());
-				bn.compareFunction = comparisonFunction;
-				bn.inA = 0f;
-				bn.inB = 0f;
-				graph.AddNode(bn);
-				StartCoroutine (AddNodeCoroutine(bn));
+				// BoolNode bn = BaseNode.CreateFromType<BoolNode> (new Vector2 ());
+				// bn.compareFunction = comparisonFunction;
+				// bn.inA = 0f;
+				// bn.inB = 0f;
+				// graph.AddNode(bn);
+				// StartCoroutine (AddNodeCoroutine(bn));
 				break;
 			case "ConditionalNode":
 				IfNode cn = BaseNode.CreateFromType<IfNode> (new Vector2 ());
@@ -225,14 +221,14 @@ public class RealityFlowGraphView : MonoBehaviour {
 		}		
 	}
 
-	public void setComparison(string input)
+	public void BoolNodeStep2(string comparisonFunction)
 	{
-		comparisonFunction = input;
-	}
-
-	public void setParameterType(string input)
-	{
-		parameterType = input;
+		BoolNode bn = BaseNode.CreateFromType<BoolNode> (new Vector2 ());
+		bn.compareFunction = comparisonFunction;
+		bn.inA = 0f;
+		bn.inB = 0f;
+		graph.AddNode(bn);
+		StartCoroutine (AddNodeCoroutine(bn));
 	}
 
 	public void PrintCommandStack(){
@@ -250,13 +246,50 @@ public class RealityFlowGraphView : MonoBehaviour {
 
 	public void AddParameter(){
 		parameterCreationCanvas.SetActive(true);
+		// //while(parameterCreationCanvas.GetComponent<ParameterCreation>().ready == false)
+		// //{ CAUSES INFINITE LOOP, REWORK
+		// 	// wait until choice made
+		// //}
+		// string tmp = JsonUtility.ToJson(graph);
+		// // get name of parameter from user input via mtrk keyboard (probably)
+		// string name = "autofill";
+		// Type type;
+		// switch(parameterType)
+		// {
+		// 	default:
+		// 	case "GameObject": type = typeof(GameObject); break;
+		// 	case "String": type = typeof(string); break;
+		// 	case "Float": type = typeof(float); break;
+		// 	case "Int": type = typeof(int); break;
+		// 	case "Bool": type = typeof(bool); break;
+		// }
+		// //Debug.Log(type.AssemblyQualifiedName);
+		// // make sure it's not a duplicate name
+		// // add parameter to a list that is drag and droppable
+		// ParameterNode pn = BaseNode.CreateFromType<ParameterNode> (new Vector2 ());
+		// graph.AddExposedParameter (name, type, Labeled);
+		// ExposedParameter epn = graph.GetExposedParameter (name);
+		// pn.parameterGUID = epn.guid;
+		// //paramDict.Add(epn.guid,epn);
+		// paramList.Add(epn);
+		// // instantiate paramView
+		// ParameterView newParamView = Instantiate(paramView,new Vector3(),Quaternion.identity).GetComponent<ParameterView> ();
+		// newParamView.gameObject.transform.SetParent (parameterContent.transform, false);
+		// newParamView.title.text = epn.name;
+		// newParamView.type.text = epn.type;
+        // newParamView.guid.text = epn.guid.Substring (epn.guid.Length - 5);
+		// newParamView.rfgv = this;
+		// newParamView.pn = epn;
+		// // add paramView to content panel
+	}
+	public void AddParameterStep2(string parameterType, string parameterName)
+	{
 		//while(parameterCreationCanvas.GetComponent<ParameterCreation>().ready == false)
 		//{ CAUSES INFINITE LOOP, REWORK
 			// wait until choice made
 		//}
 		string tmp = JsonUtility.ToJson(graph);
 		// get name of parameter from user input via mtrk keyboard (probably)
-		string name = "autofill";
 		Type type;
 		switch(parameterType)
 		{
@@ -271,8 +304,8 @@ public class RealityFlowGraphView : MonoBehaviour {
 		// make sure it's not a duplicate name
 		// add parameter to a list that is drag and droppable
 		ParameterNode pn = BaseNode.CreateFromType<ParameterNode> (new Vector2 ());
-		graph.AddExposedParameter (name, type, Labeled);
-		ExposedParameter epn = graph.GetExposedParameter (name);
+		graph.AddExposedParameter (parameterName, type, Labeled);
+		ExposedParameter epn = graph.GetExposedParameter (parameterName);
 		pn.parameterGUID = epn.guid;
 		//paramDict.Add(epn.guid,epn);
 		paramList.Add(epn);

@@ -6,10 +6,7 @@ public class ParameterCreation : MonoBehaviour
 {
     public RealityFlowGraphView rfgv;
     public Dropdown typeDropdown;
-    public bool ready;
     void Start() {
-        //dropDownText = "no it cannot be null";
-        ready = false;
         typeDropdown.onValueChanged.AddListener(delegate {
             TypeDropdownValueChangedHandler(typeDropdown);
         });
@@ -28,9 +25,8 @@ public class ParameterCreation : MonoBehaviour
     public void GetDropDownValue()
     {
         this.gameObject.SetActive(false);
-        ready = true;
         //Debug.Log(selectionDropdown.options[selectionDropdown.value].text);
-        rfgv.setParameterType(typeDropdown.options[typeDropdown.value].text);
+        rfgv.AddParameterStep2(typeDropdown.options[typeDropdown.value].text,"autofill");
         //return selectionDropdown.options[selectionDropdown.value].text;
     }
 }
