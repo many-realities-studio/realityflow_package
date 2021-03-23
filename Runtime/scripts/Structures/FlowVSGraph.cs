@@ -106,7 +106,7 @@ namespace RealityFlow.Plugin.Scripts
         public FlowVSGraph(string id, string name) {
             Name = name;
             Id = id;
-            WhiteboardManager.AddNewGraphToDict(this);
+            // WhiteboardManager.AddNewGraphToDict(this);
 
             if (idToVSGraphMapping.ContainsKey(id))
             {
@@ -121,6 +121,7 @@ namespace RealityFlow.Plugin.Scripts
 
                 var monoBehaviour = AttachedGameObject.GetComponent<FlowVSGraph_Monobehaviour>();
                 monoBehaviour.underlyingFlowVSGraph = this;
+                AttachedGameObject.transform.GetChild(2).GetComponent<RealityFlowGraphView>().InitializeGraph(this);
             }
         }
 

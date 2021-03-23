@@ -744,13 +744,13 @@ public class FlowNetworkManagerEditor : EditorWindow
         EditorGUILayout.EndHorizontal();
 
         // TODO: This info is likely incorrect for graphs, needs to be thought about
-        // foreach (FlowVSGraph currentFlowVSGraph in FlowVSGraph.idToGameObjectMapping.Values)
-        // {
-        //     if (GUILayout.Button(currentFlowVSGraph.Name, GUILayout.Height(30)))
-        //     {
-        //         Operations.DeleteVSGraph(currentFlowVSGraph.Id, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) => { Debug.Log("Deleted VSGraph " + e.message); });
-        //     }
-        // }
+        foreach (FlowVSGraph currentFlowVSGraph in FlowVSGraph.idToVSGraphMapping.Values)
+        {
+            if (GUILayout.Button(currentFlowVSGraph.Name, GUILayout.Height(30)))
+            {
+                Operations.DeleteVSGraph(currentFlowVSGraph.Id, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) => { Debug.Log("Deleted VSGraph " + e.message); });
+            }
+        }
     }
 
     private void _CreateDeleteProjectConfirmationView()

@@ -31,7 +31,7 @@ namespace RealityFlow.Plugin.Scripts
         private IEnumerable<FlowTObject> _objectList;
 
         [SerializeField]
-        private IEnumerable<BaseGraph> _vsGraphList;
+        private IEnumerable<FlowVSGraph> _vsGraphList;
 
         [JsonProperty("Id")]
         public string Id { get => _id; set => _id = value; } // The unique ID of the project
@@ -49,7 +49,7 @@ namespace RealityFlow.Plugin.Scripts
         public IEnumerable<FlowTObject> _ObjectList { get => _objectList; set => _objectList = value; }
 
         [JsonProperty("_VSGraphList")]
-        public IEnumerable<BaseGraph> _VSGraphList { get => _vsGraphList; set => _vsGraphList = value; }
+        public IEnumerable<FlowVSGraph> _VSGraphList { get => _vsGraphList; set => _vsGraphList = value; }
 
         [JsonProperty("_BehaviourList")]
         public List<FlowBehaviour> behaviourList { get; set; }
