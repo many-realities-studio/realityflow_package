@@ -40,7 +40,7 @@ namespace RealityFlow.Plugin.Scripts
                     {
                         if (idToVSGraphMapping[Id]._AttachedGameObject == null)
                         {
-                             UnityEngine.Object prefabReference = Resources.Load("prefabs/VRWhiteBoard");
+                             UnityEngine.Object prefabReference = Resources.Load("prefabs/FlowVSGraph");
                             //GameObject prefabReference = Resources.Load("prefabs/VRWhiteBoard");
                             if (prefabReference == null)
                             {
@@ -97,7 +97,8 @@ namespace RealityFlow.Plugin.Scripts
             FlowVSGraph_Monobehaviour monoBehaviour = AttachedGameObject.GetComponent<FlowVSGraph_Monobehaviour>();
 
             monoBehaviour.underlyingFlowVSGraph = this;
-            AttachedGameObject.transform.GetChild(2).GetComponent<RealityFlowGraphView>().InitializeGraph(this);
+            this.name = (this.Name + " - " + this.Id);
+            // AttachedGameObject.transform.GetChild(2).GetComponent<RealityFlowGraphView>().InitializeGraph(this);
             // base.AddNode(BaseNode.CreateFromType<FloatNode> (new Vector2 ()));
         }
 
@@ -121,7 +122,8 @@ namespace RealityFlow.Plugin.Scripts
 
                 var monoBehaviour = AttachedGameObject.GetComponent<FlowVSGraph_Monobehaviour>();
                 monoBehaviour.underlyingFlowVSGraph = this;
-                AttachedGameObject.transform.GetChild(2).GetComponent<RealityFlowGraphView>().InitializeGraph(this);
+                this.name = (this.Name + " - " + this.Id);
+                // AttachedGameObject.transform.GetChild(2).GetComponent<RealityFlowGraphView>().InitializeGraph(this);
             }
         }
 
