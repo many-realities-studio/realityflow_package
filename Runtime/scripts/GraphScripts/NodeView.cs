@@ -78,6 +78,7 @@ public class NodeView : MonoBehaviour
         Vector3 localPos = transform.localPosition;
         localPos.z = 0.0f;
         transform.localPosition = localPos;
+        transform.localScale = Vector3.one;
         //this.GetComponent<RectTransform>().anchoredPosition3D.z = 0.0f;
     }
     /*
