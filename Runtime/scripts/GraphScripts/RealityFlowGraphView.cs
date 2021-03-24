@@ -456,6 +456,7 @@ public class RealityFlowGraphView : MonoBehaviour {
         }
         nodeViewList.Add (newView);
         // LayoutRebuilder.MarkLayoutForRebuild ((RectTransform) newView.transform);
+		// RectTransform rect = newView.gameObject.transform.GetChild(0).GetComponent<RectTransform> ();
 		RectTransform rect = newView.gameObject.GetComponent<RectTransform> ();
         rect.SetAsLastSibling ();
 		rect.anchoredPosition = canvasDimensions*newNodePosition;

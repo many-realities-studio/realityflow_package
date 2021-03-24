@@ -40,6 +40,13 @@ public class NodeView : MonoBehaviour
         // deletionList = new List<BaseNode>();
     }
 
+    void Update(){
+        transform.rotation = Quaternion.identity;
+        // transform.localPosition = new Vector3(transform.position.x, transform.position.y , 0.0f);
+        // transform.localPosition.z = 0.0f;
+
+    }
+
     // public void Setup(RealityFlowGraphView rfgvi)
     // {
     //     rfgv=rfgvi;
@@ -65,6 +72,13 @@ public class NodeView : MonoBehaviour
     //    rfgv.AddToSelection(node);
        rfgv.AddToSelectionNV(this);
        this.GetComponent<CanvasRenderer>().SetColor(Color.green);
+    }
+
+    public void ResetOrientation(){
+        Vector3 localPos = transform.localPosition;
+        localPos.z = 0.0f;
+        transform.localPosition = localPos;
+        //this.GetComponent<RectTransform>().anchoredPosition3D.z = 0.0f;
     }
     /*
     public void Delete() {
