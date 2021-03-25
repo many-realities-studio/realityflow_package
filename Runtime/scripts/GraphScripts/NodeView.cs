@@ -81,6 +81,15 @@ public class NodeView : MonoBehaviour
         transform.localScale = Vector3.one;
         //this.GetComponent<RectTransform>().anchoredPosition3D.z = 0.0f;
     }
+
+    public void UpdateNodeValues()
+    {
+        // TODO: FIX
+        Debug.Log("Before update, node position is: "+node.position);
+        // 
+        node.position = new Rect(new Vector2(this.transform.position.x, this.transform.position.y), new Vector2(100,100)); //this.transform.position;
+        Debug.Log("After update, node position is: "+node.position);
+    }
     /*
     public void Delete() {
         deletionList.Add(node);
