@@ -223,10 +223,23 @@ public class RealityFlowGraphView : MonoBehaviour {
 				graph.AddNode(gn);
 				StartCoroutine(AddNodeCoroutine(gn));
 				break;
+			// case "ParameterNode":
+			// 	ParameterNode pn = BaseNode.CreateFromType<ParameterNode> (new Vector2 ());
+			// 	graph.AddNode(pn);
+			// 	StartCoroutine(AddNodeCoroutine(pn));
 			default:
 				Debug.Log("This case of addnode did not use a tag");
 				break; 
 		}		
+	}
+
+	public void AddParameterNodeToGraph(string epnGUID){
+		ParameterNode pn = BaseNode.CreateFromType<ParameterNode> (new Vector2 ());
+		// pn.parameter = epn;
+		pn.parameterGUID = epnGUID;
+
+		graph.AddNode(pn);
+		StartCoroutine(AddNodeCoroutine(pn));
 	}
 
 	public void BoolNodeStep2(string comparisonFunction)
@@ -307,14 +320,15 @@ public class RealityFlowGraphView : MonoBehaviour {
 			case "Float": type = typeof(float); break;
 			case "Int": type = typeof(int); break;
 			case "Bool": type = typeof(bool); break;
+			case "Color":type = typeof(Color); break;
 		}
 		//Debug.Log(type.AssemblyQualifiedName);
 		// make sure it's not a duplicate name
 		// add parameter to a list that is drag and droppable
-		ParameterNode pn = BaseNode.CreateFromType<ParameterNode> (new Vector2 ());
+		// ParameterNode pn = BaseNode.CreateFromType<ParameterNode> (new Vector2 ());
 		graph.AddExposedParameter (parameterName, type, Labeled);
 		ExposedParameter epn = graph.GetExposedParameter (parameterName);
-		pn.parameterGUID = epn.guid;
+		// pn.parameterGUID = epn.guid;
 		//paramDict.Add(epn.guid,epn);
 		paramList.Add(epn);
 		// instantiate paramView
@@ -325,6 +339,7 @@ public class RealityFlowGraphView : MonoBehaviour {
         newParamView.guid.text = epn.guid.Substring (epn.guid.Length - 5);
 		newParamView.rfgv = this;
 		newParamView.pn = epn;
+		// newParamView.NodeInstance = pn;
 		// add paramView to content panel
 	}
 

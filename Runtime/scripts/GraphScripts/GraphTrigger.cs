@@ -13,12 +13,19 @@ public class GraphTrigger : MonoBehaviour
     void OnCollisionEnter(Collision collision)
     {
         Debug.Log("Object has hit a collider");
-        RunGraph();
+        //RunGraph();
     }
 
     void OnTriggerEnter(Collider other) {
         Debug.Log("Object has entered a trigger");
-        RunGraph();
+        if(triggerObj != null){ // now we have to test if the collider is the right GM
+            if ( other.gameObject == triggerObj) {
+                RunGraph();
+            }
+        } 
+        else {
+            RunGraph();
+        }
     }
 
     void RunGraph(){

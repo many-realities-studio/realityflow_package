@@ -32,6 +32,11 @@ public class ParameterView : MonoBehaviour
         this.transform.parent = rfgv.contentPanel.transform;
     }
 
+    public void AddParameterNodeToGraph(){
+        // rfgv.AddNode("ParameterNode");
+        rfgv.AddParameterNodeToGraph(pn.guid);
+    }
+
     public void deleteParam()
     {
         Debug.Log("Deleting parameter");
