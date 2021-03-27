@@ -16,7 +16,6 @@ public class SelectComparison : MonoBehaviour
     }
     
     private void selectionDropdownValueChangedHandler(Dropdown target) {
-        Debug.Log("selected: "+target.value);
         string dropDownText = target.options[target.value].text;
     }
 

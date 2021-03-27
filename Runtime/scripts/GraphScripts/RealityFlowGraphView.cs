@@ -76,6 +76,7 @@ public class RealityFlowGraphView : MonoBehaviour {
 		// Debug.Log(JsonUtility.ToJson(graph));
 		// graph.name = "TEST GRAPH "+graph.GetInstanceID();
 		graph = (BaseGraph)VSGraph;
+		graph.name = (VSGraph.Name + " - " + VSGraph.Id);
 		commandPalette = GameObject.Find("CommandPalette").GetComponent<CommandPalette>();
 		// commandPalette = new CommandPalette();
         graph.onGraphChanges += GraphChangesCallback;

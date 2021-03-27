@@ -40,7 +40,7 @@ namespace RealityFlow.Plugin.Scripts
                     {
                         if (idToVSGraphMapping[Id]._AttachedGameObject == null)
                         {
-                             UnityEngine.Object prefabReference = Resources.Load("prefabs/VRWhiteBoard");
+                             UnityEngine.Object prefabReference = Resources.Load("prefabs/FlowVSGraph");
                             //GameObject prefabReference = Resources.Load("prefabs/VRWhiteBoard");
                             if (prefabReference == null)
                             {
@@ -97,7 +97,8 @@ namespace RealityFlow.Plugin.Scripts
             FlowVSGraph_Monobehaviour monoBehaviour = AttachedGameObject.GetComponent<FlowVSGraph_Monobehaviour>();
 
             monoBehaviour.underlyingFlowVSGraph = this;
-            AttachedGameObject.transform.GetChild(2).GetComponent<RealityFlowGraphView>().InitializeGraph(this);
+            this.name = (this.Name + " - " + this.Id);
+            // AttachedGameObject.transform.GetChild(2).GetComponent<RealityFlowGraphView>().InitializeGraph(this);
             // base.AddNode(BaseNode.CreateFromType<FloatNode> (new Vector2 ()));
         }
 
@@ -106,7 +107,7 @@ namespace RealityFlow.Plugin.Scripts
         public FlowVSGraph(string id, string name) {
             Name = name;
             Id = id;
-            WhiteboardManager.AddNewGraphToDict(this);
+            // WhiteboardManager.AddNewGraphToDict(this);
 
             if (idToVSGraphMapping.ContainsKey(id))
             {
@@ -121,6 +122,8 @@ namespace RealityFlow.Plugin.Scripts
 
                 var monoBehaviour = AttachedGameObject.GetComponent<FlowVSGraph_Monobehaviour>();
                 monoBehaviour.underlyingFlowVSGraph = this;
+                this.name = (this.Name + " - " + this.Id);
+                // AttachedGameObject.transform.GetChild(2).GetComponent<RealityFlowGraphView>().InitializeGraph(this);
             }
         }
 
@@ -149,6 +152,29 @@ namespace RealityFlow.Plugin.Scripts
                 CopyFromOtherGraph(newValues);
                 this.CanBeModified = tempCanBeModified;
             }
+        }
+
+        public static void DestroyVSGraph(string idOfObjectToDestroy)
+        {
+            try
+            {
+                GameObject objectToDestroy = idToVSGraphMapping[idOfObjectToDestroy].AttachedGameObject;
+                idToVSGraphMapping.Remove(idOfObjectToDestroy);
+                UnityEngine.Object.Destroy(objectToDestroy);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError(e.ToString());
+            }
+        }
+
+        public static void RemoveAllGraphsFromScene()
+        {
+            foreach (FlowVSGraph flowVSGraph in idToVSGraphMapping.Values)
+            {
+                UnityEngine.Object.DestroyImmediate(flowVSGraph.AttachedGameObject);
+            }
+            FlowVSGraph.idToVSGraphMapping = new SerializableDictionary<string, FlowVSGraph>();
         }
 
         public void CopyFromOtherGraph(FlowVSGraph input){
