@@ -6,17 +6,44 @@ using UnityEditor.UIElements;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine.UIElements;
 using GraphProcessor;
+using NodeGraphProcessor.Examples;
 
 [NodeCustomEditor(typeof(BoolNode))]
 public class BoolNodeView : BaseNodeView
 {
 	public override void Enable()
 	{
-		hasSettings = true;	// or base.Enable();
-		var node = nodeTarget as BoolNode;
+		BoolNode comparisonNode = nodeTarget as BoolNode;
+		DrawDefaultInspector();
+		
+		var inputA = new FloatField("In A") { value = comparisonNode.inA };
+		var inputB = new FloatField("In B") { value = comparisonNode.inB };
+		inputA.RegisterValueChangedCallback(v => {
+			owner.RegisterCompleteObjectUndo("Change InA value");
+			comparisonNode.inA = v.newValue;
+		});
+		inputB.RegisterValueChangedCallback(v => {
+			owner.RegisterCompleteObjectUndo("Change InB value");
+			comparisonNode.inB = v.newValue;
+		});
 
-        // Create your fields using node's variables and add them to the controlsContainer
+		nodeTarget.onAfterEdgeConnected += UpdateVisibleFields;
+		nodeTarget.onAfterEdgeDisconnected += UpdateVisibleFields;
 
-		controlsContainer.Add(new Label($"Last Evaluation: {node.getValue()}"));
+		UpdateVisibleFields(null);
+
+		void UpdateVisibleFields(SerializableEdge _)
+		{
+			var inA = nodeTarget.GetPort(nameof(comparisonNode.inA), null);
+			var inB = nodeTarget.GetPort(nameof(comparisonNode.inB), null);
+
+			controlsContainer.Add(inputA);
+			controlsContainer.Add(inputB);
+
+			if (inA.GetEdges().Count > 0)
+				controlsContainer.Remove(inputA);
+			if (inB.GetEdges().Count > 0)
+				controlsContainer.Remove(inputB);
+		}
 	}
 }

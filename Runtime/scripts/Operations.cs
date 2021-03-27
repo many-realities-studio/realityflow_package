@@ -180,7 +180,7 @@ namespace Packages.realityflow_package.Runtime.scripts
         public static void DeleteVSGraph(string idOfVSGraphToDelete, string projectId, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
         {
             //DeleteVSGraph_SendToServer deleteVSGraph = new DeleteVSGraph_SendToServer(projectId, idOfVSGraphToDelete); // TODO: format string msg
-            string message = ("{\"VSGraphId\":" + idOfVSGraphToDelete + ",\"ProjectId\":\"" + projectId + "\",\"MessageType\":\"DeleteVSGraph\"}");
+            string message = ("{\"VSGraphId\":\"" + idOfVSGraphToDelete + "\",\"ProjectId\":\"" + projectId + "\",\"MessageType\":\"DeleteVSGraph\"}");
             FlowWebsocket.SendGraphMessage(message);
 
             ReceivedMessage.AddEventHandler(typeof(DeleteVSGraph_Received), true, callbackFunction);
@@ -359,6 +359,16 @@ namespace Packages.realityflow_package.Runtime.scripts
         private static void _DeleteVSGraph(object sender, BaseReceivedEventArgs eventArgs)
         {
             // TODO: Stuff to delete the graph in Unity goes here.
+            if (eventArgs.message.WasSuccessful == true)
+            {
+                GameObject gameObject = FlowVSGraph.idToVSGraphMapping[eventArgs.message.DeletedVSGraphId].AttachedGameObject;
+
+                FlowVSGraph.idToVSGraphMapping.Remove(eventArgs.message.DeletedVSGraphId);
+
+                UnityEngine.Object.DestroyImmediate(gameObject);
+            }
+
+            Debug.Log("Delete VSGraph: " + eventArgs.message.WasSuccessful);
         }
 
         #endregion VSGraph messages received
@@ -422,6 +432,7 @@ namespace Packages.realityflow_package.Runtime.scripts
 
         private static void _OpenProject(object sender, BaseReceivedEventArgs eventArgs)
         {
+            Debug.Log("Now in load project");
             ConfigurationSingleton.SingleInstance.CurrentProject = eventArgs.message.flowProject;
 
             ConfigurationSingleton asset = ScriptableObject.CreateInstance<ConfigurationSingleton>();

@@ -11,12 +11,15 @@ public class NodeView : MonoBehaviour
     public GameObject inputPanel;
     public GameObject outputPanel;
     public BaseNode node;
+    public RealityFlowGraphView rfgv;
+
+    public List<NodePortView> inputPortViews = new List<NodePortView>();
+    public List<NodePortView> outputPortViews = new List<NodePortView>();
 
     // TODO: Make sure this is the best way to do this. I think this is really hacky -John
     // public BaseGraph graph;
 
     // public GameObject rfgvGameObject; // realityflowgraphview script
-    public RealityFlowGraphView rfgv;
 
     public static NodeView instance;
 
@@ -46,6 +49,12 @@ public class NodeView : MonoBehaviour
 
 
     public void Delete(){
+        foreach(NodePortView inputPort in inputPortViews){
+            inputPort.Delete();
+        }
+        foreach(NodePortView outputPort in outputPortViews){
+            outputPort.Delete();
+        }
         rfgv.graph.RemoveNode(node);
         // _____?.Invoke(node);
         //graph.SetDirty();

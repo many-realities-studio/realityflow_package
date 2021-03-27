@@ -20,12 +20,12 @@ public class ButtonClick : MonoBehaviour
 		//RealityFlowGraphView rfgv = rfgvGameObject.GetComponent<RealityFlowGraphView>();
 		//BaseGraph graph = rfgv.graph;
 		//NodeUI.instance.Setup(graph);
-		foreach(GameObject w in WhiteBoards)
-		{
-			GameObject rfgvGameObject = GameObject.FindGameObjectWithTag("Canvas").transform.GetChild(5).gameObject;
-			RealityFlowGraphView rfgv = rfgvGameObject.GetComponent<RealityFlowGraphView>();
+		//foreach(GameObject w in WhiteBoards)
+		//{
+		//	GameObject rfgvGameObject = GameObject.FindGameObjectWithTag("Canvas").transform.GetChild(5).gameObject;
+		//	RealityFlowGraphView rfgv = rfgvGameObject.GetComponent<RealityFlowGraphView>();
 			//BaseGraph graph = rfgv.graph;
 			//NodeUI.instance.Setup(rfgv);
-		}
+		//}
 	}
 }

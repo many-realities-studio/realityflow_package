@@ -8,6 +8,7 @@ using UnityEngine.UI;
 using UnityEngine.UIElements;
 using System.Linq;
 using RealityFlow.Plugin.Contrib;
+using RealityFlow.Plugin.Scripts;
 
 // public struct Edge {
 // 	NodePort input;
@@ -29,6 +30,8 @@ public class RealityFlowGraphView : MonoBehaviour {
 	public GameObject contentPanel;
 
 	public GameObject parameterContent;
+	public GameObject parameterCreationCanvas;
+	public GameObject SelectComparisonCanvas;
 
 	public GameObject nodePortView;
 	public GameObject nodeView;
@@ -38,11 +41,10 @@ public class RealityFlowGraphView : MonoBehaviour {
 	public List<NodeView> nodeViewList = new List<NodeView> ();
 	public List<NodeView> selectedNV = new List<NodeView>();
 	public List<BaseNode> selected = new List<BaseNode>();
+	public List<EdgeView> edgeViews = new List<EdgeView>();
 
 	public Dictionary<string,ExposedParameter> paramDict = new Dictionary<string, ExposedParameter>();
 	public List<ExposedParameter> paramList = new List<ExposedParameter>();
-
-	public List<Edge> edges = new List<Edge>();
 
 	Vector2 newNodePosition = new Vector2();
 	public Vector2 canvasDimensions = new Vector2(2560, 1080); // FOR NOW, dont have these hardcoded in final demo
@@ -54,10 +56,12 @@ public class RealityFlowGraphView : MonoBehaviour {
 
 
 	private void Start () {
-		InitializeGraph();
+		SelectComparisonCanvas.SetActive(false);
+		parameterCreationCanvas.SetActive(false);
+		//InitializeGraph();
 	}
 
-	void InitializeGraph(){
+	public void InitializeGraph(FlowVSGraph VSGraph){
 
 		// connectorListener = new EdgeListener(this);
 		// Debug.Log(connectorListener);
@@ -68,8 +72,11 @@ public class RealityFlowGraphView : MonoBehaviour {
 		// 	// graph1.SetParameterValue ("LabelContainer", Labeled);
 		// }
 		// TODO: have it create a new empty graph and use that as the graph
-		graph = new BaseGraph();
-		graph.name = "TEST GRAPH "+graph.GetInstanceID();
+		// graph = new BaseGraph();
+		// Debug.Log(JsonUtility.ToJson(graph));
+		// graph.name = "TEST GRAPH "+graph.GetInstanceID();
+		graph = (BaseGraph)VSGraph;
+		graph.name = (VSGraph.Name + " - " + VSGraph.Id);
 		commandPalette = GameObject.Find("CommandPalette").GetComponent<CommandPalette>();
 		// commandPalette = new CommandPalette();
         graph.onGraphChanges += GraphChangesCallback;
@@ -143,10 +150,11 @@ public class RealityFlowGraphView : MonoBehaviour {
 		// selected.Clear();
 		// TODO: Change deletion process so we use the NodeView.guid to delete specific dictionary indicies instead of using a list (Requires we change our NodeView List into a dictionary).
 		foreach( NodeView n in selectedNV){
+			nodeViewList.Remove(n);
 			n.Delete();
 		}
 		selectedNV.Clear();
-		nodeViewList.RemoveAll(nv => nv==null);
+		// nodeViewList.RemoveAll(nv => nv==null);
 		
 		// BaseGraph postCmd = graph;
 		// JsonUtility.FromJsonOverwrite(tmp, postCmd);
@@ -193,10 +201,17 @@ public class RealityFlowGraphView : MonoBehaviour {
 				StartCoroutine (AddNodeCoroutine(intn));
 				break;
 			case "BoolNode":
-				BoolNode bn = BaseNode.CreateFromType<BoolNode> (new Vector2 ());
-				graph.AddNode(bn);
-				bn.output = true;
-				StartCoroutine (AddNodeCoroutine(bn));
+				SelectComparisonCanvas.SetActive(true);
+				//while(SelectComparisonCanvas.GetComponent<SelectComparison>().ready == false)
+				//{ CAUSES INFINITE LOOP, REWORK
+					// wait until choice made
+				//}
+				// BoolNode bn = BaseNode.CreateFromType<BoolNode> (new Vector2 ());
+				// bn.compareFunction = comparisonFunction;
+				// bn.inA = 0f;
+				// bn.inB = 0f;
+				// graph.AddNode(bn);
+				// StartCoroutine (AddNodeCoroutine(bn));
 				break;
 			case "ConditionalNode":
 				IfNode cn = BaseNode.CreateFromType<IfNode> (new Vector2 ());
@@ -207,6 +222,16 @@ public class RealityFlowGraphView : MonoBehaviour {
 				Debug.Log("This case of addnode did not use a tag");
 				break; 
 		}		
+	}
+
+	public void BoolNodeStep2(string comparisonFunction)
+	{
+		BoolNode bn = BaseNode.CreateFromType<BoolNode> (new Vector2 ());
+		bn.compareFunction = comparisonFunction;
+		bn.inA = 0f;
+		bn.inB = 0f;
+		graph.AddNode(bn);
+		StartCoroutine (AddNodeCoroutine(bn));
 	}
 
 	public void PrintCommandStack(){
@@ -223,16 +248,67 @@ public class RealityFlowGraphView : MonoBehaviour {
 	}
 
 	public void AddParameter(){
+		parameterCreationCanvas.SetActive(true);
+		// //while(parameterCreationCanvas.GetComponent<ParameterCreation>().ready == false)
+		// //{ CAUSES INFINITE LOOP, REWORK
+		// 	// wait until choice made
+		// //}
+		// string tmp = JsonUtility.ToJson(graph);
+		// // get name of parameter from user input via mtrk keyboard (probably)
+		// string name = "autofill";
+		// Type type;
+		// switch(parameterType)
+		// {
+		// 	default:
+		// 	case "GameObject": type = typeof(GameObject); break;
+		// 	case "String": type = typeof(string); break;
+		// 	case "Float": type = typeof(float); break;
+		// 	case "Int": type = typeof(int); break;
+		// 	case "Bool": type = typeof(bool); break;
+		// }
+		// //Debug.Log(type.AssemblyQualifiedName);
+		// // make sure it's not a duplicate name
+		// // add parameter to a list that is drag and droppable
+		// ParameterNode pn = BaseNode.CreateFromType<ParameterNode> (new Vector2 ());
+		// graph.AddExposedParameter (name, type, Labeled);
+		// ExposedParameter epn = graph.GetExposedParameter (name);
+		// pn.parameterGUID = epn.guid;
+		// //paramDict.Add(epn.guid,epn);
+		// paramList.Add(epn);
+		// // instantiate paramView
+		// ParameterView newParamView = Instantiate(paramView,new Vector3(),Quaternion.identity).GetComponent<ParameterView> ();
+		// newParamView.gameObject.transform.SetParent (parameterContent.transform, false);
+		// newParamView.title.text = epn.name;
+		// newParamView.type.text = epn.type;
+        // newParamView.guid.text = epn.guid.Substring (epn.guid.Length - 5);
+		// newParamView.rfgv = this;
+		// newParamView.pn = epn;
+		// // add paramView to content panel
+	}
+	public void AddParameterStep2(string parameterType, string parameterName)
+	{
+		//while(parameterCreationCanvas.GetComponent<ParameterCreation>().ready == false)
+		//{ CAUSES INFINITE LOOP, REWORK
+			// wait until choice made
+		//}
 		string tmp = JsonUtility.ToJson(graph);
 		// get name of parameter from user input via mtrk keyboard (probably)
-		string name = "autofill";
-		Type type = typeof(string);
+		Type type;
+		switch(parameterType)
+		{
+			default:
+			case "GameObject": type = typeof(GameObject); break;
+			case "String": type = typeof(string); break;
+			case "Float": type = typeof(float); break;
+			case "Int": type = typeof(int); break;
+			case "Bool": type = typeof(bool); break;
+		}
 		//Debug.Log(type.AssemblyQualifiedName);
 		// make sure it's not a duplicate name
 		// add parameter to a list that is drag and droppable
 		ParameterNode pn = BaseNode.CreateFromType<ParameterNode> (new Vector2 ());
-		graph.AddExposedParameter (name, type, Labeled);
-		ExposedParameter epn = graph.GetExposedParameter (name);
+		graph.AddExposedParameter (parameterName, type, Labeled);
+		ExposedParameter epn = graph.GetExposedParameter (parameterName);
 		pn.parameterGUID = epn.guid;
 		//paramDict.Add(epn.guid,epn);
 		paramList.Add(epn);
@@ -279,7 +355,7 @@ public class RealityFlowGraphView : MonoBehaviour {
 	// public void ConnectEdges(NodePort input, NodePort output){
 	public void ConnectEdges(NodePortView input, NodePortView output){ // Replacing arguments w/ NodePortViews
 		// graph.Connect(input, output, true);
-		SerializableEdge newEdge = graph.Connect(input.port, output.port, true);
+		// SerializableEdge newEdge = graph.Connect(input.port, output.port, true);
 
 		StartCoroutine(AddEdgeCoroutine(input,output));
 		/* Backend:
@@ -315,14 +391,26 @@ public class RealityFlowGraphView : MonoBehaviour {
 		processor.Run ();
 	}
 
+	public float padding = 0.1f;
 	// This couroutine is in charge of asynchronously making the EdgeView Prefab
 	public IEnumerator AddEdgeCoroutine (NodePortView input, NodePortView output){
+		SerializableEdge serializedEdge = graph.Connect(input.port, output.port, true);
 		EdgeView newEdge = Instantiate( edgeView, new Vector3(), Quaternion.identity).GetComponent<EdgeView>();
+		newEdge.rfgv = this;
+		newEdge.input = input;
+		newEdge.output = output;
+		// input.edges.Add(newEdge);
+		// output.edges.Add(newEdge);
 		newEdge.gameObject.transform.SetParent (contentPanel.transform, false);
 		// Set the positions of the linerenderer
+		newEdge.edge = serializedEdge;
 		LineRenderer lr = newEdge.GetComponent<LineRenderer>();
+		// calculate the extra points for a better looking circuit board line
 		Vector3 [] edgePoints = new [] {output.GetComponent<RectTransform>().transform.position,input.GetComponent<RectTransform>().transform.position};
 		lr.SetPositions(edgePoints);
+		// edgeViews.Add(newEdge);
+		input.edges.Add(newEdge);
+		output.edges.Add(newEdge);
 		yield return new WaitForSeconds (.01f);
 	}
 
@@ -344,6 +432,7 @@ public class RealityFlowGraphView : MonoBehaviour {
 			npv.type = "input";
             yield return new WaitForSeconds (.01f);
             npv.Init (input);
+			newView.inputPortViews.Add(npv);
             // LayoutRebuilder.MarkLayoutForRebuild ((RectTransform) newView.transform);
             // newView.GetComponent<ContentSizeFitter>().enabled = true;
         }
@@ -359,6 +448,7 @@ public class RealityFlowGraphView : MonoBehaviour {
             npv.Init (output);
             // LayoutRebuilder.MarkLayoutForRebuild ((RectTransform) newView.transform);
             // newView.GetComponent<ContentSizeFitter>().enabled = true;
+			newView.outputPortViews.Add(npv);
         }
         nodeViewList.Add (newView);
         // LayoutRebuilder.MarkLayoutForRebuild ((RectTransform) newView.transform);
