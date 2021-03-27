@@ -12,10 +12,12 @@ public class GraphTrigger : MonoBehaviour
     
     void OnCollisionEnter(Collision collision)
     {
+        Debug.Log("Object has hit a collider");
         RunGraph();
     }
 
     void OnTriggerEnter(Collider other) {
+        Debug.Log("Object has entered a trigger");
         RunGraph();
     }
 
