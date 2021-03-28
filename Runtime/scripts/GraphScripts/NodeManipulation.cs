@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using GraphProcessor;
 using UnityEngine.EventSystems;
+using Microsoft.MixedReality.Toolkit;
 using Microsoft.MixedReality.Toolkit.Input;
+//using Microsoft.MixedReality.Toolkit.UI;
 
 public class NodeManipulation : MonoBehaviour//,IMixedRealityPointerHandler
 {
@@ -24,11 +26,37 @@ public class NodeManipulation : MonoBehaviour//,IMixedRealityPointerHandler
 
     public void NodeRaycastCreation()
     {
+        GameObject ptr = null;
+        foreach (IMixedRealityController controller in MixedRealityToolkit.InputSystem.DetectedControllers)
+        {
+            if (controller.Visualizer?.GameObjectProxy != null)
+            {
+                Debug.Log("Visualizer Game Object: " + controller.Visualizer.GameObjectProxy);
+            }
+            else
+            {
+                Debug.Log("Controller has no visualizer!");
+            }
+
+
+            foreach (IMixedRealityPointer pointer in controller.InputSource.Pointers)
+            {
+                if (pointer is MonoBehaviour)
+                {
+                    var monoBehavior = pointer as MonoBehaviour;
+                    Debug.Log("Found pointer game object: " + (monoBehavior.gameObject));
+                    if( monoBehavior.gameObject.name.Contains("ParabolicPointer"))
+                    {
+                        ptr = monoBehavior.gameObject;
+                    }
+                }
+            }
+        }
+
         GameObject node = gameObject.transform.GetChild(0).gameObject;
         RaycastHit hit;
-        if(Physics.Raycast(node.transform.position, 
-        node.transform.TransformDirection(Vector3.forward), 
-        out hit, 1<<6))
+        //if(Physics.Raycast(node.transform.position, node.transform.TransformDirection(Vector3.forward), out hit, 1<<6))
+        if( Physics.Raycast(node.transform.position, ptr.transform.forward, out hit, 1<<6) && ptr != null )
         {
             //Debug.DrawRay(node.transform.position, node.transform.TransformDirection(Vector3.forward) * hit.distance, Color.green);
             Debug.Log("Did Hit");

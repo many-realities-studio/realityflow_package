@@ -12,8 +12,9 @@ public class EdgeListener : MonoBehaviour
 
     // TODO: add dictionary or list to create edges
     // Save the NodePortViews instead of just the NodePort(s), so we can access the NodeViews for drawing the edges
-    NodePortView inputView, outputView;
-    NodePort input, output;
+    public NodePortView inputView, outputView;
+    [SerializeField]
+    public NodePort input, output;
 
     // Constructor
     public EdgeListener(RealityFlowGraphView graphView)
@@ -47,7 +48,7 @@ public class EdgeListener : MonoBehaviour
             Debug.Log("Both ports are filled");
             // TODO: Update this, this only takes in the type of the node and not necessarily a type that can be cast to this node
             // if (this.input.owner.name == this.output.owner.name)
-            if (this.inputView.port.owner.name == this.outputView.port.owner.name) // using NodePortViews instead
+            if (this.inputView.port.portData.displayType == this.outputView.port.portData.displayType) // using NodePortViews instead
                 // graphView.ConnectEdges(input, output);
                 graphView.ConnectEdges(inputView, outputView);
             else
