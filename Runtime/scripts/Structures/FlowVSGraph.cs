@@ -19,6 +19,11 @@ namespace RealityFlow.Plugin.Scripts
         [SerializeField]
         private bool _canBeModified;
 
+        public bool IsUpdated { get => _isUpdated; set => _isUpdated = value; }
+
+        [SerializeField]
+        private bool _isUpdated;
+
         [SerializeField]
         public string Name;
 
@@ -129,29 +134,33 @@ namespace RealityFlow.Plugin.Scripts
 
         public void UpdateFlowVSGraphGlobally(FlowVSGraph newValues)
         {
-            if (AttachedGameObject.transform.hasChanged == true)
+            if (IsUpdated == true)
             {
+                Debug.LogError("Update VSGraph flag successfully set!!!!");
+                Debug.LogError("this Nodes before copy: " + JsonUtility.ToJson(this.serializedNodes));
                 bool tempCanBeModified = this.CanBeModified;
-                CopyFromOtherGraph(newValues);
+                Debug.LogError(JsonUtility.ToJson(newValues));
+                GraphPropertyCopier<FlowVSGraph, FlowVSGraph>.Copy(newValues, this);
+                Debug.LogError("this Nodes after copy: " + JsonUtility.ToJson(this.serializedNodes));
                 this.CanBeModified = tempCanBeModified;
 
-                if (CanBeModified == true)
-                {
+                // if (CanBeModified == true)
+                // {
                     Operations.UpdateVSGraph(this, ConfigurationSingleton.SingleInstance.CurrentUser, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) => {/* Debug.Log(e.message);*/ });
-                }
+                // }
 
-                AttachedGameObject.transform.hasChanged = false;
+                _isUpdated = false;
             }
         }
 
         private void UpdateFlowVSGraphLocally(FlowVSGraph newValues)
         {
-            if (idToVSGraphMapping[newValues.Id].CanBeModified == false)
-            {
+            // if (idToVSGraphMapping[newValues.Id].CanBeModified == false)
+            // {
                 bool tempCanBeModified = this.CanBeModified;
                 CopyFromOtherGraph(newValues);
                 this.CanBeModified = tempCanBeModified;
-            }
+            // }
         }
 
         public static void DestroyVSGraph(string idOfObjectToDestroy)
@@ -178,16 +187,17 @@ namespace RealityFlow.Plugin.Scripts
         }
 
         public void CopyFromOtherGraph(FlowVSGraph input){
-            this.Name = input.name;
-            this.serializedNodes = input.serializedNodes;
-            this.edges = input.edges;
-            this.groups = input.groups;
-            this.stackNodes = input.stackNodes;
-            this.pinnedElements = input.pinnedElements;
-            this.exposedParameters = input.exposedParameters;
-            this.stickyNotes = input.stickyNotes;
-            this.position = input.position;
-            this.scale= input.scale;
+            Debug.LogError("Input in copy function: " + JsonUtility.ToJson(input));
+            Name = input.name;
+            serializedNodes = input.serializedNodes;
+            edges = input.edges;
+            groups = input.groups;
+            stackNodes = input.stackNodes;
+            pinnedElements = input.pinnedElements;
+            exposedParameters = input.exposedParameters;
+            stickyNotes = input.stickyNotes;
+            position = input.position;
+            scale= input.scale;
         }
 
     }

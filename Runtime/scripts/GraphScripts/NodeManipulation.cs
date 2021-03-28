@@ -26,6 +26,7 @@ public class NodeManipulation : MonoBehaviour//,IMixedRealityPointerHandler
 
     public void NodeRaycastCreation()
     {
+        GameObject node = gameObject.transform.GetChild(0).gameObject;
         GameObject ptr = null;
         foreach (IMixedRealityController controller in MixedRealityToolkit.InputSystem.DetectedControllers)
         {
@@ -51,9 +52,11 @@ public class NodeManipulation : MonoBehaviour//,IMixedRealityPointerHandler
                     }
                 }
             }
+            if(ptr == null)
+            {
+                ptr = node;
+            }
         }
-
-        GameObject node = gameObject.transform.GetChild(0).gameObject;
         RaycastHit hit;
         //if(Physics.Raycast(node.transform.position, node.transform.TransformDirection(Vector3.forward), out hit, 1<<6))
         if( Physics.Raycast(node.transform.position, ptr.transform.forward, out hit, 1<<6) && ptr != null )

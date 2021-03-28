@@ -17,6 +17,7 @@ using RealityFlow.Plugin.Scripts;
 
 public class RealityFlowGraphView : MonoBehaviour {
 	public BaseGraph graph;
+	public FlowVSGraph vsGraph;
 
 	private JsonElement savePoint; 
 	// public bool inputGraph;
@@ -75,6 +76,7 @@ public class RealityFlowGraphView : MonoBehaviour {
 		// graph = new BaseGraph();
 		// Debug.Log(JsonUtility.ToJson(graph));
 		// graph.name = "TEST GRAPH "+graph.GetInstanceID();
+		vsGraph = VSGraph;
 		graph = (BaseGraph)VSGraph;
 		graph.name = (VSGraph.Name + " - " + VSGraph.Id);
 		commandPalette = GameObject.Find("CommandPalette").GetComponent<CommandPalette>();
@@ -98,19 +100,36 @@ public class RealityFlowGraphView : MonoBehaviour {
 		// Debug.Log(JsonSerializer.Serialize(graph));
         if(changes.addedNode != null)
         {
-            // Debug.Log("Added a node "+changes.addedNode);
+			vsGraph.IsUpdated = true;
+			Debug.Log("Added node");            // Debug.Log("Added a node "+changes.addedNode);
             //Undo.RegisterCompleteObjectUndo(graph,"Added Node RF");
 			// commandPalette.AddCommandToStack(new AddNodeCommand("Add Node", changes,graph));
-            // Debug.Log("Serialized changes:" + JsonSerializer.Serialize(changes.addedNode));
+            Debug.Log("Serialized changes:" +JsonUtility.ToJson(graph));
+			Debug.Log("Serialized VSGraph changes:" + JsonUtility.ToJson(vsGraph));
+			Debug.Log(vsGraph.IsUpdated);
         }
         if(changes.removedNode != null)
         {
+			vsGraph.IsUpdated = true;
+			Debug.Log("Removed node"); 
             // Debug.Log("Removed node "+JsonSerializer.Serialize(changes.removedNode));
 			// commandPalette.AddCommandToStack(new DeleteNodeCommand("Remove Node", changes.removedNode));
         }
 		if (changes.nodeChanged != null)
 		{
+			vsGraph.IsUpdated = true;
+			Debug.Log("Node changed"); 
 			// Debug.Log(JsonSerializer.Serialize(changes.nodeChanged));
+		}
+		if(changes.addedEdge != null)
+		{
+			vsGraph.IsUpdated = true;
+			Debug.Log("Added edge"); 
+		}
+		if(changes.removedEdge != null)
+		{
+			vsGraph.IsUpdated = true;
+			Debug.Log("Removed edge"); 
 		}
 		// Debug.Log(JsonSerializer.Serialize(changes));
         // Debug.Log("Serialized changes:" + JsonSerializer.Serialize(changes));
