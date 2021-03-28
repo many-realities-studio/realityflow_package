@@ -12,9 +12,16 @@ using RealityFlow.Plugin.Scripts;
 using RealityFlow.Plugin.Contrib; // TODO: Fix reference
 
 //using RealityFlow.Plugin.Scripts.Events;
+// Unity/GraphQL libraries
+using System.Collections;
 using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
+using UnityEditor;
+using UnityEngine.Networking;
+using GraphQlClient.Core; // <--
+using Contrib.APIeditor;
+using Newtonsoft.Json;
+using System.Globalization;
 
 namespace Packages.realityflow_package.Runtime.scripts
 {
@@ -24,6 +31,10 @@ namespace Packages.realityflow_package.Runtime.scripts
     /// </summary>
     public static class Operations
     {
+
+        // GraphQL API reference  <----
+        //public GraphApi graphql_api;
+
         public static FlowWebsocket _FlowWebsocket { get; private set; }
 
         static Operations()
@@ -97,11 +108,14 @@ namespace Packages.realityflow_package.Runtime.scripts
 
         #region ObjectOperations
 
-        public static void CreateObject(FlowTObject flowObject, /*FlowUser flowUser,*/ string projectId, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
+        public static void CreateObject(FlowTObject flowObject, string projectId, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
         {
-            CreateObject_SendToServer createObject =
-                new CreateObject_SendToServer(flowObject, /*flowUser,*/ projectId);
-            FlowWebsocket.SendMessage(createObject);
+            graphqlClient_Editor createObject = new graphqlClient_Editor();
+            createObject.CreateObject(flowObject, projectId);
+            //FlowWebsocket.SendMessage_gql(createObject);
+            // CreateObject_SendToServer createObjectt =
+            //     new CreateObject_SendToServer(flowObject, /*flowUser,*/ projectId);
+            // FlowWebsocket.SendMessage(createObjectt);
 
             ReceivedMessage.AddEventHandler(typeof(CreateObject_Received), true, callbackFunction);
         }
@@ -116,8 +130,10 @@ namespace Packages.realityflow_package.Runtime.scripts
 
         public static void DeleteObject(string idOfObjectToDelete, string projectId, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
         {
-            DeleteObject_SendToServer deleteObject = new DeleteObject_SendToServer(projectId, idOfObjectToDelete);
-            FlowWebsocket.SendMessage(deleteObject);
+            graphqlClient_Editor deleteObject = new graphqlClient_Editor();
+            deleteObject.DeleteObject(idOfObjectToDelete);
+            DeleteObject_SendToServer deleteObjectt = new DeleteObject_SendToServer(projectId, idOfObjectToDelete);
+            FlowWebsocket.SendMessage(deleteObjectt);
 
             ReceivedMessage.AddEventHandler(typeof(DeleteObject_Received), true, callbackFunction);
             ;

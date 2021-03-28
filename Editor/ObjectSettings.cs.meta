@@ -3,7 +3,9 @@ guid: 703765a336e95304fbd15e7219f01695
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - m_ViewDataDictionary: {instanceID: 0}
+  - graphql_api: {fileID: 11400000, guid: 4ded6c1ed5a98c14bacd0240acc51f16, type: 2}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

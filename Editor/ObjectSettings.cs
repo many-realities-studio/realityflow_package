@@ -3,6 +3,10 @@ using Packages.realityflow_package.Runtime.scripts;
 using RealityFlow.Plugin.Scripts;
 using UnityEditor;
 using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
+using GraphQlClient.Core;
+using Contrib.APIeditor;
 
 namespace RealityFlow.Plugin.Editor
 {
@@ -11,6 +15,7 @@ namespace RealityFlow.Plugin.Editor
     /// </summary>
     public class ObjectSettings : EditorWindow
     {
+        //public GraphApi graphql_api;
         private static ObjectSettings window;
 
         public string ObjectName { get; private set; }

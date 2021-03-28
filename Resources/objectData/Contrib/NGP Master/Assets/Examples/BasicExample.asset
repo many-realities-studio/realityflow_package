@@ -269,7 +269,7 @@ MonoBehaviour:
   references:
     version: 1
     00000000:
-      type: {class: BaseStackNode, ns: GraphProcessor, asm: com.alelievr.NodeGraphProcessor.Runtime}
+      type: {class: BaseStackNode, ns: RealityFlow.Plugin.Contrib, asm: com.alelievr.NodeGraphProcessor.Runtime}
       data:
         position: {x: 914.0975, y: 6.5799994}
         title: Stack
