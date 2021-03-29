@@ -137,17 +137,17 @@ namespace RealityFlow.Plugin.Scripts
             if (IsUpdated == true)
             {
                 Debug.LogError("Update VSGraph flag successfully set!!!!");
-                Debug.LogError("this Nodes before copy: " + JsonUtility.ToJson(this.serializedNodes));
+                // Debug.LogError("this Nodes before copy: " + JsonUtility.ToJson(this.serializedNodes));
                 bool tempCanBeModified = this.CanBeModified;
                 Debug.LogError(JsonUtility.ToJson(newValues));
                 GraphPropertyCopier<FlowVSGraph, FlowVSGraph>.Copy(newValues, this);
-                Debug.LogError("this Nodes after copy: " + JsonUtility.ToJson(this.serializedNodes));
+                // Debug.LogError("this Nodes after copy: " + JsonUtility.ToJson(this.serializedNodes));
                 this.CanBeModified = tempCanBeModified;
 
-                // if (CanBeModified == true)
-                // {
+                if (CanBeModified == true)
+                {
                     Operations.UpdateVSGraph(this, ConfigurationSingleton.SingleInstance.CurrentUser, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) => {/* Debug.Log(e.message);*/ });
-                // }
+                }
 
                 _isUpdated = false;
             }
@@ -158,7 +158,7 @@ namespace RealityFlow.Plugin.Scripts
             // if (idToVSGraphMapping[newValues.Id].CanBeModified == false)
             // {
                 bool tempCanBeModified = this.CanBeModified;
-                CopyFromOtherGraph(newValues);
+                GraphPropertyCopier<FlowVSGraph, FlowVSGraph>.Copy(newValues, this);
                 this.CanBeModified = tempCanBeModified;
             // }
         }
@@ -186,6 +186,37 @@ namespace RealityFlow.Plugin.Scripts
             FlowVSGraph.idToVSGraphMapping = new SerializableDictionary<string, FlowVSGraph>();
         }
 
+        public void CheckIn()
+        {
+            if (CanBeModified == true)
+            {
+                Operations.CheckinVSGraph(Id, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) =>
+                {
+                    // On successful checkin
+                    if (e.message.WasSuccessful == true)
+                    {
+                        _canBeModified = false;
+                    }
+                });
+            }
+        }
+
+        public void CheckOut()
+        {
+            if (CanBeModified == false)
+            {
+                Operations.CheckoutVSGraph(Id, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) =>
+                    {
+                        // On successful checkout
+                        if (e.message.WasSuccessful == true)
+                        {
+                            _canBeModified = true;
+                        }
+                    });
+            }
+        }
+
+        // Deprecated function
         public void CopyFromOtherGraph(FlowVSGraph input){
             Debug.LogError("Input in copy function: " + JsonUtility.ToJson(input));
             Name = input.name;

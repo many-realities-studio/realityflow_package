@@ -190,6 +190,15 @@ public class FlowNetworkManagerEditor : EditorWindow
                 }
             }
 
+            // Check in all graphs
+            foreach (FlowVSGraph graph in FlowVSGraph.idToVSGraphMapping.Values)
+            {
+                if (graph.CanBeModified == true)
+                {
+                    Operations.CheckinVSGraph(graph.Id, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) => { });
+                }
+            }
+
             Operations.Logout(ConfigurationSingleton.SingleInstance.CurrentUser);
         }
     }

@@ -297,6 +297,22 @@ namespace Packages.realityflow_package.Runtime.scripts
             ReceivedMessage.AddEventHandler(typeof(CheckinObject_Received), true, callbackFunction);
         }
 
+        public static void CheckoutVSGraph(string vsGraphID, string projectID, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
+        {
+            CheckoutVSGraph_SendToServer checkoutVSGraph = new CheckoutVSGraph_SendToServer(vsGraphID, projectID);
+            FlowWebsocket.SendMessage(checkoutVSGraph);
+
+            ReceivedMessage.AddEventHandler(typeof(CheckoutVSGraph_Received), true, callbackFunction);
+        }
+
+        public static void CheckinVSGraph(string vsGraphID, string projectID, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
+        {
+            CheckinVSGraph_SendToServer checkinVSGraph = new CheckinVSGraph_SendToServer(vsGraphID, projectID);
+            FlowWebsocket.SendMessage(checkinVSGraph);
+
+            ReceivedMessage.AddEventHandler(typeof(CheckinVSGraph_Received), true, callbackFunction);
+        }
+
         #endregion Checkout system messages
 
         /// <summary>

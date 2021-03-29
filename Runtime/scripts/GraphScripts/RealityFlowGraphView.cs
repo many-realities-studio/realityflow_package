@@ -204,18 +204,21 @@ public class RealityFlowGraphView : MonoBehaviour {
 			case "TextNode":
 				TextNode tn = BaseNode.CreateFromType<TextNode> (new Vector2 ());
 				graph.AddNode (tn);
+				tn.position = new Rect(new Vector2(newNodePosition.x,newNodePosition.y),new Vector2(100,100));
 				tn.output = "Hello World";
 				StartCoroutine (AddNodeCoroutine(tn));
 				break;
 			case "FloatNode":
 				FloatNode fn = BaseNode.CreateFromType<FloatNode> (new Vector2 ());
 				graph.AddNode (fn);
+				fn.position = new Rect(new Vector2(newNodePosition.x,newNodePosition.y),new Vector2(100,100));
 				fn.output = 0.5f;
 				StartCoroutine (AddNodeCoroutine(fn));
 				break;
 			case "IntNode":
 				IntNode intn = BaseNode.CreateFromType<IntNode> (new Vector2 ());
 				graph.AddNode (intn);
+				intn.position = new Rect(new Vector2(newNodePosition.x,newNodePosition.y),new Vector2(100,100));
 				intn.output = 1;
 				StartCoroutine (AddNodeCoroutine(intn));
 				break;
@@ -235,11 +238,13 @@ public class RealityFlowGraphView : MonoBehaviour {
 			case "ConditionalNode":
 				IfNode cn = BaseNode.CreateFromType<IfNode> (new Vector2 ());
 				graph.AddNode(cn);
+				cn.position = new Rect(new Vector2(newNodePosition.x,newNodePosition.y),new Vector2(100,100));
 				StartCoroutine (AddNodeCoroutine(cn));
 				break;
 			case "GameObjectManipulationNode":
 				GameObjectManipulationNode gn = BaseNode.CreateFromType<GameObjectManipulationNode>(new Vector2());
 				graph.AddNode(gn);
+				gn.position = new Rect(new Vector2(newNodePosition.x,newNodePosition.y),new Vector2(100,100));
 				StartCoroutine(AddNodeCoroutine(gn));
 				break;
 			// case "ParameterNode":
@@ -258,6 +263,7 @@ public class RealityFlowGraphView : MonoBehaviour {
 		pn.parameterGUID = epnGUID;
 
 		graph.AddNode(pn);
+		pn.position = new Rect(new Vector2(newNodePosition.x,newNodePosition.y),new Vector2(100,100));
 		StartCoroutine(AddNodeCoroutine(pn));
 	}
 
@@ -268,6 +274,7 @@ public class RealityFlowGraphView : MonoBehaviour {
 		bn.inA = 0f;
 		bn.inB = 0f;
 		graph.AddNode(bn);
+		bn.position = new Rect(new Vector2(newNodePosition.x,newNodePosition.y),new Vector2(100,100));
 		StartCoroutine (AddNodeCoroutine(bn));
 	}
 
