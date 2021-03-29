@@ -2,6 +2,7 @@ using Newtonsoft.Json;
 using System.Collections.Generic;
 using Packages.realityflow_package.Runtime.scripts;
 using RealityFlow.Plugin.Contrib;
+using System.Linq;
 //using Packages.realityflow_package.Runtime.scripts.Managers;
 using System;
 using UnityEngine;
@@ -63,7 +64,7 @@ namespace RealityFlow.Plugin.Scripts
                     // Can happen when a client receives a create object request when another user created an object
                     else
                     {
-                        UnityEngine.Object prefabReference = Resources.Load(Prefab);
+                        UnityEngine.Object prefabReference = Resources.Load("prefabs/FlowVSGraph");
                         if (prefabReference == null)
                         {
                             Debug.Log("cannot load prefab");
@@ -116,7 +117,7 @@ namespace RealityFlow.Plugin.Scripts
                           Vector3 Scale) {
             Name = name;
             Id = id;
-            serializedNodes = SerializedNodes;
+            this.serializedNodes = SerializedNodes;
             edges = Edges;
             groups = Groups;
             stackNodes = StackNodes;
@@ -144,8 +145,49 @@ namespace RealityFlow.Plugin.Scripts
                 // AttachedGameObject.transform.GetChild(2).GetComponent<RealityFlowGraphView>().InitializeGraph(this);
             }
 
-            Debug.Log("VSGraph after json constructor: " + JsonUtility.ToJson(this));
-            Debug.Log("BaseGraph after json constructor: " + JsonUtility.ToJson((BaseGraph)this));
+            Debug.Log("serializedNodes as list in jsonconstructor:");
+            foreach (var serializedNode in serializedNodes.ToList())
+            {
+                Debug.Log(serializedNode);
+            }
+
+            Deserialize();
+
+            // Disable nodes correctly before removing them:
+			// if (nodes != null)
+			// {
+			// 	foreach (var node in nodes)
+			// 		node.DisableInternal();
+			// }
+
+			// nodes.Clear();
+
+			// foreach (var serializedNode in serializedNodes.ToList())
+			// {
+			// 	var node = GraphProcessor.JsonSerializer.DeserializeNode(serializedNode) as BaseNode;
+			// 	if (node == null)
+			// 	{
+			// 		serializedNodes.Remove(serializedNode);
+			// 		continue ;
+			// 	}
+			// 	AddNode(node);
+			// 	nodesPerGUID[node.GUID] = node;
+			// }
+
+            // Debug.Log("this.serializedNodes as list in jsonconstructor:");
+            // foreach (var serializedNode in this.serializedNodes.ToList())
+            // {
+            //     Debug.Log(serializedNode);
+            // }
+
+
+            // Debug.Log("Edges as list in jsonconstructor:");
+            // foreach (var edge in edges.ToList())
+            // {
+            //     Debug.Log(edge);
+            // }
+            // Debug.Log("VSGraph after json constructor: " + JsonUtility.ToJson(this));
+            // Debug.Log("BaseGraph after json constructor: " + JsonUtility.ToJson((BaseGraph)this));
         }
 
         public void UpdateFlowVSGraphGlobally(FlowVSGraph newValues)

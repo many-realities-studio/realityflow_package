@@ -4,6 +4,7 @@ using Packages.realityflow_package.Runtime.scripts.Structures.Actions;
 using RealityFlow.Plugin.Editor;
 using RealityFlow.Plugin.Scripts;
 using System;
+using System.Linq;
 //using System.Web.Security;
 using System.Collections;
 using System.Collections.Generic;
@@ -542,11 +543,23 @@ public class FlowNetworkManagerEditor : EditorWindow
             window = EWindowView.DELETE_PROJECT_CONFIRMATION;
         }
 
-        // Graph Message testing button to open testing window
-        if (GUILayout.Button("GRAPH MESSAGE TESTING", GUILayout.Height(40)))
+        // Button to print graphs for debug
+        if (GUILayout.Button("Print all graphs in the idToVSGraphMapping dictionary", GUILayout.Height(40)))
         {
-            // Opens a new window/unity utility tab to create an object
-            GraphMessageTesting.OpenWindow();
+            foreach (FlowVSGraph graph in FlowVSGraph.idToVSGraphMapping.Values)
+            {
+                Debug.Log(JsonUtility.ToJson(graph));
+                Debug.Log("serializedNodes as list:");
+                foreach (var serializedNode in graph.serializedNodes.ToList())
+                {
+                    Debug.Log(serializedNode);
+                }
+                Debug.Log("Edges as list:");
+                foreach (var edge in graph.edges.ToList())
+			    {
+                    Debug.Log(edge);
+                }
+            }
         }
     }
 
