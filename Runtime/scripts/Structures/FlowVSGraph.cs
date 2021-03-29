@@ -1,4 +1,5 @@
 using Newtonsoft.Json;
+using System.Collections.Generic;
 using Packages.realityflow_package.Runtime.scripts;
 using RealityFlow.Plugin.Contrib;
 //using Packages.realityflow_package.Runtime.scripts.Managers;
@@ -109,9 +110,21 @@ namespace RealityFlow.Plugin.Scripts
 
         [JsonConstructor]
         // public FlowVSGraph(string id, string name) : base(){
-        public FlowVSGraph(string id, string name) {
+        public FlowVSGraph(string id, string name, List<JsonElement> SerializedNodes, List<SerializableEdge> Edges, 
+                          List<Group> Groups, List<BaseStackNode> StackNodes, List<PinnedElement> PinnedElements, 
+                          List<ExposedParameter> ExposedParameters, List<StickyNote> StickyNotes, Vector3 Position,
+                          Vector3 Scale) {
             Name = name;
             Id = id;
+            serializedNodes = SerializedNodes;
+            edges = Edges;
+            groups = Groups;
+            stackNodes = StackNodes;
+            pinnedElements = PinnedElements;
+            exposedParameters = ExposedParameters;
+            stickyNotes = StickyNotes;
+            position = Position;
+            scale = Scale;
             // WhiteboardManager.AddNewGraphToDict(this);
 
             if (idToVSGraphMapping.ContainsKey(id))
@@ -130,6 +143,9 @@ namespace RealityFlow.Plugin.Scripts
                 this.name = (this.Name + " - " + this.Id);
                 // AttachedGameObject.transform.GetChild(2).GetComponent<RealityFlowGraphView>().InitializeGraph(this);
             }
+
+            Debug.Log("VSGraph after json constructor: " + JsonUtility.ToJson(this));
+            Debug.Log("BaseGraph after json constructor: " + JsonUtility.ToJson((BaseGraph)this));
         }
 
         public void UpdateFlowVSGraphGlobally(FlowVSGraph newValues)
