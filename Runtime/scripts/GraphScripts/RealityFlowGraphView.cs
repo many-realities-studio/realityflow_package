@@ -40,6 +40,7 @@ public class RealityFlowGraphView : MonoBehaviour {
 	public GameObject edgeView;
 
 	public List<NodeView> nodeViewList = new List<NodeView> ();
+	public Dictionary<string,NodeView> nodeViewDict = new Dictionary<string,NodeView>();
 	public List<NodeView> selectedNV = new List<NodeView>();
 	public List<BaseNode> selected = new List<BaseNode>();
 	public List<EdgeView> edgeViews = new List<EdgeView>();
@@ -91,7 +92,11 @@ public class RealityFlowGraphView : MonoBehaviour {
 
 	protected void LoadGraph(BaseGraph graph){
 		foreach (BaseNode node in graph.nodes ){
-			StartCoroutine (AddNodeCoroutine(node));        }
+			StartCoroutine (AddNodeCoroutine(node));
+		}
+		foreach (SerializableEdge edge in graph.edges){
+			StartCoroutine( AddEdgeCoroutine(edge));
+		}
 	}
 
     void GraphChangesCallback(GraphChanges changes)
@@ -169,8 +174,13 @@ public class RealityFlowGraphView : MonoBehaviour {
 		// selected.Clear();
 		// TODO: Change deletion process so we use the NodeView.guid to delete specific dictionary indicies instead of using a list (Requires we change our NodeView List into a dictionary).
 		foreach( NodeView n in selectedNV){
+			// TODO: Deletion for Dictionary
 			nodeViewList.Remove(n);
 			n.Delete();
+		}
+		foreach(KeyValuePair<string,NodeView> nv in nodeViewDict){
+			nodeViewDict.Remove(nv.Key);
+			nv.Value.Delete();
 		}
 		selectedNV.Clear();
 		// nodeViewList.RemoveAll(nv => nv==null);
@@ -402,8 +412,8 @@ public class RealityFlowGraphView : MonoBehaviour {
 	public void ConnectEdges(NodePortView input, NodePortView output){ // Replacing arguments w/ NodePortViews
 		// graph.Connect(input, output, true);
 		// SerializableEdge newEdge = graph.Connect(input.port, output.port, true);
-
-		StartCoroutine(AddEdgeCoroutine(input,output));
+		SerializableEdge edge = graph.Connect(input.port, output.port, true);
+		StartCoroutine(AddEdgeCoroutine(edge));
 		/* Backend:
 		 - Create an Edge
 		 - Store this edge into the list
@@ -439,24 +449,33 @@ public class RealityFlowGraphView : MonoBehaviour {
 
 	public float padding = 0.1f;
 	// This couroutine is in charge of asynchronously making the EdgeView Prefab
-	public IEnumerator AddEdgeCoroutine (NodePortView input, NodePortView output){
-		SerializableEdge serializedEdge = graph.Connect(input.port, output.port, true);
+	// public IEnumerator AddEdgeCoroutine (NodePortView input, NodePortView output){
+	public IEnumerator AddEdgeCoroutine (SerializableEdge edge){
+		
 		EdgeView newEdge = Instantiate( edgeView, new Vector3(), Quaternion.identity).GetComponent<EdgeView>();
 		newEdge.rfgv = this;
-		newEdge.input = input;
-		newEdge.output = output;
-		// input.edges.Add(newEdge);
-		// output.edges.Add(newEdge);
+		yield return new WaitUntil(() => nodeViewDict.Count == graph.nodes.Count);
+		NodeView inputView = nodeViewDict[edge.inputNodeGUID];
+		NodeView outputView = nodeViewDict[edge.outputNodeGUID];
+
+		foreach (NodePortView npv in inputView.inputPortViews){
+			if (npv.port == edge.inputPort){ newEdge.input = npv; break; }
+		}
+		foreach (NodePortView npv in outputView.outputPortViews){
+			if (npv.port == edge.outputPort){ newEdge.output = npv; break; }
+		}
 		newEdge.gameObject.transform.SetParent (contentPanel.transform, false);
 		// Set the positions of the linerenderer
-		newEdge.edge = serializedEdge;
+		newEdge.edge = edge;
 		LineRenderer lr = newEdge.GetComponent<LineRenderer>();
 		// calculate the extra points for a better looking circuit board line
-		Vector3 [] edgePoints = new [] {output.GetComponent<RectTransform>().transform.position,input.GetComponent<RectTransform>().transform.position};
+		Vector3 [] edgePoints = new [] {
+			newEdge.output.GetComponent<RectTransform>().transform.position,
+			newEdge.input.GetComponent<RectTransform>().transform.position
+			};
 		lr.SetPositions(edgePoints);
-		// edgeViews.Add(newEdge);
-		input.edges.Add(newEdge);
-		output.edges.Add(newEdge);
+		newEdge.input.edges.Add(newEdge);
+		newEdge.output.edges.Add(newEdge);
 		yield return new WaitForSeconds (.01f);
 	}
 
@@ -496,6 +515,7 @@ public class RealityFlowGraphView : MonoBehaviour {
             // newView.GetComponent<ContentSizeFitter>().enabled = true;
 			newView.outputPortViews.Add(npv);
         }
+		nodeViewDict.Add (node.GUID,newView);
         nodeViewList.Add (newView);
         // LayoutRebuilder.MarkLayoutForRebuild ((RectTransform) newView.transform);
 		// RectTransform rect = newView.gameObject.transform.GetChild(0).GetComponent<RectTransform> ();

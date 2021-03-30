@@ -23,6 +23,16 @@ public class EdgeView : MonoBehaviour
         Destroy(this?.gameObject);
     }
 
+    public void RedrawEdge(){
+        LineRenderer lr = this.gameObject.GetComponent<LineRenderer>();
+		// calculate the extra points for a better looking circuit board line
+		Vector3 [] edgePoints = new [] {
+			output.GetComponent<RectTransform>().transform.position,
+			input.GetComponent<RectTransform>().transform.position
+			};
+		lr.SetPositions(edgePoints);
+    }
+
 
     // recursive deletion strategy for edges: takes 
 

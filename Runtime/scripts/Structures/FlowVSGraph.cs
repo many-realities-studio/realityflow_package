@@ -119,6 +119,11 @@ namespace RealityFlow.Plugin.Scripts
             Id = id;
             this.serializedNodes = SerializedNodes;
             edges = Edges;
+
+            foreach(SerializableEdge edge in edges){
+                edge.owner = (BaseGraph)this;
+            }
+
             groups = Groups;
             stackNodes = StackNodes;
             pinnedElements = PinnedElements;

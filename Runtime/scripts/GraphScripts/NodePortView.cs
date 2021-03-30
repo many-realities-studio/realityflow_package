@@ -17,6 +17,10 @@ public class NodePortView : MonoBehaviour
 
     // public NodeView parentNodeView; // Allows the NodePortView to have a ref to the NodeView, which can help us later draw edges between nodes
 
+    public void SignalRedraw(){
+        foreach(EdgeView e in edges){ e.RedrawEdge(); }
+    }
+
     void RebuildUI(){
         fieldName.text = port.fieldName;
         string inputGUID, outputGUID;
@@ -32,6 +36,8 @@ public class NodePortView : MonoBehaviour
                 currentNodeGUID.text = outputGUID.Substring(outputGUID.Length - 5);
             }
         }
+
+        SignalRedraw();
     }
 
     public void SelectEdge(){

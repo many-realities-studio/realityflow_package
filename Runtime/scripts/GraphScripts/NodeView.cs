@@ -13,9 +13,10 @@ public class NodeView : MonoBehaviour
     public BaseNode node;
     public RealityFlowGraphView rfgv;
 
+
     public List<NodePortView> inputPortViews = new List<NodePortView>();
     public List<NodePortView> outputPortViews = new List<NodePortView>();
-
+    
     // TODO: Make sure this is the best way to do this. I think this is really hacky -John
     // public BaseGraph graph;
 
@@ -31,6 +32,15 @@ public class NodeView : MonoBehaviour
         this.node = node;
         this.GUID.text = GUID;
     }*/
+
+    public void RedrawEdges(){
+        foreach(NodePortView npv in inputPortViews){
+            if (npv.edges.Count != 0 ) { npv.SignalRedraw(); }
+        }
+        foreach(NodePortView npv in outputPortViews){
+            if (npv.edges.Count != 0 ) { npv.SignalRedraw(); }
+        }
+    }
     void Awake()
     {
         instance = this;
