@@ -11,6 +11,7 @@ public class ParameterView : MonoBehaviour
 {
     UnityEvent m_ParamDrag;
     public GameObject sphere;
+    public GameObject modificationInput;
     public RealityFlowGraphView rfgv;
     public ExposedParameter pn;
     public GameObject s;
@@ -66,34 +67,51 @@ public class ParameterView : MonoBehaviour
 
     public void ModifyParameterValue()
     {
-        
-        switch(pn.type)
-		{
-			default:
-			case "UnityEngine.GameObject":
-                if(s == null)
-                {
-                    s = Instantiate(sphere, rfgv.gameObject.transform.position, Quaternion.identity);
-                }
-                // s.gameObject.transform.GetChild(0).transform.gameObject.GetComponent<ParameterManipulation>().pv = this;
-                s.gameObject.GetComponent<ParameterManipulation>().pv = this;
-                Debug.Log("GameObject EP modified, please select a game object to fill value:");
-                break;
-			case "System.String":
-                // bring up input field to edit string
-                break;
-			case "System.Single":
-                // bring up input field to edit float
-                break;
-			case "System.Int32":
-                // bring up input field to edit int
-                break;
-			case "System.Boolean":
-                // bring up check mark to edit bool
-                break;
-			case "UnityEngine.Color":
-                // bring up color wheel to edit color
-                break;
-		}
+        modificationInput = rfgv.gameObject.transform.parent.transform.GetChild(8).gameObject;
+        modificationInput.GetComponent<ParameterModificationConfirm>().pv = this;
+        Debug.Log("pn.type is "+pn.type);
+        if(pn.type == typeof(GameObject).ToString())
+        {
+            if(s == null)
+            {
+                s = Instantiate(sphere, rfgv.gameObject.transform.position, Quaternion.identity);
+            }
+            // s.gameObject.transform.GetChild(0).transform.gameObject.GetComponent<ParameterManipulation>().pv = this;
+            s.gameObject.GetComponent<ParameterManipulation>().pv = this;
+            Debug.Log("GameObject EP modified, please select a game object to fill value:");
+        }
+        else if(pn.type == typeof(string).ToString())
+        {
+            Debug.Log(typeof(string).ToString());
+            // bring up input field to edit string
+            modificationInput.SetActive(true);
+            Debug.Log("String EP Modified");
+        }
+        else if(pn.type == typeof(int).ToString())
+        {
+            // bring up input field to edit string
+            modificationInput.SetActive(true);
+            Debug.Log("Int EP Modified");
+        }
+        else if(pn.type == typeof(float).ToString())
+        {
+            // bring up input field to edit string
+            modificationInput.SetActive(true);
+            Debug.Log("Float EP Modified");
+        }
+        else if(pn.type == typeof(bool).ToString())
+        {
+            Debug.Log("Boolean EP Modified");
+        }
+        else if(pn.type == typeof(Color).ToString())
+        {
+            Debug.Log("Color EP Modified");
+        }
+        else
+        {
+            Debug.LogError("invalid type, pn.type is "+pn.type);
+        }
+        //System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
+        // TODO: Keep checking these types and probably fix them all based on their debug outputs.
     }
 }

@@ -9,6 +9,7 @@ using UnityEngine.UIElements;
 using System.Linq;
 using RealityFlow.Plugin.Contrib;
 using RealityFlow.Plugin.Scripts;
+using NodeGraphProcessor.Examples;
 
 // public struct Edge {
 // 	NodePort input;
@@ -218,6 +219,12 @@ public class RealityFlowGraphView : MonoBehaviour {
 				tn.output = "Hello World";
 				StartCoroutine (AddNodeCoroutine(tn));
 				break;
+			case "PrintNode":
+				PrintNode pn = BaseNode.CreateFromType<PrintNode> (new Vector2 ());
+				graph.AddNode (pn);
+				pn.position = new Rect(new Vector2(newNodePosition.x,newNodePosition.y),new Vector2(100,100));
+				StartCoroutine (AddNodeCoroutine(pn));
+				break;
 			case "FloatNode":
 				FloatNode fn = BaseNode.CreateFromType<FloatNode> (new Vector2 ());
 				graph.AddNode (fn);
@@ -250,6 +257,12 @@ public class RealityFlowGraphView : MonoBehaviour {
 				graph.AddNode(cn);
 				cn.position = new Rect(new Vector2(newNodePosition.x,newNodePosition.y),new Vector2(100,100));
 				StartCoroutine (AddNodeCoroutine(cn));
+				break;
+			case "StartNode":
+				StartNode sn = BaseNode.CreateFromType<StartNode>(new Vector2());
+				graph.AddNode(sn);
+				sn.position = new Rect(new Vector2(newNodePosition.x,newNodePosition.y),new Vector2(100,100));
+				StartCoroutine(AddNodeCoroutine(sn));
 				break;
 			case "GameObjectManipulationNode":
 				GameObjectManipulationNode gn = BaseNode.CreateFromType<GameObjectManipulationNode>(new Vector2());
