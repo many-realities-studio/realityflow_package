@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using UnityEngine;
+using UnityEditor;
 using TMPro;
 
 
@@ -18,6 +19,8 @@ public class NewRealityFlowMenu : MonoBehaviour
     private string _Url = "ws://localhost:8999";
     private const string Url = "ws://a73c9fa8.ngrok.io";
 
+    // Keyboard
+    public TouchScreenKeyboard keyboard;
     // View parameters
     private string uName;
     private string pWord;
@@ -30,7 +33,6 @@ public class NewRealityFlowMenu : MonoBehaviour
     private bool _RefreshProjectList = true;
     private bool displayProjectCode = false;
     private string openProjectId;
-
 
     //private Dictionary<EWindowView, ChangeView> _ViewDictionary = new Dictionary<EWindowView, ChangeView>();
 
@@ -68,7 +70,7 @@ public class NewRealityFlowMenu : MonoBehaviour
     public GameObject guestUserProjectPanel;
 
     [Header("TextFields")]
-    public TextMeshPro textBox = null;
+    public TMP_InputField mrtkTextBox = null;
 
     private enum MenuOptions
     {
@@ -92,6 +94,29 @@ public class NewRealityFlowMenu : MonoBehaviour
         GUESTUSER_HUB = 17,
         GUESTPROJECT_HUB = 18,
         GUEST_CONFIRM_LOGIN = 19
+    }
+
+public void pressKey()
+{
+    Debug.Log("Pressed J");
+}
+    public void OpenSystemKeyboard()
+    {
+        Debug.Log("Open Keyboard");
+        keyboard =  TouchScreenKeyboard.Open("", TouchScreenKeyboardType.Default);
+    }
+    public void Update() 
+    {
+        if (keyboard != null)
+        {
+            openProjectId = keyboard.text;
+            // Do stuff with keyboardText
+        }
+
+        if (FlowWebsocket.websocket != null)
+        {
+            Unity.EditorCoroutines.Editor.EditorCoroutineUtility.StartCoroutine(Operations._FlowWebsocket.ReceiveMessage(), Operations._FlowWebsocket);
+        }
     }
 
     public void SetupGuest()
@@ -154,7 +179,7 @@ public class NewRealityFlowMenu : MonoBehaviour
 
     public void GuestUserJoinProject()
     {
-        openProjectId = textBox.text;
+        openProjectId = mrtkTextBox.text.ToString();
         if(openProjectId != null) // let this be Join button if we have an openProjectId
         {
             Operations.OpenProject(openProjectId, ConfigurationSingleton.SingleInstance.CurrentUser, (_, e) =>
