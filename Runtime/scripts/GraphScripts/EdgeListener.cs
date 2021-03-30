@@ -48,7 +48,9 @@ public class EdgeListener : MonoBehaviour
             Debug.Log("Both ports are filled");
             // TODO: Update this, this only takes in the type of the node and not necessarily a type that can be cast to this node
             // if (this.input.owner.name == this.output.owner.name)
-            if (this.inputView.port.portData.displayType == this.outputView.port.portData.displayType) // using NodePortViews instead
+            if ((this.inputView.port.portData.displayType == this.outputView.port.portData.displayType) || (this.inputView.port.portData.displayType == typeof(object) || this.outputView.port.portData.displayType == typeof(object))) // using NodePortViews instead
+            //Debug.Log("Input field type: "+this.inputView.port.inputField.FieldType+" Output field type: "+this.outputField.FieldType);
+            //if(this.inputField.FieldType == this.outputField.FieldType)
                 // graphView.ConnectEdges(input, output);
                 graphView.ConnectEdges(inputView, outputView);
             else

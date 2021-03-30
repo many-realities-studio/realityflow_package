@@ -14,16 +14,16 @@ namespace RealityFlow.Plugin.Scripts
     public class FlowVSEdge : SerializableEdge
     {
 
-        public void SetInputNodeGUID(string guid){
-            base?.inputNodeGUID = guid;
-        }
+        // public void SetInputNodeGUID(string guid){
+        //     base?.inputNodeGUID = guid;
+        // }
 
-        public void SetInputNodeGUID(string guid){
-            base?.outputNodeGUID = guid;
-        }
+        // // public void SetInputNodeGUID(string guid){
+        // //     base?.outputNodeGUID = guid;
+        // // }
 
-        public void SetOwner(BaseGraph graph){
-            base?.owner = graph;
-        }
+        // public void SetOwner(BaseGraph graph){
+        //     base?.owner = graph;
+        // }
     }
 }
