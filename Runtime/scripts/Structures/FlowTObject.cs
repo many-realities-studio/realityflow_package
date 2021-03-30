@@ -5,6 +5,8 @@ using RealityFlow.Plugin.Contrib;
 //using Packages.realityflow_package.Runtime.scripts.Managers;
 using System;
 using UnityEngine;
+using Microsoft.MixedReality.Toolkit.UI;
+using Microsoft.MixedReality.Toolkit.Input;
 namespace RealityFlow.Plugin.Scripts
 {
     [System.Serializable]
@@ -290,8 +292,15 @@ namespace RealityFlow.Plugin.Scripts
             idToGameObjectMapping.Add(Id, this);
             AttachedGameObject.transform.hasChanged = false;
             AttachedGameObject.name = name;
+            AttachedGameObject.layer = 9;
 
             AttachedGameObject.AddComponent<FlowObject_Monobehaviour>();
+            ObjectManipulator om = AttachedGameObject.AddComponent<ObjectManipulator>();
+            // om.OnManipulationEnded += SendGORefToParam;
+            AttachedGameObject.AddComponent<NearInteractionGrabbable>();
+            Rigidbody ObjectRigidBody = AttachedGameObject.AddComponent<Rigidbody>();
+            ObjectRigidBody.useGravity = false;
+            ObjectRigidBody.isKinematic = true;
             FlowObject_Monobehaviour monoBehaviour = AttachedGameObject.GetComponent<FlowObject_Monobehaviour>();
 
             monoBehaviour.underlyingFlowObject = this;
@@ -327,10 +336,16 @@ namespace RealityFlow.Plugin.Scripts
                 idToGameObjectMapping.Add(Id, this);
                 AttachedGameObject.name = name;
                 AttachedGameObject.AddComponent<FlowObject_Monobehaviour>();
+                AttachedGameObject.AddComponent<ObjectManipulator>();
+                AttachedGameObject.AddComponent<NearInteractionGrabbable>();
                 AttachedGameObject.transform.hasChanged = false;
+                AttachedGameObject.layer = 9;
 
                 var monoBehaviour = AttachedGameObject.GetComponent<FlowObject_Monobehaviour>();
                 monoBehaviour.underlyingFlowObject = this;
+                var ObjectRigidBody = AttachedGameObject.AddComponent<Rigidbody>();
+                ObjectRigidBody.useGravity = false;
+                ObjectRigidBody.isKinematic = true;
             }
         }
 

@@ -171,6 +171,7 @@ namespace Packages.realityflow_package.Runtime.scripts
         public static void UpdateVSGraph(FlowVSGraph flowVSGraph, FlowUser flowUser, string projectId, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
         {
             //UpdateVSGraph_SendToServer updateVSGraph = new UpdateVSGraph_SendToServer(flowVSGraph, /*flowUser,*/ projectId); // TODO: format string msg
+            Debug.Log(JsonUtility.ToJson(flowVSGraph.edges));
             string message = ("{\"FlowVSGraph\":" + JsonUtility.ToJson(flowVSGraph) + ",\"ProjectId\":\"" + projectId + "\",\"MessageType\":\"UpdateVSGraph\"}");
             FlowWebsocket.SendGraphMessage(message);
 
