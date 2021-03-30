@@ -12,6 +12,8 @@ public class ParameterView : MonoBehaviour
     UnityEvent m_ParamDrag;
     public GameObject sphere;
     public GameObject modificationInput;
+    public GameObject modificationDropdown;
+    public GameObject modificationColor;
     public RealityFlowGraphView rfgv;
     public ExposedParameter pn;
     public GameObject s;
@@ -68,9 +70,10 @@ public class ParameterView : MonoBehaviour
     public void ModifyParameterValue()
     {
         modificationInput = rfgv.gameObject.transform.parent.transform.GetChild(8).gameObject;
-        modificationInput.GetComponent<ParameterModificationConfirm>().pv = this;
+        modificationDropdown = rfgv.gameObject.transform.parent.transform.GetChild(10).gameObject;
+        modificationColor = rfgv.gameObject.transform.parent.transform.GetChild(9).gameObject;
         Debug.Log("pn.type is "+pn.type);
-        if(pn.type == typeof(GameObject).ToString())
+        if(pn.type == "UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null")
         {
             if(s == null)
             {
@@ -80,30 +83,33 @@ public class ParameterView : MonoBehaviour
             s.gameObject.GetComponent<ParameterManipulation>().pv = this;
             Debug.Log("GameObject EP modified, please select a game object to fill value:");
         }
-        else if(pn.type == typeof(string).ToString())
+        else if(pn.type == "System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089")
         {
-            Debug.Log(typeof(string).ToString());
+            modificationInput.GetComponent<ParameterModificationConfirm>().pv = this;
             // bring up input field to edit string
             modificationInput.SetActive(true);
             Debug.Log("String EP Modified");
         }
-        else if(pn.type == typeof(int).ToString())
+        else if(pn.type == "System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089")
         {
+            modificationInput.GetComponent<ParameterModificationConfirm>().pv = this;
             // bring up input field to edit string
             modificationInput.SetActive(true);
             Debug.Log("Int EP Modified");
         }
-        else if(pn.type == typeof(float).ToString())
+        else if(pn.type == "System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089")
         {
+            modificationInput.GetComponent<ParameterModificationConfirm>().pv = this;
             // bring up input field to edit string
             modificationInput.SetActive(true);
             Debug.Log("Float EP Modified");
         }
-        else if(pn.type == typeof(bool).ToString())
+        else if(pn.type == "System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089")
         {
+            modificationDropdown.GetComponent<ParameterModificationConfirm>().pv = this;
             Debug.Log("Boolean EP Modified");
         }
-        else if(pn.type == typeof(Color).ToString())
+        else if(pn.type == "UnityEngine.Color, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null")
         {
             Debug.Log("Color EP Modified");
         }
@@ -111,7 +117,5 @@ public class ParameterView : MonoBehaviour
         {
             Debug.LogError("invalid type, pn.type is "+pn.type);
         }
-        //System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
-        // TODO: Keep checking these types and probably fix them all based on their debug outputs.
     }
 }

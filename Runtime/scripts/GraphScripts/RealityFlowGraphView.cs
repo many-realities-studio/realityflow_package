@@ -286,6 +286,7 @@ public class RealityFlowGraphView : MonoBehaviour {
 		ParameterNode pn = BaseNode.CreateFromType<ParameterNode> (new Vector2 ());
 		// pn.parameter = epn;
 		pn.parameterGUID = epnGUID;
+		//pn.LoadExposedParameter();
 
 		graph.AddNode(pn);
 		pn.position = new Rect(new Vector2(newNodePosition.x,newNodePosition.y),new Vector2(100,100));

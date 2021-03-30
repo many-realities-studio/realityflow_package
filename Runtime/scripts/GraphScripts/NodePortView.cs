@@ -41,7 +41,7 @@ public class NodePortView : MonoBehaviour
     }
 
     public void SelectEdge(){
-        Debug.Log("Selected port of type" + this.port.owner.name);
+        Debug.Log("Selected port of type " + this.port.portData.displayType);
         switch (type)
         {
             case "input":
