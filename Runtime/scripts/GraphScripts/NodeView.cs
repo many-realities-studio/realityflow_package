@@ -94,12 +94,32 @@ public class NodeView : MonoBehaviour
 
     public void UpdateNodeValues()
     {
+
+        Vector3 [] cornerPos = new Vector3[4];
+        GameObject.Find("VRWhiteBoard").GetComponent<RectTransform>().GetWorldCorners(cornerPos);
+        Debug.Log("Corners for Graph");
+        foreach(Vector3 corner in cornerPos){
+            Debug.Log(corner);
+        }
+        Vector3 worldNode = this.transform.position;
+        Vector2 newPos;
+        newPos = (worldNode - cornerPos[1]);
+        Vector2 canvasDimensions = (cornerPos[2] - cornerPos[0]);
+        Vector2 distFromUpperLeftCorner = newPos / canvasDimensions;
+        Debug.Log("newPos:"+newPos);
+        Debug.Log("canvasDimensions:"+canvasDimensions);
+        Debug.Log("upper left:"+distFromUpperLeftCorner);
+
         Debug.Log("Before update, node position is: "+node.position);
-        node.position = new Rect(new Vector2(this.transform.position.x, this.transform.position.y), new Vector2(100,100)); //this.transform.position;
+        // node.position = new Rect(new Vector2(this.transform.position.x, this.transform.position.y), new Vector2(100,100)); //this.transform.position;
+        node.position = new Rect(distFromUpperLeftCorner, new Vector2(100,100)); //this.transform.position;
+        
         Debug.Log("After update, node position is: "+node.position);
         Debug.Log(JsonUtility.ToJson(rfgv.graph));
         Debug.Log(JsonUtility.ToJson(node));
-    }
+
+        rfgv.vsGraph.IsUpdated = true;
+    }   
     /*
     public void Delete() {
         deletionList.Add(node);

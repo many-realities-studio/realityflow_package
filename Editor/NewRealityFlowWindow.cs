@@ -149,6 +149,17 @@ public class FlowNetworkManagerEditor : EditorWindow
             Operations.Logout(ConfigurationSingleton.SingleInstance.CurrentUser);
         }
 
+        // GameObject[] wbList;
+        // wbList = GameObject.FindGameObjectsWithTag("Canvas");
+
+        // foreach (GameObject wb in wbList)
+        // {
+        //     // wb.transform.GetChild(2).gameObject.GetComponent<RealityFlowGraphView>().ClearGraph;
+        //     GameObject runeTimeGraphObject = GameObject.FindGameObjectWithTag("Canvas").transform.GetChild(2).gameObject;
+        //     RealityFlowGraphView rfgv = runeTimeGraphObject.GetComponent<RealityFlowGraphView>();
+        //     rfgv.ClearGraph();
+        // }
+
         FlowTObject.RemoveAllObjectsFromScene();
         FlowVSGraph.RemoveAllGraphsFromScene();
         ConfigurationSingleton.SingleInstance.CurrentProject = null;

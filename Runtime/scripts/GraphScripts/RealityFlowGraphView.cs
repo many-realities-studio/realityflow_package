@@ -50,6 +50,7 @@ public class RealityFlowGraphView : MonoBehaviour {
 	public List<ExposedParameter> paramList = new List<ExposedParameter>();
 
 	Vector2 newNodePosition = new Vector2();
+	Vector2 nullChecker = new Vector2(-1,-1);
 	public Vector2 canvasDimensions = new Vector2(2560, 1080); // FOR NOW, dont have these hardcoded in final demo
 
 	// protected virtual EdgeListener CreateEdgeConnectorListener()
@@ -92,6 +93,7 @@ public class RealityFlowGraphView : MonoBehaviour {
 	}
 
 	protected void LoadGraph(BaseGraph graph){
+		newNodePosition = new Vector2(-1,-1);
 		foreach (BaseNode node in graph.nodes ){
 			StartCoroutine (AddNodeCoroutine(node));
 		}
@@ -534,7 +536,12 @@ public class RealityFlowGraphView : MonoBehaviour {
 		// RectTransform rect = newView.gameObject.transform.GetChild(0).GetComponent<RectTransform> ();
 		RectTransform rect = newView.gameObject.GetComponent<RectTransform> ();
         rect.SetAsLastSibling ();
-		rect.anchoredPosition = canvasDimensions*newNodePosition;
+		if (newNodePosition == nullChecker){ // if the newNodePosition is not set, then we can load the position from server
+			rect.anchoredPosition = new Vector2(canvasDimensions.x*node.position.x, canvasDimensions.y*node.position.y);
+			// rect.anchoredPosition = new Vector2(node.position.x, node.position.y);
+		} else {
+			rect.anchoredPosition = canvasDimensions*newNodePosition;
+		}
 		// rect.anchoredPosition = new Vector2(canvasDimensions*newNodePosition);
         // contentPanel.GetComponent<VerticalLayoutGroup>().enabled = false;
         yield return new WaitForSeconds (.01f);
