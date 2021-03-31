@@ -8,8 +8,8 @@ using System.Linq;
 [System.Serializable, NodeMenuItem("Custom/GameObjectManipulation")]
 public class GameObjectManipulationNode : BaseNode
 {
-    [Input(name = "Condition")]
-    public ConditionalLink condition;
+    [Input(name = "Boolean")]
+    public bool condition;
 
 	[Input(name = "Color"), ShowAsDrawer]
 	public Color color;
@@ -20,7 +20,14 @@ public class GameObjectManipulationNode : BaseNode
 	public override string name => "Game Object Manipulation";
 
 	protected override void Process() {
-            gameObject.GetComponent<Renderer>().material.color = color;
+		if(condition == true)
+		{
+			gameObject.GetComponent<Renderer>().material.color = color;
             Debug.Log("Color set!");
+		}
+		else
+		{
+			Debug.Log("Condition false");
+		}
     }
 }
