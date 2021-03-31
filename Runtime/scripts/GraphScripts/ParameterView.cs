@@ -111,6 +111,7 @@ public class ParameterView : MonoBehaviour
         }
         else if(pn.type == "UnityEngine.Color, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null")
         {
+            modificationColor.SetActive(true);
             Debug.Log("Color EP Modified");
         }
         else

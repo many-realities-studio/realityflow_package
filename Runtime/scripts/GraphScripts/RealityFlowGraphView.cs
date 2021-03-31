@@ -460,6 +460,7 @@ public class RealityFlowGraphView : MonoBehaviour {
         return graph.nodes;
     }
 	public void DoProcessing () {
+		processor = new ProcessGraphProcessor (graph);
 		processor.Run ();
 	}
 
