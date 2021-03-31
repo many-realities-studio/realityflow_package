@@ -2,10 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class ParameterModificationConfirm : MonoBehaviour
 {
-    public InputField input;
+    public TMP_InputField input;
     public Dropdown dropdown;
     public ParameterView pv;
     
@@ -82,5 +83,6 @@ public class ParameterModificationConfirm : MonoBehaviour
         {
             pv.SetParameterValue(Color.white);
         }
+        this.gameObject.SetActive(false);
     }
 }
