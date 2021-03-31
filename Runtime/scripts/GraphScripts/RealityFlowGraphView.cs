@@ -45,6 +45,7 @@ public class RealityFlowGraphView : MonoBehaviour {
 	public List<NodeView> selectedNV = new List<NodeView>();
 	public List<BaseNode> selected = new List<BaseNode>();
 	public List<EdgeView> edgeViews = new List<EdgeView>();
+	public List<ParameterView> paramViews = new List<ParameterView>();
 
 	public Dictionary<string,ExposedParameter> paramDict = new Dictionary<string, ExposedParameter>();
 	public List<ExposedParameter> paramList = new List<ExposedParameter>();
@@ -391,6 +392,7 @@ public class RealityFlowGraphView : MonoBehaviour {
         newParamView.guid.text = epn.guid.Substring (epn.guid.Length - 5);
 		newParamView.rfgv = this;
 		newParamView.pn = epn;
+		paramViews.Add(newParamView);
 		// newParamView.NodeInstance = pn;
 		// add paramView to content panel
 	}
@@ -440,12 +442,14 @@ public class RealityFlowGraphView : MonoBehaviour {
 	}
 	
 	public void ClearGraph () {
-
-		while (graph.nodes.Count > 0) {
-			graph.RemoveNode (graph.nodes[0]);
+		foreach(ParameterView p in paramViews)
+		{
+			p.DeleteParam();
+			paramViews.Remove(p);
 		}
-		while (graph.exposedParameters.Count > 0) {
-			graph.RemoveExposedParameter (graph.exposedParameters[0]);
+		foreach(NodeView n in nodeViewList)
+		{
+			n.Delete();
 		}
 			//graph.SetDirty();
         // EditorWindow.GetWindow<CustomToolbarGraphWindow> ().InitializeGraph (graph as BaseGraph)

@@ -75,7 +75,8 @@ public class NodeView : MonoBehaviour
         rfgv.graph.RemoveNode(node);
         // _____?.Invoke(node);
         //graph.SetDirty();
-        Destroy(this.gameObject);
+        if(this.gameObject != null)
+            Destroy(this.gameObject);
     }
 
     public void Select(){

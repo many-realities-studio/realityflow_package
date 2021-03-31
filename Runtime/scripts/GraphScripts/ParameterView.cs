@@ -46,7 +46,7 @@ public class ParameterView : MonoBehaviour
         rfgv.AddParameterNodeToGraph(pn.guid);
     }
 
-    public void deleteParam()
+    public void DeleteParam()
     {
         Debug.Log("Deleting parameter");
         rfgv.RemoveParameter(pn);
