@@ -50,7 +50,8 @@ public class ParameterView : MonoBehaviour
     {
         Debug.Log("Deleting parameter");
         rfgv.RemoveParameter(pn);
-        Destroy(this.gameObject);
+        if(this.gameObject != null)
+            Destroy(this.gameObject);
     }
 
 
