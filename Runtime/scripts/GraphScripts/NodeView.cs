@@ -64,6 +64,10 @@ public class NodeView : MonoBehaviour
     // }
 
 
+    public void DeleteSelf(){
+        rfgv.nodeViewDict.Remove(node.GUID);
+        this.Delete();
+    }
 
     public void Delete(){
         foreach(NodePortView inputPort in inputPortViews){
@@ -73,6 +77,7 @@ public class NodeView : MonoBehaviour
             outputPort.Delete();
         }
         rfgv.graph.RemoveNode(node);
+        // rfgv.nodeViewDict.Remove(node.GUID);
         // _____?.Invoke(node);
         //graph.SetDirty();
         if(this.gameObject != null)

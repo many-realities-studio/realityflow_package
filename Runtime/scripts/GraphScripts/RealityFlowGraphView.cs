@@ -42,9 +42,10 @@ public class RealityFlowGraphView : MonoBehaviour {
 
 	public List<NodeView> nodeViewList = new List<NodeView> ();
 	public Dictionary<string,NodeView> nodeViewDict = new Dictionary<string,NodeView>();
-	public List<NodeView> selectedNV = new List<NodeView>();
+	//public List<NodeView> selectedNV = new List<NodeView>();
+	public Dictionary<string,NodeView> selectedNVDict = new Dictionary<string,NodeView>();
 	public List<BaseNode> selected = new List<BaseNode>();
-	public List<EdgeView> edgeViews = new List<EdgeView>();
+	// public List<EdgeView> edgeViews = new List<EdgeView>();
 	public List<ParameterView> paramViews = new List<ParameterView>();
 
 	public Dictionary<string,ExposedParameter> paramDict = new Dictionary<string, ExposedParameter>();
@@ -171,22 +172,21 @@ public class RealityFlowGraphView : MonoBehaviour {
 		commandPalette.AddCommandToStack(new DeleteNodeCommand("Delete Selection of Nodes", tmp));
 
 		// 3. Perform the command's action
-		Debug.Log(selectedNV.Count);
 		// foreach( BaseNode n in selected){
 		// 	graph.RemoveNode(n);
 		// }
 		// selected.Clear();
 		// TODO: Change deletion process so we use the NodeView.guid to delete specific dictionary indicies instead of using a list (Requires we change our NodeView List into a dictionary).
-		foreach( NodeView n in selectedNV){
-			// TODO: Deletion for Dictionary
-			nodeViewList.Remove(n);
-			n.Delete();
-		}
-		foreach(KeyValuePair<string,NodeView> nv in nodeViewDict){
+		// foreach( NodeView n in selectedNV){
+		// 	// TODO: Deletion for Dictionary
+		// 	nodeViewList.Remove(n);
+		// 	n.Delete();
+		// }
+		foreach(KeyValuePair<string,NodeView> nv in selectedNVDict){
 			nodeViewDict.Remove(nv.Key);
 			nv.Value.Delete();
 		}
-		selectedNV.Clear();
+		selectedNVDict.Clear();
 		// nodeViewList.RemoveAll(nv => nv==null);
 		
 		// BaseGraph postCmd = graph;
@@ -315,7 +315,9 @@ public class RealityFlowGraphView : MonoBehaviour {
 	}
 
 	public void AddToSelectionNV(NodeView n){
-		selectedNV.Add(n);
+		// selectedNV.Add(n);
+		selectedNVDict.Add (n.node.GUID,n);
+
 	}
 
 	public void AddParameter(){
@@ -445,12 +447,18 @@ public class RealityFlowGraphView : MonoBehaviour {
 		foreach(ParameterView p in paramViews)
 		{
 			p.DeleteParam();
-			paramViews.Remove(p);
+			// paramViews.Remove(p);
 		}
-		foreach(NodeView n in nodeViewList)
-		{
-			n.Delete();
+		paramViews.Clear();
+		// foreach(NodeView n in nodeViewList)
+		// {
+		// 	n.Delete();
+		// }
+		foreach(KeyValuePair<string,NodeView> nv in nodeViewDict){
+			// nodeViewDict.Remove(nv.Key);
+			nv.Value.Delete();
 		}
+		nodeViewDict.Clear();
 			//graph.SetDirty();
         // EditorWindow.GetWindow<CustomToolbarGraphWindow> ().InitializeGraph (graph as BaseGraph)
 
@@ -472,10 +480,17 @@ public class RealityFlowGraphView : MonoBehaviour {
 	// This couroutine is in charge of asynchronously making the EdgeView Prefab
 	// public IEnumerator AddEdgeCoroutine (NodePortView input, NodePortView output){
 	public IEnumerator AddEdgeCoroutine (SerializableEdge edge){
-		
+		Debug.Log("Dictionary CT: " + nodeViewDict.Count);
+		Debug.Log("graph node count CT: " + graph.nodes.Count);
+		if (nodeViewDict.Count != graph.nodes.Count){
+			yield return new WaitUntil(() => nodeViewDict.Count == graph.nodes.Count);
+		}
+		else{
+			yield return new WaitForSeconds (.01f);
+		}
 		EdgeView newEdge = Instantiate( edgeView, new Vector3(), Quaternion.identity).GetComponent<EdgeView>();
+		newEdge.gameObject.transform.SetParent (contentPanel.transform, false);
 		newEdge.rfgv = this;
-		yield return new WaitUntil(() => nodeViewDict.Count == graph.nodes.Count);
 		NodeView inputView = nodeViewDict[edge.inputNodeGUID];
 		NodeView outputView = nodeViewDict[edge.outputNodeGUID];
 
@@ -485,7 +500,8 @@ public class RealityFlowGraphView : MonoBehaviour {
 		foreach (NodePortView npv in outputView.outputPortViews){
 			if (npv.port == edge.outputPort){ newEdge.output = npv; break; }
 		}
-		newEdge.gameObject.transform.SetParent (contentPanel.transform, false);
+		newEdge.input.edges.Add(newEdge);
+		newEdge.output.edges.Add(newEdge);
 		// Set the positions of the linerenderer
 		newEdge.edge = edge;
 		LineRenderer lr = newEdge.GetComponent<LineRenderer>();
@@ -495,8 +511,6 @@ public class RealityFlowGraphView : MonoBehaviour {
 			newEdge.input.GetComponent<RectTransform>().transform.position
 			};
 		lr.SetPositions(edgePoints);
-		newEdge.input.edges.Add(newEdge);
-		newEdge.output.edges.Add(newEdge);
 		yield return new WaitForSeconds (.01f);
 	}
 
@@ -537,7 +551,7 @@ public class RealityFlowGraphView : MonoBehaviour {
 			newView.outputPortViews.Add(npv);
         }
 		nodeViewDict.Add (node.GUID,newView);
-        nodeViewList.Add (newView);
+        // nodeViewList.Add (newView);
         // LayoutRebuilder.MarkLayoutForRebuild ((RectTransform) newView.transform);
 		// RectTransform rect = newView.gameObject.transform.GetChild(0).GetComponent<RectTransform> ();
 		RectTransform rect = newView.gameObject.GetComponent<RectTransform> ();
