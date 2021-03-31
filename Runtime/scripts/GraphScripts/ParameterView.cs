@@ -108,10 +108,12 @@ public class ParameterView : MonoBehaviour
         else if(pn.type == "System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089")
         {
             modificationDropdown.GetComponent<ParameterModificationConfirm>().pv = this;
+            modificationDropdown.SetActive(true);
             Debug.Log("Boolean EP Modified");
         }
         else if(pn.type == "UnityEngine.Color, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null")
         {
+            modificationColor.GetComponent<ParameterModificationConfirm>().pv = this;
             modificationColor.SetActive(true);
             Debug.Log("Color EP Modified");
         }
