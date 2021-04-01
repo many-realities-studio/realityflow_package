@@ -112,10 +112,6 @@ namespace Packages.realityflow_package.Runtime.scripts
         {
             graphqlClient_Editor createObject = new graphqlClient_Editor();
             createObject.CreateObject(flowObject, projectId);
-            //FlowWebsocket.SendMessage_gql(createObject);
-            // CreateObject_SendToServer createObjectt =
-            //     new CreateObject_SendToServer(flowObject, /*flowUser,*/ projectId);
-            // FlowWebsocket.SendMessage(createObjectt);
 
             ReceivedMessage.AddEventHandler(typeof(CreateObject_Received), true, callbackFunction);
         }
@@ -132,11 +128,11 @@ namespace Packages.realityflow_package.Runtime.scripts
         {
             graphqlClient_Editor deleteObject = new graphqlClient_Editor();
             deleteObject.DeleteObject(idOfObjectToDelete);
-            DeleteObject_SendToServer deleteObjectt = new DeleteObject_SendToServer(projectId, idOfObjectToDelete);
-            FlowWebsocket.SendMessage(deleteObjectt);
+
+            DeleteObject_SendToServer _deleteObject = new DeleteObject_SendToServer(projectId, idOfObjectToDelete);
+            FlowWebsocket.SendMessage(_deleteObject);
 
             ReceivedMessage.AddEventHandler(typeof(DeleteObject_Received), true, callbackFunction);
-            ;
         }
 
         #endregion ObjectOperations

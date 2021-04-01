@@ -99,24 +99,6 @@ namespace Packages.realityflow_package.Runtime.scripts
             }
         }
 
-        // Does the same as SendMessage mentioned above but dosn't need to serialize anything. (For GraphQL)
-        public static void SendMessage_gql<T>(T message) where T : BaseMessage
-        {
-            //string message = ("{"FlowVSGraph":" + JsonUtility.ToJson(flowVSGraph) + ","ProjectId":"" + projectId + "","MessageType":"CreateVSGraph"}");
-            string sentMessage = MessageSerializer.SerializeMessage(message);
-
-            try
-            {
-                Debug.Log("Sending message Thru GraphQL: " + sentMessage);
-
-                websocket.Send(sentMessage);
-            }
-            catch (Exception e)
-            {
-                Debug.LogError("Failed to send message: " + sentMessage + " " + e);
-            }
-        }
-
         /// <summary>
         /// This is the callback function for when a message is received over a websocket connection
         /// </summary>
