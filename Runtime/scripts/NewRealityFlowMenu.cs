@@ -96,10 +96,6 @@ public class NewRealityFlowMenu : MonoBehaviour
         GUEST_CONFIRM_LOGIN = 19
     }
 
-public void pressKey()
-{
-    Debug.Log("Pressed J");
-}
     public void OpenSystemKeyboard()
     {
         Debug.Log("Open Keyboard");

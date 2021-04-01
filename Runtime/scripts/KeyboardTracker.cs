@@ -17,8 +17,6 @@ namespace Packages.realityflow_package.Runtime.scripts
         public string ShiftValue;
 
         private Text m_Text;
-        public TMP_Text  textbox;
-        public TMP_InputField inputField;
         private string text;
 
         private Button m_Button;
@@ -40,19 +38,19 @@ namespace Packages.realityflow_package.Runtime.scripts
             });
         }
 
-        // Update is called once per frame
-        void Update()
-        {
-            
-            
-        }
-
         public void AppendValue(string valueKey)
         {
-            textbox.text += valueKey;
-            inputField.text += valueKey;
-
-            Debug.Log( textbox.text.ToString());
+            if(KeyboardManager.Instance.IsShifted)
+            {
+                KeyboardManager.Instance.InputField.text = KeyboardManager.Instance.InputField.text + ShiftValue;
+                Debug.Log(KeyboardManager.Instance.InputField.text.ToString());
+            }
+            else
+            {
+                KeyboardManager.Instance.InputField.text = KeyboardManager.Instance.InputField.text + Value;
+                Debug.Log(KeyboardManager.Instance.InputField.text.ToString());
+            }
+           
         }
     }
 }
