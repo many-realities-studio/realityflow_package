@@ -10,11 +10,18 @@ using Packages.realityflow_package.Runtime.scripts.Messages.UserMessages;
 using Packages.realityflow_package.Runtime.scripts.Messages.VSGraphMessages;
 using RealityFlow.Plugin.Scripts;
 using GraphProcessor;
+using RealityFlow.Plugin.Contrib; // TODO: Fix reference
 
-//using RealityFlow.Plugin.Scripts.Events;
+// Unity/GraphQL libraries
+using System.Collections;
 using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
+using UnityEditor;
+using UnityEngine.Networking;
+using GraphQlClient.Core; 
+using Contrib.APIeditor;
+using Newtonsoft.Json;
+using System.Globalization;
 
 namespace Packages.realityflow_package.Runtime.scripts
 {
@@ -117,9 +124,8 @@ namespace Packages.realityflow_package.Runtime.scripts
 
         public static void CreateObject(FlowTObject flowObject, /*FlowUser flowUser,*/ string projectId, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
         {
-            CreateObject_SendToServer createObject =
-                new CreateObject_SendToServer(flowObject, /*flowUser,*/ projectId);
-            FlowWebsocket.SendMessage(createObject);
+            graphqlClient_Editor createObject = new graphqlClient_Editor();
+            createObject.CreateObject(flowObject, projectId);
 
             ReceivedMessage.AddEventHandler(typeof(CreateObject_Received), true, callbackFunction);
         }
@@ -134,11 +140,13 @@ namespace Packages.realityflow_package.Runtime.scripts
 
         public static void DeleteObject(string idOfObjectToDelete, string projectId, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
         {
-            DeleteObject_SendToServer deleteObject = new DeleteObject_SendToServer(projectId, idOfObjectToDelete);
-            FlowWebsocket.SendMessage(deleteObject);
+            graphqlClient_Editor deleteObject = new graphqlClient_Editor();
+            deleteObject.DeleteObject(idOfObjectToDelete);
+
+            DeleteObject_SendToServer _deleteObject = new DeleteObject_SendToServer(projectId, idOfObjectToDelete);
+            FlowWebsocket.SendMessage(_deleteObject);
 
             ReceivedMessage.AddEventHandler(typeof(DeleteObject_Received), true, callbackFunction);
-            ;
         }
 
         #endregion ObjectOperations
