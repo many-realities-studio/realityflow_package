@@ -67,19 +67,33 @@ public class AddNodeCommand : Command {
 
 }
 
+public class AddEdgeCommand : Command {
+    public AddEdgeCommand(string desc, string sp) : base (desc, sp){}
+
+}
+
+public class AddExposedParameterCommand : Command {
+    public AddExposedParameterCommand(string desc, string sp) : base(desc,sp){}
+}
+
+public class DeleteExposedParameterCommand : Command {
+    public DeleteExposedParameterCommand(string desc, string sp) : base (desc,sp){}
+}
+
+public class ModifyExposedParameterCommand : Command {
+    public ModifyExposedParameterCommand(string desc, string sp) : base(desc,sp){}
+}
+
 
 public class DeleteNodeCommand : Command {
-    List<BaseNode> nodes;
-    // TODO: Get list of gameobjects as well
     public DeleteNodeCommand(string desc, string sp) : base (desc, sp){}
+}
 
-    /*public override void UndoCommand()
-    {
-        foreach(BaseNode n in nodes)
-        {
-            RealityFlowGraphView.instance.graph.AddNode(n);
-        }
-        //throw new NotImplementedException();
-    }*/
+public class CreateGraphCommand : Command {
+    public CreateGraphCommand(string desc, string sp) : base(desc, sp){}
+}
+
+public class ClearGraphCommand : Command {
+    public ClearGraphCommand(string desc, string sp) : base(desc, sp){}
 }
 
