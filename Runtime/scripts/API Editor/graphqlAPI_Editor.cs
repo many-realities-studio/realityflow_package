@@ -1,14 +1,16 @@
 //using RealityFlow.Plugin.Editor;
 using System.Collections;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEditor;
 using UnityEngine.Networking;
 using GraphQlClient.Core;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System.Globalization;
 using RealityFlow.Plugin.Scripts;
-
+using System.Threading.Tasks;
 //using Packages.realityflow_package.Runtime.scripts.Messages.ObjectMessages;
 //using Packages.realityflow_package.Runtime.scripts;
 namespace Contrib.APIeditor
@@ -48,17 +50,36 @@ namespace Contrib.APIeditor
         }
 
 
-        // public async void CreateBehaviour(string _TypeOfTrigger, string _TriggerObjectId,
-        //                                     string _TargetObjectId, string _projectId, string _NextBehaviour, string _Action)
-        // {
-        //     //Gets the needed query from the Api Reference
-        //     GraphApi.Query createBehaviour = graphql_Var.graphql_api.GetQueryByName("CreateBehaviour", GraphApi.Query.Type.Mutation);
-        //     //Converts the JSON object to an argument string and sets the queries argument
-        //     createBehaviour.SetArgs(new{TypeOfTrigger = _TypeOfTrigger, TriggerObjectId = _TriggerObjectId, TargetObjectId = _TargetObjectId,
-        //                                                 ProjectId = _projectId, NextBehaviour = _NextBehaviour, Action = _Action});
-        //     //Performs Post request to server
-        //     UnityWebRequest request = await graphql_Var.graphql_api.Post(createBehaviour);
-        // }
+        public async Task<string> CreateBehaviour(FlowBehaviour behaviour, string projectId, List<string> behavioursToLinkTo)
+        {
+            string _behaviour;
+            string message;
+            var definition = new { Id = "" };
+
+            if(behavioursToLinkTo.Count == 0){
+                _behaviour = "[]";
+            }else
+            {
+                _behaviour = behavioursToLinkTo[0];
+            }
+            //Gets the needed query from the Api Reference
+            GraphApi.Query createBehaviour = graphql_Var.graphql_api.GetQueryByName("CreateBehaviour", GraphApi.Query.Type.Mutation);
+            //Converts the JSON object to an argument string and sets the queries argument
+            createBehaviour.SetArgs(new{Id = behaviour.Id, TypeOfTrigger = behaviour.TypeOfTrigger, TriggerObjectId = behaviour.TriggerObjectId, TargetObjectId = behaviour.TargetObjectId,
+                                            ProjectId = projectId, NextBehaviour = _behaviour, Action = new{Id = behaviour.flowAction.Id, ActionType = behaviour.flowAction.ActionType}});
+            //Performs Post request to server
+            UnityWebRequest request = await graphql_Var.graphql_api.Post(createBehaviour);
+            return request.downloadHandler.text;
+            string json1 = request.downloadHandler.text;
+        
+            Match match = Regex.Match(json1, @"""Id"":""(\S+)""");
+           // if(match.Success) {
+                message = match.Groups[1].Captures[0].Value;
+                
+           // }
+
+          return message;
+        }
 
 
         // public async void UpdateBehaviour(int behaviourId, string _TypeOfTrigger, string _TriggerObjectId,
@@ -71,7 +92,7 @@ namespace Contrib.APIeditor
         // }
 
 
-        // public async void DeleteBehaviour(int behaviourId)
+        // public async void DeleteBehaviour(List<string> behaviourIds, string projectId)
         // {
         //     GraphApi.Query DeleteBehaviour = graphql_Var.graphql_api.GetQueryByName("DeleteBehaviour", GraphApi.Query.Type.Mutation);
         //     DeleteBehaviour.SetArgs(new{id = behaviourId});

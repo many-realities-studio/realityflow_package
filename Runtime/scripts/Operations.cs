@@ -10,6 +10,7 @@ using Packages.realityflow_package.Runtime.scripts.Messages.UserMessages;
 using Packages.realityflow_package.Runtime.scripts.Messages.VSGraphMessages;
 using RealityFlow.Plugin.Scripts;
 using GraphProcessor;
+using System.Threading.Tasks;
 using RealityFlow.Plugin.Contrib; // TODO: Fix reference
 
 // Unity/GraphQL libraries
@@ -29,7 +30,7 @@ namespace Packages.realityflow_package.Runtime.scripts
     /// The purpose of this class is to provide a wrapper for the UnityPlugin,
     /// allowing for easy use with the networking tools
     /// </summary>
-    public static class Operations
+    public async class Operations
     {
         public static FlowWebsocket _FlowWebsocket { get; private set; }
 
@@ -199,16 +200,32 @@ namespace Packages.realityflow_package.Runtime.scripts
 
         #region BehaviourOperations
 
-        public static void CreateBehaviour(FlowBehaviour behaviour, string projectId, List<string> behavioursToLinkTo, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
+        public async void CreateBehaviour(FlowBehaviour behaviour, string projectId, List<string> behavioursToLinkTo, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
         {
-            CreateBehaviour_SendToServer createBehaviour = new CreateBehaviour_SendToServer(behaviour, projectId, behavioursToLinkTo);
-            FlowWebsocket.SendMessage(createBehaviour);
+            // GraphQL
+            graphqlClient_Editor createBehaviour = new graphqlClient_Editor();
+            // createBehaviour.CreateBehaviour(behaviour, projectId, behavioursToLinkTo);
+            string IdToBeLinked = await createBehaviour.CreateBehaviour(behaviour, projectId, behavioursToLinkTo);
+
+             //behavioursToLinkTo.Add(IdToBeLinked);            
+            //string IdToBeLinked 
+            if(IdToBeLinked != null){
+                Debug.Log(IdToBeLinked);
+            }
+
+            CreateBehaviour_SendToServer _createBehaviour = new CreateBehaviour_SendToServer(behaviour, projectId, behavioursToLinkTo);
+            //FlowWebsocket.SendMessage(_createBehaviour);
 
             ReceivedMessage.AddEventHandler(typeof(CreateBehaviour_Received), true, callbackFunction);
+
+            //__CreateBehaviour(_createBehaviour);
         }
 
         public static void DeleteBehaviour(List<string> behaviourIds, string projectId, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
         {
+            //GraphQL
+            //graphqlClient_Editor deleteBehaviour = new graphqlClient_Editor(BehaviourIds, projectId);
+
             DeleteBehaviour_SendToServer deleteBehaviour = new DeleteBehaviour_SendToServer(behaviourIds, projectId);
             FlowWebsocket.SendMessage(deleteBehaviour);
 
@@ -416,6 +433,23 @@ namespace Packages.realityflow_package.Runtime.scripts
 
             Debug.Log("Number of behaviours in bem = " + BehaviourEventManager.BehaviourList.Count);
         }
+
+        // private static void __CreateBehaviour(FlowBehaviour message)
+        // {      // Parent
+        // //     if (previousBehaviourId != null)
+        // //     {
+        //         Debug.Log("Success creating behaviour " + message.flowBehaviour.TypeOfTrigger);
+
+        //         BehaviourEventManager.CreateNewBehaviour(message.flowBehaviour);
+
+        //         foreach (string behaviourToLinkId in message.behavioursToLinkTo)
+        //         {
+        //             BehaviourEventManager.LinkBehaviours(message.flowBehaviour.Id, behaviourToLinkId);
+        //         }
+        // //     }
+
+        //     Debug.Log("Number of behaviours in bem = " + BehaviourEventManager.BehaviourList.Count);
+        // }
 
         private static void _DeleteBehaviour(object sender, BaseReceivedEventArgs eventArgs)
         {

@@ -17,10 +17,13 @@ MonoBehaviour:
   mutations:
   - name: CreateObject
     type: 1
-    query: "mutation CreateObject{\n    createObject{\n        Id\n        Name\n       
-      X\n        Y\n        Z\n        Q_x\n        Q_y\n        Q_z\n        Q_w\n       
-      S_x\n        S_y\n        S_z\n        R\n        G\n        B\n        A\n       
-      Prefab\n        projectId\n    }\n}"
+    query: "mutation CreateObject{\n    createObject(  Id :\"90ee3448-32b3-4286-9d97-15cf5a6a46a4\",
+      Name :\"James\", X :0, Y :0, Z :0, Q_x :0, Q_y :0, Q_z :0, Q_w :1, S_x :1,
+      S_y :1, S_z :1, R :0, G :0, B :0, A :0, Prefab :\"Pig\", projectId :\"878e6e49-f52f-49be-82ec-0184052b6951\"
+      ){\n        Id\n        Name\n        X\n        Y\n        Z\n        Q_x\n       
+      Q_y\n        Q_z\n        Q_w\n        S_x\n        S_y\n        S_z\n       
+      R\n        G\n        B\n        A\n        Prefab\n        projectId\n   
+      }\n}"
     queryString: createObject
     returnType: db_object
     queryOptions:
@@ -886,10 +889,11 @@ MonoBehaviour:
     isComplete: 1
   - name: DeleteObject
     type: 1
-    query: "mutation DeleteObject{\n    deleteObject{\n        Id\n        Name\n       
-      X\n        Y\n        Z\n        Q_x\n        Q_y\n        Q_z\n        Q_w\n       
-      S_x\n        S_y\n        S_z\n        R\n        G\n        B\n        A\n       
-      Prefab\n        projectId\n    }\n}"
+    query: "mutation DeleteObject{\n    deleteObject(  Id :\"cd2a51c2-1373-4f3a-ac45-1a465a0328ed\"
+      ){\n        Id\n        Name\n        X\n        Y\n        Z\n        Q_x\n       
+      Q_y\n        Q_z\n        Q_w\n        S_x\n        S_y\n        S_z\n       
+      R\n        G\n        B\n        A\n        Prefab\n        projectId\n   
+      }\n}"
     queryString: deleteObject
     returnType: db_object
     queryOptions:
@@ -1751,6 +1755,51 @@ MonoBehaviour:
         type: project
       - name: projectId
         type: String
+      hasChanged: 0
+    isComplete: 1
+  - name: CreateBehaviour
+    type: 1
+    query: "mutation CreateBehaviour{\n    createBehaviour(  Id :\"b8dd848c-c50c-4255-b681-08010510e1f4\",
+      TypeOfTrigger :\"Click\", TriggerObjectId :\"90ee3448-32b3-4286-9d97-15cf5a6a46a4\",
+      TargetObjectId :\"90ee3448-32b3-4286-9d97-15cf5a6a46a4\", ProjectId :\"878e6e49-f52f-49be-82ec-0184052b6951\",
+      NextBehaviour :\"[]\", Action :{ Id :\"b77245cf-b7f4-4d7f-8b18-6179d6edc6c8\",
+      ActionType :\"NoAction\"} ){\n        Id\n    }\n}"
+    queryString: createBehaviour
+    returnType: behaviour
+    queryOptions:
+    - createBehaviour
+    - updateBehaviour
+    - deleteBehaviour
+    - createUser
+    - updateUser
+    - deleteUser
+    - createProject
+    - updateProject
+    - deleteProject
+    - createObject
+    - updateObject
+    - deleteObject
+    fields:
+    - index: 0
+      name: Id
+      type: String
+      parentIndexes: 
+      hasSubField: 0
+      possibleFields:
+      - name: Id
+        type: String
+      - name: TypeOfTrigger
+        type: String
+      - name: TriggerObjectId
+        type: String
+      - name: TargetObjectId
+        type: String
+      - name: ProjectId
+        type: String
+      - name: NextBehaviour
+        type: String
+      - name: Action
+        type: JSON
       hasChanged: 0
     isComplete: 1
   subscriptions: []
