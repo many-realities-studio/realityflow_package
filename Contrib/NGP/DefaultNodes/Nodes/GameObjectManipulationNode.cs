@@ -9,7 +9,7 @@ using System.Linq;
 public class GameObjectManipulationNode : BaseNode
 {
     [Input(name = "Boolean")]
-    public bool condition;
+    public bool condition = true;
 
 	[Input(name = "Color"), ShowAsDrawer]
 	public Color color;
@@ -22,7 +22,12 @@ public class GameObjectManipulationNode : BaseNode
 	protected override void Process() {
 		if(condition == true)
 		{
-			gameObject.GetComponent<Renderer>().material.color = color;
+			if(gameObject.GetComponent<Renderer>()!=null)
+				gameObject.GetComponent<Renderer>().material.color = color;
+			else
+			{
+				gameObject.AddComponent<Renderer>().material.color = color;
+			}
             Debug.Log("Color set!");
 		}
 		else
