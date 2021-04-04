@@ -13,6 +13,9 @@ using System.IO;
 using UnityEditor;
 using UnityEngine;
 
+using Newtonsoft.Json; // TODO: TEMPORARY
+using GraphProcessor;
+
 [CustomEditor(typeof(FlowWebsocket))]
 public class FlowNetworkManagerEditor : EditorWindow
 {
@@ -559,7 +562,21 @@ public class FlowNetworkManagerEditor : EditorWindow
         {
             foreach (FlowVSGraph graph in FlowVSGraph.idToVSGraphMapping.Values)
             {
-                Debug.Log(JsonUtility.ToJson(graph));
+                Debug.Log("Using JsonUtility: " + JsonUtility.ToJson(graph));
+                try
+                {
+                    string NewtonGraph = JsonConvert.SerializeObject(graph, new JsonSerializerSettings()
+                    {
+                        PreserveReferencesHandling = PreserveReferencesHandling.Objects,
+                        ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+                    });
+                    Debug.Log("Using NewtonSoft: " + NewtonGraph);
+                }
+                catch (Exception e)
+                {
+                    Debug.LogWarning(e);
+                }
+
                 Debug.Log("serializedNodes as list:");
                 foreach (var serializedNode in graph.serializedNodes.ToList())
                 {
@@ -569,6 +586,31 @@ public class FlowNetworkManagerEditor : EditorWindow
                 foreach (var edge in graph.edges.ToList())
 			    {
                     Debug.Log(edge);
+                }
+                Debug.Log("ExposedParameters list:");
+                foreach (var exparam in graph.exposedParameters.ToList())
+			    {
+                    Debug.Log(exparam);
+                }
+
+                Debug.Log("ExposedParameters as themselves serialized");
+                foreach (ExposedParameter exparam in graph.exposedParameters)
+                {
+                    Debug.Log("serialized value of exposed parameter: " + exparam.serializedValue.value.ToString());
+                    try
+                    {
+                        // string NewtonExparam = JsonConvert.SerializeObject(exparam, new JsonSerializerSettings()
+                        // {
+                        //     PreserveReferencesHandling = PreserveReferencesHandling.Objects,
+                        //     ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+                        // });
+                        // Debug.Log("Newton serialized exposed parameter: " + NewtonExparam);
+                        Debug.Log("JsonUtility serialized version of exposed parameter: " + JsonUtility.ToJson(exparam));
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.LogWarning(e);
+                    }
                 }
             }
         }

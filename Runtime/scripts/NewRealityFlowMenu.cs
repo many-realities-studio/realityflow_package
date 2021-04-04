@@ -175,7 +175,7 @@ public class NewRealityFlowMenu : MonoBehaviour
 
     public void GuestUserJoinProject()
     {
-        openProjectId = KeyboardFunctionalKeys.Instance.InputField.text.ToString();
+        openProjectId = KeyboardManager.Instance.InputField.text.ToString();
         Debug.Log("Open Project Id: " + openProjectId);
         if(openProjectId != null) // let this be Join button if we have an openProjectId
         {
