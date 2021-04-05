@@ -350,6 +350,7 @@ public class RealityFlowGraphView : MonoBehaviour {
 		newParamView.pn = epn;
 		//paramViews.Add(newParamView);
 		paramDict.Add(epn.guid,newParamView);
+		vsGraph.IsUpdated = true;
 		// paramList.Add(epn);
 		yield return new WaitForSeconds (.01f);
 	}
