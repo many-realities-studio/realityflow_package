@@ -14,7 +14,7 @@ using UnityEditor;
 using UnityEngine;
 
 [CustomEditor(typeof(FlowWebsocket))]
-public async class FlowNetworkManagerEditor : EditorWindow
+public class FlowNetworkManagerEditor : EditorWindow
 {
     //private string _Url = "ws://plato.mrl.ai:8999";
     private string _Url = "ws://localhost:8999";
@@ -1471,7 +1471,7 @@ public async class FlowNetworkManagerEditor : EditorWindow
     /// If adding on to the behaviour chain, then adds the flowBehaviour to the end of the current chain
     /// </summary>
     /// <param name="flowbehaviour"></param>
-    private async void AddBehaviour(FlowBehaviour newFlowBehaviour)
+    private void AddBehaviour(FlowBehaviour newFlowBehaviour)
     {
         // Create the list of behaviours that need to add newFlowBehaviour to their chain
         List<string> behavioursToLinkTo = new List<string>();

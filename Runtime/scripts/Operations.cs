@@ -30,7 +30,7 @@ namespace Packages.realityflow_package.Runtime.scripts
     /// The purpose of this class is to provide a wrapper for the UnityPlugin,
     /// allowing for easy use with the networking tools
     /// </summary>
-    public async class Operations
+    public static class Operations
     {
         public static FlowWebsocket _FlowWebsocket { get; private set; }
 
@@ -200,18 +200,17 @@ namespace Packages.realityflow_package.Runtime.scripts
 
         #region BehaviourOperations
 
-        public async void CreateBehaviour(FlowBehaviour behaviour, string projectId, List<string> behavioursToLinkTo, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
+        public static void CreateBehaviour(FlowBehaviour behaviour, string projectId, List<string> behavioursToLinkTo, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
         {
             // GraphQL
             graphqlClient_Editor createBehaviour = new graphqlClient_Editor();
             // createBehaviour.CreateBehaviour(behaviour, projectId, behavioursToLinkTo);
-            string IdToBeLinked = await createBehaviour.CreateBehaviour(behaviour, projectId, behavioursToLinkTo);
-
-             //behavioursToLinkTo.Add(IdToBeLinked);            
-            //string IdToBeLinked 
-            if(IdToBeLinked != null){
-                Debug.Log(IdToBeLinked);
-            }
+            createBehaviour.CreateBehaviour(behaviour, projectId, behavioursToLinkTo);
+                         
+            // //string IdToBeLinked 
+            // if(IdToBeLinked != null){
+            //     Debug.Log(IdToBeLinked);
+            // }
 
             CreateBehaviour_SendToServer _createBehaviour = new CreateBehaviour_SendToServer(behaviour, projectId, behavioursToLinkTo);
             //FlowWebsocket.SendMessage(_createBehaviour);

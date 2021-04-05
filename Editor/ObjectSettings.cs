@@ -9,7 +9,7 @@ namespace RealityFlow.Plugin.Editor
     /// <summary>
     /// A new editor window to handle changing a unity object's parameters
     /// </summary>
-    public async class ObjectSettings : EditorWindow
+    public class ObjectSettings : EditorWindow
     {
         private static ObjectSettings window;
 

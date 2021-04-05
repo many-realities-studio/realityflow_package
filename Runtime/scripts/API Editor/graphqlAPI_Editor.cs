@@ -50,7 +50,7 @@ namespace Contrib.APIeditor
         }
 
 
-        public async Task<string> CreateBehaviour(FlowBehaviour behaviour, string projectId, List<string> behavioursToLinkTo)
+        public async void CreateBehaviour(FlowBehaviour behaviour, string projectId, List<string> behavioursToLinkTo)
         {
             string _behaviour;
             string message;
@@ -69,16 +69,16 @@ namespace Contrib.APIeditor
                                             ProjectId = projectId, NextBehaviour = _behaviour, Action = new{Id = behaviour.flowAction.Id, ActionType = behaviour.flowAction.ActionType}});
             //Performs Post request to server
             UnityWebRequest request = await graphql_Var.graphql_api.Post(createBehaviour);
-            return request.downloadHandler.text;
-            string json1 = request.downloadHandler.text;
+        //     return request.downloadHandler.text;
+        //     string json1 = request.downloadHandler.text;
         
-            Match match = Regex.Match(json1, @"""Id"":""(\S+)""");
-           // if(match.Success) {
-                message = match.Groups[1].Captures[0].Value;
+        //     Match match = Regex.Match(json1, @"""Id"":""(\S+)""");
+        //    // if(match.Success) {
+        //         message = match.Groups[1].Captures[0].Value;
                 
-           // }
+        //    // }
 
-          return message;
+        //   return message;
         }
 
 
