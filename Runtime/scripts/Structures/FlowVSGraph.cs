@@ -183,7 +183,7 @@ namespace RealityFlow.Plugin.Scripts
 
                         // paramBuilder.serializedValue.serializedType = param.serializedValue.serializedType;
                         paramBuilder.serializedValue.serializedName = param.serializedValue.serializedName;
-                        paramBuilder.serializedValue.value = newAttachedGameObj;
+                        paramBuilder.serializedValue.value = new SerializableObject(newAttachedGameObj,typeof(GameObject),null);
                     }
                     else
                     {
