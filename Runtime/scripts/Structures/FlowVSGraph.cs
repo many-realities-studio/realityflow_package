@@ -17,6 +17,9 @@ namespace RealityFlow.Plugin.Scripts
         [SerializeField]
         public static SerializableDictionary<string, FlowVSGraph> idToVSGraphMapping = new SerializableDictionary<string, FlowVSGraph>();
 
+        [SerializeField]
+        public SerializableDictionary<string, string> paramIdToObjId = new SerializableDictionary<string, string>();
+
         public bool CanBeModified { get => _canBeModified; set => _canBeModified = value; }
 
         [SerializeField]
@@ -106,6 +109,7 @@ namespace RealityFlow.Plugin.Scripts
 
             monoBehaviour.underlyingFlowVSGraph = this;
             this.name = (this.Name + " - " + this.Id);
+
             // AttachedGameObject.transform.GetChild(2).GetComponent<RealityFlowGraphView>().InitializeGraph(this);
             // base.AddNode(BaseNode.CreateFromType<FloatNode> (new Vector2 ()));
         }
@@ -115,7 +119,7 @@ namespace RealityFlow.Plugin.Scripts
         public FlowVSGraph(string id, string name, List<JsonElement> SerializedNodes, List<SerializableEdge> Edges, 
                           List<Group> Groups, List<BaseStackNode> StackNodes, List<PinnedElement> PinnedElements, 
                           string ExposedParameters, List<StickyNote> StickyNotes, Vector3 Position,
-                          Vector3 Scale) {
+                          Vector3 Scale, string ParamIdToObjId) {
             Name = name;
             Id = id;
             this.serializedNodes = SerializedNodes;
@@ -155,6 +159,9 @@ namespace RealityFlow.Plugin.Scripts
                 }
             }
 
+            paramIdToObjId = JsonUtility.FromJson<SerializableDictionary<string, string>>(ParamIdToObjId);
+            Debug.Log("Id to Id dictionary after deserialization: " + paramIdToObjId.ToString());
+
             // Update graph to add new Exposed Parameters and update still existing ones.
             foreach (var param in exposedParamList.ToList())
             {
@@ -167,10 +174,24 @@ namespace RealityFlow.Plugin.Scripts
                     // param.serializedValue = new SerializableObject(setValue,typeof(object),null);
 
                     // Update the value of an exposed parameter by setting the serialized values within its SerializableObject using data received from the server
-                    paramBuilder.serializedValue.serializedType = param.serializedValue.serializedType;
-                    paramBuilder.serializedValue.serializedName = param.serializedValue.serializedName;
-                    paramBuilder.serializedValue.serializedValue = param.serializedValue.serializedValue;
-                    paramBuilder.serializedValue.OnAfterDeserialize();
+                    if (Type.GetType(param.type).ToString().Equals("UnityEngine.GameObject"))
+                    {
+                        // Get the object we want to attach to the parameter from the FlowTObject dictionary
+                        string newObjGuid = paramIdToObjId[param.guid];
+                        FlowTObject updatedFlowTObject = FlowTObject.idToGameObjectMapping[newObjGuid];
+                        GameObject newAttachedGameObj = updatedFlowTObject.AttachedGameObject;
+
+                        // paramBuilder.serializedValue.serializedType = param.serializedValue.serializedType;
+                        paramBuilder.serializedValue.serializedName = param.serializedValue.serializedName;
+                        paramBuilder.serializedValue.value = newAttachedGameObj;
+                    }
+                    else
+                    {
+                        paramBuilder.serializedValue.serializedType = param.serializedValue.serializedType;
+                        paramBuilder.serializedValue.serializedName = param.serializedValue.serializedName;
+                        paramBuilder.serializedValue.serializedValue = param.serializedValue.serializedValue;
+                        paramBuilder.serializedValue.OnAfterDeserialize();
+                    }
 
                     // switch(Type.GetType(param.type).ToString())
 		            // {
@@ -193,19 +214,37 @@ namespace RealityFlow.Plugin.Scripts
                     //string paramtype = Type.GetType(param.type).ToString();
 
                     // TODO: This will need to be fixed to work with objects as a special case.
-                    SerializableObject emptyObj = (SerializableObject)FormatterServices.GetUninitializedObject(typeof(SerializableObject));
-                    emptyObj.serializedType = param.serializedValue.serializedType;
-                    emptyObj.serializedName = param.serializedValue.serializedName;
-                    emptyObj.serializedValue = param.serializedValue.serializedValue;
-                    emptyObj.OnAfterDeserialize();
+                    if (Type.GetType(param.type).ToString().Equals("UnityEngine.GameObject"))
+                    {
+                        // Get the object we want to attach to the parameter from the FlowTObject dictionary
+                        string newObjGuid = paramIdToObjId[param.guid];
+                        FlowTObject updatedFlowTObject = FlowTObject.idToGameObjectMapping[newObjGuid];
+                        GameObject newAttachedGameObj = updatedFlowTObject.AttachedGameObject;
 
-                    exposedParameters.Add(new ExposedParameter{
-                        guid = param.guid,
-                        name = param.name,
-                        type = param.type,
-                        settings = new ExposedParameterSettings(),
-                        serializedValue = emptyObj
-                    });
+                        exposedParameters.Add(new ExposedParameter{
+                            guid = param.guid,
+                            name = param.name,
+                            type = param.type,
+                            settings = new ExposedParameterSettings(),
+                            serializedValue = new SerializableObject(newAttachedGameObj,typeof(GameObject),null)
+                        });
+                    }
+                    else
+                    {
+                        SerializableObject emptyObj = (SerializableObject)FormatterServices.GetUninitializedObject(typeof(SerializableObject));
+                        emptyObj.serializedType = param.serializedValue.serializedType;
+                        emptyObj.serializedName = param.serializedValue.serializedName;
+                        emptyObj.serializedValue = param.serializedValue.serializedValue;
+                        emptyObj.OnAfterDeserialize();
+
+                        exposedParameters.Add(new ExposedParameter{
+                            guid = param.guid,
+                            name = param.name,
+                            type = param.type,
+                            settings = new ExposedParameterSettings(),
+                            serializedValue = emptyObj
+                        });
+                    }
                 }
             }
 
