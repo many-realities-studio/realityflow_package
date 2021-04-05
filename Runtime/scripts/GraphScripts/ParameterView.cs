@@ -49,11 +49,15 @@ public class ParameterView : MonoBehaviour
     public void DeleteParam()
     {
         Debug.Log("Deleting parameter");
-        rfgv.RemoveParameter(pn);
-        if(this.gameObject != null)
-            Destroy(this.gameObject);
+        rfgv.RemoveParameter(this);
+        this.Delete();
     }
 
+    public void Delete(){
+        if(this.gameObject != null)
+            Destroy(this.gameObject);
+
+    }
 
     public void ResetOrientation(){
         Vector3 localPos = transform.localPosition;
@@ -70,6 +74,7 @@ public class ParameterView : MonoBehaviour
 
     public void ModifyParameterValue()
     {
+        rfgv.ModifyExposedParameterValue();
         modificationInput = rfgv.gameObject.transform.parent.transform.GetChild(8).gameObject;
         modificationDropdown = rfgv.gameObject.transform.parent.transform.GetChild(10).gameObject;
         modificationColor = rfgv.gameObject.transform.parent.transform.GetChild(9).gameObject;

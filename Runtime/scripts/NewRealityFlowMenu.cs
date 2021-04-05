@@ -16,7 +16,7 @@ using TMPro;
 public class NewRealityFlowMenu : MonoBehaviour
 {
    //private string _Url = "ws://plato.mrl.ai:8999";
-    private string _Url = "wss://api.realityflow.io";
+    private string _Url = "ws://ebf19740e74a.ngrok.io/";
     private const string Url = "ws://a73c9fa8.ngrok.io";
 
     // Keyboard

@@ -11,7 +11,6 @@ public class VSGraphSelectionDropdown : MonoBehaviour
 
     public List<FlowVSGraph> VSGraphList;
     void Start() {
-        this.gameObject.SetActive(false);
         selectionDropdown.onValueChanged.AddListener(delegate {
             selectionDropdownValueChangedHandler(selectionDropdown);
         });
@@ -35,7 +34,6 @@ public class VSGraphSelectionDropdown : MonoBehaviour
         }
         selectionDropdown.ClearOptions ();
         selectionDropdown.AddOptions(options);
-        this.gameObject.SetActive(true);
     }
 
     public void GetDropDownValue()
