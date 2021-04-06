@@ -4,6 +4,8 @@ using GraphProcessor;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Events;
+using Packages.realityflow_package.Runtime.scripts;
+using RealityFlow.Plugin.Scripts;
 using Microsoft.MixedReality.Toolkit.Input;
 using Microsoft.MixedReality.Toolkit.UI;
 
@@ -49,11 +51,16 @@ public class ParameterView : MonoBehaviour
     public void DeleteParam()
     {
         Debug.Log("Deleting parameter");
-        rfgv.RemoveParameter(pn);
-        if(this.gameObject != null)
-            Destroy(this.gameObject);
+        rfgv.RemoveParameter(this);
+        this.Delete();
     }
 
+    public void Delete(){
+        if(this.gameObject != null)
+            Destroy(this.gameObject);
+        rfgv.vsGraph.IsUpdated = true;
+
+    }
 
     public void ResetOrientation(){
         Vector3 localPos = transform.localPosition;
@@ -66,10 +73,22 @@ public class ParameterView : MonoBehaviour
     public void SetParameterValue(object setValue){
         pn.serializedValue = new SerializableObject(setValue,typeof(object),null);
         s = null;
+
+        if (pn.type == "UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null")
+        {
+            GameObject valueObject = (GameObject)setValue;
+            FlowObject_Monobehaviour monoBehaviour = valueObject.GetComponent<FlowObject_Monobehaviour>();
+            FlowTObject flowTObj = monoBehaviour.underlyingFlowObject;
+
+            rfgv.vsGraph.paramIdToObjId.Add(pn.guid, flowTObj.Id);
+        }
+
+        rfgv.vsGraph.IsUpdated = true;
     }
 
     public void ModifyParameterValue()
     {
+        rfgv.ModifyExposedParameterValue();
         modificationInput = rfgv.gameObject.transform.parent.transform.GetChild(8).gameObject;
         modificationDropdown = rfgv.gameObject.transform.parent.transform.GetChild(10).gameObject;
         modificationColor = rfgv.gameObject.transform.parent.transform.GetChild(9).gameObject;
