@@ -175,7 +175,8 @@ public class NewRealityFlowMenu : MonoBehaviour
 
     public void GuestUserJoinProject()
     {
-        openProjectId = mrtkTextBox.text.ToString();
+        openProjectId = KeyboardManager.Instance.InputField.text.ToString();
+        Debug.Log("THIS: " + openProjectId);
         if(openProjectId != null) // let this be Join button if we have an openProjectId
         {
             Operations.OpenProject(openProjectId, ConfigurationSingleton.SingleInstance.CurrentUser, (_, e) =>
