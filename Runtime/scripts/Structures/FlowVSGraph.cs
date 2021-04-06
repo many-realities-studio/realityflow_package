@@ -281,10 +281,12 @@ namespace RealityFlow.Plugin.Scripts
 
             if (idToVSGraphMapping.ContainsKey(id))
             {
+                Deserialize();
                 idToVSGraphMapping[id].UpdateFlowVSGraphLocally(this);
             }
             else // Create graph object if it doesn't exist
             {
+                Deserialize();
                 idToVSGraphMapping.Add(Id, this);
                 AttachedGameObject.name = name;
                 AttachedGameObject.AddComponent<FlowVSGraph_Monobehaviour>();
@@ -304,7 +306,7 @@ namespace RealityFlow.Plugin.Scripts
                 Debug.Log("Type of node: " + baseNodeType);
             }
 
-            Deserialize();
+            // Deserialize();
 
             // Disable nodes correctly before removing them:
 			// if (nodes != null)
