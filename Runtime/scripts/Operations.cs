@@ -4,6 +4,7 @@ using Packages.realityflow_package.Runtime.scripts.Messages;
 using Packages.realityflow_package.Runtime.scripts.Messages.BehaviourMessages;
 using Packages.realityflow_package.Runtime.scripts.Messages.CheckoutMessages;
 using Packages.realityflow_package.Runtime.scripts.Messages.ObjectMessages;
+using Packages.realityflow_package.Runtime.scripts.Messages.Avatargit pucd Messages;
 using Packages.realityflow_package.Runtime.scripts.Messages.ProjectMessages;
 using Packages.realityflow_package.Runtime.scripts.Messages.RoomMessages;
 using Packages.realityflow_package.Runtime.scripts.Messages.UserMessages;
@@ -151,6 +152,35 @@ namespace Packages.realityflow_package.Runtime.scripts
         }
 
         #endregion ObjectOperations
+
+    #region AvatarOperations
+
+        public static void CreateAvatar(FlowAvatar flowAvatar, /*FlowUser flowUser,*/ string projectId, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
+        {
+            CreateAvatar_SendToServer createObject =
+                new CreateAvatar_SendToServer(flowAvatar, /*flowUser,*/ projectId);
+            FlowWebsocket.SendMessage(createObject);
+
+            ReceivedMessage.AddEventHandler(typeof(CreateAvatar_Received), true, callbackFunction);
+        }
+
+        public static void UpdateAvatar(FlowAvatar flowAvatar, FlowUser flowUser, string projectId, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
+        {
+            UpdateAvatar_SendToServer updateObject = new UpdateAvatar_SendToServer(flowAvatar, /*flowUser,*/ projectId);
+            FlowWebsocket.SendMessage(updateObject);
+
+            ReceivedMessage.AddEventHandler(typeof(UpdateAvatar_Received), true, callbackFunction);
+        }
+
+        public static void DeleteAvatar(string idOfObjectToDelete, string projectId, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
+        {
+            DeleteAvatar_SendToServer deleteObject = new DeleteAvatar_SendToServer(projectId, idOfObjectToDelete);
+            FlowWebsocket.SendMessage(deleteObject);
+
+            ReceivedMessage.AddEventHandler(typeof(DeleteAvatar_Received), true, callbackFunction);
+        }
+
+        #endregion AvatarOperations
 
         #region VSGraphOperations
 
@@ -387,6 +417,31 @@ namespace Packages.realityflow_package.Runtime.scripts
             }
 
             Debug.Log("Delete Object: " + eventArgs.message.WasSuccessful);
+        }
+
+        #endregion Object messages received
+
+        #region Avatar messages received
+
+        private static void _CreateAvatar(object sender, BaseReceivedEventArgs eventArgs)
+        {
+        }
+
+        private static void _DeleteAvatar(object sender, BaseReceivedEventArgs eventArgs)
+        {
+            // Delete object in unity
+            //NewObjectManager.DestroyObject(eventArgs.message.DeletedObject.Id);
+
+            if (eventArgs.message.WasSuccessful == true)
+            {
+                GameObject gameObject = FlowAvatar.idToGameObjectMapping[eventArgs.message.DeletedAvatarId].AttachedGameObject;
+
+                FlowAvatar.idToGameObjectMapping.Remove(eventArgs.message.DeletedAvatarId);
+
+                UnityEngine.Object.DestroyImmediate(gameObject);
+            }
+
+            Debug.Log("Delete Avatar: " + eventArgs.message.WasSuccessful);
         }
 
         #endregion Object messages received
