@@ -4,7 +4,7 @@ using Packages.realityflow_package.Runtime.scripts.Messages;
 using Packages.realityflow_package.Runtime.scripts.Messages.BehaviourMessages;
 using Packages.realityflow_package.Runtime.scripts.Messages.CheckoutMessages;
 using Packages.realityflow_package.Runtime.scripts.Messages.ObjectMessages;
-using Packages.realityflow_package.Runtime.scripts.Messages.AvatarMessages;
+using Packages.realityflow_package.Runtime.scripts.Messages.Avatargit pucd Messages;
 using Packages.realityflow_package.Runtime.scripts.Messages.ProjectMessages;
 using Packages.realityflow_package.Runtime.scripts.Messages.RoomMessages;
 using Packages.realityflow_package.Runtime.scripts.Messages.UserMessages;

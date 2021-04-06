@@ -16,7 +16,7 @@ using TMPro;
 public class NewRealityFlowMenu : MonoBehaviour
 {
    //private string _Url = "ws://plato.mrl.ai:8999";
-    private string _Url = "wss://api.realityflow.io";
+    private string _Url = "ws://ebf19740e74a.ngrok.io/";
     private const string Url = "ws://a73c9fa8.ngrok.io";
 
     // Keyboard
@@ -176,7 +176,7 @@ public class NewRealityFlowMenu : MonoBehaviour
     public void GuestUserJoinProject()
     {
         openProjectId = KeyboardManager.Instance.InputField.text.ToString();
-        Debug.Log("THIS: " + openProjectId);
+        Debug.Log("Open Project Id: " + openProjectId);
         if(openProjectId != null) // let this be Join button if we have an openProjectId
         {
             Operations.OpenProject(openProjectId, ConfigurationSingleton.SingleInstance.CurrentUser, (_, e) =>

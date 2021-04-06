@@ -26,14 +26,16 @@ public class RealityFlowGraphView : MonoBehaviour {
 
 	public EdgeListener connectorListener;
 
-	public static CommandPalette commandPalette;
+	public CommandPalette commandPalette;
 
 	public GameObject Labeled;
 	public GameObject contentPanel;
 
 	public GameObject parameterContent;
+	
 	public GameObject parameterCreationCanvas;
 	public GameObject SelectComparisonCanvas;
+	public GameObject VSGraphDropdownCanvas;
 
 	public GameObject nodePortView;
 	public GameObject nodeView;
@@ -46,10 +48,10 @@ public class RealityFlowGraphView : MonoBehaviour {
 	public Dictionary<string,NodeView> selectedNVDict = new Dictionary<string,NodeView>();
 	public List<BaseNode> selected = new List<BaseNode>();
 	// public List<EdgeView> edgeViews = new List<EdgeView>();
-	public List<ParameterView> paramViews = new List<ParameterView>();
+	//public List<ParameterView> paramViews = new List<ParameterView>();
 
-	public Dictionary<string,ExposedParameter> paramDict = new Dictionary<string, ExposedParameter>();
-	public List<ExposedParameter> paramList = new List<ExposedParameter>();
+	public Dictionary<string,ParameterView> paramDict = new Dictionary<string, ParameterView>();
+	//public List<ExposedParameter> paramList = new List<ExposedParameter>();
 
 	Vector2 newNodePosition = new Vector2();
 	Vector2 nullChecker = new Vector2(-1,-1);
@@ -64,9 +66,15 @@ public class RealityFlowGraphView : MonoBehaviour {
 	private void Start () {
 		SelectComparisonCanvas.SetActive(false);
 		parameterCreationCanvas.SetActive(false);
+		VSGraphDropdownCanvas.SetActive(false);
 		//InitializeGraph();
 	}
 
+	public void InitializeGraphStep1()
+	{
+		VSGraphDropdownCanvas.SetActive(true);
+		VSGraphDropdownCanvas.GetComponent<VSGraphSelectionDropdown>().LoadGraphs();
+	}
 	public void InitializeGraph(FlowVSGraph VSGraph){
 
 		// connectorListener = new EdgeListener(this);
@@ -96,6 +104,9 @@ public class RealityFlowGraphView : MonoBehaviour {
 
 	protected void LoadGraph(BaseGraph graph){
 		newNodePosition = new Vector2(-1,-1);
+		foreach(ExposedParameter p in graph.exposedParameters){
+			StartCoroutine(AddExposedParameterCoroutine(p));
+		}
 		foreach (BaseNode node in graph.nodes ){
 			StartCoroutine (AddNodeCoroutine(node));
 		}
@@ -156,45 +167,37 @@ public class RealityFlowGraphView : MonoBehaviour {
 		// Debug.Log(cmd.PrintCommand());
 		JsonUtility.FromJsonOverwrite(cmd.GetGraphState(), graph);
 		graph.Deserialize();
+		vsGraph.IsUpdated = true;
+		ClearGraph();
+		LoadGraph(graph);
 	}
 
 	public void DeleteSelection(){
 		// serialize the current version of the graph
 		string tmp;
 		tmp = JsonUtility.ToJson(graph);
-		// tmp = JsonSerializer.Serialize(graph);
-		// tmp.jsonDatas = JsonUtility.ToJson(graph);
 
-		// BaseGraph preCmd = graph;
-		// JsonUtility.FromJsonOverwrite(tmp, preCmd);
-
-		// send this to the command palette
 		commandPalette.AddCommandToStack(new DeleteNodeCommand("Delete Selection of Nodes", tmp));
 
-		// 3. Perform the command's action
-		// foreach( BaseNode n in selected){
-		// 	graph.RemoveNode(n);
-		// }
-		// selected.Clear();
-		// TODO: Change deletion process so we use the NodeView.guid to delete specific dictionary indicies instead of using a list (Requires we change our NodeView List into a dictionary).
-		// foreach( NodeView n in selectedNV){
-		// 	// TODO: Deletion for Dictionary
-		// 	nodeViewList.Remove(n);
-		// 	n.Delete();
-		// }
 		foreach(KeyValuePair<string,NodeView> nv in selectedNVDict){
 			nodeViewDict.Remove(nv.Key);
 			nv.Value.Delete();
 		}
 		selectedNVDict.Clear();
-		// nodeViewList.RemoveAll(nv => nv==null);
-		
-		// BaseGraph postCmd = graph;
-		// JsonUtility.FromJsonOverwrite(tmp, postCmd);
-		// iterate over list
-			// remove all nodes from the graph.
-			// remove all their edges
-			// remove any selected exposed params
+
+	}
+
+	// Overload of single node deletion
+	public void DeleteSelection(NodeView nv){
+		// serialize the current version of the graph
+		string tmp;
+		tmp = JsonUtility.ToJson(graph);
+
+		commandPalette.AddCommandToStack(new DeleteNodeCommand("Delete Selection of Nodes", tmp));
+
+		nodeViewDict.Remove(nv.node.GUID);
+		graph.RemoveNode(nv.node);
+
 	}
 
 	public void SetNewNodeLocation(Vector2 pos2D){
@@ -212,7 +215,6 @@ public class RealityFlowGraphView : MonoBehaviour {
 
 		// perform the actual command action
         //TextNode tn = BaseNode.CreateFromType<TextNode> (new Vector2 ());
-		BaseNode node;
 		switch(nodeTag)
 		{
 			case "TextNode":
@@ -244,16 +246,6 @@ public class RealityFlowGraphView : MonoBehaviour {
 				break;
 			case "BoolNode":
 				SelectComparisonCanvas.SetActive(true);
-				//while(SelectComparisonCanvas.GetComponent<SelectComparison>().ready == false)
-				//{ CAUSES INFINITE LOOP, REWORK
-					// wait until choice made
-				//}
-				// BoolNode bn = BaseNode.CreateFromType<BoolNode> (new Vector2 ());
-				// bn.compareFunction = comparisonFunction;
-				// bn.inA = 0f;
-				// bn.inB = 0f;
-				// graph.AddNode(bn);
-				// StartCoroutine (AddNodeCoroutine(bn));
 				break;
 			case "ConditionalNode":
 				IfNode cn = BaseNode.CreateFromType<IfNode> (new Vector2 ());
@@ -273,10 +265,6 @@ public class RealityFlowGraphView : MonoBehaviour {
 				gn.position = new Rect(new Vector2(newNodePosition.x,newNodePosition.y),new Vector2(100,100));
 				StartCoroutine(AddNodeCoroutine(gn));
 				break;
-			// case "ParameterNode":
-			// 	ParameterNode pn = BaseNode.CreateFromType<ParameterNode> (new Vector2 ());
-			// 	graph.AddNode(pn);
-			// 	StartCoroutine(AddNodeCoroutine(pn));
 			default:
 				Debug.Log("This case of addnode did not use a tag");
 				break; 
@@ -284,6 +272,11 @@ public class RealityFlowGraphView : MonoBehaviour {
 	}
 
 	public void AddParameterNodeToGraph(string epnGUID){
+		string tmp = JsonUtility.ToJson(graph);
+
+		// send this to the command palette
+		commandPalette.AddCommandToStack(new AddNodeCommand("Add Parameter to Graph", tmp));
+
 		ParameterNode pn = BaseNode.CreateFromType<ParameterNode> (new Vector2 ());
 		// pn.parameter = epn;
 		pn.parameterGUID = epnGUID;
@@ -322,49 +315,14 @@ public class RealityFlowGraphView : MonoBehaviour {
 
 	public void AddParameter(){
 		parameterCreationCanvas.SetActive(true);
-		// //while(parameterCreationCanvas.GetComponent<ParameterCreation>().ready == false)
-		// //{ CAUSES INFINITE LOOP, REWORK
-		// 	// wait until choice made
-		// //}
-		// string tmp = JsonUtility.ToJson(graph);
-		// // get name of parameter from user input via mtrk keyboard (probably)
-		// string name = "autofill";
-		// Type type;
-		// switch(parameterType)
-		// {
-		// 	default:
-		// 	case "GameObject": type = typeof(GameObject); break;
-		// 	case "String": type = typeof(string); break;
-		// 	case "Float": type = typeof(float); break;
-		// 	case "Int": type = typeof(int); break;
-		// 	case "Bool": type = typeof(bool); break;
-		// }
-		// //Debug.Log(type.AssemblyQualifiedName);
-		// // make sure it's not a duplicate name
-		// // add parameter to a list that is drag and droppable
-		// ParameterNode pn = BaseNode.CreateFromType<ParameterNode> (new Vector2 ());
-		// graph.AddExposedParameter (name, type, Labeled);
-		// ExposedParameter epn = graph.GetExposedParameter (name);
-		// pn.parameterGUID = epn.guid;
-		// //paramDict.Add(epn.guid,epn);
-		// paramList.Add(epn);
-		// // instantiate paramView
-		// ParameterView newParamView = Instantiate(paramView,new Vector3(),Quaternion.identity).GetComponent<ParameterView> ();
-		// newParamView.gameObject.transform.SetParent (parameterContent.transform, false);
-		// newParamView.title.text = epn.name;
-		// newParamView.type.text = epn.type;
-        // newParamView.guid.text = epn.guid.Substring (epn.guid.Length - 5);
-		// newParamView.rfgv = this;
-		// newParamView.pn = epn;
-		// // add paramView to content panel
 	}
 	public void AddParameterStep2(string parameterType, string parameterName)
 	{
-		//while(parameterCreationCanvas.GetComponent<ParameterCreation>().ready == false)
-		//{ CAUSES INFINITE LOOP, REWORK
-			// wait until choice made
-		//}
 		string tmp = JsonUtility.ToJson(graph);
+
+		// send this to the command palette
+		commandPalette.AddCommandToStack(new AddExposedParameterCommand("Add Exposed Parameter", tmp));
+
 		// get name of parameter from user input via mtrk keyboard (probably)
 		Type type;
 		switch(parameterType)
@@ -377,16 +335,12 @@ public class RealityFlowGraphView : MonoBehaviour {
 			case "Bool": type = typeof(bool); break;
 			case "Color":type = typeof(Color); break;
 		}
-		//Debug.Log(type.AssemblyQualifiedName);
-		// make sure it's not a duplicate name
-		// add parameter to a list that is drag and droppable
-		// ParameterNode pn = BaseNode.CreateFromType<ParameterNode> (new Vector2 ());
 		graph.AddExposedParameter (parameterName, type, Labeled);
 		ExposedParameter epn = graph.GetExposedParameter (parameterName);
-		// pn.parameterGUID = epn.guid;
-		//paramDict.Add(epn.guid,epn);
-		paramList.Add(epn);
-		// instantiate paramView
+		StartCoroutine(AddExposedParameterCoroutine(epn));
+	}
+
+	public IEnumerator AddExposedParameterCoroutine (ExposedParameter epn){
 		ParameterView newParamView = Instantiate(paramView,new Vector3(),Quaternion.identity).GetComponent<ParameterView> ();
 		newParamView.gameObject.transform.SetParent (parameterContent.transform, false);
 		newParamView.title.text = epn.name;
@@ -394,19 +348,36 @@ public class RealityFlowGraphView : MonoBehaviour {
         newParamView.guid.text = epn.guid.Substring (epn.guid.Length - 5);
 		newParamView.rfgv = this;
 		newParamView.pn = epn;
-		paramViews.Add(newParamView);
-		// newParamView.NodeInstance = pn;
-		// add paramView to content panel
+		//paramViews.Add(newParamView);
+		paramDict.Add(epn.guid,newParamView);
+		vsGraph.IsUpdated = true;
+		// paramList.Add(epn);
+		yield return new WaitForSeconds (.01f);
 	}
 
-	public void RemoveParameter(ExposedParameter pn)
+	public void ModifyExposedParameterValue()
 	{
-		graph.RemoveExposedParameter(pn);
-		paramList.Remove(pn);
+		string tmp = JsonUtility.ToJson(graph);
+        commandPalette.AddCommandToStack(new ModifyExposedParameterCommand("Modify Exposed Parameter", tmp));
+	}
+
+	public void RemoveParameter(ParameterView pv)
+	{
+		string tmp = JsonUtility.ToJson(graph);
+        commandPalette.AddCommandToStack(new DeleteExposedParameterCommand("Delete Exposed Parameter", tmp));
+		// paramList.Remove(pv.pn);
+		//paramViews.Remove(pv);
+		paramDict.Remove(pv.pn.guid);
+		graph.RemoveExposedParameter(pv.pn);
 	}
 
 	public void CreateGraph () {
 		// graph.SetDirty();
+		string tmp = JsonUtility.ToJson(graph);
+
+		// send this to the command palette
+		commandPalette.AddCommandToStack(new CreateGraphCommand("Create Graph", tmp));
+
 		graph.AddExposedParameter ("LabelContainer", typeof (GameObject), Labeled);
 		TextNode tn = BaseNode.CreateFromType<TextNode> (new Vector2 ());
 		graph.AddNode (tn);
@@ -432,6 +403,8 @@ public class RealityFlowGraphView : MonoBehaviour {
 	public void ConnectEdges(NodePortView input, NodePortView output){ // Replacing arguments w/ NodePortViews
 		// graph.Connect(input, output, true);
 		// SerializableEdge newEdge = graph.Connect(input.port, output.port, true);
+		string tmp = JsonUtility.ToJson(graph);
+        commandPalette.AddCommandToStack(new AddEdgeCommand("Created Edge", tmp));
 		SerializableEdge edge = graph.Connect(input.port, output.port, true);
 		StartCoroutine(AddEdgeCoroutine(edge));
 		/* Backend:
@@ -444,18 +417,24 @@ public class RealityFlowGraphView : MonoBehaviour {
 	}
 	
 	public void ClearGraph () {
-		foreach(ParameterView p in paramViews)
-		{
-			p.DeleteParam();
+		string tmp = JsonUtility.ToJson(graph);
+        commandPalette.AddCommandToStack(new DeleteExposedParameterCommand("Clearing Graph", tmp));
+		//foreach(ParameterView p in paramViews)
+		//{
+		//	p.DeleteParam();
 			// paramViews.Remove(p);
-		}
-		paramViews.Clear();
+		//}
+		//paramViews.Clear();
 		// foreach(NodeView n in nodeViewList)
 		// {
 		// 	n.Delete();
 		// }
+		foreach(KeyValuePair<string,ParameterView> pv in paramDict){
+			pv.Value.Delete();
+		}
+		paramDict.Clear();
+
 		foreach(KeyValuePair<string,NodeView> nv in nodeViewDict){
-			// nodeViewDict.Remove(nv.Key);
 			nv.Value.Delete();
 		}
 		nodeViewDict.Clear();
@@ -510,6 +489,8 @@ public class RealityFlowGraphView : MonoBehaviour {
 			newEdge.output.GetComponent<RectTransform>().transform.position,
 			newEdge.input.GetComponent<RectTransform>().transform.position
 			};
+		Debug.Log("Should have created a line now");
+		Debug.Log(lr);
 		lr.SetPositions(edgePoints);
 		yield return new WaitForSeconds (.01f);
 	}
