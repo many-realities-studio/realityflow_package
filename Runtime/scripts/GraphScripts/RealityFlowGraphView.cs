@@ -559,7 +559,6 @@ public class RealityFlowGraphView : MonoBehaviour {
         newView.gameObject.transform.SetParent (contentPanel.transform, false);
 		// Set the rectTransform position here after we've set the parent
         newView.title.text = node.name;
-		// coroutine comment to test nodeview prefab
         newView.node = node;
         newView.GUID.text = node.GUID.Substring (node.GUID.Length - 5);
 		newView.rfgv = this;
