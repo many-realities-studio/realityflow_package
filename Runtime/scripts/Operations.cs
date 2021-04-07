@@ -40,6 +40,7 @@ namespace Packages.realityflow_package.Runtime.scripts
             ReceivedMessage.AddEventHandler(typeof(CreateProject_Received), false, _CreateProject);
             ReceivedMessage.AddEventHandler(typeof(OpenProject_Received), false, _OpenProject);
             ReceivedMessage.AddEventHandler(typeof(LeaveProject_Received), false, _LeaveProject);
+            ReceivedMessage.AddEventHandler(typeof(DeleteProject_Received), false, _DeleteProject);
 
             // Set up Room updates
             ReceivedMessage.AddEventHandler(typeof(UserLeftRoom_Received), false, _UserLeftRoom);
@@ -509,6 +510,22 @@ namespace Packages.realityflow_package.Runtime.scripts
             else
             {
                 Debug.LogWarning("Unable to leave project.");
+            }
+        }
+
+        private static void _DeleteProject(object sender, BaseReceivedEventArgs eventArgs)
+        {
+            if (eventArgs.message.WasSuccessful == true)
+            {
+                Debug.Log("Successfully deleted project");
+
+                // Clear the behaviour list and BEM
+                BehaviourEventManager.Clear();
+                BehaviourEventManager.Initialize();
+            }
+            else
+            {
+                Debug.LogWarning("Unable to delete project.");
             }
         }
 

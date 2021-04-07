@@ -8,7 +8,18 @@ namespace Packages.realityflow_package.Runtime.scripts
     [Serializable]
     public class FlowObject_Monobehaviour : MonoBehaviour
     {
+        public Color latestColor;
         public FlowTObject underlyingFlowObject;
+
+        /*private void Start()
+        {
+            if(gameObject.GetComponent<Renderer>()!=null)
+				latestColor = gameObject.GetComponent<Renderer>().material.color;
+			else
+			{
+				latestColor = gameObject.AddComponent<Renderer>().material.color;
+			}
+        }*/
 
         private void OnEnable()
         {
@@ -25,6 +36,11 @@ namespace Packages.realityflow_package.Runtime.scripts
             {
                 underlyingFlowObject.UpdateObjectGlobally(underlyingFlowObject);
             }
+            /*if(underlyingFlowObject != null && gameObject.GetComponent<Renderer>().material.color != latestColor)
+            {
+                latestColor = gameObject.GetComponent<Renderer>().material.color;
+                underlyingFlowObject.UpdateObjectGlobally(underlyingFlowObject);
+            }*/
         }
     }
 }
