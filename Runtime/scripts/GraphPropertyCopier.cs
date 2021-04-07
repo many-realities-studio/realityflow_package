@@ -31,6 +31,7 @@ namespace Packages.realityflow_package.Runtime.scripts
             var childPosition = child.GetType().GetField("position");
             var childScale = child.GetType().GetField("scale");
             var childNodes = child.GetType().GetField("nodes");
+            var childParamIdToObjId = child.GetType().GetField("paramIdToObjId");
 
             var parentName = parent.GetType().GetField("Name");
             var parentSerializedNodes = parent.GetType().GetField("serializedNodes");
@@ -43,6 +44,7 @@ namespace Packages.realityflow_package.Runtime.scripts
             var parentPosition = parent.GetType().GetField("position");
             var parentScale = parent.GetType().GetField("scale");
             var parentNodes = parent.GetType().GetField("nodes");
+            var parentParamIdToObjId = parent.GetType().GetField("paramIdToObjId");
 
             childName.SetValue(child, parentName.GetValue(parent));
             childSerializedNodes.SetValue(child, parentSerializedNodes.GetValue(parent));
@@ -55,6 +57,7 @@ namespace Packages.realityflow_package.Runtime.scripts
             childPosition.SetValue(child, parentPosition.GetValue(parent));
             childScale.SetValue(child, parentScale.GetValue(parent));
             childNodes.SetValue(child, parentNodes.GetValue(parent));
+            childParamIdToObjId.SetValue(child, parentParamIdToObjId.GetValue(parent));
 
             // childProperties. = input.name;
             // serializedNodes = input.serializedNodes;

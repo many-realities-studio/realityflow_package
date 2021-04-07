@@ -18,6 +18,8 @@ using UnityEngine;
 
 namespace Packages.realityflow_package.Runtime.scripts
 {
+    public delegate void NotifyGraphUpdate();
+    
     /// <summary>
     /// The purpose of this class is to provide a wrapper for the UnityPlugin,
     /// allowing for easy use with the networking tools
@@ -55,6 +57,7 @@ namespace Packages.realityflow_package.Runtime.scripts
             // Set up Graph updates
             ReceivedMessage.AddEventHandler(typeof(CreateVSGraph_Received), false, _CreateVSGraph);
             ReceivedMessage.AddEventHandler(typeof(DeleteVSGraph_Received), false, _DeleteVSGraph);
+            ReceivedMessage.AddEventHandler(typeof(UpdateVSGraph_Received), false, _UpdateVSGraph);
         }
 
         #region UserOperations
@@ -144,6 +147,8 @@ namespace Packages.realityflow_package.Runtime.scripts
         #endregion ObjectOperations
 
         #region VSGraphOperations
+
+        public static event NotifyGraphUpdate updateRFGV;
 
         // Temporary debugging function
         // public static void CreateVSGraph(string msg)
@@ -386,6 +391,11 @@ namespace Packages.realityflow_package.Runtime.scripts
             }
 
             Debug.Log("Delete VSGraph: " + eventArgs.message.WasSuccessful);
+        }
+
+        private static void _UpdateVSGraph(object sender, BaseReceivedEventArgs eventArgs)
+        {
+            updateRFGV?.Invoke();
         }
 
         #endregion VSGraph messages received

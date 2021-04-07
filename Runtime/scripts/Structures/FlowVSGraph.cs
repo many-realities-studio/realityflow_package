@@ -217,17 +217,31 @@ namespace RealityFlow.Plugin.Scripts
                     if (Type.GetType(param.type).ToString().Equals("UnityEngine.GameObject"))
                     {
                         // Get the object we want to attach to the parameter from the FlowTObject dictionary
-                        string newObjGuid = paramIdToObjId[param.guid];
-                        FlowTObject updatedFlowTObject = FlowTObject.idToGameObjectMapping[newObjGuid];
-                        GameObject newAttachedGameObj = updatedFlowTObject.AttachedGameObject;
+                        if (paramIdToObjId.ContainsKey(param.guid))
+                        {
+                            string newObjGuid = paramIdToObjId[param.guid];
+                            FlowTObject updatedFlowTObject = FlowTObject.idToGameObjectMapping[newObjGuid];
+                            GameObject newAttachedGameObj = updatedFlowTObject.AttachedGameObject;
 
-                        exposedParameters.Add(new ExposedParameter{
-                            guid = param.guid,
-                            name = param.name,
-                            type = param.type,
-                            settings = new ExposedParameterSettings(),
-                            serializedValue = new SerializableObject(newAttachedGameObj,typeof(GameObject),null)
-                        });
+                            exposedParameters.Add(new ExposedParameter{
+                                guid = param.guid,
+                                name = param.name,
+                                type = param.type,
+                                settings = new ExposedParameterSettings(),
+                                serializedValue = new SerializableObject(newAttachedGameObj,typeof(GameObject),null)
+                            });
+                        }
+                        else
+                        {
+                            Debug.LogWarning("Cannot create GameObject Exposed Parameter from nonexistent object.");
+                            exposedParameters.Add(new ExposedParameter{
+                                guid = param.guid,
+                                name = param.name,
+                                type = param.type,
+                                settings = new ExposedParameterSettings(),
+                                serializedValue = new SerializableObject(null,typeof(GameObject),null)
+                            });
+                        }
                     }
                     else
                     {

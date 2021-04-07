@@ -10,6 +10,7 @@ using System.Linq;
 using RealityFlow.Plugin.Contrib;
 using RealityFlow.Plugin.Scripts;
 using NodeGraphProcessor.Examples;
+using Packages.realityflow_package.Runtime.scripts;
 
 // public struct Edge {
 // 	NodePort input;
@@ -95,14 +96,16 @@ public class RealityFlowGraphView : MonoBehaviour {
 		commandPalette = GameObject.Find("CommandPalette").GetComponent<CommandPalette>();
 		// commandPalette = new CommandPalette();
         graph.onGraphChanges += GraphChangesCallback;
+		Operations.updateRFGV += ReloadRFGV;
 		savePoint = JsonSerializer.Serialize(graph);
 		
 		// selected =
 		// NodeView.instance.LoadGraph(graph);
-		LoadGraph(graph);
+		HardLoadGraph(graph);
 	}
 
-	protected void LoadGraph(BaseGraph graph){
+	protected void SoftLoadGraph(BaseGraph graph){
+		ClearWhiteBoard();
 		newNodePosition = new Vector2(-1,-1);
 		foreach(ExposedParameter p in graph.exposedParameters){
 			StartCoroutine(AddExposedParameterCoroutine(p));
@@ -115,6 +118,30 @@ public class RealityFlowGraphView : MonoBehaviour {
 		}
 	}
 
+	protected void HardLoadGraph(BaseGraph graph){
+		ClearGraph();
+		newNodePosition = new Vector2(-1,-1);
+		foreach(ExposedParameter p in graph.exposedParameters){
+			StartCoroutine(AddExposedParameterCoroutine(p));
+		}
+		foreach (BaseNode node in graph.nodes ){
+			StartCoroutine (AddNodeCoroutine(node));
+		}
+		foreach (SerializableEdge edge in graph.edges){
+			StartCoroutine( AddEdgeCoroutine(edge));
+		}
+	}
+	
+	void ReloadRFGV()
+	{
+		SoftLoadGraph(graph);
+	}
+	
+	void OnApplicationQuit() 
+	{
+		Operations.updateRFGV -= ReloadRFGV;
+	}
+
     void GraphChangesCallback(GraphChanges changes)
     {
 		// TODO have this event redraw the graph UI
@@ -125,9 +152,9 @@ public class RealityFlowGraphView : MonoBehaviour {
 			Debug.Log("Added node");            // Debug.Log("Added a node "+changes.addedNode);
             //Undo.RegisterCompleteObjectUndo(graph,"Added Node RF");
 			// commandPalette.AddCommandToStack(new AddNodeCommand("Add Node", changes,graph));
-            Debug.Log("Serialized changes:" +JsonUtility.ToJson(graph));
-			Debug.Log("Serialized VSGraph changes:" + JsonUtility.ToJson(vsGraph));
-			Debug.Log(vsGraph.IsUpdated);
+            //Debug.Log("Serialized changes:" +JsonUtility.ToJson(graph));
+			//Debug.Log("Serialized VSGraph changes:" + JsonUtility.ToJson(vsGraph));
+			//Debug.Log(vsGraph.IsUpdated);
         }
         if(changes.removedNode != null)
         {
@@ -168,8 +195,8 @@ public class RealityFlowGraphView : MonoBehaviour {
 		JsonUtility.FromJsonOverwrite(cmd.GetGraphState(), graph);
 		graph.Deserialize();
 		vsGraph.IsUpdated = true;
-		ClearGraph();
-		LoadGraph(graph);
+		///ClearGraph();
+		HardLoadGraph(graph);
 	}
 
 	public void DeleteSelection(){
@@ -309,7 +336,14 @@ public class RealityFlowGraphView : MonoBehaviour {
 
 	public void AddToSelectionNV(NodeView n){
 		// selectedNV.Add(n);
-		selectedNVDict.Add (n.node.GUID,n);
+		//if(selectedNVDict.ContainsKey(n.node.GUID))
+        //{
+        //    selectedNVDict[n.node.GUID] = n;
+        //}
+        //else
+        //{
+            selectedNVDict.Add (n.node.GUID,n);
+        //}
 
 	}
 
@@ -335,7 +369,7 @@ public class RealityFlowGraphView : MonoBehaviour {
 			case "Bool": type = typeof(bool); break;
 			case "Color":type = typeof(Color); break;
 		}
-		graph.AddExposedParameter (parameterName, type, Labeled);
+		graph.AddExposedParameter (parameterName, type, null);
 		ExposedParameter epn = graph.GetExposedParameter (parameterName);
 		StartCoroutine(AddExposedParameterCoroutine(epn));
 	}
@@ -349,7 +383,19 @@ public class RealityFlowGraphView : MonoBehaviour {
 		newParamView.rfgv = this;
 		newParamView.pn = epn;
 		//paramViews.Add(newParamView);
-		paramDict.Add(epn.guid,newParamView);
+		// if(paramDict.ContainsKey(epn.guid))
+        // {
+        //     paramDict[epn.guid] = newParamView;
+        // }
+        // else
+        // {
+        //     paramDict.Add (epn.guid,newParamView);
+        // }
+		paramDict.Add (epn.guid,newParamView);
+		if(newParamView.pn.serializedValue.value == null)
+		{
+			newParamView.ModifyParameterValue();
+		}
 		vsGraph.IsUpdated = true;
 		// paramList.Add(epn);
 		yield return new WaitForSeconds (.01f);
@@ -444,6 +490,18 @@ public class RealityFlowGraphView : MonoBehaviour {
 		// TODO: graphs don't have GUIDs....
 		// commandPalette.AddCommandToStack(new Command("Clear Graph", "NO GUID"));
     }
+	public void ClearWhiteBoard()
+	{
+		foreach(KeyValuePair<string,ParameterView> pv in paramDict){
+			pv.Value.Delete();
+		}
+		paramDict.Clear();
+
+		foreach(KeyValuePair<string,NodeView> nv in nodeViewDict){
+			nv.Value.DeleteFromWhiteBoard();
+		}
+		nodeViewDict.Clear();
+	}
 
     public List <BaseNode> GetNodes()
     {
@@ -531,7 +589,14 @@ public class RealityFlowGraphView : MonoBehaviour {
             // newView.GetComponent<ContentSizeFitter>().enabled = true;
 			newView.outputPortViews.Add(npv);
         }
-		nodeViewDict.Add (node.GUID,newView);
+		//if(nodeViewDict.ContainsKey(node.GUID))
+        //{
+        //    nodeViewDict[node.GUID] = newView;
+        //}
+        //else
+        //{
+            nodeViewDict.Add (node.GUID,newView);
+        //}
         // nodeViewList.Add (newView);
         // LayoutRebuilder.MarkLayoutForRebuild ((RectTransform) newView.transform);
 		// RectTransform rect = newView.gameObject.transform.GetChild(0).GetComponent<RectTransform> ();
