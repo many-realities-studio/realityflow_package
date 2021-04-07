@@ -392,7 +392,7 @@ public class RealityFlowGraphView : MonoBehaviour {
         //     paramDict.Add (epn.guid,newParamView);
         // }
 		paramDict.Add (epn.guid,newParamView);
-		if(newParamView.pn.serializedValue.value == null)
+		if(newParamView.pn.serializedValue.value == null && newParamView.pn.type != "UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null")
 		{
 			newParamView.ModifyParameterValue();
 		}
@@ -414,6 +414,7 @@ public class RealityFlowGraphView : MonoBehaviour {
 		// paramList.Remove(pv.pn);
 		//paramViews.Remove(pv);
 		paramDict.Remove(pv.pn.guid);
+		vsGraph.paramIdToObjId.Remove(pv.pn.guid);
 		graph.RemoveExposedParameter(pv.pn);
 	}
 
