@@ -1,6 +1,7 @@
 ﻿using RealityFlow.Plugin.Scripts;
 using System;
 using UnityEngine;
+using Microsoft.MixedReality.Toolkit.UI;
 
 namespace Packages.realityflow_package.Runtime.scripts
 {
@@ -8,9 +9,27 @@ namespace Packages.realityflow_package.Runtime.scripts
     [Serializable]
     public class FlowObject_Monobehaviour : MonoBehaviour
     {
+        public ObjectManipulator handler;
         public Color latestColor;
         public FlowTObject underlyingFlowObject;
-
+        //private IMixedRealityPointer _pointer;  
+        private void start()
+        {
+            handler = gameObject.GetComponent<ObjectManipulator>();
+            handler.OnManipulationStarted.AddListener(HandleOnManipulationStarted);
+            handler.OnManipulationEnded.AddListener(HandleOnManipulationEnded);
+        }
+        private void HandleOnManipulationStarted(ManipulationEventData eventData)
+        {
+            //_pointer = eventData.Pointer;
+            Debug.Log("Manipulation start");
+            underlyingFlowObject.CheckOut();
+        }
+        private void HandleOnManipulationEnded(ManipulationEventData eventData)
+        {
+            Debug.Log("Manipulation end");
+            underlyingFlowObject.CheckIn();
+        }
         /*private void Start()
         {
             if(gameObject.GetComponent<Renderer>()!=null)
