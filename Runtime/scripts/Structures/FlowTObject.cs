@@ -296,7 +296,6 @@ namespace RealityFlow.Plugin.Scripts
 
             AttachedGameObject.AddComponent<FlowObject_Monobehaviour>();
             ObjectManipulator om = AttachedGameObject.AddComponent<ObjectManipulator>();
-            // om.OnManipulationEnded += SendGORefToParam;
             AttachedGameObject.AddComponent<NearInteractionGrabbable>();
             Rigidbody ObjectRigidBody = AttachedGameObject.AddComponent<Rigidbody>();
             ObjectRigidBody.useGravity = false;
@@ -304,6 +303,22 @@ namespace RealityFlow.Plugin.Scripts
             FlowObject_Monobehaviour monoBehaviour = AttachedGameObject.GetComponent<FlowObject_Monobehaviour>();
 
             monoBehaviour.underlyingFlowObject = this;
+            om.OnManipulationStarted.RemoveListener(ManipulationStart);
+            om.OnManipulationEnded.RemoveListener(ManipulationEnd);
+            om.OnManipulationStarted.AddListener(ManipulationStart);
+            om.OnManipulationEnded.AddListener(ManipulationEnd);
+        }
+
+        private void ManipulationStart(ManipulationEventData eventData)
+        {
+            //_pointer = eventData.Pointer;
+            Debug.Log("Manipulation start");
+            this.CheckOut();
+        }
+        private void ManipulationEnd(ManipulationEventData eventData)
+        {
+            Debug.Log("Manipulation end");
+            this.CheckIn();
         }
 
         [JsonConstructor]
@@ -336,7 +351,7 @@ namespace RealityFlow.Plugin.Scripts
                 idToGameObjectMapping.Add(Id, this);
                 AttachedGameObject.name = name;
                 AttachedGameObject.AddComponent<FlowObject_Monobehaviour>();
-                AttachedGameObject.AddComponent<ObjectManipulator>();
+                ObjectManipulator om = AttachedGameObject.AddComponent<ObjectManipulator>();
                 AttachedGameObject.AddComponent<NearInteractionGrabbable>();
                 AttachedGameObject.transform.hasChanged = false;
                 AttachedGameObject.layer = 9;
@@ -346,6 +361,10 @@ namespace RealityFlow.Plugin.Scripts
                 var ObjectRigidBody = AttachedGameObject.AddComponent<Rigidbody>();
                 ObjectRigidBody.useGravity = false;
                 ObjectRigidBody.isKinematic = true;
+                om.OnManipulationStarted.RemoveListener(ManipulationStart);
+                om.OnManipulationEnded.RemoveListener(ManipulationEnd);
+                om.OnManipulationStarted.AddListener(ManipulationStart);
+                om.OnManipulationEnded.AddListener(ManipulationEnd);
             }
         }
 
