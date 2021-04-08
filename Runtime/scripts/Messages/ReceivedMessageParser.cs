@@ -62,11 +62,14 @@ namespace Packages.realityflow_package.Runtime.scripts
             messageRouter.Add("CheckoutObject", typeof(CheckoutObject_Received));
             messageRouter.Add("CheckinVSGraph", typeof(CheckinVSGraph_Received));
             messageRouter.Add("CheckoutVSGraph", typeof(CheckoutVSGraph_Received));
+            messageRouter.Add("CheckinNodeView", typeof(CheckinNodeView_Received));
+            messageRouter.Add("CheckoutNodeView", typeof(CheckoutNodeView_Received));
 
             // Visual Scripting Graph messages
             messageRouter.Add("CreateVSGraph", typeof(CreateVSGraph_Received));
             messageRouter.Add("DeleteVSGraph", typeof(DeleteVSGraph_Received));
             messageRouter.Add("UpdateVSGraph", typeof(UpdateVSGraph_Received));
+            messageRouter.Add("UpdateNodeView", typeof(UpdateNodeView_Received));
         }
 
         /// <summary>

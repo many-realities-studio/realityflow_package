@@ -45,6 +45,8 @@ public class RealityFlowGraphView : MonoBehaviour {
 
 	public List<NodeView> nodeViewList = new List<NodeView> ();
 	public Dictionary<string,NodeView> nodeViewDict = new Dictionary<string,NodeView>();
+
+	public static Dictionary<string,RealityFlowGraphView> nodeViewtoRFGVDict = new Dictionary<string,RealityFlowGraphView>();
 	//public List<NodeView> selectedNV = new List<NodeView>();
 	public Dictionary<string,NodeView> selectedNVDict = new Dictionary<string,NodeView>();
 	public List<BaseNode> selected = new List<BaseNode>();
@@ -562,6 +564,7 @@ public class RealityFlowGraphView : MonoBehaviour {
         newView.node = node;
         newView.GUID.text = node.GUID.Substring (node.GUID.Length - 5);
 		newView.rfgv = this;
+		newView.nodeGUID = node.GUID;
         // contentPanel.GetComponent<ContentSizeFitter>().enabled = false;
         foreach (NodePort input in node.inputPorts) {
             // newView.GetComponent<ContentSizeFitter>().enabled = false/;
@@ -599,6 +602,14 @@ public class RealityFlowGraphView : MonoBehaviour {
             nodeViewDict.Add (node.GUID,newView);
         //}
         // nodeViewList.Add (newView);
+		if(nodeViewtoRFGVDict.ContainsKey(node.GUID))
+		{
+			nodeViewtoRFGVDict[node.GUID] = this;
+		}
+		else
+		{
+			nodeViewtoRFGVDict.Add(node.GUID,this);
+		}
         // LayoutRebuilder.MarkLayoutForRebuild ((RectTransform) newView.transform);
 		// RectTransform rect = newView.gameObject.transform.GetChild(0).GetComponent<RectTransform> ();
 		RectTransform rect = newView.gameObject.GetComponent<RectTransform> ();

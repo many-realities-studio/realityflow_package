@@ -1,17 +1,28 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using GraphProcessor;
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 using RealityFlow.Plugin.Contrib;
+using Newtonsoft.Json;
+using Packages.realityflow_package.Runtime.scripts;
+
 public class NodeView : MonoBehaviour
 {
     public Text title;
     public Text GUID;
+    public string nodeGUID;
     public GameObject inputPanel;
     public GameObject outputPanel;
     public BaseNode node;
     public RealityFlowGraphView rfgv;
+    public Vector3 localPos;
+
+    public bool CanBeModified { get => _canBeModified; set => _canBeModified = value; }
+
+    [SerializeField]
+    private bool _canBeModified;
 
 
     public List<NodePortView> inputPortViews = new List<NodePortView>();
@@ -19,20 +30,74 @@ public class NodeView : MonoBehaviour
     
     // TODO: Make sure this is the best way to do this. I think this is really hacky -John
     // public BaseGraph graph;
+    [JsonConstructor]
+    public NodeView(Vector3 NodeViewPos, string NodeViewNodeGUID)
+    {
+        localPos = NodeViewPos;
+        nodeGUID = NodeViewNodeGUID;
+        if(RealityFlowGraphView.nodeViewtoRFGVDict.ContainsKey(NodeViewNodeGUID))
+        {
+            RealityFlowGraphView.nodeViewtoRFGVDict[NodeViewNodeGUID].nodeViewDict[NodeViewNodeGUID].UpdateNodeViewLocally(this);
+            //Nodepropertycopier
+        }
+        else
+        {
+            Debug.LogWarning("Nodeview with specified GUID does not exist in the scene. Failed to update NodeView.");
+            return;
+        }
+        // Find the nodeview with the GUID we need to update that one specifically
 
-    // public GameObject rfgvGameObject; // realityflowgraphview script
+        // var baseNodeType = Type.GetType(serializedNode.type);
 
-    public static NodeView instance;
+        // if (serializedNode.jsonDatas == null)
+		// 	return;
 
-    // static List <BaseNode> deletionList;
+        // var newNode = Activator.CreateInstance(baseNodeType) as BaseNode;
 
-    // Start is called before the first frame update
-    /*public NodeUI(string title, BaseNode node, string GUID){
-        this.title.text = title;
-        this.node = node;
-        this.GUID.text = GUID;
-    }*/
+        // JsonUtility.FromJsonOverwrite(serializedNode.jsonDatas, newNode);
 
+        // if(!rfgv.graph.nodesPerGUID.ContainsKey(newNode.GUID))
+        // {
+        //     rfgv.graph.AddNode(newNode);
+        // }  
+        // rfgv.graph.nodesPerGUID[newNode.GUID] = newNode;
+
+        // node = rfgv.graph.nodesPerGUID[newNode.GUID];
+        //BaseNode newNode = JsonUtility.FromJson<BaseNode>(serializedNode.jsonDatas);
+
+
+    }
+    private void UpdateNodeViewLocally(NodeView newValues)
+    {
+        if(RealityFlowGraphView.nodeViewtoRFGVDict[nodeGUID].nodeViewDict[nodeGUID].CanBeModified == false)
+        {
+            bool tempCanBeModified = this.CanBeModified;
+            //PropertyCopier<FlowTObject, FlowTObject>.Copy(newValues, this);
+            this.transform.localPosition = newValues.localPos;
+            this.CanBeModified = tempCanBeModified;
+        }
+    }
+    private void UpdateNodeViewGlobally(NodeView newValues)
+    {
+        //TODO: Fill in
+        if (transform.hasChanged == true)
+        {
+            bool tempCanBeModified = this.CanBeModified;
+            this.transform.localPosition = newValues.localPos;
+            this.CanBeModified = tempCanBeModified;
+
+            if (CanBeModified == true)
+            {
+                Operations.UpdateNodeView(this, ConfigurationSingleton.SingleInstance.CurrentUser, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) => {/* Debug.Log(e.message);*/ });
+            }
+
+            transform.hasChanged = false;
+        }
+    }
+    private void Start()
+    {
+        localPos = transform.localPosition;
+    }
     public void RedrawEdges(){
         foreach(NodePortView npv in inputPortViews){
             if (npv.edges.Count != 0 ) { npv.SignalRedraw(); }
@@ -41,27 +106,11 @@ public class NodeView : MonoBehaviour
             if (npv.edges.Count != 0 ) { npv.SignalRedraw(); }
         }
     }
-    void Awake()
-    {
-        instance = this;
-    }
-    void Start()
-    {   
-        // deletionList = new List<BaseNode>();
-    }
 
     void Update(){
         transform.rotation = Quaternion.identity;
-        // transform.localPosition = new Vector3(transform.position.x, transform.position.y , 0.0f);
-        // transform.localPosition.z = 0.0f;
-
+        localPos = transform.localPosition;
     }
-
-    // public void Setup(RealityFlowGraphView rfgvi)
-    // {
-    //     rfgv=rfgvi;
-    //     graph = rfgvi.graph;
-    // }
 
 
     public void DeleteSelf(){
@@ -93,7 +142,6 @@ public class NodeView : MonoBehaviour
     }
 
     public void Select(){
-    //    rfgv.AddToSelection(node);
        rfgv.AddToSelectionNV(this);
        this.GetComponent<CanvasRenderer>().SetColor(Color.green);
     }
@@ -103,50 +151,49 @@ public class NodeView : MonoBehaviour
         localPos.z = 0.0f;
         transform.localPosition = localPos;
         transform.localScale = Vector3.one;
-        //this.GetComponent<RectTransform>().anchoredPosition3D.z = 0.0f;
     }
 
     public void UpdateNodeValues()
     {
-
         Vector3 [] cornerPos = new Vector3[4];
         GameObject.Find("VRWhiteBoard").GetComponent<RectTransform>().GetWorldCorners(cornerPos);
-        Debug.Log("Corners for Graph");
-        foreach(Vector3 corner in cornerPos){
-            Debug.Log(corner);
-        }
         Vector3 worldNode = this.transform.position;
         Vector2 newPos;
         newPos = (worldNode - cornerPos[1]);
         Vector2 canvasDimensions = (cornerPos[2] - cornerPos[0]);
         Vector2 distFromUpperLeftCorner = newPos / canvasDimensions;
-        Debug.Log("newPos:"+newPos);
-        Debug.Log("canvasDimensions:"+canvasDimensions);
-        Debug.Log("upper left:"+distFromUpperLeftCorner);
-
-        Debug.Log("Before update, node position is: "+node.position);
-        // node.position = new Rect(new Vector2(this.transform.position.x, this.transform.position.y), new Vector2(100,100)); //this.transform.position;
-        node.position = new Rect(distFromUpperLeftCorner, new Vector2(100,100)); //this.transform.position;
-        
-        Debug.Log("After update, node position is: "+node.position);
-        Debug.Log(JsonUtility.ToJson(rfgv.graph));
-        Debug.Log(JsonUtility.ToJson(node));
+        node.position = new Rect(distFromUpperLeftCorner, new Vector2(100,100));
 
         rfgv.vsGraph.IsUpdated = true;
-    }   
-    /*
-    public void Delete() {
-        deletionList.Add(node);
     }
-    public void DeleteAll(){
-        Debug.Log("Deletion list contains "+deletionList.Count);
-        foreach(BaseNode n in deletionList)
+
+    public void CheckIn()
+    {
+        if (CanBeModified == true)
         {
-            RuntimeGraph.commandPalette.AddCommandToStack(new Command("Remove Node", n.GUID));
-            graph.RemoveNode(n);
-            //graph.SetDirty();
-            Destroy(gameObject);
+            Operations.CheckinNodeView(nodeGUID, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) =>
+            {
+                // On successful checkin
+                if (e.message.WasSuccessful == true)
+                {
+                    _canBeModified = false;
+                }
+            });
         }
     }
-    */
+
+    public void CheckOut()
+    {
+        if (CanBeModified == false)
+        {
+            Operations.CheckoutNodeView(nodeGUID, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) =>
+                {
+                    // On successful checkout
+                    if (e.message.WasSuccessful == true)
+                    {
+                        _canBeModified = true;
+                    }
+                });
+        }
+    }
 }

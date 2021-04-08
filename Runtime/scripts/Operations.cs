@@ -59,6 +59,7 @@ namespace Packages.realityflow_package.Runtime.scripts
             ReceivedMessage.AddEventHandler(typeof(CreateVSGraph_Received), false, _CreateVSGraph);
             ReceivedMessage.AddEventHandler(typeof(DeleteVSGraph_Received), false, _DeleteVSGraph);
             ReceivedMessage.AddEventHandler(typeof(UpdateVSGraph_Received), false, _UpdateVSGraph);
+            // ReceivedMessage.AddEventHandler(typeof(UpdateNodeView_Received), false, _UpdateNodeView);
         }
 
         #region UserOperations
@@ -193,6 +194,16 @@ namespace Packages.realityflow_package.Runtime.scripts
             ReceivedMessage.AddEventHandler(typeof(DeleteVSGraph_Received), true, callbackFunction);
         }
 
+        public static void UpdateNodeView(NodeView nodeView, FlowUser flowUser, string projectId, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
+        {
+            //UpdateVSGraph_SendToServer updateVSGraph = new UpdateVSGraph_SendToServer(flowVSGraph, /*flowUser,*/ projectId); // TODO: format string msg
+
+            string message = ("{\"NodeView\": {\"CanBeModified\":" + nodeView.CanBeModified + ",\"LocalPos\":" + JsonUtility.ToJson(nodeView.localPos) + ",\"NodeGUID\":\"" + nodeView.nodeGUID + "\"},\"ProjectId\":\"" + projectId + "\",\"MessageType\":\"UpdateNodeView\"}");
+            FlowWebsocket.SendGraphMessage(message);
+
+            ReceivedMessage.AddEventHandler(typeof(UpdateVSGraph_Received), true, callbackFunction);
+        }
+
         #endregion VSGraphOperations
 
         #region BehaviourOperations
@@ -318,6 +329,22 @@ namespace Packages.realityflow_package.Runtime.scripts
             FlowWebsocket.SendMessage(checkinVSGraph);
 
             ReceivedMessage.AddEventHandler(typeof(CheckinVSGraph_Received), true, callbackFunction);
+        }
+
+        public static void CheckoutNodeView(string nodeGUID, string projectID, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
+        {
+            CheckoutNodeView_SendToServer checkoutNodeView = new CheckoutNodeView_SendToServer(nodeGUID, projectID);
+            FlowWebsocket.SendMessage(checkoutNodeView);
+
+            ReceivedMessage.AddEventHandler(typeof(CheckoutNodeView_Received), true, callbackFunction);
+        }
+
+        public static void CheckinNodeView(string nodeGUID, string projectID, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
+        {
+            CheckinNodeView_SendToServer checkinNodeView = new CheckinNodeView_SendToServer(nodeGUID, projectID);
+            FlowWebsocket.SendMessage(checkinNodeView);
+
+            ReceivedMessage.AddEventHandler(typeof(CheckinNodeView_Received), true, callbackFunction);
         }
 
         #endregion Checkout system messages
