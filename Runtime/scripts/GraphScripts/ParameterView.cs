@@ -80,7 +80,14 @@ public class ParameterView : MonoBehaviour
             FlowObject_Monobehaviour monoBehaviour = valueObject.GetComponent<FlowObject_Monobehaviour>();
             FlowTObject flowTObj = monoBehaviour.underlyingFlowObject;
 
-            rfgv.vsGraph.paramIdToObjId.Add(pn.guid, flowTObj.Id);
+            if(rfgv.vsGraph.paramIdToObjId.ContainsKey(pn.guid))
+            {
+                rfgv.vsGraph.paramIdToObjId[pn.guid] = flowTObj.Id;
+            }
+            else
+            {
+                rfgv.vsGraph.paramIdToObjId.Add(pn.guid, flowTObj.Id);
+            }
         }
 
         rfgv.vsGraph.IsUpdated = true;
