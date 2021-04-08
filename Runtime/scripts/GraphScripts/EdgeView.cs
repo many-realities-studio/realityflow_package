@@ -12,6 +12,11 @@ public class EdgeView : MonoBehaviour
     public NodePortView input;
     public NodePortView output;
 
+    private LineRenderer lr;
+    private Transform inputLoc, outputLoc; // exact transform locations where to draw the ends of the edges
+    public bool UpdateEdgesPerFrame; // flag that is toggled by when the user grabs/lets go of the node view
+
+
     // TODO: when we delete a node and the edge gets deleted, we need to make sure the remaining node has that edge removed from it's references as well
     // public void Delete(){
     public void Delete(NodePortView portBeingDeleted){
@@ -24,16 +29,31 @@ public class EdgeView : MonoBehaviour
     }
 
     public void RedrawEdge(){
-        LineRenderer lr = this.gameObject.GetComponent<LineRenderer>();
 		// calculate the extra points for a better looking circuit board line
+        // switched with explicit references to Transforms since that's wayyyyy more efficient than having to use GetComponent() every Update()
 		Vector3 [] edgePoints = new [] {
-			output.GetComponent<RectTransform>().transform.position,
-			input.GetComponent<RectTransform>().transform.position
+			outputLoc.position,
+			inputLoc.position
 			};
 		lr.SetPositions(edgePoints);
     }
 
+    public void Init(){
+        Debug.Log("Edge Created, drawing edge now");
+        inputLoc = input.GetComponent<RectTransform>().transform.GetChild(0);
+        outputLoc = output.GetComponent<RectTransform>().transform.GetChild(0);
+        lr = this.gameObject.GetComponent<LineRenderer>();
+        RedrawEdge();
+    }
 
+    public void ToggleUpdates(bool flag){
+        UpdateEdgesPerFrame = flag;
+        RedrawEdge();
+    }
+
+    void Update(){
+        if (UpdateEdgesPerFrame) { RedrawEdge(); }
+    }
     // recursive deletion strategy for edges: takes 
 
 }

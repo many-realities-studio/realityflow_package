@@ -483,15 +483,17 @@ public class RealityFlowGraphView : MonoBehaviour {
 		newEdge.output.edges.Add(newEdge);
 		// Set the positions of the linerenderer
 		newEdge.edge = edge;
-		LineRenderer lr = newEdge.GetComponent<LineRenderer>();
+
+		newEdge.Init();
+		// LineRenderer lr = newEdge.GetComponent<LineRenderer>();
 		// calculate the extra points for a better looking circuit board line
-		Vector3 [] edgePoints = new [] {
-			newEdge.output.GetComponent<RectTransform>().transform.position,
-			newEdge.input.GetComponent<RectTransform>().transform.position
-			};
-		Debug.Log("Should have created a line now");
-		Debug.Log(lr);
-		lr.SetPositions(edgePoints);
+		// Vector3 [] edgePoints = new [] {
+		// 	newEdge.output.GetComponent<RectTransform>().transform.position,
+		// 	newEdge.input.GetComponent<RectTransform>().transform.position
+		// 	};
+		// Debug.Log("Should have created a line now");
+		// Debug.Log(lr);
+		// lr.SetPositions(edgePoints);
 		yield return new WaitForSeconds (.01f);
 	}
 
