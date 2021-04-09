@@ -204,6 +204,7 @@ public class RealityFlowGraphView : MonoBehaviour {
 
 	public void UndoLastCommand(){
 		// get the command itself
+		CheckOutGraph();
 		Command cmd;
 		// cmd = commandPalette.GetCommandStack()[0];
 		// cmd = commandPalette.GetCommandStack()[commandPalette.GetCommandStack().Count-1];
@@ -214,10 +215,12 @@ public class RealityFlowGraphView : MonoBehaviour {
 		vsGraph.IsUpdated = true;
 		///ClearGraph();
 		HardLoadGraph(graph);
+		CheckInGraph();
 	}
 
 	public void DeleteSelection(){
 		// serialize the current version of the graph
+		CheckOutGraph();
 		string tmp;
 		tmp = JsonUtility.ToJson(graph);
 
@@ -228,7 +231,7 @@ public class RealityFlowGraphView : MonoBehaviour {
 			nv.Value.Delete();
 		}
 		selectedNVDict.Clear();
-
+		CheckInGraph();
 	}
 
 	// Overload of single node deletion
@@ -365,6 +368,7 @@ public class RealityFlowGraphView : MonoBehaviour {
 	}
 
 	public void AddParameter(){
+		CheckOutGraph();
 		parameterCreationCanvas.SetActive(true);
 	}
 	public void AddParameterStep2(string parameterType, string parameterName)
@@ -389,6 +393,7 @@ public class RealityFlowGraphView : MonoBehaviour {
 		graph.AddExposedParameter (parameterName, type, null);
 		ExposedParameter epn = graph.GetExposedParameter (parameterName);
 		StartCoroutine(AddExposedParameterCoroutine(epn));
+		CheckInGraph();
 	}
 
 	public IEnumerator AddExposedParameterCoroutine (ExposedParameter epn){
@@ -437,6 +442,7 @@ public class RealityFlowGraphView : MonoBehaviour {
 
 	public void CreateGraph () {
 		// graph.SetDirty();
+		CheckOutGraph();
 		string tmp = JsonUtility.ToJson(graph);
 
 		// send this to the command palette
@@ -461,6 +467,7 @@ public class RealityFlowGraphView : MonoBehaviour {
 		// graph.ed
 		// graph.SetParameterValue ("LabelContainer", Labeled);
 		processor = new ProcessGraphProcessor (graph);
+		CheckInGraph();
     }
 	
 	// public void ConnectEdges(NodePort input, NodePort output){
@@ -481,6 +488,7 @@ public class RealityFlowGraphView : MonoBehaviour {
 	}
 	
 	public void ClearGraph () {
+		CheckOutGraph();
 		string tmp = JsonUtility.ToJson(graph);
         commandPalette.AddCommandToStack(new DeleteExposedParameterCommand("Clearing Graph", tmp));
 		//foreach(ParameterView p in paramViews)
@@ -502,6 +510,7 @@ public class RealityFlowGraphView : MonoBehaviour {
 			nv.Value.Delete();
 		}
 		nodeViewDict.Clear();
+		CheckInGraph();
 			//graph.SetDirty();
         // EditorWindow.GetWindow<CustomToolbarGraphWindow> ().InitializeGraph (graph as BaseGraph)
 
@@ -527,8 +536,10 @@ public class RealityFlowGraphView : MonoBehaviour {
         return graph.nodes;
     }
 	public void DoProcessing () {
+		CheckOutGraph();
 		processor = new ProcessGraphProcessor (graph);
 		processor.Run ();
+		CheckInGraph();
 	}
 
 	public float padding = 0.1f;
