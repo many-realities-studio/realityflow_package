@@ -117,13 +117,13 @@ public class NodeView : MonoBehaviour
 
 
     public void DeleteSelf(){
-        rfgv.CheckOutGraph();
+        //rfgv.CheckOutGraph();
         rfgv.DeleteSelection(this);
         this.Delete();
     }
 
     public void Delete(){
-        rfgv.CheckOutGraph();
+        //rfgv.CheckOutGraph();
         foreach(NodePortView inputPort in inputPortViews){
             inputPort.Delete();
         }
@@ -132,7 +132,7 @@ public class NodeView : MonoBehaviour
         }
         if(this.gameObject != null)
             Destroy(this.gameObject);
-        rfgv.CheckInGraph();
+        //rfgv.CheckInGraph();
     }
 
     public void DeleteFromWhiteBoard()

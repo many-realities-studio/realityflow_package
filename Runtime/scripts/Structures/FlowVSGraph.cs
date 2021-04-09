@@ -403,14 +403,14 @@ namespace RealityFlow.Plugin.Scripts
             // {
             //     Operations.UpdateVSGraph(this, ConfigurationSingleton.SingleInstance.CurrentUser, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) => {/* Debug.Log(e.message);*/ });
             // }
-            Operations.CheckinVSGraph(Id, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) =>
-            {
-                // On successful checkin
-                if (e.message.WasSuccessful == true)
-                {
-                    _canBeModified = false;
-                }
-            });
+            // Operations.CheckinVSGraph(Id, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) =>
+            // {
+            //     // On successful checkin
+            //     if (e.message.WasSuccessful == true)
+            //     {
+            //         _canBeModified = false;
+            //     }
+            // });
 
             _isUpdated = false;
         }
