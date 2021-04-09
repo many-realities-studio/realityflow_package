@@ -31,13 +31,13 @@ public class NodeView : MonoBehaviour
     // TODO: Make sure this is the best way to do this. I think this is really hacky -John
     // public BaseGraph graph;
     [JsonConstructor]
-    public NodeView(Vector3 NodeViewPos, string NodeViewNodeGUID)
+    public NodeView(Vector3 LocalPos, string NodeGUID)
     {
-        localPos = NodeViewPos;
-        nodeGUID = NodeViewNodeGUID;
-        if(RealityFlowGraphView.nodeViewtoRFGVDict.ContainsKey(NodeViewNodeGUID))
+        localPos = LocalPos;
+        nodeGUID = NodeGUID;
+        if(RealityFlowGraphView.nodeViewtoRFGVDict.ContainsKey(NodeGUID))
         {
-            RealityFlowGraphView.nodeViewtoRFGVDict[NodeViewNodeGUID].nodeViewDict[NodeViewNodeGUID].UpdateNodeViewLocally(this);
+            RealityFlowGraphView.nodeViewtoRFGVDict[NodeGUID].nodeViewDict[NodeGUID].UpdateNodeViewLocally(this);
             
         }
         else
