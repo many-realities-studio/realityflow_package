@@ -148,10 +148,10 @@ public class NodeView : MonoBehaviour
     }
 
     public void Select(){
-       rfgv.CheckOutGraph();
+       //rfgv.CheckOutGraph();
        rfgv.AddToSelectionNV(this);
        this.GetComponent<CanvasRenderer>().SetColor(Color.green);
-       rfgv.CheckInGraph();
+       //rfgv.CheckInGraph();
     }
 
     public void ResetOrientation(){
