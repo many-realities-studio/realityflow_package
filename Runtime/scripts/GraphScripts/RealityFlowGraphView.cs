@@ -73,6 +73,21 @@ public class RealityFlowGraphView : MonoBehaviour {
 		//InitializeGraph();
 	}
 
+	public void CheckOutGraph()
+	{
+		if(vsGraph!=null)
+		{
+			vsGraph.CheckOut();
+		}
+	}
+	public void CheckInGraph()
+	{
+		if(vsGraph!=null)
+		{
+			vsGraph.CheckIn();
+		}
+	}
+
 	public void InitializeGraphStep1()
 	{
 		VSGraphDropdownCanvas.SetActive(true);
