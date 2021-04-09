@@ -38,7 +38,7 @@ public class NodeView : MonoBehaviour
         if(RealityFlowGraphView.nodeViewtoRFGVDict.ContainsKey(NodeViewNodeGUID))
         {
             RealityFlowGraphView.nodeViewtoRFGVDict[NodeViewNodeGUID].nodeViewDict[NodeViewNodeGUID].UpdateNodeViewLocally(this);
-            //Nodepropertycopier
+            
         }
         else
         {
@@ -96,6 +96,7 @@ public class NodeView : MonoBehaviour
     }
     private void Start()
     {
+        transform.hasChanged = false;
         localPos = transform.localPosition;
     }
     public void RedrawEdges(){
@@ -110,6 +111,8 @@ public class NodeView : MonoBehaviour
     void Update(){
         transform.rotation = Quaternion.identity;
         localPos = transform.localPosition;
+
+        UpdateNodeViewGlobally(this);
     }
 
 
@@ -164,7 +167,7 @@ public class NodeView : MonoBehaviour
         Vector2 distFromUpperLeftCorner = newPos / canvasDimensions;
         node.position = new Rect(distFromUpperLeftCorner, new Vector2(100,100));
 
-        rfgv.vsGraph.IsUpdated = true;
+        rfgv.vsGraph.ManipulationEndGlobalUpdate(rfgv.vsGraph);
     }
 
     public void CheckIn()
@@ -186,7 +189,7 @@ public class NodeView : MonoBehaviour
     {
         if (CanBeModified == false)
         {
-            Operations.CheckoutNodeView(nodeGUID, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) =>
+            Operations.CheckoutNodeView(this, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) =>
                 {
                     // On successful checkout
                     if (e.message.WasSuccessful == true)
