@@ -1759,11 +1759,11 @@ MonoBehaviour:
     isComplete: 1
   - name: CreateBehaviour
     type: 1
-    query: "mutation CreateBehaviour{\n    createBehaviour(  Id :\"b8dd848c-c50c-4255-b681-08010510e1f4\",
-      TypeOfTrigger :\"Click\", TriggerObjectId :\"90ee3448-32b3-4286-9d97-15cf5a6a46a4\",
-      TargetObjectId :\"90ee3448-32b3-4286-9d97-15cf5a6a46a4\", ProjectId :\"878e6e49-f52f-49be-82ec-0184052b6951\",
-      NextBehaviour :\"[]\", Action :{ Id :\"b77245cf-b7f4-4d7f-8b18-6179d6edc6c8\",
-      ActionType :\"NoAction\"} ){\n        Id\n    }\n}"
+    query: "mutation CreateBehaviour{\n    createBehaviour(  Id :\"7ad16a7f-7e70-4adf-b180-92b0f011473f\",
+      TypeOfTrigger :\"Immediate\", TriggerObjectId :\"502f3b44-e235-428b-98d5-5388b06ce993\",
+      TargetObjectId :\"502f3b44-e235-428b-98d5-5388b06ce993\", ProjectId :\"d8563f65-5558-4146-9985-68d0e7b6ab9b\",
+      NextBehaviour :\"[]\", Action :{ Id :null, ActionType :\"Disable\"} ){\n       
+      Id\n    }\n}"
     queryString: createBehaviour
     returnType: behaviour
     queryOptions:
@@ -1800,6 +1800,376 @@ MonoBehaviour:
         type: String
       - name: Action
         type: JSON
+      hasChanged: 0
+    isComplete: 1
+  - name: DeleteBehaviour
+    type: 1
+    query: "mutation DeleteBehaviour{\n    deleteBehaviour(  Id :\"7a59640e-8fea-4453-a1ba-c8a8090345f7\"
+      ){\n        Id\n    }\n}"
+    queryString: deleteBehaviour
+    returnType: behaviour
+    queryOptions:
+    - createBehaviour
+    - updateBehaviour
+    - deleteBehaviour
+    - createUser
+    - updateUser
+    - deleteUser
+    - createProject
+    - updateProject
+    - deleteProject
+    - createObject
+    - updateObject
+    - deleteObject
+    fields:
+    - index: 0
+      name: Id
+      type: String
+      parentIndexes: 
+      hasSubField: 0
+      possibleFields:
+      - name: Id
+        type: String
+      - name: TypeOfTrigger
+        type: String
+      - name: TriggerObjectId
+        type: String
+      - name: TargetObjectId
+        type: String
+      - name: ProjectId
+        type: String
+      - name: NextBehaviour
+        type: String
+      - name: Action
+        type: JSON
+      hasChanged: 0
+    isComplete: 1
+  - name: CreateUser
+    type: 1
+    query: "mutation CreateUser{\n    createUser(  Username :\"testUser\", Password
+      :\"12345\" ){\n        Username\n    }\n}"
+    queryString: createUser
+    returnType: user
+    queryOptions:
+    - createBehaviour
+    - updateBehaviour
+    - deleteBehaviour
+    - createUser
+    - updateUser
+    - deleteUser
+    - createProject
+    - updateProject
+    - deleteProject
+    - createObject
+    - updateObject
+    - deleteObject
+    fields:
+    - index: 0
+      name: Username
+      type: String
+      parentIndexes: 
+      hasSubField: 0
+      possibleFields:
+      - name: Username
+        type: String
+      - name: Password
+        type: String
+      - name: project
+        type: project
+      hasChanged: 0
+    isComplete: 1
+  - name: CreateVSGraph
+    type: 1
+    query: "mutation CreateVSGraph{\n    createVSGraph{\n        Id\n        Name\n   
+      }\n}"
+    queryString: createVSGraph
+    returnType: vs_graph
+    queryOptions:
+    - createBehaviour
+    - updateBehaviour
+    - deleteBehaviour
+    - createUser
+    - updateUser
+    - deleteUser
+    - createProject
+    - updateProject
+    - deleteProject
+    - createObject
+    - updateObject
+    - deleteObject
+    - createVSGraph
+    - updateVSGraph
+    - deleteVSGraph
+    fields:
+    - index: 1
+      name: Id
+      type: String
+      parentIndexes: 
+      hasSubField: 0
+      possibleFields:
+      - name: id
+        type: Int
+      - name: Id
+        type: String
+      - name: Name
+        type: String
+      - name: serializedNodes
+        type: String
+      - name: edges
+        type: String
+      - name: groups
+        type: String
+      - name: stackNodes
+        type: String
+      - name: pinnedElements
+        type: String
+      - name: exposedParameters
+        type: String
+      - name: stickyNotes
+        type: String
+      - name: position
+        type: String
+      - name: scale
+        type: String
+      - name: references
+        type: String
+      - name: projectId
+        type: String
+      - name: project
+        type: project
+      hasChanged: 0
+    - index: 2
+      name: Name
+      type: String
+      parentIndexes: 
+      hasSubField: 0
+      possibleFields:
+      - name: id
+        type: Int
+      - name: Id
+        type: String
+      - name: Name
+        type: String
+      - name: serializedNodes
+        type: String
+      - name: edges
+        type: String
+      - name: groups
+        type: String
+      - name: stackNodes
+        type: String
+      - name: pinnedElements
+        type: String
+      - name: exposedParameters
+        type: String
+      - name: stickyNotes
+        type: String
+      - name: position
+        type: String
+      - name: scale
+        type: String
+      - name: references
+        type: String
+      - name: projectId
+        type: String
+      - name: project
+        type: project
+      hasChanged: 0
+    isComplete: 1
+  - name: UpdateVSGraph
+    type: 1
+    query: "mutation UpdateVSGraph{\n    updateVSGraph{\n        Id\n        Name\n   
+      }\n}"
+    queryString: updateVSGraph
+    returnType: vs_graph
+    queryOptions:
+    - createBehaviour
+    - updateBehaviour
+    - deleteBehaviour
+    - createUser
+    - updateUser
+    - deleteUser
+    - createProject
+    - updateProject
+    - deleteProject
+    - createObject
+    - updateObject
+    - deleteObject
+    - createVSGraph
+    - updateVSGraph
+    - deleteVSGraph
+    fields:
+    - index: 1
+      name: Id
+      type: String
+      parentIndexes: 
+      hasSubField: 0
+      possibleFields:
+      - name: id
+        type: Int
+      - name: Id
+        type: String
+      - name: Name
+        type: String
+      - name: serializedNodes
+        type: String
+      - name: edges
+        type: String
+      - name: groups
+        type: String
+      - name: stackNodes
+        type: String
+      - name: pinnedElements
+        type: String
+      - name: exposedParameters
+        type: String
+      - name: stickyNotes
+        type: String
+      - name: position
+        type: String
+      - name: scale
+        type: String
+      - name: references
+        type: String
+      - name: projectId
+        type: String
+      - name: project
+        type: project
+      hasChanged: 0
+    - index: 2
+      name: Name
+      type: String
+      parentIndexes: 
+      hasSubField: 0
+      possibleFields:
+      - name: id
+        type: Int
+      - name: Id
+        type: String
+      - name: Name
+        type: String
+      - name: serializedNodes
+        type: String
+      - name: edges
+        type: String
+      - name: groups
+        type: String
+      - name: stackNodes
+        type: String
+      - name: pinnedElements
+        type: String
+      - name: exposedParameters
+        type: String
+      - name: stickyNotes
+        type: String
+      - name: position
+        type: String
+      - name: scale
+        type: String
+      - name: references
+        type: String
+      - name: projectId
+        type: String
+      - name: project
+        type: project
+      hasChanged: 0
+    isComplete: 1
+  - name: DeleteVSGraph
+    type: 1
+    query: "mutation DeleteVSGraph{\n    deleteVSGraph{\n        Id\n        Name\n   
+      }\n}"
+    queryString: deleteVSGraph
+    returnType: vs_graph
+    queryOptions:
+    - createBehaviour
+    - updateBehaviour
+    - deleteBehaviour
+    - createUser
+    - updateUser
+    - deleteUser
+    - createProject
+    - updateProject
+    - deleteProject
+    - createObject
+    - updateObject
+    - deleteObject
+    - createVSGraph
+    - updateVSGraph
+    - deleteVSGraph
+    fields:
+    - index: 1
+      name: Id
+      type: String
+      parentIndexes: 
+      hasSubField: 0
+      possibleFields:
+      - name: id
+        type: Int
+      - name: Id
+        type: String
+      - name: Name
+        type: String
+      - name: serializedNodes
+        type: String
+      - name: edges
+        type: String
+      - name: groups
+        type: String
+      - name: stackNodes
+        type: String
+      - name: pinnedElements
+        type: String
+      - name: exposedParameters
+        type: String
+      - name: stickyNotes
+        type: String
+      - name: position
+        type: String
+      - name: scale
+        type: String
+      - name: references
+        type: String
+      - name: projectId
+        type: String
+      - name: project
+        type: project
+      hasChanged: 0
+    - index: 2
+      name: Name
+      type: String
+      parentIndexes: 
+      hasSubField: 0
+      possibleFields:
+      - name: id
+        type: Int
+      - name: Id
+        type: String
+      - name: Name
+        type: String
+      - name: serializedNodes
+        type: String
+      - name: edges
+        type: String
+      - name: groups
+        type: String
+      - name: stackNodes
+        type: String
+      - name: pinnedElements
+        type: String
+      - name: exposedParameters
+        type: String
+      - name: stickyNotes
+        type: String
+      - name: position
+        type: String
+      - name: scale
+        type: String
+      - name: references
+        type: String
+      - name: projectId
+        type: String
+      - name: project
+        type: project
       hasChanged: 0
     isComplete: 1
   subscriptions: []

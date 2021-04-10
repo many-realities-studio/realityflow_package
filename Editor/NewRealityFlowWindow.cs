@@ -365,6 +365,7 @@ public class FlowNetworkManagerEditor : EditorWindow
         {
             // Send the user to the load project screen
             window = EWindowView.LOAD_PROJECT;
+            
         }
 
         // // Create "Delete Project" Button and define onClick action
@@ -383,6 +384,13 @@ public class FlowNetworkManagerEditor : EditorWindow
             {
                 if (e.message.WasSuccessful == true)
                 {
+                    // JohnLynch
+                    Transform head = GameObject.Find("Main Camera").transform;
+                    // Transform lHand = 
+                    // Transform rHand = 
+                    FlowAvatar createAvatar = new FlowAvatar(head);
+                    // Operations.CreateAvatar(createAvatar, eventArgs.message.flowProject.Id);
+                    Operations.CreateAvatar(createAvatar, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, f) => { Debug.Log(f.message); });
                     Debug.Log(e.message);
                     if (e.message.WasSuccessful == true)
                     {
@@ -391,12 +399,14 @@ public class FlowNetworkManagerEditor : EditorWindow
                     }
                 }
             });
+
         }
         EditorGUILayout.EndHorizontal();
 
         // Create "Logout" Button and define onClick action
         if (GUILayout.Button("Logout", GUILayout.Height(20)))
         {
+            
             // Send logout event to the server
             if (ConfigurationSingleton.SingleInstance.CurrentUser != null)
             {
@@ -761,6 +771,16 @@ public class FlowNetworkManagerEditor : EditorWindow
                         if (e.message.WasSuccessful == true)
                         {
                             ConfigurationSingleton.SingleInstance.CurrentProject = e.message.flowProject;
+                            // JohnLynch
+                            Transform head = GameObject.Find("Main Camera").transform;
+                            // Transform lHand = 
+                            // Transform rHand = 
+                            FlowAvatar createAvatar = new FlowAvatar(head);
+                            // Operations.CreateAvatar(createAvatar, eventArgs.message.flowProject.Id);
+                            Operations.CreateAvatar(createAvatar, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, f) => { Debug.Log(f.message); });
+                            Debug.Log(e.message);
+                            Debug.Log("Avatar has been seen!");
+                            
                             window = EWindowView.PROJECT_HUB;
                         }
                     });
@@ -937,6 +957,7 @@ public class FlowNetworkManagerEditor : EditorWindow
             {
                 ConfigurationSingleton.SingleInstance.CurrentProject = null;
                 FlowTObject.RemoveAllObjectsFromScene();
+                FlowAvatar.RemoveAllAvatarFromScene();
                 FlowVSGraph.RemoveAllGraphsFromScene();
             }
             else
