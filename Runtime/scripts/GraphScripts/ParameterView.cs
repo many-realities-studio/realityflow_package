@@ -59,7 +59,7 @@ public class ParameterView : MonoBehaviour
     }
 
     public void Delete(){
-        rfgv.CheckOutGraph();
+        //rfgv.CheckOutGraph();
         if(this.gameObject != null)
             Destroy(this.gameObject);
         rfgv.vsGraph.IsUpdated = true;

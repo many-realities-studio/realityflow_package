@@ -518,7 +518,7 @@ public class RealityFlowGraphView : MonoBehaviour {
 	}
 	
 	public void ClearGraph () {
-		CheckOutGraph();
+		//CheckOutGraph();
 		string tmp = JsonUtility.ToJson(graph);
         commandPalette.AddCommandToStack(new DeleteExposedParameterCommand("Clearing Graph", tmp));
 		//foreach(ParameterView p in paramViews)
@@ -566,7 +566,7 @@ public class RealityFlowGraphView : MonoBehaviour {
         return graph.nodes;
     }
 	public void DoProcessing () {
-		CheckOutGraph();
+		//CheckOutGraph();
 		processor = new ProcessGraphProcessor (graph);
 		processor.Run ();
 		//CheckInGraph();
