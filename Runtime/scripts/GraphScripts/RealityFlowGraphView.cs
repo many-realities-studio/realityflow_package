@@ -65,12 +65,22 @@ public class RealityFlowGraphView : MonoBehaviour {
 
     //public RealityFlowGraphView instance;
 
+	public float updateTimer;
+	public float maxUpdateTime = 0.01f;
+	public bool reloadCoroutineStarted;
+
 
 	private void Start () {
+		updateTimer = 0f;
+		reloadCoroutineStarted = false;
 		SelectComparisonCanvas.SetActive(false);
 		parameterCreationCanvas.SetActive(false);
 		VSGraphDropdownCanvas.SetActive(false);
 		//InitializeGraph();
+	}
+
+	private void Update(){
+		updateTimer += Time.deltaTime;
 	}
 
 	public void CheckOutGraph()
@@ -151,8 +161,28 @@ public class RealityFlowGraphView : MonoBehaviour {
 	
 	void ReloadRFGV()
 	{
-		SoftLoadGraph(graph);
+		updateTimer = 0f;
+		if (!reloadCoroutineStarted)
+		{
+			Debug.Log("Starting a reload coroutine");
+			StartCoroutine (CallSoftReloadCoroutine());
+			reloadCoroutineStarted = true;
+		}
 	}
+
+	public IEnumerator CallSoftReloadCoroutine() {
+		Debug.Log("Inside reload coroutine, we will now wait");
+		yield return new WaitUntil(() => updateTimer >= maxUpdateTime);
+		Debug.Log("Inside reload coroutine, we ARE DONE WAITING!");
+		SoftLoadGraph(graph);
+		updateTimer = 0f;
+		reloadCoroutineStarted = false;
+	}
+
+	// when we receive a graph update, we don't immediately want to trigger a reload. We want to first check if we get any additional updates in a time
+	// frame, and if we do not, then call the reload
+
+	// in RFGV we can set a flag when update received. This allows update to go into if statement
 	
 	void OnApplicationQuit() 
 	{
