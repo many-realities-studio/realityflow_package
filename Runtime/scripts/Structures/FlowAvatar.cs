@@ -18,6 +18,7 @@ namespace RealityFlow.Plugin.Scripts
         public bool CanBeModified { get => _canBeModified; set => _canBeModified = value; }
 
         [JsonProperty("Id")]
+        // Is this actually the user id from the server or just a random
         public string Id { get => _id; set => _id = value; }
 
         [JsonIgnore]
@@ -41,8 +42,9 @@ namespace RealityFlow.Plugin.Scripts
                                 Debug.Log("cannot load prefab");
                             }
                             idToAvatarMapping[Id]._AttachedGameObject = GameObject.Instantiate(prefabReference) as GameObject;
+                            idToAvatarMapping[Id]._AttachedGameObject.transform.SetParent(GameObject.Find("Main Camera").transform);
+                            
                         }
-
                         _AttachedGameObject = idToAvatarMapping[Id]._AttachedGameObject;
                     }
 
@@ -56,6 +58,7 @@ namespace RealityFlow.Plugin.Scripts
                             Debug.Log("cannot load prefab");
                         }
                         _AttachedGameObject = GameObject.Instantiate(prefabReference) as GameObject;
+                        _AttachedGameObject.transform.SetParent( GameObject.Find("Main Camera").transform );
                         Debug.Log("we are running on update!!!!!");
                     }
                 }
@@ -258,21 +261,22 @@ namespace RealityFlow.Plugin.Scripts
         }
 
         [SerializeField]
-        private string _Prefab;
+        /* private string _Prefab;
 
         public string Prefab
         {
             get { return _Prefab; }
             set { _Prefab = value; }
-        }
+        } */
 
-        public static void DestroyObject(string idOfObjectToDestroy)
+        // public static void DestroyObject(string idOfObjectToDestroy)
+        public static void DestroyAvatar(string idOfAvatarToDestroy)
         {
             try
             {
-                GameObject objectToDestroy = idToAvatarMapping[idOfObjectToDestroy].AttachedGameObject;
-                idToAvatarMapping.Remove(idOfObjectToDestroy);
-                UnityEngine.Object.Destroy(objectToDestroy);
+                GameObject avatarToDestroy = idToAvatarMapping[idOfAvatarToDestroy].AttachedGameObject;
+                idToAvatarMapping.Remove(idOfAvatarToDestroy);
+                UnityEngine.Object.Destroy(avatarToDestroy);
             }
             catch (Exception e)
             {
@@ -288,7 +292,7 @@ namespace RealityFlow.Plugin.Scripts
             this.Position = head.position; 
             this.Rotation = head.rotation;
             
-            head.gameObject.AddComponent<FlowAvatar_Monobehaviour>();
+            // head.gameObject.AddComponent<FlowAvatar_Monobehaviour>();
             // FlowAvatar_Monobehaviour monoBehaviour = head.gameObject.GetComponent<FlowAvatar_Monobehaviour>(); /* TBD */
 
             
@@ -304,6 +308,9 @@ namespace RealityFlow.Plugin.Scripts
             // AttachedGameObject.name = name;
             // AttachedGameObject.layer = 9;
 
+            FlowAvatar_Monobehaviour monoBehaviour = AttachedGameObject.GetComponent<FlowAvatar_Monobehaviour>();
+            monoBehaviour.underlyingFlowObject = this;
+
             // AttachedGameObject.AddComponent<FlowAvatar_Monobehaviour>();
             //ObjectManipulator om = AttachedGameObject.AddComponent<ObjectManipulator>();
             // om.OnManipulationEnded += SendGORefToParam;
@@ -312,17 +319,17 @@ namespace RealityFlow.Plugin.Scripts
             // ObjectRigidBody.useGravity = false;
             // ObjectRigidBody.isKinematic = true;
             
-
+            Debug.Log("");
 
             // monoBehaviour.underlyingFlowObject = this;
         } 
 
         [JsonConstructor]
         // public FlowAvatar(string id, float x, float y, float z, float q_x, float q_y, float q_z, float q_w, float s_x, float s_y, float s_z, float r, float g, float b, float a, string name, string prefab)
-        public FlowAvatar(string id, float x, float y, float z, float q_x, float q_y, float q_z, float q_w, float s_x, float s_y, float s_z, float r, float g, float b, float a, string name, string prefab)
+        public FlowAvatar(string id, float x, float y, float z, float q_x, float q_y, float q_z, float q_w, float s_x, float s_y, float s_z, float r, float g, float b, float a, string name/* , string prefab */)
         {
             Id = id;
-            this.Prefab = prefab;
+            // this.Prefab = prefab;
             X = x;
             Y = y;
             Z = z;
@@ -347,7 +354,7 @@ namespace RealityFlow.Plugin.Scripts
             {
                 idToAvatarMapping.Add(Id, this);
                 AttachedGameObject.name = name;
-                AttachedGameObject.AddComponent<FlowAvatar_Monobehaviour>();
+                // AttachedGameObject.AddComponent<FlowAvatar_Monobehaviour>();
                 // AttachedGameObject.AddComponent<ObjectManipulator>();
                 // AttachedGameObject.AddComponent<NearInteractionGrabbable>();
                 AttachedGameObject.transform.hasChanged = false;
@@ -436,8 +443,14 @@ namespace RealityFlow.Plugin.Scripts
 
         public static void RemoveAllAvatarFromScene()
         {
+            // TODO: Remove the FlowAvatar_Monobehavior component from the main camera to avoid stacking
+            // foreach (FlowAvatar flowAvatar in idToAvatarMapping.Values)
+            // if it's the client's FA - only remove the component from main cam
+            // for everyone else - delete the attach
             foreach (FlowAvatar flowAvatar in idToAvatarMapping.Values)
             {
+
+                Debug.Log(JsonUtility.ToJson(flowAvatar));
                 UnityEngine.Object.DestroyImmediate(flowAvatar.AttachedGameObject);
             }
             FlowAvatar.idToAvatarMapping = new SerializableDictionary<string, FlowAvatar>();
