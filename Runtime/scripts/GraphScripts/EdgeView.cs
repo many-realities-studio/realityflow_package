@@ -23,6 +23,12 @@ public class EdgeView : MonoBehaviour
         Destroy(this?.gameObject);
     }
 
+    public void DeleteFromWhiteBoard(NodePortView portBeingDeleted){
+        if (input != null && portBeingDeleted != input) { input.DeleteEdge(this);}
+        if (output != null && portBeingDeleted != output) { output.DeleteEdge(this);}
+        Destroy(this?.gameObject);
+    }
+
     public void RedrawEdge(){
         LineRenderer lr = this.gameObject.GetComponent<LineRenderer>();
 		// calculate the extra points for a better looking circuit board line

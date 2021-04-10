@@ -27,10 +27,8 @@ using System.Globalization;
 
 namespace Packages.realityflow_package.Runtime.scripts
 {
-    public class GraphQLOps {
-        GraphQLOps singleton;
-
-    }
+    public delegate void NotifyGraphUpdate();
+    
     /// <summary>
     /// The purpose of this class is to provide a wrapper for the UnityPlugin,
     /// allowing for easy use with the networking tools
@@ -55,6 +53,7 @@ namespace Packages.realityflow_package.Runtime.scripts
             ReceivedMessage.AddEventHandler(typeof(CreateProject_Received), false, _CreateProject);
             ReceivedMessage.AddEventHandler(typeof(OpenProject_Received), false, _OpenProject);
             ReceivedMessage.AddEventHandler(typeof(LeaveProject_Received), false, _LeaveProject);
+            ReceivedMessage.AddEventHandler(typeof(DeleteProject_Received), false, _DeleteProject);
 
             // Set up Room updates
             ReceivedMessage.AddEventHandler(typeof(UserLeftRoom_Received), false, _UserLeftRoom);
@@ -72,6 +71,7 @@ namespace Packages.realityflow_package.Runtime.scripts
             // Set up Graph updates
             ReceivedMessage.AddEventHandler(typeof(CreateVSGraph_Received), false, _CreateVSGraph);
             ReceivedMessage.AddEventHandler(typeof(DeleteVSGraph_Received), false, _DeleteVSGraph);
+            ReceivedMessage.AddEventHandler(typeof(UpdateVSGraph_Received), false, _UpdateVSGraph);
         }
 
         #region UserOperations
@@ -194,6 +194,8 @@ namespace Packages.realityflow_package.Runtime.scripts
         #endregion AvatarOperations
 
         #region VSGraphOperations
+
+        public static event NotifyGraphUpdate updateRFGV;
 
         // Temporary debugging function
         // public static void CreateVSGraph(string msg)
@@ -485,6 +487,11 @@ namespace Packages.realityflow_package.Runtime.scripts
             Debug.Log("Delete VSGraph: " + eventArgs.message.WasSuccessful);
         }
 
+        private static void _UpdateVSGraph(object sender, BaseReceivedEventArgs eventArgs)
+        {
+            updateRFGV?.Invoke();
+        }
+
         #endregion VSGraph messages received
 
         #region Behaviour messages received
@@ -632,6 +639,22 @@ namespace Packages.realityflow_package.Runtime.scripts
             else
             {
                 Debug.LogWarning("Unable to leave project.");
+            }
+        }
+
+        private static void _DeleteProject(object sender, BaseReceivedEventArgs eventArgs)
+        {
+            if (eventArgs.message.WasSuccessful == true)
+            {
+                Debug.Log("Successfully deleted project");
+
+                // Clear the behaviour list and BEM
+                BehaviourEventManager.Clear();
+                BehaviourEventManager.Initialize();
+            }
+            else
+            {
+                Debug.LogWarning("Unable to delete project.");
             }
         }
 

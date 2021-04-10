@@ -143,6 +143,24 @@ public class FlowNetworkManagerEditor : EditorWindow
 
     private void OnDestroy()
     {
+        // Check in all objects
+        foreach (FlowTObject obj in FlowTObject.idToGameObjectMapping.Values)
+        {
+            if (obj.CanBeModified == true)
+            {
+                Operations.CheckinObject(obj.Id, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) => { });
+            }
+        }
+
+        // Check in all graphs
+        foreach (FlowVSGraph graph in FlowVSGraph.idToVSGraphMapping.Values)
+        {
+            if (graph.CanBeModified == true)
+            {
+                Operations.CheckinVSGraph(graph.Id, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) => { });
+            }
+        }
+
         if (userIsGuest)
         {
             Operations.DeleteUser(new FlowUser(tempUName, tempPWord));
@@ -152,16 +170,16 @@ public class FlowNetworkManagerEditor : EditorWindow
             Operations.Logout(ConfigurationSingleton.SingleInstance.CurrentUser);
         }
 
-        // GameObject[] wbList;
-        // wbList = GameObject.FindGameObjectsWithTag("Canvas");
+        GameObject[] wbList;
+        wbList = GameObject.FindGameObjectsWithTag("Canvas");
 
-        // foreach (GameObject wb in wbList)
-        // {
-        //     // wb.transform.GetChild(2).gameObject.GetComponent<RealityFlowGraphView>().ClearGraph;
-        //     GameObject runeTimeGraphObject = GameObject.FindGameObjectWithTag("Canvas").transform.GetChild(2).gameObject;
-        //     RealityFlowGraphView rfgv = runeTimeGraphObject.GetComponent<RealityFlowGraphView>();
-        //     rfgv.ClearGraph();
-        // }
+        foreach (GameObject wb in wbList)
+        {
+            // wb.transform.GetChild(2).gameObject.GetComponent<RealityFlowGraphView>().ClearGraph;
+            GameObject runeTimeGraphObject = GameObject.FindGameObjectWithTag("Canvas").transform.GetChild(2).gameObject;
+            RealityFlowGraphView rfgv = runeTimeGraphObject.GetComponent<RealityFlowGraphView>();
+            rfgv.ClearWhiteBoard();
+        }
 
         FlowTObject.RemoveAllObjectsFromScene();
         FlowVSGraph.RemoveAllGraphsFromScene();
@@ -854,20 +872,43 @@ public class FlowNetworkManagerEditor : EditorWindow
         // Create "Confirm Project Deletion" Button and define onClick action
         if (GUILayout.Button("Confirm Project Deletion", GUILayout.Height(40)))
         {
-            Operations.DeleteProject(ConfigurationSingleton.SingleInstance.CurrentProject, ConfigurationSingleton.SingleInstance.CurrentUser, (_, e) =>
-            {
-                Debug.Log(e.message);
-                if (e.message.WasSuccessful == true)
-                {
-                    window = EWindowView.USER_HUB;
-                    ConfigurationSingleton.SingleInstance.CurrentProject = null;
-                }
-            });
+            DeleteProject();
+
+            window = EWindowView.USER_HUB;
         }
         if (GUILayout.Button("Cancel", GUILayout.Height(40)))
         {
             window = EWindowView.PROJECT_HUB;
         }
+    }
+
+    private void DeleteProject()
+    {
+        Operations.DeleteProject(ConfigurationSingleton.SingleInstance.CurrentProject, ConfigurationSingleton.SingleInstance.CurrentUser, (_, e) =>
+        {
+            if (e.message.WasSuccessful == true)
+            {
+                ConfigurationSingleton.SingleInstance.CurrentProject = null;
+
+                GameObject[] wbList;
+                wbList = GameObject.FindGameObjectsWithTag("Canvas");
+
+                foreach (GameObject wb in wbList)
+                {
+                    // wb.transform.GetChild(2).gameObject.GetComponent<RealityFlowGraphView>().ClearGraph;
+                    GameObject runeTimeGraphObject = GameObject.FindGameObjectWithTag("Canvas").transform.GetChild(2).gameObject;
+                    RealityFlowGraphView rfgv = runeTimeGraphObject.GetComponent<RealityFlowGraphView>();
+                    rfgv.ClearWhiteBoard();
+                }
+
+                FlowTObject.RemoveAllObjectsFromScene();
+                FlowVSGraph.RemoveAllGraphsFromScene();
+            }
+            else
+            {
+                Debug.LogWarning("Error deleting project.");
+            }
+        });
     }
 
     private void _CreateProjectCreationView()
@@ -951,11 +992,41 @@ public class FlowNetworkManagerEditor : EditorWindow
 
     private void ExitProject()
     {
+        // Check in all objects
+        foreach (FlowTObject obj in FlowTObject.idToGameObjectMapping.Values)
+        {
+            if (obj.CanBeModified == true)
+            {
+                Operations.CheckinObject(obj.Id, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) => { });
+            }
+        }
+
+        // Check in all graphs
+        foreach (FlowVSGraph graph in FlowVSGraph.idToVSGraphMapping.Values)
+        {
+            if (graph.CanBeModified == true)
+            {
+                Operations.CheckinVSGraph(graph.Id, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) => { });
+            }
+        }
+
         Operations.LeaveProject(ConfigurationSingleton.SingleInstance.CurrentProject.Id, ConfigurationSingleton.SingleInstance.CurrentUser, (_, e) =>
         {
             if (e.message.WasSuccessful == true)
             {
                 ConfigurationSingleton.SingleInstance.CurrentProject = null;
+
+                GameObject[] wbList;
+                wbList = GameObject.FindGameObjectsWithTag("Canvas");
+
+                foreach (GameObject wb in wbList)
+                {
+                    // wb.transform.GetChild(2).gameObject.GetComponent<RealityFlowGraphView>().ClearGraph;
+                    GameObject runeTimeGraphObject = GameObject.FindGameObjectWithTag("Canvas").transform.GetChild(2).gameObject;
+                    RealityFlowGraphView rfgv = runeTimeGraphObject.GetComponent<RealityFlowGraphView>();
+                    rfgv.ClearWhiteBoard();
+                }
+
                 FlowTObject.RemoveAllObjectsFromScene();
                 FlowAvatar.RemoveAllAvatarFromScene();
                 FlowVSGraph.RemoveAllGraphsFromScene();

@@ -183,7 +183,7 @@ namespace RealityFlow.Plugin.Scripts
 
                         // paramBuilder.serializedValue.serializedType = param.serializedValue.serializedType;
                         paramBuilder.serializedValue.serializedName = param.serializedValue.serializedName;
-                        paramBuilder.serializedValue.value = newAttachedGameObj;
+                        paramBuilder.serializedValue.value = new SerializableObject(newAttachedGameObj,typeof(GameObject),null);
                     }
                     else
                     {
@@ -217,17 +217,31 @@ namespace RealityFlow.Plugin.Scripts
                     if (Type.GetType(param.type).ToString().Equals("UnityEngine.GameObject"))
                     {
                         // Get the object we want to attach to the parameter from the FlowTObject dictionary
-                        string newObjGuid = paramIdToObjId[param.guid];
-                        FlowTObject updatedFlowTObject = FlowTObject.idToGameObjectMapping[newObjGuid];
-                        GameObject newAttachedGameObj = updatedFlowTObject.AttachedGameObject;
+                        if (paramIdToObjId.ContainsKey(param.guid))
+                        {
+                            string newObjGuid = paramIdToObjId[param.guid];
+                            FlowTObject updatedFlowTObject = FlowTObject.idToGameObjectMapping[newObjGuid];
+                            GameObject newAttachedGameObj = updatedFlowTObject.AttachedGameObject;
 
-                        exposedParameters.Add(new ExposedParameter{
-                            guid = param.guid,
-                            name = param.name,
-                            type = param.type,
-                            settings = new ExposedParameterSettings(),
-                            serializedValue = new SerializableObject(newAttachedGameObj,typeof(GameObject),null)
-                        });
+                            exposedParameters.Add(new ExposedParameter{
+                                guid = param.guid,
+                                name = param.name,
+                                type = param.type,
+                                settings = new ExposedParameterSettings(),
+                                serializedValue = new SerializableObject(newAttachedGameObj,typeof(GameObject),null)
+                            });
+                        }
+                        else
+                        {
+                            Debug.LogWarning("Cannot create GameObject Exposed Parameter from nonexistent object.");
+                            exposedParameters.Add(new ExposedParameter{
+                                guid = param.guid,
+                                name = param.name,
+                                type = param.type,
+                                settings = new ExposedParameterSettings(),
+                                serializedValue = new SerializableObject(null,typeof(GameObject),null)
+                            });
+                        }
                     }
                     else
                     {
@@ -281,10 +295,12 @@ namespace RealityFlow.Plugin.Scripts
 
             if (idToVSGraphMapping.ContainsKey(id))
             {
+                Deserialize();
                 idToVSGraphMapping[id].UpdateFlowVSGraphLocally(this);
             }
             else // Create graph object if it doesn't exist
             {
+                Deserialize();
                 idToVSGraphMapping.Add(Id, this);
                 AttachedGameObject.name = name;
                 AttachedGameObject.AddComponent<FlowVSGraph_Monobehaviour>();
@@ -304,7 +320,7 @@ namespace RealityFlow.Plugin.Scripts
                 Debug.Log("Type of node: " + baseNodeType);
             }
 
-            Deserialize();
+            // Deserialize();
 
             // Disable nodes correctly before removing them:
 			// if (nodes != null)
