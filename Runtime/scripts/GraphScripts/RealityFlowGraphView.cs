@@ -360,7 +360,7 @@ public class RealityFlowGraphView : MonoBehaviour {
 		//pn.LoadExposedParameter();
 
 		graph.AddNode(pn);
-		pn.position = new Rect(new Vector2(newNodePosition.x,newNodePosition.y),new Vector2(100,100));
+		pn.position = new Rect(new Vector2(),new Vector2(100,100));
 		StartCoroutine(AddNodeCoroutine(pn));
 	}
 
