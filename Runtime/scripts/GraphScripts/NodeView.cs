@@ -122,14 +122,14 @@ public class NodeView : MonoBehaviour
 
         UpdateNodeViewGlobally(this);
 
-        if (this.CanBeModified == true && constraintsFrozen)
+        if (this.CanBeModified && rfgv.vsGraph.CanBeModified && constraintsFrozen)
         {
             Debug.LogError("NodeView can be edited but the constraints are frozen. We now unfreeze them.");
             constraintsFrozen = false;
             nodeViewRigidbody.constraints = RigidbodyConstraints.None;
         }
         
-        if (this.CanBeModified == false && constraintsFrozen == false)
+        if (!this.CanBeModified && !rfgv.vsGraph.CanBeModified && !constraintsFrozen)
         {
             Debug.LogError("NodeView can not be edited but the constraints are not yet frozen. We now freeze them.");
             constraintsFrozen = true;
