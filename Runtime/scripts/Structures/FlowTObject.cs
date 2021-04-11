@@ -303,6 +303,7 @@ namespace RealityFlow.Plugin.Scripts
             FlowObject_Monobehaviour monoBehaviour = AttachedGameObject.GetComponent<FlowObject_Monobehaviour>();
 
             monoBehaviour.underlyingFlowObject = this;
+            monoBehaviour.objectRigidbody = ObjectRigidBody;
             om.OnManipulationStarted.RemoveListener(ManipulationStart);
             om.OnManipulationEnded.RemoveListener(ManipulationEnd);
             om.OnManipulationStarted.AddListener(ManipulationStart);
@@ -361,6 +362,7 @@ namespace RealityFlow.Plugin.Scripts
                 var ObjectRigidBody = AttachedGameObject.AddComponent<Rigidbody>();
                 ObjectRigidBody.useGravity = false;
                 ObjectRigidBody.isKinematic = true;
+                monoBehaviour.objectRigidbody = ObjectRigidBody;
                 om.OnManipulationStarted.RemoveListener(ManipulationStart);
                 om.OnManipulationEnded.RemoveListener(ManipulationEnd);
                 om.OnManipulationStarted.AddListener(ManipulationStart);
