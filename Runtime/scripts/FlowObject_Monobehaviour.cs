@@ -9,15 +9,17 @@ namespace Packages.realityflow_package.Runtime.scripts
     [Serializable]
     public class FlowObject_Monobehaviour : MonoBehaviour
     {
-        public ObjectManipulator handler;
+        public Rigidbody objectRigidbody;
         public Color latestColor;
         public FlowTObject underlyingFlowObject;
+
+        private bool constraintsFrozen;
         //private IMixedRealityPointer _pointer;  
         private void start()
         {
-            handler = gameObject.GetComponent<ObjectManipulator>();
-            handler.OnManipulationStarted.AddListener(HandleOnManipulationStarted);
-            handler.OnManipulationEnded.AddListener(HandleOnManipulationEnded);
+            // handler = gameObject.GetComponent<ObjectManipulator>();
+            // handler.OnManipulationStarted.AddListener(HandleOnManipulationStarted);
+            // handler.OnManipulationEnded.AddListener(HandleOnManipulationEnded);
         }
         private void HandleOnManipulationStarted(ManipulationEventData eventData)
         {
@@ -42,6 +44,9 @@ namespace Packages.realityflow_package.Runtime.scripts
 
         private void OnEnable()
         {
+            // objectRigidbody = gameObject.GetComponent<Rigidbody>();
+            // objectRigidbody.constraints = RigidbodyConstraints.FreezeAll;
+            constraintsFrozen = true;
         }
 
         private void OnValidate()
@@ -54,6 +59,20 @@ namespace Packages.realityflow_package.Runtime.scripts
             if (underlyingFlowObject != null)
             {
                 underlyingFlowObject.UpdateObjectGlobally(underlyingFlowObject);
+            }
+
+            if (underlyingFlowObject.CanBeModified == true && constraintsFrozen)
+            {
+                Debug.LogError("NodeView can be edited but the constraints are frozen. We now unfreeze them.");
+                constraintsFrozen = false;
+                objectRigidbody.constraints = RigidbodyConstraints.None;
+            }
+            
+            if (underlyingFlowObject.CanBeModified == false && constraintsFrozen == false)
+            {
+                Debug.LogError("NodeView can not be edited but the constraints are not yet frozen. We now freeze them.");
+                constraintsFrozen = true;
+                objectRigidbody.constraints = RigidbodyConstraints.FreezeAll;
             }
             /*if(underlyingFlowObject != null && gameObject.GetComponent<Renderer>().material.color != latestColor)
             {

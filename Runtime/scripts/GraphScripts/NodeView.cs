@@ -19,6 +19,10 @@ public class NodeView : MonoBehaviour
     public RealityFlowGraphView rfgv;
     public Vector3 localPos;
 
+    public Rigidbody nodeViewRigidbody;
+
+    private bool constraintsFrozen;
+
     public bool CanBeModified { get => _canBeModified; set => _canBeModified = value; }
 
     [SerializeField]
@@ -98,6 +102,10 @@ public class NodeView : MonoBehaviour
     {
         transform.hasChanged = false;
         localPos = transform.localPosition;
+        nodeViewRigidbody = this.gameObject.GetComponent<Rigidbody>();
+
+        nodeViewRigidbody.constraints = RigidbodyConstraints.FreezeAll;
+        constraintsFrozen = true;
     }
     public void RedrawEdges(){
         foreach(NodePortView npv in inputPortViews){
@@ -113,6 +121,20 @@ public class NodeView : MonoBehaviour
         localPos = transform.localPosition;
 
         UpdateNodeViewGlobally(this);
+
+        if (this.CanBeModified == true && constraintsFrozen)
+        {
+            Debug.LogError("NodeView can be edited but the constraints are frozen. We now unfreeze them.");
+            constraintsFrozen = false;
+            nodeViewRigidbody.constraints = RigidbodyConstraints.None;
+        }
+        
+        if (this.CanBeModified == false && constraintsFrozen == false)
+        {
+            Debug.LogError("NodeView can not be edited but the constraints are not yet frozen. We now freeze them.");
+            constraintsFrozen = true;
+            nodeViewRigidbody.constraints = RigidbodyConstraints.FreezeAll;
+        }
     }
 
 
