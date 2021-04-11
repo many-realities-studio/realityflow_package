@@ -309,7 +309,8 @@ namespace RealityFlow.Plugin.Scripts
             // AttachedGameObject.layer = 9;
 
             FlowAvatar_Monobehaviour monoBehaviour = AttachedGameObject.GetComponent<FlowAvatar_Monobehaviour>();
-            monoBehaviour.underlyingFlowObject = this;
+            
+            //monoBehav (John)
 
             // AttachedGameObject.AddComponent<FlowAvatar_Monobehaviour>();
             //ObjectManipulator om = AttachedGameObject.AddComponent<ObjectManipulator>();

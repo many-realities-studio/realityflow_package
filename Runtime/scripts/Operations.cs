@@ -135,10 +135,13 @@ namespace Packages.realityflow_package.Runtime.scripts
 
         #region ObjectOperations
 
-        public static void CreateObject(FlowTObject flowObject, /*FlowUser flowUser,*/ string projectId, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
+        public static void CreateObject(FlowTObject flowObject, string projectId, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
         {
             graphqlClient_Editor createObject = new graphqlClient_Editor();
             createObject.CreateObject(flowObject, projectId);
+
+            // CreateObject_SendToServer createObject = new CreateObject_SendToServer(flowObject, projectId);
+            // FlowWebsocket.SendMessage(createObject);
 
             ReceivedMessage.AddEventHandler(typeof(CreateObject_Received), true, callbackFunction);
         }
@@ -151,13 +154,19 @@ namespace Packages.realityflow_package.Runtime.scripts
             ReceivedMessage.AddEventHandler(typeof(UpdateObject_Received), true, callbackFunction);
         }
 
-        public static void DeleteObject(string idOfObjectToDelete, string projectId, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
+        public static async void DeleteObject(string idOfObjectToDelete, string projectId, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
         {
             graphqlClient_Editor deleteObject = new graphqlClient_Editor();
-            deleteObject.DeleteObject(idOfObjectToDelete);
+            string deletedObjectId = await deleteObject.DeleteObject(idOfObjectToDelete, projectId);
 
-            DeleteObject_SendToServer _deleteObject = new DeleteObject_SendToServer(projectId, idOfObjectToDelete);
-            FlowWebsocket.SendMessage(_deleteObject);
+            if(deletedObjectId != null){ // meaning that the requets went through.
+                __DeleteObject(deletedObjectId);
+            }
+            else
+                Debug.Log("Error, didn't delete object.");
+
+            // DeleteObject_SendToServer _deleteObject = new DeleteObject_SendToServer(projectId, idOfObjectToDelete);
+            // FlowWebsocket.SendMessage(_deleteObject);
 
             ReceivedMessage.AddEventHandler(typeof(DeleteObject_Received), true, callbackFunction);
         }
@@ -435,6 +444,18 @@ namespace Packages.realityflow_package.Runtime.scripts
             }
 
             Debug.Log("Delete Object: " + eventArgs.message.WasSuccessful);
+        }
+
+        // GRAPHQL deleteObject
+        private static void __DeleteObject(string DeletedObjectId)
+        {
+            GameObject gameObject = FlowTObject.idToGameObjectMapping[DeletedObjectId].AttachedGameObject;
+
+            FlowTObject.idToGameObjectMapping.Remove(DeletedObjectId);
+
+            UnityEngine.Object.DestroyImmediate(gameObject);
+
+            Debug.Log("Delete Object was successful!");
         }
 
         #endregion Object messages received

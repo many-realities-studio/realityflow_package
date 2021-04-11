@@ -224,6 +224,8 @@ public class FlowNetworkManagerEditor : EditorWindow
                 }
             }
 
+            //Ask Owen...
+
             // Check in all graphs
             foreach (FlowVSGraph graph in FlowVSGraph.idToVSGraphMapping.Values)
             {
