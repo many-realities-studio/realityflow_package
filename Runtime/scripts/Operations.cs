@@ -20,6 +20,8 @@ using UnityEngine;
 namespace Packages.realityflow_package.Runtime.scripts
 {
     public delegate void NotifyGraphUpdate();
+
+    public delegate void RunGraphHandler(string vsGraphId);
     
     /// <summary>
     /// The purpose of this class is to provide a wrapper for the UnityPlugin,
@@ -28,6 +30,10 @@ namespace Packages.realityflow_package.Runtime.scripts
     public static class Operations
     {
         public static FlowWebsocket _FlowWebsocket { get; private set; }
+
+        public static event NotifyGraphUpdate updateRFGV;
+
+        public static event RunGraphHandler runVSGraph;
 
         static Operations()
         {
@@ -60,6 +66,7 @@ namespace Packages.realityflow_package.Runtime.scripts
             ReceivedMessage.AddEventHandler(typeof(CreateVSGraph_Received), false, _CreateVSGraph);
             ReceivedMessage.AddEventHandler(typeof(DeleteVSGraph_Received), false, _DeleteVSGraph);
             ReceivedMessage.AddEventHandler(typeof(UpdateVSGraph_Received), false, _UpdateVSGraph);
+            ReceivedMessage.AddEventHandler(typeof(RunVSGraph_Received), false, _RunVSGraph);
             // ReceivedMessage.AddEventHandler(typeof(UpdateNodeView_Received), false, _UpdateNodeView);
         }
 
@@ -180,8 +187,6 @@ namespace Packages.realityflow_package.Runtime.scripts
 
         #region VSGraphOperations
 
-        public static event NotifyGraphUpdate updateRFGV;
-
         // Temporary debugging function
         // public static void CreateVSGraph(string msg)
         // {
@@ -232,6 +237,14 @@ namespace Packages.realityflow_package.Runtime.scripts
             FlowWebsocket.SendGraphMessage(message);
 
             ReceivedMessage.AddEventHandler(typeof(UpdateVSGraph_Received), true, callbackFunction);
+        }
+
+        public static void RunVSGraph(string idOfVSGraphToRun, string projectId, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
+        {
+            string message = ("{\"VSGraphId\":\"" + idOfVSGraphToRun + "\",\"ProjectId\":\"" + projectId + "\",\"MessageType\":\"RunVSGraph\"}");
+            FlowWebsocket.SendGraphMessage(message);
+
+            ReceivedMessage.AddEventHandler(typeof(RunVSGraph_Received), true, callbackFunction);
         }
 
         #endregion VSGraphOperations
@@ -484,6 +497,11 @@ namespace Packages.realityflow_package.Runtime.scripts
         private static void _UpdateVSGraph(object sender, BaseReceivedEventArgs eventArgs)
         {
             updateRFGV?.Invoke();
+        }
+
+        private static void _RunVSGraph(object sender, BaseReceivedEventArgs eventArgs)
+        {
+            runVSGraph?.Invoke(eventArgs.message.VSGraphId);
         }
 
         #endregion VSGraph messages received

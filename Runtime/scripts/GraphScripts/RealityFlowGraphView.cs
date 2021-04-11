@@ -124,6 +124,7 @@ public class RealityFlowGraphView : MonoBehaviour {
 		// commandPalette = new CommandPalette();
         graph.onGraphChanges += GraphChangesCallback;
 		Operations.updateRFGV += ReloadRFGV;
+		Operations.runVSGraph += ReceiveRunVSGraph;
 		savePoint = JsonSerializer.Serialize(graph);
 		
 		// selected =
@@ -170,6 +171,15 @@ public class RealityFlowGraphView : MonoBehaviour {
 		}
 	}
 
+	void ReceiveRunVSGraph(string receivedVSGraphId)
+	{
+		if (vsGraph.Id == receivedVSGraphId)
+		{
+			processor = new ProcessGraphProcessor (graph);
+			processor.Run ();
+		}
+	}
+
 	public IEnumerator CallSoftReloadCoroutine() {
 		Debug.Log("Inside reload coroutine, we will now wait");
 		yield return new WaitUntil(() => updateTimer >= maxUpdateTime);
@@ -187,6 +197,7 @@ public class RealityFlowGraphView : MonoBehaviour {
 	void OnApplicationQuit() 
 	{
 		Operations.updateRFGV -= ReloadRFGV;
+		Operations.runVSGraph -= ReceiveRunVSGraph;
 	}
 
     void GraphChangesCallback(GraphChanges changes)
@@ -567,6 +578,7 @@ public class RealityFlowGraphView : MonoBehaviour {
     }
 	public void DoProcessing () {
 		//CheckOutGraph();
+		Operations.RunVSGraph(vsGraph.Id, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) => {/* Debug.Log(e.message);*/ });
 		processor = new ProcessGraphProcessor (graph);
 		processor.Run ();
 		//CheckInGraph();

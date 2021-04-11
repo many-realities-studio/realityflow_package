@@ -70,6 +70,7 @@ namespace Packages.realityflow_package.Runtime.scripts
             messageRouter.Add("DeleteVSGraph", typeof(DeleteVSGraph_Received));
             messageRouter.Add("UpdateVSGraph", typeof(UpdateVSGraph_Received));
             messageRouter.Add("UpdateNodeView", typeof(UpdateNodeView_Received));
+            messageRouter.Add("RunVSGraph", typeof(RunVSGraph_Received));
         }
 
         /// <summary>
