@@ -181,6 +181,7 @@ public class RealityFlowGraphView : MonoBehaviour {
 
 		foreach(KeyValuePair<string,NodeView> nv in selectedNVDict){
 			nodeViewDict.Remove(nv.Key);
+			graph.RemoveNode(nv.Value.node);
 			nv.Value.Delete();
 		}
 		selectedNVDict.Clear();
