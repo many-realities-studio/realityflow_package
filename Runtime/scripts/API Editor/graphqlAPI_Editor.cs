@@ -171,14 +171,14 @@ namespace Contrib.APIeditor
             UnityWebRequest request = await graphql_Var.graphql_api.Post(CreateObject);  
         }
 
-        // public async void UpdateObject(int objectId, string Name, int X, int Y, int Z, int Q_x, int Q_y, int Q_z, int Q_w,
-        //                                 int S_x, int S_y, int S_z, int R, int G, int B, int A, string Prefab, string projectId)
-        // {
-        //     GraphApi.Query UpdateObject = graphql_Var.graphql_api.GetQueryByName("UpdateObject", GraphApi.Query.Type.Mutation);
-        //     UpdateObject.SetArgs(new{id = objectId, Name = _Name, X = _X, Y = _Y, Z = _Z, Q_x = _Q_x, Q_y = _Q_y, Q_z = _Q_z, Q_w = _Q_w,
-        //                             S_x = _S_x, S_y =_S_y, S_z =_S_z, R = _R, G =_G, B = _B, A = _A, Prefab = _Prefab, projectId = _projectID});
-        //     UnityWebRequest request = await graphql_Var.graphql_api.Post(UpdateObject);
-        // }
+        public async void UpdateObject(FlowTObject flowObject, string _projectId)
+        {
+            GraphApi.Query UpdateObject = graphql_Var.graphql_api.GetQueryByName("UpdateObject", GraphApi.Query.Type.Mutation);
+            UpdateObject.SetArgs(new{Id = flowObject.Id, Name = flowObject.Name, X = flowObject.X, Y = flowObject.Y, Z = flowObject.Z, Q_x = flowObject.Q_x,
+                                    Q_y = flowObject.Q_y, Q_z = flowObject.Q_z, Q_w = flowObject.Q_w, S_x = flowObject.S_x, S_y = flowObject.S_y,
+                                    S_z = flowObject.S_z, R = flowObject.R, G = flowObject.G, B = flowObject.B, A = flowObject.A, Prefab = flowObject.Prefab, projectId = _projectId});
+            UnityWebRequest request = await graphql_Var.graphql_api.Post(UpdateObject);
+        }
 
         public async Task<string> DeleteObject(string objectId, string projectID){
             GraphApi.Query DeleteObject = graphql_Var.graphql_api.GetQueryByName("DeleteObject", GraphApi.Query.Type.Mutation);

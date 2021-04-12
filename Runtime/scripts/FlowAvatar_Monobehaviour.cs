@@ -8,12 +8,14 @@ namespace Packages.realityflow_package.Runtime.scripts
     [Serializable]
     public class FlowAvatar_Monobehaviour : MonoBehaviour
     {
-        public FlowAvatar underlyingFlowObject;
+        public FlowAvatar underlyingFlowAvatar;
         public GameObject head, lHand, rHand;
+
+        private bool flag = false;
 
         void Start(){
             GameObject ps = GameObject.FindGameObjectWithTag("Player"); 
-            head = GameObject.FindGameObjectWithTag("MainCamera");
+            // head = GameObject.FindGameObjectWithTag("MainCamera");
         }
 
         private void OnEnable()
@@ -28,11 +30,18 @@ namespace Packages.realityflow_package.Runtime.scripts
 
         public void Update()
         {
-            if (underlyingFlowObject != null)
-            {
-                underlyingFlowObject.UpdateObjectGlobally(underlyingFlowObject);
-                // Tell the server our transform.position of the hands & head
+            if (flag) {
+                if (underlyingFlowAvatar != null)
+                {
+                    underlyingFlowAvatar.UpdateObjectGlobally(underlyingFlowAvatar);
+                    // Tell the server our transform.position of the hands & head
+                }
             }
         }
+
+        public void SetFlag(Boolean f){
+            this.flag = f;
+        }
+
     }
 }

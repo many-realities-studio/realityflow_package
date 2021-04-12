@@ -303,13 +303,17 @@ namespace RealityFlow.Plugin.Scripts
 
             // Not sure if it should be idToGameObjectMapping ...
             idToAvatarMapping.Add(Id, this);
-            // AttachedGameObject.transform.hasChanged = false;
+            AttachedGameObject.transform.hasChanged = false;
+            AttachedGameObject.AddComponent<FlowAvatar_Monobehaviour>();
+
+            FlowAvatar_Monobehaviour monoBehaviour = AttachedGameObject.GetComponent<FlowAvatar_Monobehaviour>();
+            monoBehaviour.underlyingFlowAvatar = this;
+            monoBehaviour.head = head.gameObject; // Cannot implicitly convert type 'UnityEngine.Transform' to 'UnityEngine.GameObject'
             // AttachedGameObject.name = name;
             // AttachedGameObject.layer = 9;
             idToAvatarMapping[Id]._AttachedGameObject.transform.SetParent(GameObject.Find("Main Camera").transform);
             
 
-            FlowAvatar_Monobehaviour monoBehaviour = AttachedGameObject.GetComponent<FlowAvatar_Monobehaviour>();
             //monoBehav (John)
 
             // AttachedGameObject.AddComponent<FlowAvatar_Monobehaviour>();
@@ -320,7 +324,7 @@ namespace RealityFlow.Plugin.Scripts
             // ObjectRigidBody.useGravity = false;
             // ObjectRigidBody.isKinematic = true;
             
-            Debug.Log("");
+            
 
             // monoBehaviour.underlyingFlowObject = this;
         } 
@@ -346,6 +350,14 @@ namespace RealityFlow.Plugin.Scripts
             // B = b;
             // A = a;
             // Name = name;
+            /*
+            
+            "MessageType":"CreateAvatar","FlowAvatar":{"Id":"86920863-828b-4fb0-8007-bdd27db167ad","Name":null,"X":0,"Y":0,"Z":0,"Q_x":0,"Q_y":0,"Q_z":0,"Q_w":1,"S_x":1,"S_y":1,"S_z":1,"R":0,"G":0,"B":0,"A":0},"WasSuccessful":true,
+            "AvatarList":[{"Id":"edcce338-e8d7-4f29-8e8c-587b29b0d4a1","Name":null,"X":0,"Y":0,"Z":0,"Q_x":0,"Q_y":0,"Q_z":0,"Q_w":1,"S_x":1,"S_y":1,"S_z":1,"R":0,"G":0,"B":0,"A":0},
+            {"Id":"119f0875-47d9-424d-856c-658b1a45e7ee","Name":null,"X":0,"Y":0,"Z":0,"Q_x":0,"Q_y":0,"Q_z":0,"Q_w":1,"S_x":1,"S_y":1,"S_z":1,"R":0,"G":0,"B":0,"A":0},
+            {"Id":"86920863-828b-4fb0-8007-bdd27db167ad","Name":null,"X":0,"Y":0,"Z":0,"Q_x":0,"Q_y":0,"Q_z":0,"Q_w":1,"S_x":1,"S_y":1,"S_z":1,"R":0,"G":0,"B":0,"A":0}]}
+            
+            */
 
             if (idToAvatarMapping.ContainsKey(id))
             {
@@ -354,7 +366,7 @@ namespace RealityFlow.Plugin.Scripts
             else // Create game object if it doesn't exist
             {
                 idToAvatarMapping.Add(Id, this);
-                AttachedGameObject.name = name;
+                //AttachedGameObject.name = name;
                 // AttachedGameObject.AddComponent<FlowAvatar_Monobehaviour>();
                 // AttachedGameObject.AddComponent<ObjectManipulator>();
                 // AttachedGameObject.AddComponent<NearInteractionGrabbable>();
@@ -362,8 +374,8 @@ namespace RealityFlow.Plugin.Scripts
                 
                 //AttachedGameObject.layer = 9;
 
-                var monoBehaviour = AttachedGameObject.GetComponent<FlowAvatar_Monobehaviour>();
-                monoBehaviour.underlyingFlowObject = this;
+                //var monoBehaviour = AttachedGameObject.GetComponent<FlowAvatar_Monobehaviour>();
+                //monoBehaviour.underlyingFlowObject = this;
                 //var ObjectRigidBody = AttachedGameObject.AddComponent<Rigidbody>();
                 //ObjectRigidBody.useGravity = false;
                 //ObjectRigidBody.isKinematic = true;

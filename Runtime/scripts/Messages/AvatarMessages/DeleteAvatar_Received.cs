@@ -4,12 +4,12 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.AvatarMessages
 {
     public class DeleteAvatar_Received : ConfirmationMessage_Received
     {
-        [JsonProperty("ObjectId")]
-        public string DeletedObjectId { get; set; } // The deleted avatar
+        [JsonProperty("avatarId")]
+        public string DeletedAvatarId { get; set; } // The deleted avatar
 
-        public DeleteAvatar_Received(string deletedObjectId, bool wasSuccessful) : base(wasSuccessful)
+        public DeleteAvatar_Received(string deletedAvatarId, bool wasSuccessful) : base(wasSuccessful)
         {
-            DeletedObjectId = deletedObjectId;
+            DeletedAvatarId = deletedAvatarId;
             this.MessageType = "DeleteAvatar";
         }
     }

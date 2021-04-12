@@ -148,8 +148,11 @@ namespace Packages.realityflow_package.Runtime.scripts
 
         public static void UpdateObject(FlowTObject flowObject, FlowUser flowUser, string projectId, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
         {
-            UpdateObject_SendToServer updateObject = new UpdateObject_SendToServer(flowObject, /*flowUser,*/ projectId);
-            FlowWebsocket.SendMessage(updateObject);
+            // graphqlClient_Editor updateObject = new graphqlClient_Editor();
+            // updateObject.UpdateObject(flowObject, projectId);
+
+            UpdateObject_SendToServer _updateObject = new UpdateObject_SendToServer(flowObject, projectId);
+            FlowWebsocket.SendMessage(_updateObject);
 
             ReceivedMessage.AddEventHandler(typeof(UpdateObject_Received), true, callbackFunction);
         }
@@ -446,17 +449,17 @@ namespace Packages.realityflow_package.Runtime.scripts
             Debug.Log("Delete Object: " + eventArgs.message.WasSuccessful);
         }
 
-        // // GRAPHQL deleteObject
-        // private static void __DeleteObject(string DeletedObjectId)
-        // {
-        //     GameObject gameObject = FlowTObject.idToGameObjectMapping[DeletedObjectId].AttachedGameObject;
+        // GRAPHQL deleteObject
+        private static void __DeleteObject(string DeletedObjectId)
+        {
+            GameObject gameObject = FlowTObject.idToGameObjectMapping[DeletedObjectId].AttachedGameObject;
 
-        //     FlowTObject.idToGameObjectMapping.Remove(DeletedObjectId);
+            FlowTObject.idToGameObjectMapping.Remove(DeletedObjectId);
 
-        //     UnityEngine.Object.DestroyImmediate(gameObject);
+            UnityEngine.Object.DestroyImmediate(gameObject);
 
-        //     Debug.Log("Delete Object was successful!");
-        // }
+            Debug.Log("Delete Object was successful!");
+        }
 
         #endregion Object messages received
 
