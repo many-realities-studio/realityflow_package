@@ -11,6 +11,7 @@ namespace Packages.realityflow_package.Runtime.scripts
         public FlowAvatar underlyingFlowAvatar;
         public GameObject head, lHand, rHand;
 
+
         void Start(){
             GameObject ps = GameObject.FindGameObjectWithTag("Player"); 
             // head = GameObject.FindGameObjectWithTag("MainCamera");
@@ -27,7 +28,8 @@ namespace Packages.realityflow_package.Runtime.scripts
         }
 
         public void Update()
-        {
+        {   
+            
             
             if (underlyingFlowAvatar != null)
             {
