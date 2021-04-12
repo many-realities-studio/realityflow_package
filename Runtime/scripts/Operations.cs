@@ -66,6 +66,7 @@ namespace Packages.realityflow_package.Runtime.scripts
             ReceivedMessage.AddEventHandler(typeof(CreateVSGraph_Received), false, _CreateVSGraph);
             ReceivedMessage.AddEventHandler(typeof(DeleteVSGraph_Received), false, _DeleteVSGraph);
             ReceivedMessage.AddEventHandler(typeof(UpdateVSGraph_Received), false, _UpdateVSGraph);
+            ReceivedMessage.AddEventHandler(typeof(FinalizedUpdateVSGraph_Received), false, _FinalizedUpdateVSGraph);
             ReceivedMessage.AddEventHandler(typeof(RunVSGraph_Received), false, _RunVSGraph);
             // ReceivedMessage.AddEventHandler(typeof(UpdateNodeView_Received), false, _UpdateNodeView);
         }
@@ -218,6 +219,16 @@ namespace Packages.realityflow_package.Runtime.scripts
             FlowWebsocket.SendGraphMessage(message);
 
             ReceivedMessage.AddEventHandler(typeof(UpdateVSGraph_Received), true, callbackFunction);
+        }
+
+        public static void FinalizedUpdateVSGraph(FlowVSGraph flowVSGraph, FlowUser flowUser, string projectId, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
+        {
+            //UpdateVSGraph_SendToServer updateVSGraph = new UpdateVSGraph_SendToServer(flowVSGraph, /*flowUser,*/ projectId); // TODO: format string msg
+            Debug.Log(JsonUtility.ToJson(flowVSGraph.edges));
+            string message = ("{\"FlowVSGraph\":" + JsonUtility.ToJson(flowVSGraph) + ",\"ProjectId\":\"" + projectId + "\",\"MessageType\":\"FinalizedUpdateVSGraph\"}");
+            FlowWebsocket.SendGraphMessage(message);
+
+            ReceivedMessage.AddEventHandler(typeof(FinalizedUpdateVSGraph_Received), true, callbackFunction);
         }
 
         public static void DeleteVSGraph(string idOfVSGraphToDelete, string projectId, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
@@ -495,6 +506,11 @@ namespace Packages.realityflow_package.Runtime.scripts
         }
 
         private static void _UpdateVSGraph(object sender, BaseReceivedEventArgs eventArgs)
+        {
+            updateRFGV?.Invoke();
+        }
+
+        private static void _FinalizedUpdateVSGraph(object sender, BaseReceivedEventArgs eventArgs)
         {
             updateRFGV?.Invoke();
         }

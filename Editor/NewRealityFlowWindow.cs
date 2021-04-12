@@ -153,13 +153,13 @@ public class FlowNetworkManagerEditor : EditorWindow
         }
 
         // Check in all graphs
-        foreach (FlowVSGraph graph in FlowVSGraph.idToVSGraphMapping.Values)
-        {
-            if (graph.CanBeModified == true)
-            {
-                Operations.CheckinVSGraph(graph.Id, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) => { });
-            }
-        }
+        // foreach (FlowVSGraph graph in FlowVSGraph.idToVSGraphMapping.Values)
+        // {
+        //     if (graph.CanBeModified == true)
+        //     {
+        //         Operations.CheckinVSGraph(graph.Id, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) => { });
+        //     }
+        // }
 
         if (userIsGuest)
         {
@@ -224,13 +224,13 @@ public class FlowNetworkManagerEditor : EditorWindow
             }
 
             // Check in all graphs
-            foreach (FlowVSGraph graph in FlowVSGraph.idToVSGraphMapping.Values)
-            {
-                if (graph.CanBeModified == true)
-                {
-                    Operations.CheckinVSGraph(graph.Id, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) => { });
-                }
-            }
+            // foreach (FlowVSGraph graph in FlowVSGraph.idToVSGraphMapping.Values)
+            // {
+            //     if (graph.CanBeModified == true)
+            //     {
+            //         Operations.CheckinVSGraph(graph.Id, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) => { });
+            //     }
+            // }
 
             Operations.Logout(ConfigurationSingleton.SingleInstance.CurrentUser);
         }
@@ -982,13 +982,13 @@ public class FlowNetworkManagerEditor : EditorWindow
         }
 
         // Check in all graphs
-        foreach (FlowVSGraph graph in FlowVSGraph.idToVSGraphMapping.Values)
-        {
-            if (graph.CanBeModified == true)
-            {
-                Operations.CheckinVSGraph(graph.Id, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) => { });
-            }
-        }
+        // foreach (FlowVSGraph graph in FlowVSGraph.idToVSGraphMapping.Values)
+        // {
+        //     if (graph.CanBeModified == true)
+        //     {
+        //         Operations.CheckinVSGraph(graph.Id, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) => { });
+        //     }
+        // }
 
         Operations.LeaveProject(ConfigurationSingleton.SingleInstance.CurrentProject.Id, ConfigurationSingleton.SingleInstance.CurrentUser, (_, e) =>
         {

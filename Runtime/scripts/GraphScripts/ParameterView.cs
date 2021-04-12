@@ -45,14 +45,14 @@ public class ParameterView : MonoBehaviour
 
     public void AddParameterNodeToGraph(){
         // rfgv.AddNode("ParameterNode");
-        rfgv.CheckOutGraph();
+        // rfgv.CheckOutGraph();
         rfgv.AddParameterNodeToGraph(pn.guid);
         //rfgv.CheckInGraph();
     }
 
     public void DeleteParam()
     {
-        rfgv.CheckOutGraph();
+        // rfgv.CheckOutGraph();
         Debug.Log("Deleting parameter");
         rfgv.RemoveParameter(this);
         this.Delete();
@@ -99,7 +99,7 @@ public class ParameterView : MonoBehaviour
 
     public void ModifyParameterValue()
     {
-        rfgv.CheckOutGraph();
+        // rfgv.CheckOutGraph();
         rfgv.ModifyExposedParameterValue();
         modificationInput = rfgv.gameObject.transform.parent.transform.GetChild(8).gameObject;
         modificationDropdown = rfgv.gameObject.transform.parent.transform.GetChild(10).gameObject;
