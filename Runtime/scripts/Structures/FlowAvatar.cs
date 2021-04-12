@@ -42,7 +42,7 @@ namespace RealityFlow.Plugin.Scripts
                                 Debug.Log("cannot load prefab");
                             }
                             idToAvatarMapping[Id]._AttachedGameObject = GameObject.Instantiate(prefabReference) as GameObject;
-                            idToAvatarMapping[Id]._AttachedGameObject.transform.SetParent(GameObject.Find("Main Camera").transform);
+                            
                             
                         }
                         _AttachedGameObject = idToAvatarMapping[Id]._AttachedGameObject;
@@ -58,8 +58,7 @@ namespace RealityFlow.Plugin.Scripts
                             Debug.Log("cannot load prefab");
                         }
                         _AttachedGameObject = GameObject.Instantiate(prefabReference) as GameObject;
-                        _AttachedGameObject.transform.SetParent( GameObject.Find("Main Camera").transform );
-                        Debug.Log("we are running on update!!!!!");
+                        //Debug.Log("we are running on update!!!!!");
                     }
                 }
                 return _AttachedGameObject;
@@ -307,9 +306,10 @@ namespace RealityFlow.Plugin.Scripts
             // AttachedGameObject.transform.hasChanged = false;
             // AttachedGameObject.name = name;
             // AttachedGameObject.layer = 9;
+            idToAvatarMapping[Id]._AttachedGameObject.transform.SetParent(GameObject.Find("Main Camera").transform);
+            
 
             FlowAvatar_Monobehaviour monoBehaviour = AttachedGameObject.GetComponent<FlowAvatar_Monobehaviour>();
-            
             //monoBehav (John)
 
             // AttachedGameObject.AddComponent<FlowAvatar_Monobehaviour>();
@@ -327,7 +327,7 @@ namespace RealityFlow.Plugin.Scripts
 
         [JsonConstructor]
         // public FlowAvatar(string id, float x, float y, float z, float q_x, float q_y, float q_z, float q_w, float s_x, float s_y, float s_z, float r, float g, float b, float a, string name, string prefab)
-        public FlowAvatar(string id, float x, float y, float z, float q_x, float q_y, float q_z, float q_w, float s_x, float s_y, float s_z, float r, float g, float b, float a, string name/* , string prefab */)
+        public FlowAvatar(string id, float x, float y, float z, float q_x, float q_y, float q_z, float q_w/* , float s_x, float s_y, float s_z, float r, float g, float b, float a, string name *//* , string prefab */)
         {
             Id = id;
             // this.Prefab = prefab;
@@ -338,14 +338,14 @@ namespace RealityFlow.Plugin.Scripts
             Q_y = q_y;
             Q_z = q_z;
             Q_w = q_w;
-            S_x = s_x;
-            S_y = s_y;
-            S_z = s_z;
-            R = r;
-            G = g;
-            B = b;
-            A = a;
-            Name = name;
+            // S_x = s_x;
+            // S_y = s_y;
+            // S_z = s_z;
+            // R = r;
+            // G = g;
+            // B = b;
+            // A = a;
+            // Name = name;
 
             if (idToAvatarMapping.ContainsKey(id))
             {
@@ -359,6 +359,7 @@ namespace RealityFlow.Plugin.Scripts
                 // AttachedGameObject.AddComponent<ObjectManipulator>();
                 // AttachedGameObject.AddComponent<NearInteractionGrabbable>();
                 AttachedGameObject.transform.hasChanged = false;
+                
                 //AttachedGameObject.layer = 9;
 
                 var monoBehaviour = AttachedGameObject.GetComponent<FlowAvatar_Monobehaviour>();

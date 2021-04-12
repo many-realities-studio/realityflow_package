@@ -464,6 +464,23 @@ namespace Packages.realityflow_package.Runtime.scripts
 
         private static void _CreateAvatar(object sender, BaseReceivedEventArgs eventArgs)
         {
+            if (eventArgs.message.WasSuccessful == true)
+            {
+/*                 let returnContent = {
+      "MessageType": "CreateAvatar",
+      "FlowAvatar": returnData[0],
+      "WasSuccessful": (returnData[0] == null) ? false: true,
+      "AvatarList": returnData[2]
+    } */        
+                // load the prefab of avatar
+
+                // foreach (FlowAvatar user in eventArgs.message.AvatarList){
+                //     // make sure we exclude the client's FlowAvatar
+                //     if ( user.Id != eventArgs.message.FlowAvatar.Id ){
+                        
+                //     }
+                // }
+            }
         }
 
         private static void _DeleteAvatar(object sender, BaseReceivedEventArgs eventArgs)
@@ -476,7 +493,7 @@ namespace Packages.realityflow_package.Runtime.scripts
 
                 // TODO: Remove Mono
                 GameObject gameObject = FlowAvatar.idToAvatarMapping[eventArgs.message.DeletedAvatarId].AttachedGameObject;
-
+        
                 // FlowAvatar.idToGameObjectMapping.Remove(eventArgs.message.DeletedAvatarId);
 
                 UnityEngine.Object.DestroyImmediate(gameObject);
