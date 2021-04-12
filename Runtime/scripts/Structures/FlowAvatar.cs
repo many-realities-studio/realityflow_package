@@ -12,6 +12,9 @@ namespace RealityFlow.Plugin.Scripts
     [System.Serializable]
     public class FlowAvatar
     {
+        [JsonIgnore]
+        public bool currentAvatarIsMe = false;
+
         [SerializeField]
         public static SerializableDictionary<string, FlowAvatar> idToAvatarMapping = new SerializableDictionary<string, FlowAvatar>();
 
@@ -288,6 +291,7 @@ namespace RealityFlow.Plugin.Scripts
         {
             // Debug.Log("prefab is " + Prefab);
             // this.Name = name;
+            currentAvatarIsMe = true;
             this.Position = head.position; 
             this.Rotation = head.rotation;
             
@@ -402,14 +406,10 @@ namespace RealityFlow.Plugin.Scripts
         {
             if (AttachedGameObject.transform.hasChanged == true)
             {
-                bool tempCanBeModified = this.CanBeModified;
                 PropertyCopier<FlowAvatar, FlowAvatar>.Copy(newValues, this);
-                this.CanBeModified = tempCanBeModified;
 
-                if (CanBeModified == true)
-                {
-                    Operations.UpdateAvatar(this, ConfigurationSingleton.SingleInstance.CurrentUser, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) => {/* Debug.Log(e.message);*/ });
-                }
+                
+                Operations.UpdateAvatar(this, ConfigurationSingleton.SingleInstance.CurrentUser, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) => {/* Debug.Log(e.message);*/ });
 
                 AttachedGameObject.transform.hasChanged = false;
             }
@@ -419,9 +419,7 @@ namespace RealityFlow.Plugin.Scripts
         {
             if (idToAvatarMapping[newValues.Id].CanBeModified == false)
             {
-                bool tempCanBeModified = this.CanBeModified;
                 PropertyCopier<FlowAvatar, FlowAvatar>.Copy(newValues, this);
-                this.CanBeModified = tempCanBeModified;
             }
         }
 
