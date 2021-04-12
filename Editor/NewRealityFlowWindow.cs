@@ -1014,15 +1014,16 @@ public class FlowNetworkManagerEditor : EditorWindow
             }
         }
 
+        foreach (FlowAvatar avatar in FlowAvatar.idToAvatarMapping.Values)
+        {
+            if (avatar.currentAvatarIsMe == true)
+            {
+                Operations.DeleteAvatar(avatar.Id,ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) => { });
+            }
+        }
+
         Operations.LeaveProject(ConfigurationSingleton.SingleInstance.CurrentProject.Id, ConfigurationSingleton.SingleInstance.CurrentUser, (_, e) =>
         {
-            foreach (FlowAvatar avatar in FlowAvatar.idToAvatarMapping.Values)
-            {
-                if (avatar.currentAvatarIsMe == true)
-                {
-                    Operations.DeleteAvatar(avatar.Id,ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) => { });
-                }
-            }
             
             if (e.message.WasSuccessful == true)
             {

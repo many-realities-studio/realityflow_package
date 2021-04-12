@@ -11,8 +11,6 @@ namespace Packages.realityflow_package.Runtime.scripts
         public FlowAvatar underlyingFlowAvatar;
         public GameObject head, lHand, rHand;
 
-        private bool flag = false;
-
         void Start(){
             GameObject ps = GameObject.FindGameObjectWithTag("Player"); 
             // head = GameObject.FindGameObjectWithTag("MainCamera");
@@ -30,17 +28,12 @@ namespace Packages.realityflow_package.Runtime.scripts
 
         public void Update()
         {
-            if (flag) {
-                if (underlyingFlowAvatar != null)
-                {
-                    underlyingFlowAvatar.UpdateObjectGlobally(underlyingFlowAvatar);
-                    // Tell the server our transform.position of the hands & head
-                }
+            
+            if (underlyingFlowAvatar != null)
+            {
+                underlyingFlowAvatar.UpdateObjectGlobally(underlyingFlowAvatar);
+                // Tell the server our transform.position of the hands & head
             }
-        }
-
-        public void SetFlag(Boolean f){
-            this.flag = f;
         }
 
     }

@@ -408,7 +408,6 @@ namespace RealityFlow.Plugin.Scripts
             {
                 PropertyCopier<FlowAvatar, FlowAvatar>.Copy(newValues, this);
 
-                
                 Operations.UpdateAvatar(this, ConfigurationSingleton.SingleInstance.CurrentUser, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) => {/* Debug.Log(e.message);*/ });
 
                 AttachedGameObject.transform.hasChanged = false;
