@@ -120,6 +120,8 @@ public class NodeView : MonoBehaviour
         transform.rotation = Quaternion.identity;
         localPos = transform.localPosition;
 
+        // Debug.Log("NV CanBeModified state: " + this.CanBeModified + ", constraintsFrozen state: " + constraintsFrozen);
+
         UpdateNodeViewGlobally(this);
 
         if (this.CanBeModified && constraintsFrozen)
@@ -194,7 +196,12 @@ public class NodeView : MonoBehaviour
         Vector2 distFromUpperLeftCorner = newPos / canvasDimensions;
         node.position = new Rect(distFromUpperLeftCorner, new Vector2(100,100));
 
-        rfgv.vsGraph.ManipulationEndGlobalUpdate(rfgv.vsGraph);
+        if (CanBeModified)
+        {
+            rfgv.vsGraph.ManipulationEndGlobalUpdate(rfgv.vsGraph);
+            this.CheckIn();
+        }
+        
     }
 
     public void CheckIn()
