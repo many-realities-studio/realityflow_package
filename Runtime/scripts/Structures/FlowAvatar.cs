@@ -402,18 +402,20 @@ namespace RealityFlow.Plugin.Scripts
         /// Copy all new values into this object
         /// </summary>
         /// <param name="newValues">The values that should be copied over into this object</param>
-        public void UpdateObjectGlobally(FlowAvatar newValues)
+        public void UpdateObjectGlobally(FlowAvatar newValues, GameObject head)
         {
             if (AttachedGameObject.transform.hasChanged == true)
             {
-                PropertyCopier<FlowAvatar, FlowAvatar>.Copy(newValues, this);
+                newValues.Position = head.transform.position;
+                newValues.Rotation = head.transform.rotation;
+                //PropertyCopier<FlowAvatar, FlowAvatar>.Copy(newValues, this);
 
-                Operations.UpdateAvatar(this, ConfigurationSingleton.SingleInstance.CurrentUser, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) => {/* Debug.Log(e.message);*/ });
+                
+                Operations.UpdateAvatar(newValues, ConfigurationSingleton.SingleInstance.CurrentUser, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) => {/* Debug.Log(e.message);*/ });
 
                 AttachedGameObject.transform.hasChanged = false;
             }
         }
-
         private void UpdateObjectLocally(FlowAvatar newValues)
         {
             if (idToAvatarMapping[newValues.Id].CanBeModified == false)

@@ -29,11 +29,9 @@ namespace Packages.realityflow_package.Runtime.scripts
 
         public void Update()
         {   
-            
-            
             if (underlyingFlowAvatar != null)
             {
-                underlyingFlowAvatar.UpdateObjectGlobally(underlyingFlowAvatar);
+                underlyingFlowAvatar.UpdateObjectGlobally(underlyingFlowAvatar, head);
                 // Tell the server our transform.position of the hands & head
             }
         }
