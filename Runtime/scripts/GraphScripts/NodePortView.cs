@@ -81,6 +81,24 @@ public class NodePortView : MonoBehaviour
         Destroy(this.gameObject);
     }
 
+    public void DeleteFromWhiteBoard(){
+        // while (edges.Any()){
+        //     edges[0].Delete();
+        //     edges.RemoveAt(0);
+        // }
+        // if (!list.Any()){
+
+        // } else {
+        // edges.RemoveAll(e => e == null);
+        foreach (EdgeView e in edges){
+            // edges.Remove(e);
+            e.DeleteFromWhiteBoard(this); 
+        }
+        edges.Clear();
+        // }
+        Destroy(this.gameObject);
+    }
+
     public void Init(NodePort np)
     {
         port = np;

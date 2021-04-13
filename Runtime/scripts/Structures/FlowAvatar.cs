@@ -10,10 +10,10 @@ using Microsoft.MixedReality.Toolkit.Input;
 namespace RealityFlow.Plugin.Scripts
 {
     [System.Serializable]
-    public class FlowTObject
+    public class FlowAvatar
     {
         [SerializeField]
-        public static SerializableDictionary<string, FlowTObject> idToGameObjectMapping = new SerializableDictionary<string, FlowTObject>();
+        public static SerializableDictionary<string, FlowAvatar> idToGameObjectMapping = new SerializableDictionary<string, FlowAvatar>();
 
         public bool CanBeModified { get => _canBeModified; set => _canBeModified = value; }
 
@@ -231,17 +231,17 @@ namespace RealityFlow.Plugin.Scripts
             }
         }
 
-        [JsonIgnore]
-        public Vector3 Scale
-        {
-            get => new Vector3(S_x, S_y, S_z);
-            set
-            {
-                S_x = value.x;
-                S_y = value.y;
-                S_z = value.z;
-            }
-        }
+        // [JsonIgnore]
+        // public Vector3 Scale
+        // {
+        //     get => new Vector3(S_x, S_y, S_z);
+        //     set
+        //     {
+        //         S_x = value.x;
+        //         S_y = value.y;
+        //         S_z = value.z;
+        //     }
+        // }
 
         [JsonIgnore]
         public Quaternion Rotation
@@ -279,14 +279,14 @@ namespace RealityFlow.Plugin.Scripts
             }
         }
 
-        public FlowTObject(string name, Vector3 position, Quaternion rotation, Vector3 scale, Color color, string ObjectPrefab)
+        public FlowAvatar(string name, Vector3 position, Quaternion rotation, Color color, string ObjectPrefab)
         {
             this.Prefab = ObjectPrefab;
             Debug.Log("prefab is " + Prefab);
             this.Name = name;
             this.Position = position;
             this.Rotation = rotation;
-            this.Scale = scale;
+            //this.Scale = scale;
             this.ObjectColor = color;
 
             idToGameObjectMapping.Add(Id, this);
@@ -294,35 +294,20 @@ namespace RealityFlow.Plugin.Scripts
             AttachedGameObject.name = name;
             AttachedGameObject.layer = 9;
 
-            AttachedGameObject.AddComponent<FlowObject_Monobehaviour>();
-            ObjectManipulator om = AttachedGameObject.AddComponent<ObjectManipulator>();
-            AttachedGameObject.AddComponent<NearInteractionGrabbable>();
-            Rigidbody ObjectRigidBody = AttachedGameObject.AddComponent<Rigidbody>();
-            ObjectRigidBody.useGravity = false;
-            ObjectRigidBody.isKinematic = true;
-            FlowObject_Monobehaviour monoBehaviour = AttachedGameObject.GetComponent<FlowObject_Monobehaviour>();
+            AttachedGameObject.AddComponent<FlowAvatar_Monobehaviour>();
+            //ObjectManipulator om = AttachedGameObject.AddComponent<ObjectManipulator>();
+            // om.OnManipulationEnded += SendGORefToParam;
+            //AttachedGameObject.AddComponent<NearInteractionGrabbable>();
+            //Rigidbody ObjectRigidBody = AttachedGameObject.AddComponent<Rigidbody>();
+            // ObjectRigidBody.useGravity = false;
+            // ObjectRigidBody.isKinematic = true;
+            FlowAvatar_Monobehaviour monoBehaviour = AttachedGameObject.GetComponent<FlowAvatar_Monobehaviour>();
 
             monoBehaviour.underlyingFlowObject = this;
-            om.OnManipulationStarted.RemoveListener(ManipulationStart);
-            om.OnManipulationEnded.RemoveListener(ManipulationEnd);
-            om.OnManipulationStarted.AddListener(ManipulationStart);
-            om.OnManipulationEnded.AddListener(ManipulationEnd);
-        }
-
-        private void ManipulationStart(ManipulationEventData eventData)
-        {
-            //_pointer = eventData.Pointer;
-            Debug.Log("Manipulation start");
-            this.CheckOut();
-        }
-        private void ManipulationEnd(ManipulationEventData eventData)
-        {
-            Debug.Log("Manipulation end");
-            this.CheckIn();
         }
 
         [JsonConstructor]
-        public FlowTObject(string id, float x, float y, float z, float q_x, float q_y, float q_z, float q_w, float s_x, float s_y, float s_z, float r, float g, float b, float a, string name, string prefab)
+        public FlowAvatar(string id, float x, float y, float z, float q_x, float q_y, float q_z, float q_w, float s_x, float s_y, float s_z, float r, float g, float b, float a, string name, string prefab)
         {
             Id = id;
             this.Prefab = prefab;
@@ -350,26 +335,22 @@ namespace RealityFlow.Plugin.Scripts
             {
                 idToGameObjectMapping.Add(Id, this);
                 AttachedGameObject.name = name;
-                AttachedGameObject.AddComponent<FlowObject_Monobehaviour>();
-                ObjectManipulator om = AttachedGameObject.AddComponent<ObjectManipulator>();
-                AttachedGameObject.AddComponent<NearInteractionGrabbable>();
+                AttachedGameObject.AddComponent<FlowAvatar_Monobehaviour>();
+                // AttachedGameObject.AddComponent<ObjectManipulator>();
+                // AttachedGameObject.AddComponent<NearInteractionGrabbable>();
                 AttachedGameObject.transform.hasChanged = false;
-                AttachedGameObject.layer = 9;
+                //AttachedGameObject.layer = 9;
 
-                var monoBehaviour = AttachedGameObject.GetComponent<FlowObject_Monobehaviour>();
+                var monoBehaviour = AttachedGameObject.GetComponent<FlowAvatar_Monobehaviour>();
                 monoBehaviour.underlyingFlowObject = this;
-                var ObjectRigidBody = AttachedGameObject.AddComponent<Rigidbody>();
-                ObjectRigidBody.useGravity = false;
-                ObjectRigidBody.isKinematic = true;
-                om.OnManipulationStarted.RemoveListener(ManipulationStart);
-                om.OnManipulationEnded.RemoveListener(ManipulationEnd);
-                om.OnManipulationStarted.AddListener(ManipulationStart);
-                om.OnManipulationEnded.AddListener(ManipulationEnd);
+                //var ObjectRigidBody = AttachedGameObject.AddComponent<Rigidbody>();
+                //ObjectRigidBody.useGravity = false;
+                //ObjectRigidBody.isKinematic = true;
             }
         }
 
         /// <summary>
-        /// saves the current flowTObject properties to a Unity GameObject
+        /// saves the current FlowAvatar properties to a Unity GameObject
         /// </summary>
         /// <param name="gameObject">GameObject that the information is to be saved to</param>
         public void SavePropertiesToGameObject(GameObject gameObject)
@@ -377,36 +358,36 @@ namespace RealityFlow.Plugin.Scripts
             // TODO: add all properties to the conversion
             gameObject.gameObject.transform.position = new Vector3(X, Y, Z);
             gameObject.gameObject.transform.rotation = new Quaternion(Q_x, Q_y, Q_z, Q_w);
-            gameObject.gameObject.transform.localScale = new Vector3(S_x, S_y, S_z);
+            //gameObject.gameObject.transform.localScale = new Vector3(S_x, S_y, S_z);
         }
 
         /// <summary>
         /// Copy all new values into this object
         /// </summary>
         /// <param name="newValues">The values that should be copied over into this object</param>
-        public void UpdateObjectGlobally(FlowTObject newValues)
+        public void UpdateObjectGlobally(FlowAvatar newValues)
         {
             if (AttachedGameObject.transform.hasChanged == true)
             {
                 bool tempCanBeModified = this.CanBeModified;
-                PropertyCopier<FlowTObject, FlowTObject>.Copy(newValues, this);
+                PropertyCopier<FlowAvatar, FlowAvatar>.Copy(newValues, this);
                 this.CanBeModified = tempCanBeModified;
 
                 if (CanBeModified == true)
                 {
-                    Operations.UpdateObject(this, ConfigurationSingleton.SingleInstance.CurrentUser, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) => {/* Debug.Log(e.message);*/ });
+                    Operations.UpdateAvatar(this, ConfigurationSingleton.SingleInstance.CurrentUser, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) => {/* Debug.Log(e.message);*/ });
                 }
 
                 AttachedGameObject.transform.hasChanged = false;
             }
         }
 
-        private void UpdateObjectLocally(FlowTObject newValues)
+        private void UpdateObjectLocally(FlowAvatar newValues)
         {
             if (idToGameObjectMapping[newValues.Id].CanBeModified == false)
             {
                 bool tempCanBeModified = this.CanBeModified;
-                PropertyCopier<FlowTObject, FlowTObject>.Copy(newValues, this);
+                PropertyCopier<FlowAvatar, FlowAvatar>.Copy(newValues, this);
                 this.CanBeModified = tempCanBeModified;
             }
         }
@@ -443,11 +424,11 @@ namespace RealityFlow.Plugin.Scripts
 
         public static void RemoveAllObjectsFromScene()
         {
-            foreach (FlowTObject flowObject in idToGameObjectMapping.Values)
+            foreach (FlowAvatar flowObject in idToGameObjectMapping.Values)
             {
                 UnityEngine.Object.DestroyImmediate(flowObject.AttachedGameObject);
             }
-            FlowTObject.idToGameObjectMapping = new SerializableDictionary<string, FlowTObject>();
+            FlowAvatar.idToGameObjectMapping = new SerializableDictionary<string, FlowAvatar>();
         }
     }
 }

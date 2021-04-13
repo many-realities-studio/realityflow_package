@@ -81,6 +81,18 @@ public class NodeView : MonoBehaviour
             Destroy(this.gameObject);
     }
 
+    public void DeleteFromWhiteBoard()
+    {
+        foreach(NodePortView inputPort in inputPortViews){
+            inputPort.DeleteFromWhiteBoard();
+        }
+        foreach(NodePortView outputPort in outputPortViews){
+            outputPort.DeleteFromWhiteBoard();
+        }
+        if(this.gameObject != null)
+            Destroy(this.gameObject);
+    }
+
     public void Select(){
     //    rfgv.AddToSelection(node);
        rfgv.AddToSelectionNV(this);

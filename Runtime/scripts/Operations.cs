@@ -4,6 +4,7 @@ using Packages.realityflow_package.Runtime.scripts.Messages;
 using Packages.realityflow_package.Runtime.scripts.Messages.BehaviourMessages;
 using Packages.realityflow_package.Runtime.scripts.Messages.CheckoutMessages;
 using Packages.realityflow_package.Runtime.scripts.Messages.ObjectMessages;
+using Packages.realityflow_package.Runtime.scripts.Messages.AvatarMessages;
 using Packages.realityflow_package.Runtime.scripts.Messages.ProjectMessages;
 using Packages.realityflow_package.Runtime.scripts.Messages.RoomMessages;
 using Packages.realityflow_package.Runtime.scripts.Messages.UserMessages;
@@ -18,6 +19,8 @@ using UnityEngine;
 
 namespace Packages.realityflow_package.Runtime.scripts
 {
+    public delegate void NotifyGraphUpdate();
+    
     /// <summary>
     /// The purpose of this class is to provide a wrapper for the UnityPlugin,
     /// allowing for easy use with the networking tools
@@ -38,6 +41,7 @@ namespace Packages.realityflow_package.Runtime.scripts
             ReceivedMessage.AddEventHandler(typeof(CreateProject_Received), false, _CreateProject);
             ReceivedMessage.AddEventHandler(typeof(OpenProject_Received), false, _OpenProject);
             ReceivedMessage.AddEventHandler(typeof(LeaveProject_Received), false, _LeaveProject);
+            ReceivedMessage.AddEventHandler(typeof(DeleteProject_Received), false, _DeleteProject);
 
             // Set up Room updates
             ReceivedMessage.AddEventHandler(typeof(UserLeftRoom_Received), false, _UserLeftRoom);
@@ -55,6 +59,7 @@ namespace Packages.realityflow_package.Runtime.scripts
             // Set up Graph updates
             ReceivedMessage.AddEventHandler(typeof(CreateVSGraph_Received), false, _CreateVSGraph);
             ReceivedMessage.AddEventHandler(typeof(DeleteVSGraph_Received), false, _DeleteVSGraph);
+            ReceivedMessage.AddEventHandler(typeof(UpdateVSGraph_Received), false, _UpdateVSGraph);
         }
 
         #region UserOperations
@@ -143,7 +148,38 @@ namespace Packages.realityflow_package.Runtime.scripts
 
         #endregion ObjectOperations
 
+    #region AvatarOperations
+
+        public static void CreateAvatar(FlowAvatar flowAvatar, /*FlowUser flowUser,*/ string projectId, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
+        {
+            CreateAvatar_SendToServer createObject =
+                new CreateAvatar_SendToServer(flowAvatar, /*flowUser,*/ projectId);
+            FlowWebsocket.SendMessage(createObject);
+
+            ReceivedMessage.AddEventHandler(typeof(CreateAvatar_Received), true, callbackFunction);
+        }
+
+        public static void UpdateAvatar(FlowAvatar flowAvatar, FlowUser flowUser, string projectId, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
+        {
+            UpdateAvatar_SendToServer updateObject = new UpdateAvatar_SendToServer(flowAvatar, /*flowUser,*/ projectId);
+            FlowWebsocket.SendMessage(updateObject);
+
+            ReceivedMessage.AddEventHandler(typeof(UpdateAvatar_Received), true, callbackFunction);
+        }
+
+        public static void DeleteAvatar(string idOfObjectToDelete, string projectId, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
+        {
+            DeleteAvatar_SendToServer deleteObject = new DeleteAvatar_SendToServer(projectId, idOfObjectToDelete);
+            FlowWebsocket.SendMessage(deleteObject);
+
+            ReceivedMessage.AddEventHandler(typeof(DeleteAvatar_Received), true, callbackFunction);
+        }
+
+        #endregion AvatarOperations
+
         #region VSGraphOperations
+
+        public static event NotifyGraphUpdate updateRFGV;
 
         // Temporary debugging function
         // public static void CreateVSGraph(string msg)
@@ -367,6 +403,31 @@ namespace Packages.realityflow_package.Runtime.scripts
 
         #endregion Object messages received
 
+        #region Avatar messages received
+
+        private static void _CreateAvatar(object sender, BaseReceivedEventArgs eventArgs)
+        {
+        }
+
+        private static void _DeleteAvatar(object sender, BaseReceivedEventArgs eventArgs)
+        {
+            // Delete object in unity
+            //NewObjectManager.DestroyObject(eventArgs.message.DeletedObject.Id);
+
+            if (eventArgs.message.WasSuccessful == true)
+            {
+                GameObject gameObject = FlowAvatar.idToGameObjectMapping[eventArgs.message.DeletedAvatarId].AttachedGameObject;
+
+                FlowAvatar.idToGameObjectMapping.Remove(eventArgs.message.DeletedAvatarId);
+
+                UnityEngine.Object.DestroyImmediate(gameObject);
+            }
+
+            Debug.Log("Delete Avatar: " + eventArgs.message.WasSuccessful);
+        }
+
+        #endregion Object messages received
+
         #region VSGraph messages received
 
         private static void _CreateVSGraph(object sender, BaseReceivedEventArgs eventArgs)
@@ -386,6 +447,11 @@ namespace Packages.realityflow_package.Runtime.scripts
             }
 
             Debug.Log("Delete VSGraph: " + eventArgs.message.WasSuccessful);
+        }
+
+        private static void _UpdateVSGraph(object sender, BaseReceivedEventArgs eventArgs)
+        {
+            updateRFGV?.Invoke();
         }
 
         #endregion VSGraph messages received
@@ -499,6 +565,22 @@ namespace Packages.realityflow_package.Runtime.scripts
             else
             {
                 Debug.LogWarning("Unable to leave project.");
+            }
+        }
+
+        private static void _DeleteProject(object sender, BaseReceivedEventArgs eventArgs)
+        {
+            if (eventArgs.message.WasSuccessful == true)
+            {
+                Debug.Log("Successfully deleted project");
+
+                // Clear the behaviour list and BEM
+                BehaviourEventManager.Clear();
+                BehaviourEventManager.Initialize();
+            }
+            else
+            {
+                Debug.LogWarning("Unable to delete project.");
             }
         }
 
