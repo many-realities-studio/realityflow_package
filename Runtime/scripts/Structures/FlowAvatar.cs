@@ -308,6 +308,8 @@ namespace RealityFlow.Plugin.Scripts
             // Not sure if it should be idToGameObjectMapping ...
             idToAvatarMapping.Add(Id, this);
             AttachedGameObject.transform.hasChanged = false;
+            MeshRenderer renderer = AttachedGameObject.GetComponent<MeshRenderer>();
+            renderer.enabled = false;
             AttachedGameObject.AddComponent<FlowAvatar_Monobehaviour>();
 
             FlowAvatar_Monobehaviour monoBehaviour = AttachedGameObject.GetComponent<FlowAvatar_Monobehaviour>();
