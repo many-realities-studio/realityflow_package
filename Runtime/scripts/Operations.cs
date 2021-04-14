@@ -11,11 +11,19 @@ using Packages.realityflow_package.Runtime.scripts.Messages.UserMessages;
 using Packages.realityflow_package.Runtime.scripts.Messages.VSGraphMessages;
 using RealityFlow.Plugin.Scripts;
 using GraphProcessor;
+using System.Threading.Tasks;
+using RealityFlow.Plugin.Contrib; // TODO: Fix reference
 
-//using RealityFlow.Plugin.Scripts.Events;
+// Unity/GraphQL libraries
+using System.Collections;
 using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
+using UnityEditor;
+using UnityEngine.Networking;
+using GraphQlClient.Core; 
+using Contrib.APIeditor;
+using Newtonsoft.Json;
+using System.Globalization;
 
 namespace Packages.realityflow_package.Runtime.scripts
 {
@@ -42,6 +50,10 @@ namespace Packages.realityflow_package.Runtime.scripts
             // Set up Object updates
             ReceivedMessage.AddEventHandler(typeof(CreateObject_Received), false, _CreateObject);
             ReceivedMessage.AddEventHandler(typeof(DeleteObject_Received), false, _DeleteObject);
+
+            // Set up Avatar updates
+            ReceivedMessage.AddEventHandler(typeof(CreateAvatar_Received), false, _CreateAvatar);
+            ReceivedMessage.AddEventHandler(typeof(DeleteAvatar_Received), false, _DeleteAvatar);
 
             // Set up Project updates
             ReceivedMessage.AddEventHandler(typeof(CreateProject_Received), false, _CreateProject);
@@ -106,7 +118,7 @@ namespace Packages.realityflow_package.Runtime.scripts
 
         public static void Register(string username, string password, string url, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
         {
-            bool connectionSuccssfull = ConnectToServer(url);
+             bool connectionSuccssfull = ConnectToServer(url);
 
             if (FlowWebsocket.websocket.ReadyState == WebSocketSharp.WebSocketState.Open)
             {
@@ -115,6 +127,9 @@ namespace Packages.realityflow_package.Runtime.scripts
 
                 ReceivedMessage.AddEventHandler(typeof(RegisterUser_Received), true, callbackFunction);
             }
+
+            // graphqlClient_Editor createUser = new graphqlClient_Editor();
+            // createUser.CreateUser(username, password); 
         }
 
         public static void DeleteUser(FlowUser flowUser)
@@ -129,10 +144,12 @@ namespace Packages.realityflow_package.Runtime.scripts
 
         #region ObjectOperations
 
-        public static void CreateObject(FlowTObject flowObject, /*FlowUser flowUser,*/ string projectId, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
+        public static void CreateObject(FlowTObject flowObject, string projectId, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
         {
-            CreateObject_SendToServer createObject =
-                new CreateObject_SendToServer(flowObject, /*flowUser,*/ projectId);
+            // graphqlClient_Editor createObject = new graphqlClient_Editor();
+            // createObject.CreateObject(flowObject, projectId);
+
+            CreateObject_SendToServer createObject = new CreateObject_SendToServer(flowObject, projectId);
             FlowWebsocket.SendMessage(createObject);
 
             ReceivedMessage.AddEventHandler(typeof(CreateObject_Received), true, callbackFunction);
@@ -140,37 +157,48 @@ namespace Packages.realityflow_package.Runtime.scripts
 
         public static void UpdateObject(FlowTObject flowObject, FlowUser flowUser, string projectId, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
         {
-            UpdateObject_SendToServer updateObject = new UpdateObject_SendToServer(flowObject, /*flowUser,*/ projectId);
-            FlowWebsocket.SendMessage(updateObject);
+            // graphqlClient_Editor updateObject = new graphqlClient_Editor();
+            // updateObject.UpdateObject(flowObject, projectId);
+
+            UpdateObject_SendToServer _updateObject = new UpdateObject_SendToServer(flowObject, projectId);
+            FlowWebsocket.SendMessage(_updateObject);
 
             ReceivedMessage.AddEventHandler(typeof(UpdateObject_Received), true, callbackFunction);
         }
 
-        public static void DeleteObject(string idOfObjectToDelete, string projectId, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
+        public static async void DeleteObject(string idOfObjectToDelete, string projectId, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
         {
-            DeleteObject_SendToServer deleteObject = new DeleteObject_SendToServer(projectId, idOfObjectToDelete);
-            FlowWebsocket.SendMessage(deleteObject);
+            // graphqlClient_Editor deleteObject = new graphqlClient_Editor();
+            // string deletedObjectId = await deleteObject.DeleteObject(idOfObjectToDelete, projectId);
+
+            // if(deletedObjectId != null){ // meaning that the requets went through.
+            //     __DeleteObject(deletedObjectId);
+            // }
+            // else
+            //     Debug.Log("Error, didn't delete object.");
+
+            DeleteObject_SendToServer _deleteObject = new DeleteObject_SendToServer(projectId, idOfObjectToDelete);
+            FlowWebsocket.SendMessage(_deleteObject);
 
             ReceivedMessage.AddEventHandler(typeof(DeleteObject_Received), true, callbackFunction);
-            ;
         }
 
         #endregion ObjectOperations
 
     #region AvatarOperations
 
-        public static void CreateAvatar(FlowAvatar flowAvatar, /*FlowUser flowUser,*/ string projectId, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
+        public static void CreateAvatar(FlowAvatar flowAvatar, string projectId , ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
         {
-            CreateAvatar_SendToServer createObject =
-                new CreateAvatar_SendToServer(flowAvatar, /*flowUser,*/ projectId);
-            FlowWebsocket.SendMessage(createObject);
+            CreateAvatar_SendToServer createAvatar =
+                new CreateAvatar_SendToServer(flowAvatar, projectId);
+            FlowWebsocket.SendMessage(createAvatar);
 
             ReceivedMessage.AddEventHandler(typeof(CreateAvatar_Received), true, callbackFunction);
         }
 
         public static void UpdateAvatar(FlowAvatar flowAvatar, FlowUser flowUser, string projectId, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
         {
-            UpdateAvatar_SendToServer updateObject = new UpdateAvatar_SendToServer(flowAvatar, /*flowUser,*/ projectId);
+            UpdateAvatar_SendToServer updateObject = new UpdateAvatar_SendToServer(flowAvatar, projectId);
             FlowWebsocket.SendMessage(updateObject);
 
             ReceivedMessage.AddEventHandler(typeof(UpdateAvatar_Received), true, callbackFunction);
@@ -262,16 +290,34 @@ namespace Packages.realityflow_package.Runtime.scripts
 
         #region BehaviourOperations
 
-        public static void CreateBehaviour(FlowBehaviour behaviour, string projectId, List<string> behavioursToLinkTo, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
+        public static async void CreateBehaviour(FlowBehaviour behaviour, string projectId, List<string> behavioursToLinkTo, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
         {
-            CreateBehaviour_SendToServer createBehaviour = new CreateBehaviour_SendToServer(behaviour, projectId, behavioursToLinkTo);
-            FlowWebsocket.SendMessage(createBehaviour);
+            // GraphQL
+             graphqlClient_Editor createBehaviour = new graphqlClient_Editor();
+             //createBehaviour.CreateBehaviour(behaviour, projectId, behavioursToLinkTo);
+             string IdToBeLinked = await createBehaviour.CreateBehaviour(behaviour, projectId, behavioursToLinkTo);
+    
+            if(IdToBeLinked != null){
+                behaviour.BehaviourName = behaviour.flowAction.ActionType;
+                //behavioursToLinkTo.Add(IdToBeLinked);
+                __CreateBehaviour(behaviour, projectId, behavioursToLinkTo, IdToBeLinked);
+                
+            }
+            
+            // Probz change this name...
+            // CreateBehaviour_SendToServer _createBehaviour = new CreateBehaviour_SendToServer(behaviour, projectId, behavioursToLinkTo);
 
-            ReceivedMessage.AddEventHandler(typeof(CreateBehaviour_Received), true, callbackFunction);
+            // FlowWebsocket.SendMessage(_createBehaviour);
+            //ReceivedMessage.AddEventHandler(typeof(CreateBehaviour_Received), true, callbackFunction);
+
         }
 
         public static void DeleteBehaviour(List<string> behaviourIds, string projectId, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
         {
+            //GraphQL
+            // graphqlClient_Editor deleteBehaviour = new graphqlClient_Editor();
+            // deleteBehaviour.DeleteBehaviour(behaviourIds, projectId);
+            //__DeleteBehaviour(behaviourIds);
             DeleteBehaviour_SendToServer deleteBehaviour = new DeleteBehaviour_SendToServer(behaviourIds, projectId);
             FlowWebsocket.SendMessage(deleteBehaviour);
 
@@ -314,6 +360,8 @@ namespace Packages.realityflow_package.Runtime.scripts
             //}
             //else
             //{
+            // GameObject.Find()
+            // Create Avatar HERE
             OpenProject_SendToServer openProject = new OpenProject_SendToServer(projectId, flowUser);
             FlowWebsocket.SendMessage(openProject);
 
@@ -457,12 +505,41 @@ namespace Packages.realityflow_package.Runtime.scripts
             Debug.Log("Delete Object: " + eventArgs.message.WasSuccessful);
         }
 
+        // GRAPHQL deleteObject
+        private static void __DeleteObject(string DeletedObjectId)
+        {
+            GameObject gameObject = FlowTObject.idToGameObjectMapping[DeletedObjectId].AttachedGameObject;
+
+            FlowTObject.idToGameObjectMapping.Remove(DeletedObjectId);
+
+            UnityEngine.Object.DestroyImmediate(gameObject);
+
+            Debug.Log("Delete Object was successful!");
+        }
+
         #endregion Object messages received
 
         #region Avatar messages received
 
         private static void _CreateAvatar(object sender, BaseReceivedEventArgs eventArgs)
         {
+            if (eventArgs.message.WasSuccessful == true)
+            {
+/*                 let returnContent = {
+      "MessageType": "CreateAvatar",
+      "FlowAvatar": returnData[0],
+      "WasSuccessful": (returnData[0] == null) ? false: true,
+      "AvatarList": returnData[2]
+    } */        
+                // load the prefab of avatar
+
+                // foreach (FlowAvatar user in eventArgs.message.AvatarList){
+                //     // make sure we exclude the client's FlowAvatar
+                //     if ( user.Id != eventArgs.message.FlowAvatar.Id ){
+                        
+                //     }
+                // }
+            }
         }
 
         private static void _DeleteAvatar(object sender, BaseReceivedEventArgs eventArgs)
@@ -472,9 +549,11 @@ namespace Packages.realityflow_package.Runtime.scripts
 
             if (eventArgs.message.WasSuccessful == true)
             {
-                GameObject gameObject = FlowAvatar.idToGameObjectMapping[eventArgs.message.DeletedAvatarId].AttachedGameObject;
 
-                FlowAvatar.idToGameObjectMapping.Remove(eventArgs.message.DeletedAvatarId);
+                // TODO: Remove Mono
+                GameObject gameObject = FlowAvatar.idToAvatarMapping[eventArgs.message.DeletedAvatarId].AttachedGameObject;
+        
+                // FlowAvatar.idToGameObjectMapping.Remove(eventArgs.message.DeletedAvatarId);
 
                 UnityEngine.Object.DestroyImmediate(gameObject);
             }
@@ -541,6 +620,24 @@ namespace Packages.realityflow_package.Runtime.scripts
             Debug.Log("Number of behaviours in bem = " + BehaviourEventManager.BehaviourList.Count);
         }
 
+        //GraphQL method
+        private static void __CreateBehaviour(FlowBehaviour behaviour, string projectId, List<string> behavioursToLinkTo, string currentBehaviourId)
+        {      // Parent
+            if (currentBehaviourId != null)
+            {
+                Debug.Log("Success creating behaviour with GraphQL " + behaviour.TypeOfTrigger);
+
+                BehaviourEventManager.CreateNewBehaviour(behaviour);
+
+                foreach (string behaviourToLinkId in behavioursToLinkTo)
+                {
+                    BehaviourEventManager.LinkBehaviours(behaviour.Id, behaviourToLinkId);
+                }
+            }
+
+            Debug.Log("Number of behaviours in bem = " + BehaviourEventManager.BehaviourList.Count);
+        }
+
         private static void _DeleteBehaviour(object sender, BaseReceivedEventArgs eventArgs)
         {
             // this is where things happen after a DeleteBehaviour message is deserialized
@@ -556,6 +653,24 @@ namespace Packages.realityflow_package.Runtime.scripts
                 Debug.Log("Successfully delete all behaviours in the chain");
                 Debug.Log("Number of behaviours in bem = " + BehaviourEventManager.BehaviourList.Count);
             }
+        }
+
+        //gql
+        private static void __DeleteBehaviour(List<string> BehaviourIds)
+        {
+            // this is where things happen after a DeleteBehaviour message is deserialized
+            // if (eventArgs.message.WasSuccessful)
+            // {
+                // for each behaviour id in behaviourIds, delete from behaviour list and from each object's interactablevents
+                foreach (string id in BehaviourIds)
+                {
+                    FlowBehaviour fb = BehaviourEventManager.BehaviourList[id];
+
+                    BehaviourEventManager.DeleteFlowBehaviour(fb.TriggerObjectId, fb.TriggerObjectId, fb);
+                }
+                Debug.Log("Successfully delete all behaviours in the chain");
+                Debug.Log("Number of behaviours in bem = " + BehaviourEventManager.BehaviourList.Count);
+            //
         }
 
         private static void _UpdateBehaviour(object sender, BaseReceivedEventArgs eventArgs)
@@ -583,7 +698,7 @@ namespace Packages.realityflow_package.Runtime.scripts
         {
             Debug.Log("Now in load project");
             ConfigurationSingleton.SingleInstance.CurrentProject = eventArgs.message.flowProject;
-
+            
             ConfigurationSingleton asset = ScriptableObject.CreateInstance<ConfigurationSingleton>();
             asset.CurrentProject = ConfigurationSingleton.SingleInstance.CurrentProject;
             asset.CurrentUser = ConfigurationSingleton.SingleInstance.CurrentUser;
@@ -657,6 +772,7 @@ namespace Packages.realityflow_package.Runtime.scripts
         private static void _UserLeftRoom(object sender, BaseReceivedEventArgs eventArgs)
         {
             Debug.Log("Room Alert: " + eventArgs.message.leftRoomMessage);
+
         }
 
         #endregion Room messages received

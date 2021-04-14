@@ -31,7 +31,7 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.AvatarMessages
     /// </summary>
     public class UpdateAvatar_SendToServer : BaseMessage
     {
-        [JsonProperty("flowAvatar")]
+        [JsonProperty("FlowAvatar")]
         public FlowAvatar flowAvatar { get; set; }
 
         [JsonProperty("ProjectId")]
@@ -51,16 +51,16 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.AvatarMessages
     /// </summary>
     public class DeleteAvatar_SendToServer : BaseMessage
     {
-        [JsonProperty("ObjectId")]
-        public string ObjectId { get; set; } // Id of the deleted object
+        [JsonProperty("AvatarId")]
+        public string AvatarId { get; set; } // Id of the deleted object
 
         [JsonProperty("ProjectId")]
         public string ProjectId { get; set; }
 
-        public DeleteAvatar_SendToServer(string projectId, string objectId)
+        public DeleteAvatar_SendToServer(string projectId, string AvatarId)
         {
             ProjectId = projectId;
-            this.ObjectId = objectId;
+            this.AvatarId = AvatarId;
             this.MessageType = "DeleteAvatar";
         }
     }
@@ -70,7 +70,7 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.AvatarMessages
     /// </summary>
     public class FinalizedUpdateAvatar_SendToServer : BaseMessage
     {
-        [JsonProperty("flowAvatar")]
+        [JsonProperty("FlowAvatar")]
         public FlowAvatar flowAvatar { get; set; }
 
         [JsonProperty("projectId")]

@@ -3,6 +3,7 @@ using Packages.realityflow_package.Runtime.scripts.Messages;
 using Packages.realityflow_package.Runtime.scripts.Messages.BehaviourMessages;
 using Packages.realityflow_package.Runtime.scripts.Messages.CheckoutMessages;
 using Packages.realityflow_package.Runtime.scripts.Messages.ObjectMessages;
+using Packages.realityflow_package.Runtime.scripts.Messages.AvatarMessages;
 using Packages.realityflow_package.Runtime.scripts.Messages.ProjectMessages;
 using Packages.realityflow_package.Runtime.scripts.Messages.RoomMessages;
 using Packages.realityflow_package.Runtime.scripts.Messages.UserMessages;
@@ -33,6 +34,11 @@ namespace Packages.realityflow_package.Runtime.scripts
             messageRouter.Add("CreateObject", typeof(CreateObject_Received));
             messageRouter.Add("DeleteObject", typeof(DeleteObject_Received));
             messageRouter.Add("UpdateObject", typeof(UpdateObject_Received));
+
+            // Avatar Messages
+            messageRouter.Add("CreateAvatar", typeof(CreateAvatar_Received));
+            messageRouter.Add("DeleteAvatar", typeof(DeleteAvatar_Received));
+            messageRouter.Add("UpdateAvatar", typeof(UpdateAvatar_Received));
 
             // Project Messages
             messageRouter.Add("CreateProject", typeof(CreateProject_Received));

@@ -31,6 +31,7 @@ public class NodeView : MonoBehaviour
 
     public List<NodePortView> inputPortViews = new List<NodePortView>();
     public List<NodePortView> outputPortViews = new List<NodePortView>();
+    public static NodeView instance;
     
     // TODO: Make sure this is the best way to do this. I think this is really hacky -John
     // public BaseGraph graph;
@@ -98,6 +99,10 @@ public class NodeView : MonoBehaviour
             transform.hasChanged = false;
         }
     }
+    void Awake()
+    {
+        instance = this;
+    }
     private void Start()
     {
         transform.hasChanged = false;
@@ -107,12 +112,12 @@ public class NodeView : MonoBehaviour
         nodeViewRigidbody.constraints = RigidbodyConstraints.FreezeAll;
         constraintsFrozen = true;
     }
-    public void RedrawEdges(){
+    public void RedrawEdges(bool flag){
         foreach(NodePortView npv in inputPortViews){
-            if (npv.edges.Count != 0 ) { npv.SignalRedraw(); }
+            if (npv.edges.Count != 0 ) { npv.SignalRedrawOnUpdate(flag); }
         }
         foreach(NodePortView npv in outputPortViews){
-            if (npv.edges.Count != 0 ) { npv.SignalRedraw(); }
+            if (npv.edges.Count != 0 ) { npv.SignalRedrawOnUpdate(flag); }
         }
     }
 
@@ -183,6 +188,7 @@ public class NodeView : MonoBehaviour
         localPos.z = 0.0f;
         transform.localPosition = localPos;
         transform.localScale = Vector3.one;
+        RedrawEdges(false);
     }
 
     public void UpdateNodeValues()

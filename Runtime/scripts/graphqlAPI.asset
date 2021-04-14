@@ -1,0 +1,1376 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1ccf793b7ca1cc645b9cd36d753b8e3c, type: 3}
+  m_Name: graphqlAPI
+  m_EditorClassIdentifier: 
+  url: http://localhost:4000/
+  queries: []
+  mutations:
+  - name: CreateObject
+    type: 1
+    query: "mutation CreateObject{\n    createObject(  Id :\"90ee3448-32b3-4286-9d97-15cf5a6a46a4\",
+      Name :\"James\", X :0, Y :0, Z :0, Q_x :0, Q_y :0, Q_z :0, Q_w :1, S_x :1,
+      S_y :1, S_z :1, R :0, G :0, B :0, A :0, Prefab :\"Pig\", projectId :\"878e6e49-f52f-49be-82ec-0184052b6951\"
+      ){\n        Id\n        Name\n        X\n        Y\n        Z\n        Q_x\n       
+      Q_y\n        Q_z\n        Q_w\n        S_x\n        S_y\n        S_z\n       
+      R\n        G\n        B\n        A\n        Prefab\n        projectId\n   
+      }\n}"
+    queryString: createObject
+    returnType: db_object
+    queryOptions:
+    - createBehaviour
+    - updateBehaviour
+    - deleteBehaviour
+    - createUser
+    - updateUser
+    - deleteUser
+    - createProject
+    - updateProject
+    - deleteProject
+    - createObject
+    - updateObject
+    - deleteObject
+    fields:
+    - index: 1
+      name: Id
+      type: String
+      parentIndexes: 
+      hasSubField: 0
+      possibleFields:
+      - name: id
+        type: Int
+      - name: Id
+        type: String
+      - name: Name
+        type: String
+      - name: X
+        type: Int
+      - name: Y
+        type: Int
+      - name: Z
+        type: Int
+      - name: Q_x
+        type: Int
+      - name: Q_y
+        type: Int
+      - name: Q_z
+        type: Int
+      - name: Q_w
+        type: Int
+      - name: S_x
+        type: Int
+      - name: S_y
+        type: Int
+      - name: S_z
+        type: Int
+      - name: R
+        type: Int
+      - name: G
+        type: Int
+      - name: B
+        type: Int
+      - name: A
+        type: Int
+      - name: Prefab
+        type: String
+      - name: project
+        type: project
+      - name: projectId
+        type: String
+      hasChanged: 0
+    - index: 2
+      name: Name
+      type: String
+      parentIndexes: 
+      hasSubField: 0
+      possibleFields:
+      - name: id
+        type: Int
+      - name: Id
+        type: String
+      - name: Name
+        type: String
+      - name: X
+        type: Int
+      - name: Y
+        type: Int
+      - name: Z
+        type: Int
+      - name: Q_x
+        type: Int
+      - name: Q_y
+        type: Int
+      - name: Q_z
+        type: Int
+      - name: Q_w
+        type: Int
+      - name: S_x
+        type: Int
+      - name: S_y
+        type: Int
+      - name: S_z
+        type: Int
+      - name: R
+        type: Int
+      - name: G
+        type: Int
+      - name: B
+        type: Int
+      - name: A
+        type: Int
+      - name: Prefab
+        type: String
+      - name: project
+        type: project
+      - name: projectId
+        type: String
+      hasChanged: 0
+    - index: 3
+      name: X
+      type: Int
+      parentIndexes: 
+      hasSubField: 0
+      possibleFields:
+      - name: id
+        type: Int
+      - name: Id
+        type: String
+      - name: Name
+        type: String
+      - name: X
+        type: Int
+      - name: Y
+        type: Int
+      - name: Z
+        type: Int
+      - name: Q_x
+        type: Int
+      - name: Q_y
+        type: Int
+      - name: Q_z
+        type: Int
+      - name: Q_w
+        type: Int
+      - name: S_x
+        type: Int
+      - name: S_y
+        type: Int
+      - name: S_z
+        type: Int
+      - name: R
+        type: Int
+      - name: G
+        type: Int
+      - name: B
+        type: Int
+      - name: A
+        type: Int
+      - name: Prefab
+        type: String
+      - name: project
+        type: project
+      - name: projectId
+        type: String
+      hasChanged: 0
+    - index: 4
+      name: Y
+      type: Int
+      parentIndexes: 
+      hasSubField: 0
+      possibleFields:
+      - name: id
+        type: Int
+      - name: Id
+        type: String
+      - name: Name
+        type: String
+      - name: X
+        type: Int
+      - name: Y
+        type: Int
+      - name: Z
+        type: Int
+      - name: Q_x
+        type: Int
+      - name: Q_y
+        type: Int
+      - name: Q_z
+        type: Int
+      - name: Q_w
+        type: Int
+      - name: S_x
+        type: Int
+      - name: S_y
+        type: Int
+      - name: S_z
+        type: Int
+      - name: R
+        type: Int
+      - name: G
+        type: Int
+      - name: B
+        type: Int
+      - name: A
+        type: Int
+      - name: Prefab
+        type: String
+      - name: project
+        type: project
+      - name: projectId
+        type: String
+      hasChanged: 0
+    - index: 5
+      name: Z
+      type: Int
+      parentIndexes: 
+      hasSubField: 0
+      possibleFields:
+      - name: id
+        type: Int
+      - name: Id
+        type: String
+      - name: Name
+        type: String
+      - name: X
+        type: Int
+      - name: Y
+        type: Int
+      - name: Z
+        type: Int
+      - name: Q_x
+        type: Int
+      - name: Q_y
+        type: Int
+      - name: Q_z
+        type: Int
+      - name: Q_w
+        type: Int
+      - name: S_x
+        type: Int
+      - name: S_y
+        type: Int
+      - name: S_z
+        type: Int
+      - name: R
+        type: Int
+      - name: G
+        type: Int
+      - name: B
+        type: Int
+      - name: A
+        type: Int
+      - name: Prefab
+        type: String
+      - name: project
+        type: project
+      - name: projectId
+        type: String
+      hasChanged: 0
+    - index: 6
+      name: Q_x
+      type: Int
+      parentIndexes: 
+      hasSubField: 0
+      possibleFields:
+      - name: id
+        type: Int
+      - name: Id
+        type: String
+      - name: Name
+        type: String
+      - name: X
+        type: Int
+      - name: Y
+        type: Int
+      - name: Z
+        type: Int
+      - name: Q_x
+        type: Int
+      - name: Q_y
+        type: Int
+      - name: Q_z
+        type: Int
+      - name: Q_w
+        type: Int
+      - name: S_x
+        type: Int
+      - name: S_y
+        type: Int
+      - name: S_z
+        type: Int
+      - name: R
+        type: Int
+      - name: G
+        type: Int
+      - name: B
+        type: Int
+      - name: A
+        type: Int
+      - name: Prefab
+        type: String
+      - name: project
+        type: project
+      - name: projectId
+        type: String
+      hasChanged: 0
+    - index: 7
+      name: Q_y
+      type: Int
+      parentIndexes: 
+      hasSubField: 0
+      possibleFields:
+      - name: id
+        type: Int
+      - name: Id
+        type: String
+      - name: Name
+        type: String
+      - name: X
+        type: Int
+      - name: Y
+        type: Int
+      - name: Z
+        type: Int
+      - name: Q_x
+        type: Int
+      - name: Q_y
+        type: Int
+      - name: Q_z
+        type: Int
+      - name: Q_w
+        type: Int
+      - name: S_x
+        type: Int
+      - name: S_y
+        type: Int
+      - name: S_z
+        type: Int
+      - name: R
+        type: Int
+      - name: G
+        type: Int
+      - name: B
+        type: Int
+      - name: A
+        type: Int
+      - name: Prefab
+        type: String
+      - name: project
+        type: project
+      - name: projectId
+        type: String
+      hasChanged: 0
+    - index: 8
+      name: Q_z
+      type: Int
+      parentIndexes: 
+      hasSubField: 0
+      possibleFields:
+      - name: id
+        type: Int
+      - name: Id
+        type: String
+      - name: Name
+        type: String
+      - name: X
+        type: Int
+      - name: Y
+        type: Int
+      - name: Z
+        type: Int
+      - name: Q_x
+        type: Int
+      - name: Q_y
+        type: Int
+      - name: Q_z
+        type: Int
+      - name: Q_w
+        type: Int
+      - name: S_x
+        type: Int
+      - name: S_y
+        type: Int
+      - name: S_z
+        type: Int
+      - name: R
+        type: Int
+      - name: G
+        type: Int
+      - name: B
+        type: Int
+      - name: A
+        type: Int
+      - name: Prefab
+        type: String
+      - name: project
+        type: project
+      - name: projectId
+        type: String
+      hasChanged: 0
+    - index: 9
+      name: Q_w
+      type: Int
+      parentIndexes: 
+      hasSubField: 0
+      possibleFields:
+      - name: id
+        type: Int
+      - name: Id
+        type: String
+      - name: Name
+        type: String
+      - name: X
+        type: Int
+      - name: Y
+        type: Int
+      - name: Z
+        type: Int
+      - name: Q_x
+        type: Int
+      - name: Q_y
+        type: Int
+      - name: Q_z
+        type: Int
+      - name: Q_w
+        type: Int
+      - name: S_x
+        type: Int
+      - name: S_y
+        type: Int
+      - name: S_z
+        type: Int
+      - name: R
+        type: Int
+      - name: G
+        type: Int
+      - name: B
+        type: Int
+      - name: A
+        type: Int
+      - name: Prefab
+        type: String
+      - name: project
+        type: project
+      - name: projectId
+        type: String
+      hasChanged: 0
+    - index: 10
+      name: S_x
+      type: Int
+      parentIndexes: 
+      hasSubField: 0
+      possibleFields:
+      - name: id
+        type: Int
+      - name: Id
+        type: String
+      - name: Name
+        type: String
+      - name: X
+        type: Int
+      - name: Y
+        type: Int
+      - name: Z
+        type: Int
+      - name: Q_x
+        type: Int
+      - name: Q_y
+        type: Int
+      - name: Q_z
+        type: Int
+      - name: Q_w
+        type: Int
+      - name: S_x
+        type: Int
+      - name: S_y
+        type: Int
+      - name: S_z
+        type: Int
+      - name: R
+        type: Int
+      - name: G
+        type: Int
+      - name: B
+        type: Int
+      - name: A
+        type: Int
+      - name: Prefab
+        type: String
+      - name: project
+        type: project
+      - name: projectId
+        type: String
+      hasChanged: 0
+    - index: 11
+      name: S_y
+      type: Int
+      parentIndexes: 
+      hasSubField: 0
+      possibleFields:
+      - name: id
+        type: Int
+      - name: Id
+        type: String
+      - name: Name
+        type: String
+      - name: X
+        type: Int
+      - name: Y
+        type: Int
+      - name: Z
+        type: Int
+      - name: Q_x
+        type: Int
+      - name: Q_y
+        type: Int
+      - name: Q_z
+        type: Int
+      - name: Q_w
+        type: Int
+      - name: S_x
+        type: Int
+      - name: S_y
+        type: Int
+      - name: S_z
+        type: Int
+      - name: R
+        type: Int
+      - name: G
+        type: Int
+      - name: B
+        type: Int
+      - name: A
+        type: Int
+      - name: Prefab
+        type: String
+      - name: project
+        type: project
+      - name: projectId
+        type: String
+      hasChanged: 0
+    - index: 12
+      name: S_z
+      type: Int
+      parentIndexes: 
+      hasSubField: 0
+      possibleFields:
+      - name: id
+        type: Int
+      - name: Id
+        type: String
+      - name: Name
+        type: String
+      - name: X
+        type: Int
+      - name: Y
+        type: Int
+      - name: Z
+        type: Int
+      - name: Q_x
+        type: Int
+      - name: Q_y
+        type: Int
+      - name: Q_z
+        type: Int
+      - name: Q_w
+        type: Int
+      - name: S_x
+        type: Int
+      - name: S_y
+        type: Int
+      - name: S_z
+        type: Int
+      - name: R
+        type: Int
+      - name: G
+        type: Int
+      - name: B
+        type: Int
+      - name: A
+        type: Int
+      - name: Prefab
+        type: String
+      - name: project
+        type: project
+      - name: projectId
+        type: String
+      hasChanged: 0
+    - index: 13
+      name: R
+      type: Int
+      parentIndexes: 
+      hasSubField: 0
+      possibleFields:
+      - name: id
+        type: Int
+      - name: Id
+        type: String
+      - name: Name
+        type: String
+      - name: X
+        type: Int
+      - name: Y
+        type: Int
+      - name: Z
+        type: Int
+      - name: Q_x
+        type: Int
+      - name: Q_y
+        type: Int
+      - name: Q_z
+        type: Int
+      - name: Q_w
+        type: Int
+      - name: S_x
+        type: Int
+      - name: S_y
+        type: Int
+      - name: S_z
+        type: Int
+      - name: R
+        type: Int
+      - name: G
+        type: Int
+      - name: B
+        type: Int
+      - name: A
+        type: Int
+      - name: Prefab
+        type: String
+      - name: project
+        type: project
+      - name: projectId
+        type: String
+      hasChanged: 0
+    - index: 14
+      name: G
+      type: Int
+      parentIndexes: 
+      hasSubField: 0
+      possibleFields:
+      - name: id
+        type: Int
+      - name: Id
+        type: String
+      - name: Name
+        type: String
+      - name: X
+        type: Int
+      - name: Y
+        type: Int
+      - name: Z
+        type: Int
+      - name: Q_x
+        type: Int
+      - name: Q_y
+        type: Int
+      - name: Q_z
+        type: Int
+      - name: Q_w
+        type: Int
+      - name: S_x
+        type: Int
+      - name: S_y
+        type: Int
+      - name: S_z
+        type: Int
+      - name: R
+        type: Int
+      - name: G
+        type: Int
+      - name: B
+        type: Int
+      - name: A
+        type: Int
+      - name: Prefab
+        type: String
+      - name: project
+        type: project
+      - name: projectId
+        type: String
+      hasChanged: 0
+    - index: 15
+      name: B
+      type: Int
+      parentIndexes: 
+      hasSubField: 0
+      possibleFields:
+      - name: id
+        type: Int
+      - name: Id
+        type: String
+      - name: Name
+        type: String
+      - name: X
+        type: Int
+      - name: Y
+        type: Int
+      - name: Z
+        type: Int
+      - name: Q_x
+        type: Int
+      - name: Q_y
+        type: Int
+      - name: Q_z
+        type: Int
+      - name: Q_w
+        type: Int
+      - name: S_x
+        type: Int
+      - name: S_y
+        type: Int
+      - name: S_z
+        type: Int
+      - name: R
+        type: Int
+      - name: G
+        type: Int
+      - name: B
+        type: Int
+      - name: A
+        type: Int
+      - name: Prefab
+        type: String
+      - name: project
+        type: project
+      - name: projectId
+        type: String
+      hasChanged: 0
+    - index: 16
+      name: A
+      type: Int
+      parentIndexes: 
+      hasSubField: 0
+      possibleFields:
+      - name: id
+        type: Int
+      - name: Id
+        type: String
+      - name: Name
+        type: String
+      - name: X
+        type: Int
+      - name: Y
+        type: Int
+      - name: Z
+        type: Int
+      - name: Q_x
+        type: Int
+      - name: Q_y
+        type: Int
+      - name: Q_z
+        type: Int
+      - name: Q_w
+        type: Int
+      - name: S_x
+        type: Int
+      - name: S_y
+        type: Int
+      - name: S_z
+        type: Int
+      - name: R
+        type: Int
+      - name: G
+        type: Int
+      - name: B
+        type: Int
+      - name: A
+        type: Int
+      - name: Prefab
+        type: String
+      - name: project
+        type: project
+      - name: projectId
+        type: String
+      hasChanged: 0
+    - index: 17
+      name: Prefab
+      type: String
+      parentIndexes: 
+      hasSubField: 0
+      possibleFields:
+      - name: id
+        type: Int
+      - name: Id
+        type: String
+      - name: Name
+        type: String
+      - name: X
+        type: Int
+      - name: Y
+        type: Int
+      - name: Z
+        type: Int
+      - name: Q_x
+        type: Int
+      - name: Q_y
+        type: Int
+      - name: Q_z
+        type: Int
+      - name: Q_w
+        type: Int
+      - name: S_x
+        type: Int
+      - name: S_y
+        type: Int
+      - name: S_z
+        type: Int
+      - name: R
+        type: Int
+      - name: G
+        type: Int
+      - name: B
+        type: Int
+      - name: A
+        type: Int
+      - name: Prefab
+        type: String
+      - name: project
+        type: project
+      - name: projectId
+        type: String
+      hasChanged: 0
+    - index: 19
+      name: projectId
+      type: String
+      parentIndexes: 
+      hasSubField: 0
+      possibleFields:
+      - name: id
+        type: Int
+      - name: Id
+        type: String
+      - name: Name
+        type: String
+      - name: X
+        type: Int
+      - name: Y
+        type: Int
+      - name: Z
+        type: Int
+      - name: Q_x
+        type: Int
+      - name: Q_y
+        type: Int
+      - name: Q_z
+        type: Int
+      - name: Q_w
+        type: Int
+      - name: S_x
+        type: Int
+      - name: S_y
+        type: Int
+      - name: S_z
+        type: Int
+      - name: R
+        type: Int
+      - name: G
+        type: Int
+      - name: B
+        type: Int
+      - name: A
+        type: Int
+      - name: Prefab
+        type: String
+      - name: project
+        type: project
+      - name: projectId
+        type: String
+      hasChanged: 0
+    isComplete: 1
+  - name: CreateBehaviour
+    type: 1
+    query: "mutation CreateBehaviour{\n    createBehaviour(  Id :\"7ad16a7f-7e70-4adf-b180-92b0f011473f\",
+      TypeOfTrigger :\"Immediate\", TriggerObjectId :\"502f3b44-e235-428b-98d5-5388b06ce993\",
+      TargetObjectId :\"502f3b44-e235-428b-98d5-5388b06ce993\", ProjectId :\"d8563f65-5558-4146-9985-68d0e7b6ab9b\",
+      NextBehaviour :\"[]\", Action :{ Id :null, ActionType :\"Disable\"} ){\n       
+      Id\n    }\n}"
+    queryString: createBehaviour
+    returnType: behaviour
+    queryOptions:
+    - createBehaviour
+    - updateBehaviour
+    - deleteBehaviour
+    - createUser
+    - updateUser
+    - deleteUser
+    - createProject
+    - updateProject
+    - deleteProject
+    - createObject
+    - updateObject
+    - deleteObject
+    fields:
+    - index: 0
+      name: Id
+      type: String
+      parentIndexes: 
+      hasSubField: 0
+      possibleFields:
+      - name: Id
+        type: String
+      - name: TypeOfTrigger
+        type: String
+      - name: TriggerObjectId
+        type: String
+      - name: TargetObjectId
+        type: String
+      - name: ProjectId
+        type: String
+      - name: NextBehaviour
+        type: String
+      - name: Action
+        type: JSON
+      hasChanged: 0
+    isComplete: 1
+  - name: DeleteBehaviour
+    type: 1
+    query: "mutation DeleteBehaviour{\n    deleteBehaviour(  Id :\"7a59640e-8fea-4453-a1ba-c8a8090345f7\"
+      ){\n        Id\n    }\n}"
+    queryString: deleteBehaviour
+    returnType: behaviour
+    queryOptions:
+    - createBehaviour
+    - updateBehaviour
+    - deleteBehaviour
+    - createUser
+    - updateUser
+    - deleteUser
+    - createProject
+    - updateProject
+    - deleteProject
+    - createObject
+    - updateObject
+    - deleteObject
+    fields:
+    - index: 0
+      name: Id
+      type: String
+      parentIndexes: 
+      hasSubField: 0
+      possibleFields:
+      - name: Id
+        type: String
+      - name: TypeOfTrigger
+        type: String
+      - name: TriggerObjectId
+        type: String
+      - name: TargetObjectId
+        type: String
+      - name: ProjectId
+        type: String
+      - name: NextBehaviour
+        type: String
+      - name: Action
+        type: JSON
+      hasChanged: 0
+    isComplete: 1
+  - name: CreateUser
+    type: 1
+    query: "mutation CreateUser{\n    createUser(  Username :\"testUser\", Password
+      :\"12345\" ){\n        Username\n    }\n}"
+    queryString: createUser
+    returnType: user
+    queryOptions:
+    - createBehaviour
+    - updateBehaviour
+    - deleteBehaviour
+    - createUser
+    - updateUser
+    - deleteUser
+    - createProject
+    - updateProject
+    - deleteProject
+    - createObject
+    - updateObject
+    - deleteObject
+    fields:
+    - index: 0
+      name: Username
+      type: String
+      parentIndexes: 
+      hasSubField: 0
+      possibleFields:
+      - name: Username
+        type: String
+      - name: Password
+        type: String
+      - name: project
+        type: project
+      hasChanged: 0
+    isComplete: 1
+  - name: CreateVSGraph
+    type: 1
+    query: "mutation CreateVSGraph{\n    createVSGraph{\n        Id\n        Name\n   
+      }\n}"
+    queryString: createVSGraph
+    returnType: vs_graph
+    queryOptions:
+    - createBehaviour
+    - updateBehaviour
+    - deleteBehaviour
+    - createUser
+    - updateUser
+    - deleteUser
+    - createProject
+    - updateProject
+    - deleteProject
+    - createObject
+    - updateObject
+    - deleteObject
+    - createVSGraph
+    - updateVSGraph
+    - deleteVSGraph
+    fields:
+    - index: 1
+      name: Id
+      type: String
+      parentIndexes: 
+      hasSubField: 0
+      possibleFields:
+      - name: id
+        type: Int
+      - name: Id
+        type: String
+      - name: Name
+        type: String
+      - name: serializedNodes
+        type: String
+      - name: edges
+        type: String
+      - name: groups
+        type: String
+      - name: stackNodes
+        type: String
+      - name: pinnedElements
+        type: String
+      - name: exposedParameters
+        type: String
+      - name: stickyNotes
+        type: String
+      - name: position
+        type: String
+      - name: scale
+        type: String
+      - name: references
+        type: String
+      - name: projectId
+        type: String
+      - name: project
+        type: project
+      hasChanged: 0
+    - index: 2
+      name: Name
+      type: String
+      parentIndexes: 
+      hasSubField: 0
+      possibleFields:
+      - name: id
+        type: Int
+      - name: Id
+        type: String
+      - name: Name
+        type: String
+      - name: serializedNodes
+        type: String
+      - name: edges
+        type: String
+      - name: groups
+        type: String
+      - name: stackNodes
+        type: String
+      - name: pinnedElements
+        type: String
+      - name: exposedParameters
+        type: String
+      - name: stickyNotes
+        type: String
+      - name: position
+        type: String
+      - name: scale
+        type: String
+      - name: references
+        type: String
+      - name: projectId
+        type: String
+      - name: project
+        type: project
+      hasChanged: 0
+    isComplete: 1
+  - name: UpdateVSGraph
+    type: 1
+    query: "mutation UpdateVSGraph{\n    updateVSGraph{\n        Id\n        Name\n   
+      }\n}"
+    queryString: updateVSGraph
+    returnType: vs_graph
+    queryOptions:
+    - createBehaviour
+    - updateBehaviour
+    - deleteBehaviour
+    - createUser
+    - updateUser
+    - deleteUser
+    - createProject
+    - updateProject
+    - deleteProject
+    - createObject
+    - updateObject
+    - deleteObject
+    - createVSGraph
+    - updateVSGraph
+    - deleteVSGraph
+    fields:
+    - index: 1
+      name: Id
+      type: String
+      parentIndexes: 
+      hasSubField: 0
+      possibleFields:
+      - name: id
+        type: Int
+      - name: Id
+        type: String
+      - name: Name
+        type: String
+      - name: serializedNodes
+        type: String
+      - name: edges
+        type: String
+      - name: groups
+        type: String
+      - name: stackNodes
+        type: String
+      - name: pinnedElements
+        type: String
+      - name: exposedParameters
+        type: String
+      - name: stickyNotes
+        type: String
+      - name: position
+        type: String
+      - name: scale
+        type: String
+      - name: references
+        type: String
+      - name: projectId
+        type: String
+      - name: project
+        type: project
+      hasChanged: 0
+    - index: 2
+      name: Name
+      type: String
+      parentIndexes: 
+      hasSubField: 0
+      possibleFields:
+      - name: id
+        type: Int
+      - name: Id
+        type: String
+      - name: Name
+        type: String
+      - name: serializedNodes
+        type: String
+      - name: edges
+        type: String
+      - name: groups
+        type: String
+      - name: stackNodes
+        type: String
+      - name: pinnedElements
+        type: String
+      - name: exposedParameters
+        type: String
+      - name: stickyNotes
+        type: String
+      - name: position
+        type: String
+      - name: scale
+        type: String
+      - name: references
+        type: String
+      - name: projectId
+        type: String
+      - name: project
+        type: project
+      hasChanged: 0
+    isComplete: 1
+  - name: DeleteVSGraph
+    type: 1
+    query: "mutation DeleteVSGraph{\n    deleteVSGraph{\n        Id\n        Name\n   
+      }\n}"
+    queryString: deleteVSGraph
+    returnType: vs_graph
+    queryOptions:
+    - createBehaviour
+    - updateBehaviour
+    - deleteBehaviour
+    - createUser
+    - updateUser
+    - deleteUser
+    - createProject
+    - updateProject
+    - deleteProject
+    - createObject
+    - updateObject
+    - deleteObject
+    - createVSGraph
+    - updateVSGraph
+    - deleteVSGraph
+    fields:
+    - index: 1
+      name: Id
+      type: String
+      parentIndexes: 
+      hasSubField: 0
+      possibleFields:
+      - name: id
+        type: Int
+      - name: Id
+        type: String
+      - name: Name
+        type: String
+      - name: serializedNodes
+        type: String
+      - name: edges
+        type: String
+      - name: groups
+        type: String
+      - name: stackNodes
+        type: String
+      - name: pinnedElements
+        type: String
+      - name: exposedParameters
+        type: String
+      - name: stickyNotes
+        type: String
+      - name: position
+        type: String
+      - name: scale
+        type: String
+      - name: references
+        type: String
+      - name: projectId
+        type: String
+      - name: project
+        type: project
+      hasChanged: 0
+    - index: 2
+      name: Name
+      type: String
+      parentIndexes: 
+      hasSubField: 0
+      possibleFields:
+      - name: id
+        type: Int
+      - name: Id
+        type: String
+      - name: Name
+        type: String
+      - name: serializedNodes
+        type: String
+      - name: edges
+        type: String
+      - name: groups
+        type: String
+      - name: stackNodes
+        type: String
+      - name: pinnedElements
+        type: String
+      - name: exposedParameters
+        type: String
+      - name: stickyNotes
+        type: String
+      - name: position
+        type: String
+      - name: scale
+        type: String
+      - name: references
+        type: String
+      - name: projectId
+        type: String
+      - name: project
+        type: project
+      hasChanged: 0
+    isComplete: 1
+  - name: DeleteObject
+    type: 1
+    query: "mutation DeleteObject{\n    deleteObject{\n        Id\n    }\n}"
+    queryString: deleteObject
+    returnType: db_object
+    queryOptions:
+    - createBehaviour
+    - updateBehaviour
+    - deleteBehaviour
+    - createUser
+    - updateUser
+    - deleteUser
+    - createProject
+    - updateProject
+    - deleteProject
+    - createObject
+    - updateObject
+    - deleteObject
+    - createVSGraph
+    - updateVSGraph
+    - deleteVSGraph
+    fields:
+    - index: 1
+      name: Id
+      type: String
+      parentIndexes: 
+      hasSubField: 0
+      possibleFields:
+      - name: id
+        type: Int
+      - name: Id
+        type: String
+      - name: Name
+        type: String
+      - name: X
+        type: Float
+      - name: Y
+        type: Float
+      - name: Z
+        type: Float
+      - name: Q_x
+        type: Float
+      - name: Q_y
+        type: Float
+      - name: Q_z
+        type: Float
+      - name: Q_w
+        type: Float
+      - name: S_x
+        type: Float
+      - name: S_y
+        type: Float
+      - name: S_z
+        type: Float
+      - name: R
+        type: Float
+      - name: G
+        type: Float
+      - name: B
+        type: Float
+      - name: A
+        type: Float
+      - name: Prefab
+        type: String
+      - name: project
+        type: project
+      - name: projectId
+        type: String
+      hasChanged: 0
+    isComplete: 1
+  subscriptions: []
+  loading: 0

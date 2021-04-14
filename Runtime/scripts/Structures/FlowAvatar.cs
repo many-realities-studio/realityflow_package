@@ -12,12 +12,16 @@ namespace RealityFlow.Plugin.Scripts
     [System.Serializable]
     public class FlowAvatar
     {
+        [JsonIgnore]
+        public bool currentAvatarIsMe = false;
+
         [SerializeField]
-        public static SerializableDictionary<string, FlowAvatar> idToGameObjectMapping = new SerializableDictionary<string, FlowAvatar>();
+        public static SerializableDictionary<string, FlowAvatar> idToAvatarMapping = new SerializableDictionary<string, FlowAvatar>();
 
         public bool CanBeModified { get => _canBeModified; set => _canBeModified = value; }
 
         [JsonProperty("Id")]
+        // Is this actually the user id from the server or just a random
         public string Id { get => _id; set => _id = value; }
 
         [JsonIgnore]
@@ -31,31 +35,33 @@ namespace RealityFlow.Plugin.Scripts
                 if (_AttachedGameObject == null)
                 {
                     // The game object already exists
-                    if (idToGameObjectMapping.ContainsKey(Id))
+                    if (idToAvatarMapping.ContainsKey(Id))
                     {
-                        if (idToGameObjectMapping[Id]._AttachedGameObject == null)
+                        if (idToAvatarMapping[Id]._AttachedGameObject == null)
                         {
-                            UnityEngine.Object prefabReference = Resources.Load(idToGameObjectMapping[Id].Prefab);
+                            UnityEngine.Object prefabReference = Resources.Load("prefabs/Avatar");
                             if (prefabReference == null)
                             {
                                 Debug.Log("cannot load prefab");
                             }
-                            idToGameObjectMapping[Id]._AttachedGameObject = GameObject.Instantiate(prefabReference) as GameObject;
+                            idToAvatarMapping[Id]._AttachedGameObject = GameObject.Instantiate(prefabReference) as GameObject;
+                            
+                            
                         }
-
-                        _AttachedGameObject = idToGameObjectMapping[Id]._AttachedGameObject;
+                        _AttachedGameObject = idToAvatarMapping[Id]._AttachedGameObject;
                     }
 
                     // The game object doesn't exist, but it should by this point
                     // Can happen when a client receives a create object request when another user created an object
                     else
                     {
-                        UnityEngine.Object prefabReference = Resources.Load(Prefab);
+                        UnityEngine.Object prefabReference = Resources.Load("prefabs/Avatar");
                         if (prefabReference == null)
                         {
                             Debug.Log("cannot load prefab");
                         }
                         _AttachedGameObject = GameObject.Instantiate(prefabReference) as GameObject;
+                        //Debug.Log("we are running on update!!!!!");
                     }
                 }
                 return _AttachedGameObject;
@@ -257,21 +263,22 @@ namespace RealityFlow.Plugin.Scripts
         }
 
         [SerializeField]
-        private string _Prefab;
+        /* private string _Prefab;
 
         public string Prefab
         {
             get { return _Prefab; }
             set { _Prefab = value; }
-        }
+        } */
 
-        public static void DestroyObject(string idOfObjectToDestroy)
+        // public static void DestroyObject(string idOfObjectToDestroy)
+        public static void DestroyAvatar(string idOfAvatarToDestroy)
         {
             try
             {
-                GameObject objectToDestroy = idToGameObjectMapping[idOfObjectToDestroy].AttachedGameObject;
-                idToGameObjectMapping.Remove(idOfObjectToDestroy);
-                UnityEngine.Object.Destroy(objectToDestroy);
+                GameObject avatarToDestroy = idToAvatarMapping[idOfAvatarToDestroy].AttachedGameObject;
+                idToAvatarMapping.Remove(idOfAvatarToDestroy);
+                UnityEngine.Object.Destroy(avatarToDestroy);
             }
             catch (Exception e)
             {
@@ -279,38 +286,61 @@ namespace RealityFlow.Plugin.Scripts
             }
         }
 
-        public FlowAvatar(string name, Vector3 position, Quaternion rotation, Color color, string ObjectPrefab)
+        // public FlowAvatar(string name, Vector3 position, Quaternion rotation, Color color, string ObjectPrefab)
+        public FlowAvatar(/*string name,*/ Transform head /*, Transform lHand, Transform rHand */)
         {
-            this.Prefab = ObjectPrefab;
-            Debug.Log("prefab is " + Prefab);
-            this.Name = name;
-            this.Position = position;
-            this.Rotation = rotation;
+            // Debug.Log("prefab is " + Prefab);
+            // this.Name = name;
+            currentAvatarIsMe = true;
+            this.Position = head.position; 
+            this.Rotation = head.rotation;
+            
+            // head.gameObject.AddComponent<FlowAvatar_Monobehaviour>();
+            // FlowAvatar_Monobehaviour monoBehaviour = head.gameObject.GetComponent<FlowAvatar_Monobehaviour>(); /* TBD */
+
+            
+            // this.Scale = head.scale;
+            // this.Position = position;
+            // this.Rotation = rotation;
             //this.Scale = scale;
-            this.ObjectColor = color;
+            // this.ObjectColor = color;
 
-            idToGameObjectMapping.Add(Id, this);
+            // Not sure if it should be idToGameObjectMapping ...
+            idToAvatarMapping.Add(Id, this);
             AttachedGameObject.transform.hasChanged = false;
-            AttachedGameObject.name = name;
-            AttachedGameObject.layer = 9;
-
+            MeshRenderer renderer = AttachedGameObject.GetComponent<MeshRenderer>();
+            renderer.enabled = false;
             AttachedGameObject.AddComponent<FlowAvatar_Monobehaviour>();
+
+            FlowAvatar_Monobehaviour monoBehaviour = AttachedGameObject.GetComponent<FlowAvatar_Monobehaviour>();
+            monoBehaviour.underlyingFlowAvatar = this;
+            monoBehaviour.head = head.gameObject; // Cannot implicitly convert type 'UnityEngine.Transform' to 'UnityEngine.GameObject'
+            // AttachedGameObject.name = name;
+            // AttachedGameObject.layer = 9;
+            idToAvatarMapping[Id]._AttachedGameObject.transform.SetParent(GameObject.Find("Main Camera").transform);
+            
+
+            //monoBehav (John)
+
+            // AttachedGameObject.AddComponent<FlowAvatar_Monobehaviour>();
             //ObjectManipulator om = AttachedGameObject.AddComponent<ObjectManipulator>();
             // om.OnManipulationEnded += SendGORefToParam;
             //AttachedGameObject.AddComponent<NearInteractionGrabbable>();
             //Rigidbody ObjectRigidBody = AttachedGameObject.AddComponent<Rigidbody>();
             // ObjectRigidBody.useGravity = false;
             // ObjectRigidBody.isKinematic = true;
-            FlowAvatar_Monobehaviour monoBehaviour = AttachedGameObject.GetComponent<FlowAvatar_Monobehaviour>();
+            
+            
 
-            monoBehaviour.underlyingFlowObject = this;
-        }
+            // monoBehaviour.underlyingFlowObject = this;
+        } 
 
         [JsonConstructor]
-        public FlowAvatar(string id, float x, float y, float z, float q_x, float q_y, float q_z, float q_w, float s_x, float s_y, float s_z, float r, float g, float b, float a, string name, string prefab)
+        // public FlowAvatar(string id, float x, float y, float z, float q_x, float q_y, float q_z, float q_w, float s_x, float s_y, float s_z, float r, float g, float b, float a, string name, string prefab)
+        public FlowAvatar(string id, float x, float y, float z, float q_x, float q_y, float q_z, float q_w/* , float s_x, float s_y, float s_z, float r, float g, float b, float a, string name *//* , string prefab */)
         {
             Id = id;
-            this.Prefab = prefab;
+            // this.Prefab = prefab;
             X = x;
             Y = y;
             Z = z;
@@ -318,31 +348,40 @@ namespace RealityFlow.Plugin.Scripts
             Q_y = q_y;
             Q_z = q_z;
             Q_w = q_w;
-            S_x = s_x;
-            S_y = s_y;
-            S_z = s_z;
-            R = r;
-            G = g;
-            B = b;
-            A = a;
-            Name = name;
+            // S_x = s_x;
+            // S_y = s_y;
+            // S_z = s_z;
+            // R = r;
+            // G = g;
+            // B = b;
+            // A = a;
+            // Name = name;
+            /*
+            
+            "MessageType":"CreateAvatar","FlowAvatar":{"Id":"86920863-828b-4fb0-8007-bdd27db167ad","Name":null,"X":0,"Y":0,"Z":0,"Q_x":0,"Q_y":0,"Q_z":0,"Q_w":1,"S_x":1,"S_y":1,"S_z":1,"R":0,"G":0,"B":0,"A":0},"WasSuccessful":true,
+            "AvatarList":[{"Id":"edcce338-e8d7-4f29-8e8c-587b29b0d4a1","Name":null,"X":0,"Y":0,"Z":0,"Q_x":0,"Q_y":0,"Q_z":0,"Q_w":1,"S_x":1,"S_y":1,"S_z":1,"R":0,"G":0,"B":0,"A":0},
+            {"Id":"119f0875-47d9-424d-856c-658b1a45e7ee","Name":null,"X":0,"Y":0,"Z":0,"Q_x":0,"Q_y":0,"Q_z":0,"Q_w":1,"S_x":1,"S_y":1,"S_z":1,"R":0,"G":0,"B":0,"A":0},
+            {"Id":"86920863-828b-4fb0-8007-bdd27db167ad","Name":null,"X":0,"Y":0,"Z":0,"Q_x":0,"Q_y":0,"Q_z":0,"Q_w":1,"S_x":1,"S_y":1,"S_z":1,"R":0,"G":0,"B":0,"A":0}]}
+            
+            */
 
-            if (idToGameObjectMapping.ContainsKey(id))
+            if (idToAvatarMapping.ContainsKey(id))
             {
-                idToGameObjectMapping[id].UpdateObjectLocally(this);
+                idToAvatarMapping[id].UpdateObjectLocally(this);
             }
             else // Create game object if it doesn't exist
             {
-                idToGameObjectMapping.Add(Id, this);
-                AttachedGameObject.name = name;
-                AttachedGameObject.AddComponent<FlowAvatar_Monobehaviour>();
+                idToAvatarMapping.Add(Id, this);
+                //AttachedGameObject.name = name;
+                // AttachedGameObject.AddComponent<FlowAvatar_Monobehaviour>();
                 // AttachedGameObject.AddComponent<ObjectManipulator>();
                 // AttachedGameObject.AddComponent<NearInteractionGrabbable>();
                 AttachedGameObject.transform.hasChanged = false;
+                
                 //AttachedGameObject.layer = 9;
 
-                var monoBehaviour = AttachedGameObject.GetComponent<FlowAvatar_Monobehaviour>();
-                monoBehaviour.underlyingFlowObject = this;
+                //var monoBehaviour = AttachedGameObject.GetComponent<FlowAvatar_Monobehaviour>();
+                //monoBehaviour.underlyingFlowObject = this;
                 //var ObjectRigidBody = AttachedGameObject.AddComponent<Rigidbody>();
                 //ObjectRigidBody.useGravity = false;
                 //ObjectRigidBody.isKinematic = true;
@@ -365,30 +404,32 @@ namespace RealityFlow.Plugin.Scripts
         /// Copy all new values into this object
         /// </summary>
         /// <param name="newValues">The values that should be copied over into this object</param>
-        public void UpdateObjectGlobally(FlowAvatar newValues)
+        public void UpdateObjectGlobally(FlowAvatar newValues, GameObject head)
         {
             if (AttachedGameObject.transform.hasChanged == true)
             {
-                bool tempCanBeModified = this.CanBeModified;
-                PropertyCopier<FlowAvatar, FlowAvatar>.Copy(newValues, this);
-                this.CanBeModified = tempCanBeModified;
+                newValues.Position = head.transform.position;
+                newValues.Rotation = head.transform.rotation;
+                //PropertyCopier<FlowAvatar, FlowAvatar>.Copy(newValues, this);
+                
+                Operations.UpdateAvatar(newValues, ConfigurationSingleton.SingleInstance.CurrentUser, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) => {/* Debug.Log(e.message);*/ });
+                
+                // newValues.Position = Vector3.zero;
+                // newValues.Rotation = new Quaternion(0, 0, 0, 0);
+                // AttachedGameObject.transform.localPosition = Vector3.zero;
+                // AttachedGameObject.transform.localRotation = Quaternion.identity;
 
-                if (CanBeModified == true)
-                {
-                    Operations.UpdateAvatar(this, ConfigurationSingleton.SingleInstance.CurrentUser, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) => {/* Debug.Log(e.message);*/ });
-                }
-
-                AttachedGameObject.transform.hasChanged = false;
+                AttachedGameObject.transform.hasChanged = false;   
             }
+            
         }
-
         private void UpdateObjectLocally(FlowAvatar newValues)
         {
-            if (idToGameObjectMapping[newValues.Id].CanBeModified == false)
+            if (idToAvatarMapping[newValues.Id].CanBeModified == false)
             {
-                bool tempCanBeModified = this.CanBeModified;
-                PropertyCopier<FlowAvatar, FlowAvatar>.Copy(newValues, this);
-                this.CanBeModified = tempCanBeModified;
+                //PropertyCopier<FlowAvatar, FlowAvatar>.Copy(newValues, this);
+                //newValues.Position = Vector3.zero;
+                //newValues.Rotation = new Quaternion(0, 0, 0, 0);
             }
         }
 
@@ -422,13 +463,19 @@ namespace RealityFlow.Plugin.Scripts
             }
         }
 
-        public static void RemoveAllObjectsFromScene()
+        public static void RemoveAllAvatarFromScene()
         {
-            foreach (FlowAvatar flowObject in idToGameObjectMapping.Values)
+            // TODO: Remove the FlowAvatar_Monobehavior component from the main camera to avoid stacking
+            // foreach (FlowAvatar flowAvatar in idToAvatarMapping.Values)
+            // if it's the client's FA - only remove the component from main cam
+            // for everyone else - delete the attach
+            foreach (FlowAvatar flowAvatar in idToAvatarMapping.Values)
             {
-                UnityEngine.Object.DestroyImmediate(flowObject.AttachedGameObject);
+
+                Debug.Log(JsonUtility.ToJson(flowAvatar));
+                UnityEngine.Object.DestroyImmediate(flowAvatar.AttachedGameObject);
             }
-            FlowAvatar.idToGameObjectMapping = new SerializableDictionary<string, FlowAvatar>();
+            FlowAvatar.idToAvatarMapping = new SerializableDictionary<string, FlowAvatar>();
         }
     }
 }
