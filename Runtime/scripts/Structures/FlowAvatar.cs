@@ -409,23 +409,25 @@ namespace RealityFlow.Plugin.Scripts
                 newValues.Position = head.transform.position;
                 newValues.Rotation = head.transform.rotation;
                 //PropertyCopier<FlowAvatar, FlowAvatar>.Copy(newValues, this);
-
                 
                 Operations.UpdateAvatar(newValues, ConfigurationSingleton.SingleInstance.CurrentUser, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) => {/* Debug.Log(e.message);*/ });
-
+                
                 // newValues.Position = Vector3.zero;
-                // newValues.Rotation = Quaternion.identity;
+                // newValues.Rotation = new Quaternion(0, 0, 0, 0);
                 // AttachedGameObject.transform.localPosition = Vector3.zero;
                 // AttachedGameObject.transform.localRotation = Quaternion.identity;
-                
-                AttachedGameObject.transform.hasChanged = false;
+
+                AttachedGameObject.transform.hasChanged = false;   
             }
+            
         }
         private void UpdateObjectLocally(FlowAvatar newValues)
         {
             if (idToAvatarMapping[newValues.Id].CanBeModified == false)
             {
-                PropertyCopier<FlowAvatar, FlowAvatar>.Copy(newValues, this);
+                //PropertyCopier<FlowAvatar, FlowAvatar>.Copy(newValues, this);
+                //newValues.Position = Vector3.zero;
+                //newValues.Rotation = new Quaternion(0, 0, 0, 0);
             }
         }
 
