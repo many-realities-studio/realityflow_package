@@ -582,7 +582,7 @@ public class RealityFlowGraphView : MonoBehaviour {
 	public void ClearWhiteBoard()
 	{
 		foreach(KeyValuePair<string,ParameterView> pv in paramDict){
-			pv.Value.Delete();
+			pv.Value.DeleteFromWhiteBoard();
 		}
 		paramDict.Clear();
 

@@ -67,6 +67,11 @@ public class ParameterView : MonoBehaviour
         //rfgv.CheckInGraph();
     }
 
+    public void DeleteFromWhiteBoard(){
+        if(this.gameObject != null)
+            Destroy(this.gameObject);
+    }
+
     public void ResetOrientation(){
         Vector3 localPos = transform.localPosition;
         localPos.z = 0.0f;
