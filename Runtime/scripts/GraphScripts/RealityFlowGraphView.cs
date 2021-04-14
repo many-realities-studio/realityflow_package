@@ -66,12 +66,15 @@ public class RealityFlowGraphView : MonoBehaviour {
     //public RealityFlowGraphView instance;
 
 	public float updateTimer;
-	public float maxUpdateTime = 0.01f;
+	public float maxUpdateTime;
 	public bool reloadCoroutineStarted;
+
+	private bool allNodesAdded = false;
 
 
 	private void Start () {
 		updateTimer = 0f;
+		maxUpdateTime = 0.05f;
 		reloadCoroutineStarted = false;
 		SelectComparisonCanvas.SetActive(false);
 		parameterCreationCanvas.SetActive(false);
@@ -123,6 +126,8 @@ public class RealityFlowGraphView : MonoBehaviour {
 		commandPalette = GameObject.Find("CommandPalette").GetComponent<CommandPalette>();
 		// commandPalette = new CommandPalette();
         graph.onGraphChanges += GraphChangesCallback;
+		graph.onExposedParameterListChanged += ParamChangesListChangeCallBack;
+		graph.onExposedParameterModified += ParamChangesModifiedCallBack;
 		Operations.updateRFGV += ReloadRFGV;
 		Operations.runVSGraph += ReceiveRunVSGraph;
 		savePoint = JsonSerializer.Serialize(graph);
@@ -163,6 +168,7 @@ public class RealityFlowGraphView : MonoBehaviour {
 	void ReloadRFGV()
 	{
 		updateTimer = 0f;
+		Debug.Log("Timer reset to 0");
 		if (!reloadCoroutineStarted)
 		{
 			Debug.Log("Starting a reload coroutine");
@@ -182,8 +188,13 @@ public class RealityFlowGraphView : MonoBehaviour {
 
 	public IEnumerator CallSoftReloadCoroutine() {
 		Debug.Log("Inside reload coroutine, we will now wait");
-		yield return new WaitUntil(() => updateTimer >= maxUpdateTime);
+		if(graph.nodes.Count == 0)
+		{
+			allNodesAdded = true;
+		}
+		yield return new WaitUntil(() => updateTimer > maxUpdateTime /*&& allNodesAdded == true*/);
 		Debug.Log("Inside reload coroutine, we ARE DONE WAITING!");
+		Debug.Log("The timer is at "+updateTimer);
 		SoftLoadGraph(graph);
 		updateTimer = 0f;
 		reloadCoroutineStarted = false;
@@ -198,6 +209,19 @@ public class RealityFlowGraphView : MonoBehaviour {
 	{
 		Operations.updateRFGV -= ReloadRFGV;
 		Operations.runVSGraph -= ReceiveRunVSGraph;
+		graph.onExposedParameterListChanged -= ParamChangesListChangeCallBack;
+		graph.onExposedParameterModified -= ParamChangesModifiedCallBack;
+		graph.onGraphChanges -= GraphChangesCallback;
+	}
+
+	void ParamChangesListChangeCallBack()
+	{
+		vsGraph.IsUpdated = true;
+	}
+
+	void ParamChangesModifiedCallBack(string s)
+	{
+		vsGraph.IsUpdated = true;
 	}
 
     void GraphChangesCallback(GraphChanges changes)
@@ -459,7 +483,7 @@ public class RealityFlowGraphView : MonoBehaviour {
 		{
 			newParamView.ModifyParameterValue();
 		}
-		vsGraph.IsUpdated = true;
+		//vsGraph.IsUpdated = true;
 		// paramList.Add(epn);
 		yield return new WaitForSeconds (.01f);
 	}
@@ -569,6 +593,8 @@ public class RealityFlowGraphView : MonoBehaviour {
 			nv.Value.DeleteFromWhiteBoard();
 		}
 		nodeViewDict.Clear();
+		allNodesAdded = false;
+		Debug.Log("Cleared nodeViewDict");
 	}
 
     public List <BaseNode> GetNodes()
@@ -668,6 +694,7 @@ public class RealityFlowGraphView : MonoBehaviour {
         //else
         //{
             nodeViewDict.Add (node.GUID,newView);
+			Debug.Log("Added to nodeViewDict");
         //}
         // nodeViewList.Add (newView);
 		if(nodeViewtoRFGVDict.ContainsKey(node.GUID))
@@ -690,6 +717,10 @@ public class RealityFlowGraphView : MonoBehaviour {
 		}
 		// rect.anchoredPosition = new Vector2(canvasDimensions*newNodePosition);
         // contentPanel.GetComponent<VerticalLayoutGroup>().enabled = false;
+		if(nodeViewDict.Count == graph.nodes.Count)
+		{
+			allNodesAdded = true;
+		}
         yield return new WaitForSeconds (.01f);
         // contentPanel.GetComponent<VerticalLayoutGroup>().enabled = true;
         // contentPanel.GetComponent<ContentSizeFitter>().enabled = true;

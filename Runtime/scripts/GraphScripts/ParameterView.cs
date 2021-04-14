@@ -62,7 +62,7 @@ public class ParameterView : MonoBehaviour
         //rfgv.CheckOutGraph();
         if(this.gameObject != null)
             Destroy(this.gameObject);
-        rfgv.vsGraph.IsUpdated = true;
+        //rfgv.vsGraph.IsUpdated = true;
         //rfgv.CheckInGraph();
     }
 
@@ -93,7 +93,7 @@ public class ParameterView : MonoBehaviour
                 rfgv.vsGraph.paramIdToObjId.Add(pn.guid, flowTObj.Id);
             }
         }
-        rfgv.vsGraph.IsUpdated = true;
+        //rfgv.vsGraph.IsUpdated = true;
         //rfgv.CheckInGraph();
     }
 
