@@ -413,6 +413,11 @@ namespace RealityFlow.Plugin.Scripts
                 
                 Operations.UpdateAvatar(newValues, ConfigurationSingleton.SingleInstance.CurrentUser, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) => {/* Debug.Log(e.message);*/ });
 
+                // newValues.Position = Vector3.zero;
+                // newValues.Rotation = Quaternion.identity;
+                // AttachedGameObject.transform.localPosition = Vector3.zero;
+                // AttachedGameObject.transform.localRotation = Quaternion.identity;
+                
                 AttachedGameObject.transform.hasChanged = false;
             }
         }
