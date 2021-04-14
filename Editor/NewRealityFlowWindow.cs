@@ -182,6 +182,7 @@ public class FlowNetworkManagerEditor : EditorWindow
         }
 
         FlowTObject.RemoveAllObjectsFromScene();
+        FlowAvatar.RemoveAllAvatarFromScene();
         FlowVSGraph.RemoveAllGraphsFromScene();
         ConfigurationSingleton.SingleInstance.CurrentProject = null;
         ConfigurationSingleton.SingleInstance.CurrentUser = null;
@@ -222,6 +223,8 @@ public class FlowNetworkManagerEditor : EditorWindow
                     Operations.CheckinObject(obj.Id, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) => { });
                 }
             }
+
+            //Ask Owen...
 
             // Check in all graphs
             foreach (FlowVSGraph graph in FlowVSGraph.idToVSGraphMapping.Values)
@@ -383,6 +386,7 @@ public class FlowNetworkManagerEditor : EditorWindow
         {
             // Send the user to the load project screen
             window = EWindowView.LOAD_PROJECT;
+            
         }
 
         // // Create "Delete Project" Button and define onClick action
@@ -401,6 +405,13 @@ public class FlowNetworkManagerEditor : EditorWindow
             {
                 if (e.message.WasSuccessful == true)
                 {
+                    // JohnLynch
+                    Transform head = GameObject.Find("Main Camera").transform;
+                    // Transform lHand = 
+                    // Transform rHand = 
+                    FlowAvatar createAvatar = new FlowAvatar(head);
+                    // Operations.CreateAvatar(createAvatar, eventArgs.message.flowProject.Id);
+                    Operations.CreateAvatar(createAvatar, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, f) => { Debug.Log(f.message); });
                     Debug.Log(e.message);
                     if (e.message.WasSuccessful == true)
                     {
@@ -409,12 +420,14 @@ public class FlowNetworkManagerEditor : EditorWindow
                     }
                 }
             });
+
         }
         EditorGUILayout.EndHorizontal();
 
         // Create "Logout" Button and define onClick action
         if (GUILayout.Button("Logout", GUILayout.Height(20)))
         {
+            
             // Send logout event to the server
             if (ConfigurationSingleton.SingleInstance.CurrentUser != null)
             {
@@ -779,6 +792,16 @@ public class FlowNetworkManagerEditor : EditorWindow
                         if (e.message.WasSuccessful == true)
                         {
                             ConfigurationSingleton.SingleInstance.CurrentProject = e.message.flowProject;
+                            // JohnLynch
+                            Transform head = GameObject.Find("Main Camera").transform;
+                            // Transform lHand = 
+                            // Transform rHand = 
+                            FlowAvatar createAvatar = new FlowAvatar(head);
+                            // Operations.CreateAvatar(createAvatar, eventArgs.message.flowProject.Id);
+                            Operations.CreateAvatar(createAvatar, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, f) => { Debug.Log(f.message); });
+                            Debug.Log(e.message);
+                            Debug.Log("Avatar has been seen!");
+                            
                             window = EWindowView.PROJECT_HUB;
                         }
                     });
@@ -882,6 +905,7 @@ public class FlowNetworkManagerEditor : EditorWindow
                 }
 
                 FlowTObject.RemoveAllObjectsFromScene();
+                FlowAvatar.RemoveAllAvatarFromScene();
                 FlowVSGraph.RemoveAllGraphsFromScene();
             }
             else
@@ -990,8 +1014,17 @@ public class FlowNetworkManagerEditor : EditorWindow
             }
         }
 
+        foreach (FlowAvatar avatar in FlowAvatar.idToAvatarMapping.Values)
+        {
+            if (avatar.currentAvatarIsMe == true)
+            {
+                Operations.DeleteAvatar(avatar.Id,ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) => { });
+            }
+        }
+
         Operations.LeaveProject(ConfigurationSingleton.SingleInstance.CurrentProject.Id, ConfigurationSingleton.SingleInstance.CurrentUser, (_, e) =>
         {
+            
             if (e.message.WasSuccessful == true)
             {
                 ConfigurationSingleton.SingleInstance.CurrentProject = null;
@@ -1008,6 +1041,7 @@ public class FlowNetworkManagerEditor : EditorWindow
                 }
 
                 FlowTObject.RemoveAllObjectsFromScene();
+                FlowAvatar.RemoveAllAvatarFromScene();
                 FlowVSGraph.RemoveAllGraphsFromScene();
             }
             else

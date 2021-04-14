@@ -38,6 +38,7 @@ namespace Behaviours
         {
             // Add the behaviour to the list of behaviours
             BehaviourList[flowBehaviour.Id] = flowBehaviour;
+            PreviousBehaviourId = flowBehaviour.Id;
 
             // Make both objects interactable
             ObjectIsInteractable oIsIFirst = FindAndMakeInteractable(flowBehaviour.TriggerObjectId);

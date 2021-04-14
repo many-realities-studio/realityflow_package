@@ -1,16 +1,20 @@
 using Newtonsoft.Json;
 using RealityFlow.Plugin.Scripts;
+using System.Collections.Generic;
 
 namespace Packages.realityflow_package.Runtime.scripts.Messages.AvatarMessages
 {
     public class CreateAvatar_Received : ReceivedMessage
     {
-        [JsonProperty("flowObject")]
-        public FlowTObject flowObject { get; set; }
+        [JsonProperty("flowAvatar")]
+        public FlowAvatar flowAvatar { get; set; }
 
-        public CreateAvatar_Received(FlowTObject flowObject) : base(typeof(CreateAvatar_Received))
+        [JsonProperty("AvatarList")]
+        public List<FlowAvatar> AvatarList { get; set; }
+
+        public CreateAvatar_Received(FlowAvatar flowAvatar, bool wasSuccessful) : base(typeof(CreateAvatar_Received))
         {
-            this.flowObject = flowObject;
+            this.flowAvatar = flowAvatar;
             this.MessageType = "CreateAvatar";
         }
     }
