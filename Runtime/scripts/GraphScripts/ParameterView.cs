@@ -60,6 +60,7 @@ public class ParameterView : MonoBehaviour
 
     public void Delete(){
         //rfgv.CheckOutGraph();
+        rfgv.graph.RemoveExposedParameter(this.pn);
         if(this.gameObject != null)
             Destroy(this.gameObject);
         //rfgv.vsGraph.IsUpdated = true;

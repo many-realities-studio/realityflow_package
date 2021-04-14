@@ -656,6 +656,7 @@ public class RealityFlowGraphView : MonoBehaviour {
 		// Set the rectTransform position here after we've set the parent
         newView.title.text = node.name;
         newView.node = node;
+		// check if the node is a parameter. If it is, newView.GUID.text = node.name;
         newView.GUID.text = node.GUID.Substring (node.GUID.Length - 5);
 		newView.rfgv = this;
 		newView.nodeGUID = node.GUID;

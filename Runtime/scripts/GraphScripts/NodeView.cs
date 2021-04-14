@@ -159,6 +159,7 @@ public class NodeView : MonoBehaviour
         foreach(NodePortView outputPort in outputPortViews){
             outputPort.Delete();
         }
+        rfgv.graph.RemoveNode(this.node);
         if(this.gameObject != null)
             Destroy(this.gameObject);
         //rfgv.CheckInGraph();
