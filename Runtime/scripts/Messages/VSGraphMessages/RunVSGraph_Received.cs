@@ -4,14 +4,16 @@ using GraphProcessor;
 
 namespace Packages.realityflow_package.Runtime.scripts.Messages.VSGraphMessages
 {
-    public class RunVSGraph_Received : ReceivedMessage
+    public class RunVSGraph_Received : ConfirmationMessage_Received
     {
+        // base(typeof(RunVSGraph_Received))
         [JsonProperty("vsGraphId")]
-        public string vsGraphId { get; set; }
+        public string VSGraphId { get; set; }
 
-        public RunVSGraph_Received(string vsGraphId) : base(typeof(RunVSGraph_Received))
+        public RunVSGraph_Received(string vsGraphId, bool wasSuccessful) : base(wasSuccessful)
         {
-            this.vsGraphId = vsGraphId;
+            VSGraphId = vsGraphId;
+            this.MessageType = "RunVSGraph";
         }
     }
 }
