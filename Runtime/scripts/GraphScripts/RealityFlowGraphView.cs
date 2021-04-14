@@ -69,7 +69,7 @@ public class RealityFlowGraphView : MonoBehaviour {
 	public float maxUpdateTime;
 	public bool reloadCoroutineStarted;
 
-	private bool allNodesAdded = false;
+	private bool nodeRoutineRunning = false;
 
 
 	private void Start () {
@@ -188,11 +188,7 @@ public class RealityFlowGraphView : MonoBehaviour {
 
 	public IEnumerator CallSoftReloadCoroutine() {
 		Debug.Log("Inside reload coroutine, we will now wait");
-		if(graph.nodes.Count == 0)
-		{
-			allNodesAdded = true;
-		}
-		yield return new WaitUntil(() => updateTimer > maxUpdateTime /*&& allNodesAdded == true*/);
+		yield return new WaitUntil(() => updateTimer > maxUpdateTime && !nodeRoutineRunning);
 		Debug.Log("Inside reload coroutine, we ARE DONE WAITING!");
 		Debug.Log("The timer is at "+updateTimer);
 		SoftLoadGraph(graph);
@@ -593,7 +589,6 @@ public class RealityFlowGraphView : MonoBehaviour {
 			nv.Value.DeleteFromWhiteBoard();
 		}
 		nodeViewDict.Clear();
-		allNodesAdded = false;
 		Debug.Log("Cleared nodeViewDict");
 	}
 
@@ -651,6 +646,8 @@ public class RealityFlowGraphView : MonoBehaviour {
 	}
 
 	public IEnumerator AddNodeCoroutine (BaseNode node) {
+		if(!nodeRoutineRunning)
+			nodeRoutineRunning = true;
         NodeView newView = Instantiate (nodeView, new Vector3(), Quaternion.identity).GetComponent<NodeView> ();
         newView.gameObject.transform.SetParent (contentPanel.transform, false);
 		// Set the rectTransform position here after we've set the parent
@@ -717,10 +714,7 @@ public class RealityFlowGraphView : MonoBehaviour {
 		}
 		// rect.anchoredPosition = new Vector2(canvasDimensions*newNodePosition);
         // contentPanel.GetComponent<VerticalLayoutGroup>().enabled = false;
-		if(nodeViewDict.Count == graph.nodes.Count)
-		{
-			allNodesAdded = true;
-		}
+		nodeRoutineRunning = false;
         yield return new WaitForSeconds (.01f);
         // contentPanel.GetComponent<VerticalLayoutGroup>().enabled = true;
         // contentPanel.GetComponent<ContentSizeFitter>().enabled = true;
