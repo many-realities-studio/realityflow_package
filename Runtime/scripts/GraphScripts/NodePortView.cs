@@ -17,6 +17,10 @@ public class NodePortView : MonoBehaviour
 
     // public NodeView parentNodeView; // Allows the NodePortView to have a ref to the NodeView, which can help us later draw edges between nodes
 
+    public void SignalRedrawOnUpdate(bool flag){
+        foreach(EdgeView e in edges){ e.ToggleUpdates(flag); }
+    }
+
     public void SignalRedraw(){
         foreach(EdgeView e in edges){ e.RedrawEdge(); }
     }

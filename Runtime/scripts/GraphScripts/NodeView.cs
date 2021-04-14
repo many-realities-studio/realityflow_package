@@ -33,14 +33,15 @@ public class NodeView : MonoBehaviour
         this.GUID.text = GUID;
     }*/
 
-    public void RedrawEdges(){
+    public void RedrawEdges(bool flag){
         foreach(NodePortView npv in inputPortViews){
-            if (npv.edges.Count != 0 ) { npv.SignalRedraw(); }
+            if (npv.edges.Count != 0 ) { npv.SignalRedrawOnUpdate(flag); }
         }
         foreach(NodePortView npv in outputPortViews){
-            if (npv.edges.Count != 0 ) { npv.SignalRedraw(); }
+            if (npv.edges.Count != 0 ) { npv.SignalRedrawOnUpdate(flag); }
         }
     }
+
     void Awake()
     {
         instance = this;
@@ -103,6 +104,7 @@ public class NodeView : MonoBehaviour
         localPos.z = 0.0f;
         transform.localPosition = localPos;
         transform.localScale = Vector3.one;
+        RedrawEdges(false);
         //this.GetComponent<RectTransform>().anchoredPosition3D.z = 0.0f;
     }
 
