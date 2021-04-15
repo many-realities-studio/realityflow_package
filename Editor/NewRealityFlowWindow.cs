@@ -475,16 +475,17 @@ public class FlowNetworkManagerEditor : EditorWindow
         openProjectId = EditorGUILayout.TextField(openProjectId);
         if (GUILayout.Button("Join project"))
         {
+            
             Operations.OpenProject(openProjectId, ConfigurationSingleton.SingleInstance.CurrentUser, (_, e) =>
             {
                 if (e.message.WasSuccessful == true)
                 {
+                    ConfigurationSingleton.SingleInstance.CurrentProject = e.message.flowProject;
+                    Transform head = GameObject.Find("Main Camera").transform;
+                    FlowAvatar createAvatar = new FlowAvatar(head);
+                    Operations.CreateAvatar(createAvatar, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, f) => { Debug.Log(f.message); });
                     Debug.Log(e.message);
-                    if (e.message.WasSuccessful == true)
-                    {
-                        ConfigurationSingleton.SingleInstance.CurrentProject = e.message.flowProject;
-                        window = EWindowView.GUESTPROJECT_HUB;
-                    }
+                    window = EWindowView.GUESTPROJECT_HUB;
                 }
             });
         }

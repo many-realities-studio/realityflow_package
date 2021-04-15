@@ -137,11 +137,11 @@ namespace Packages.realityflow_package.Runtime.scripts
 
         public static void CreateObject(FlowTObject flowObject, string projectId, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
         {
-            // graphqlClient_Editor createObject = new graphqlClient_Editor();
-            // createObject.CreateObject(flowObject, projectId);
+            graphqlClient_Editor createObject = new graphqlClient_Editor();
+            createObject.CreateObject(flowObject, projectId);
 
-            CreateObject_SendToServer createObject = new CreateObject_SendToServer(flowObject, projectId);
-            FlowWebsocket.SendMessage(createObject);
+            // CreateObject_SendToServer createObject = new CreateObject_SendToServer(flowObject, projectId);
+            // FlowWebsocket.SendMessage(createObject);
 
             ReceivedMessage.AddEventHandler(typeof(CreateObject_Received), true, callbackFunction);
         }
@@ -159,17 +159,17 @@ namespace Packages.realityflow_package.Runtime.scripts
 
         public static async void DeleteObject(string idOfObjectToDelete, string projectId, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
         {
-            // graphqlClient_Editor deleteObject = new graphqlClient_Editor();
-            // string deletedObjectId = await deleteObject.DeleteObject(idOfObjectToDelete, projectId);
+            graphqlClient_Editor deleteObject = new graphqlClient_Editor();
+            string deletedObjectId = await deleteObject.DeleteObject(idOfObjectToDelete, projectId);
 
-            // if(deletedObjectId != null){ // meaning that the requets went through.
-            //     __DeleteObject(deletedObjectId);
-            // }
-            // else
-            //     Debug.Log("Error, didn't delete object.");
+            if(deletedObjectId != null){ // meaning that the requets went through.
+                __DeleteObject(deletedObjectId);
+            }
+            else
+                Debug.Log("Error, didn't delete object.");
 
-            DeleteObject_SendToServer _deleteObject = new DeleteObject_SendToServer(projectId, idOfObjectToDelete);
-            FlowWebsocket.SendMessage(_deleteObject);
+            // DeleteObject_SendToServer _deleteObject = new DeleteObject_SendToServer(projectId, idOfObjectToDelete);
+            // FlowWebsocket.SendMessage(_deleteObject);
 
             ReceivedMessage.AddEventHandler(typeof(DeleteObject_Received), true, callbackFunction);
         }
@@ -467,23 +467,7 @@ namespace Packages.realityflow_package.Runtime.scripts
 
         private static void _CreateAvatar(object sender, BaseReceivedEventArgs eventArgs)
         {
-            if (eventArgs.message.WasSuccessful == true)
-            {
-/*                 let returnContent = {
-      "MessageType": "CreateAvatar",
-      "FlowAvatar": returnData[0],
-      "WasSuccessful": (returnData[0] == null) ? false: true,
-      "AvatarList": returnData[2]
-    } */        
-                // load the prefab of avatar
-
-                // foreach (FlowAvatar user in eventArgs.message.AvatarList){
-                //     // make sure we exclude the client's FlowAvatar
-                //     if ( user.Id != eventArgs.message.FlowAvatar.Id ){
-                        
-                //     }
-                // }
-            }
+        
         }
 
         private static void _DeleteAvatar(object sender, BaseReceivedEventArgs eventArgs)
@@ -625,7 +609,19 @@ namespace Packages.realityflow_package.Runtime.scripts
         {
             ConfigurationSingleton.SingleInstance.CurrentProject = eventArgs.message.flowProject;
 
-            Operations.OpenProject(ConfigurationSingleton.SingleInstance.CurrentProject.Id, ConfigurationSingleton.SingleInstance.CurrentUser, (_, e) => { Debug.Log("opened project after create: " + e.message.WasSuccessful); });
+            Operations.OpenProject(ConfigurationSingleton.SingleInstance.CurrentProject.Id, ConfigurationSingleton.SingleInstance.CurrentUser, (_, e) => 
+            { 
+                // Creating an Avatar Upon entering a newly created project
+                if (e.message.WasSuccessful == true)
+                {
+                    ConfigurationSingleton.SingleInstance.CurrentProject = e.message.flowProject;
+                    Transform head = GameObject.Find("Main Camera").transform;
+                    FlowAvatar createAvatar = new FlowAvatar(head);
+                    Operations.CreateAvatar(createAvatar, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, f) => { Debug.Log(f.message); });
+                    Debug.Log(e.message);
+                }
+                Debug.Log("opened project after create: " + e.message.WasSuccessful); 
+                });
         }
 
         private static void _OpenProject(object sender, BaseReceivedEventArgs eventArgs)
