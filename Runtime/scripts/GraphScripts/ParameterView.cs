@@ -45,21 +45,31 @@ public class ParameterView : MonoBehaviour
 
     public void AddParameterNodeToGraph(){
         // rfgv.AddNode("ParameterNode");
+        // rfgv.CheckOutGraph();
         rfgv.AddParameterNodeToGraph(pn.guid);
+        //rfgv.CheckInGraph();
     }
 
     public void DeleteParam()
     {
+        // rfgv.CheckOutGraph();
         Debug.Log("Deleting parameter");
         rfgv.RemoveParameter(this);
         this.Delete();
     }
 
     public void Delete(){
+        //rfgv.CheckOutGraph();
+        rfgv.graph.RemoveExposedParameter(this.pn);
         if(this.gameObject != null)
             Destroy(this.gameObject);
-        rfgv.vsGraph.IsUpdated = true;
+        //rfgv.vsGraph.IsUpdated = true;
+        //rfgv.CheckInGraph();
+    }
 
+    public void DeleteFromWhiteBoard(){
+        if(this.gameObject != null)
+            Destroy(this.gameObject);
     }
 
     public void ResetOrientation(){
@@ -89,12 +99,13 @@ public class ParameterView : MonoBehaviour
                 rfgv.vsGraph.paramIdToObjId.Add(pn.guid, flowTObj.Id);
             }
         }
-
         rfgv.vsGraph.IsUpdated = true;
+        //rfgv.CheckInGraph();
     }
 
     public void ModifyParameterValue()
     {
+        // rfgv.CheckOutGraph();
         rfgv.ModifyExposedParameterValue();
         modificationInput = rfgv.gameObject.transform.parent.transform.GetChild(8).gameObject;
         modificationDropdown = rfgv.gameObject.transform.parent.transform.GetChild(10).gameObject;

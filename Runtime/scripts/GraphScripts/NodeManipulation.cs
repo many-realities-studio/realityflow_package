@@ -68,6 +68,7 @@ public class NodeManipulation : MonoBehaviour//,IMixedRealityPointerHandler
             Debug.Log("rfgv object name is "+rfgvGameObject.name);
             rfgv = rfgvGameObject.GetComponent<RealityFlowGraphView>();
             graph = rfgv.graph;
+            // rfgv.CheckOutGraph();
 
             Vector3 [] cornerPos = new Vector3[4];
             hit.collider.gameObject.GetComponent<RectTransform>().GetWorldCorners(cornerPos);
