@@ -140,10 +140,7 @@ public class RealityFlowGraphView : MonoBehaviour {
 
 	protected void SoftLoadGraph(BaseGraph graph){
 		ClearWhiteBoard();
-		if(!isMobile)
-		{
-			newNodePosition = new Vector2(-1,-1);
-		}
+		newNodePosition = new Vector2(-1,-1);
 		foreach(ExposedParameter p in graph.exposedParameters){
 			StartCoroutine(AddExposedParameterCoroutine(p));
 		}
@@ -157,10 +154,7 @@ public class RealityFlowGraphView : MonoBehaviour {
 
 	protected void HardLoadGraph(BaseGraph graph){
 		ClearGraph();
-		if(!isMobile)
-		{
-			newNodePosition = new Vector2(-1,-1);
-		}
+		newNodePosition = new Vector2(-1,-1);
 		foreach(ExposedParameter p in graph.exposedParameters){
 			StartCoroutine(AddExposedParameterCoroutine(p));
 		}
