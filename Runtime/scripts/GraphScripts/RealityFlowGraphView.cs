@@ -732,8 +732,9 @@ public class RealityFlowGraphView : MonoBehaviour {
         // LayoutRebuilder.MarkLayoutForRebuild ((RectTransform) contentPanel.transform);
     }
 
-	public void SetToMobile()
+	public void SetToMobile(Vector2 newCanvasDimensions)
 	{
+		canvasDimensions = newCanvasDimensions;
 		isMobile = true;
 	}
 }
