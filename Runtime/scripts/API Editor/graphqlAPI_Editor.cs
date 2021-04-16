@@ -180,17 +180,17 @@ namespace Contrib.APIeditor
             UnityWebRequest request = await graphql_Var.graphql_api.Post(UpdateObject);
         }
 
-        public async Task<string> DeleteObject(string objectId, string projectID){
+        public async void DeleteObject(string objectId, string projectID){
             GraphApi.Query DeleteObject = graphql_Var.graphql_api.GetQueryByName("DeleteObject", GraphApi.Query.Type.Mutation);
             DeleteObject.SetArgs(new{Id = objectId, projectId = projectID});
             UnityWebRequest request = await graphql_Var.graphql_api.Post(DeleteObject);
             
-            // This is a check to make sure graphql was successfully executed...
-            string text = request.downloadHandler.text;
-            Match match = Regex.Match(text, @"""Id"":""(\S+)""");
-            string message = match.Groups[1].Captures[0].Value;
+            // // This is a check to make sure graphql was successfully executed...
+            // string text = request.downloadHandler.text;
+            // Match match = Regex.Match(text, @"""Id"":""(\S+)""");
+            // string message = match.Groups[1].Captures[0].Value;
 
-            return message;
+            // return message;
         }
 
     /// VSGRAPH

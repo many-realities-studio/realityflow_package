@@ -405,17 +405,13 @@ public class FlowNetworkManagerEditor : EditorWindow
             {
                 if (e.message.WasSuccessful == true)
                 {
-                    // JohnLynch
-                    Transform head = GameObject.Find("Main Camera").transform;
-                    // Transform lHand = 
-                    // Transform rHand = 
-                    FlowAvatar createAvatar = new FlowAvatar(head);
-                    // Operations.CreateAvatar(createAvatar, eventArgs.message.flowProject.Id);
-                    Operations.CreateAvatar(createAvatar, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, f) => { Debug.Log(f.message); });
                     Debug.Log(e.message);
                     if (e.message.WasSuccessful == true)
                     {
                         ConfigurationSingleton.SingleInstance.CurrentProject = e.message.flowProject;
+                        Transform head = GameObject.Find("Main Camera").transform;
+                        FlowAvatar createAvatar = new FlowAvatar(head);
+                        Operations.CreateAvatar(createAvatar, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, f) => { Debug.Log(f.message); });
                         window = EWindowView.PROJECT_HUB;
                     }
                 }

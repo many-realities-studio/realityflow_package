@@ -309,9 +309,9 @@ namespace RealityFlow.Plugin.Scripts
             idToAvatarMapping.Add(Id, this);
             AttachedGameObject.transform.hasChanged = false;
             // To tell players apart.
-            AttachedGameObject.GetComponent<MeshRenderer>().material.color = UnityEngine.Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f);
+            //AttachedGameObject.GetComponent<MeshRenderer>().material.color = UnityEngine.Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f);
             MeshRenderer renderer = AttachedGameObject.GetComponent<MeshRenderer>();
-            renderer.enabled = true;
+            renderer.enabled = false;
             AttachedGameObject.AddComponent<FlowAvatar_Monobehaviour>();
 
             FlowAvatar_Monobehaviour monoBehaviour = AttachedGameObject.GetComponent<FlowAvatar_Monobehaviour>();
