@@ -146,7 +146,7 @@ namespace Packages.realityflow_package.Runtime.scripts
 
         public static void CreateObject(FlowTObject flowObject, string projectId, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
         {
-            graphqlClient_Editor createObject = new graphqlClient_Editor();
+            graphqlClient_Editor createObject = ScriptableObject.CreateInstance<graphqlClient_Editor>();
             createObject.CreateObject(flowObject, projectId);
 
             // CreateObject_SendToServer createObject = new CreateObject_SendToServer(flowObject, projectId);
@@ -166,9 +166,9 @@ namespace Packages.realityflow_package.Runtime.scripts
             ReceivedMessage.AddEventHandler(typeof(UpdateObject_Received), true, callbackFunction);
         }
 
-        public static async void DeleteObject(string idOfObjectToDelete, string projectId, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
+        public static void DeleteObject(string idOfObjectToDelete, string projectId, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
         {
-            graphqlClient_Editor deleteObject = new graphqlClient_Editor();
+            graphqlClient_Editor deleteObject = ScriptableObject.CreateInstance<graphqlClient_Editor>();
             /*string deletedObjectId = await */deleteObject.DeleteObject(idOfObjectToDelete, projectId);
 
             // if(deletedObjectId != null){ // meaning that the requets went through.
