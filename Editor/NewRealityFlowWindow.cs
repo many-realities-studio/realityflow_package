@@ -75,17 +75,9 @@ public class FlowNetworkManagerEditor : EditorWindow
 
     public delegate void PhotonLeaveHandler();
 
-    public delegate void PhotonConnectHandler();
-
-    public delegate void PhotonDisconnectHandler();
-
     public static event PhotonJoinHandler joinProjectEvent;
 
     public static event PhotonLeaveHandler leaveProjectEvent;
-
-    public static event PhotonConnectHandler rfLoginEvent;
-
-    public static event PhotonDisconnectHandler rfLogoutEvent;
 
     private enum EWindowView
     {
@@ -176,7 +168,7 @@ public class FlowNetworkManagerEditor : EditorWindow
         //         Operations.CheckinVSGraph(graph.Id, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) => { });
         //     }
         // }
-        rfLogoutEvent?.Invoke();
+        leaveProjectEvent?.Invoke();
 
         if (userIsGuest)
         {
@@ -450,7 +442,6 @@ public class FlowNetworkManagerEditor : EditorWindow
             if (ConfigurationSingleton.SingleInstance.CurrentUser != null)
             {
                 Operations.Logout(ConfigurationSingleton.SingleInstance.CurrentUser);
-                rfLogoutEvent?.Invoke();
                 window = EWindowView.LOGIN;
             }
         }
@@ -519,7 +510,7 @@ public class FlowNetworkManagerEditor : EditorWindow
                 // TODO: Logic for deleting user after logout
                 //FlowUser toDelete = ConfigurationSingleton.SingleInstance.CurrentUser;
                 Operations.DeleteUser(ConfigurationSingleton.SingleInstance.CurrentUser);
-                rfLogoutEvent?.Invoke();
+
                 userIsGuest = false;
                 window = EWindowView.LOGIN;
             }
