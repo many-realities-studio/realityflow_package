@@ -962,6 +962,7 @@ public class FlowNetworkManagerEditor : EditorWindow
                     if (e.message.WasSuccessful == true)
                     {
                         // TODO: overwrite current project with new received project info
+                        joinProjectEvent?.Invoke(ConfigurationSingleton.SingleInstance.CurrentProject.Id);
                         window = EWindowView.PROJECT_HUB;
                         Debug.Log(e.message);
                     }
