@@ -20,10 +20,10 @@ namespace RealityFlow.Plugin.Scripts
         [SerializeField]
         public SerializableDictionary<string, string> paramIdToObjId = new SerializableDictionary<string, string>();
 
-        public bool CanBeModified { get => _canBeModified; set => _canBeModified = value; }
+        // public bool CanBeModified { get => _canBeModified; set => _canBeModified = value; }
 
-        [SerializeField]
-        private bool _canBeModified;
+        // [SerializeField]
+        // private bool _canBeModified;
 
         public bool IsUpdated { get => _isUpdated; set => _isUpdated = value; }
 
@@ -365,28 +365,61 @@ namespace RealityFlow.Plugin.Scripts
             {
                 Debug.LogError("Update VSGraph flag successfully set!!!!");
                 // Debug.LogError("this Nodes before copy: " + JsonUtility.ToJson(this.serializedNodes));
-                bool tempCanBeModified = this.CanBeModified;
+                // bool tempCanBeModified = this.CanBeModified;
                 Debug.LogError(JsonUtility.ToJson(newValues));
                 GraphPropertyCopier<FlowVSGraph, FlowVSGraph>.Copy(newValues, this);
                 // Debug.LogError("this Nodes after copy: " + JsonUtility.ToJson(this.serializedNodes));
-                this.CanBeModified = tempCanBeModified;
+                // this.CanBeModified = tempCanBeModified;
 
-                if (CanBeModified == true)
-                {
-                    Operations.UpdateVSGraph(this, ConfigurationSingleton.SingleInstance.CurrentUser, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) => {/* Debug.Log(e.message);*/ });
-                }
+                Operations.FinalizedUpdateVSGraph(this, ConfigurationSingleton.SingleInstance.CurrentUser, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) => {/* Debug.Log(e.message);*/ });
+
 
                 _isUpdated = false;
             }
+        }
+
+        public void ManipulationEndGlobalUpdate(FlowVSGraph newValues)
+        {
+            Debug.LogError("Updating graph after node manipulation");
+            // Debug.LogError("this Nodes before copy: " + JsonUtility.ToJson(this.serializedNodes));
+            // bool tempCanBeModified = this.CanBeModified;
+            GraphPropertyCopier<FlowVSGraph, FlowVSGraph>.Copy(newValues, this);
+            // Debug.LogError("this Nodes after copy: " + JsonUtility.ToJson(this.serializedNodes));
+            // this.CanBeModified = tempCanBeModified;
+
+            // Operations.CheckoutVSGraph(Id, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) =>
+            // {
+            //     // On successful checkout
+            //     if (e.message.WasSuccessful == true)
+            //     {
+            //         _canBeModified = true;
+            //     }
+            // });
+
+            Operations.FinalizedUpdateVSGraph(this, ConfigurationSingleton.SingleInstance.CurrentUser, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) => {/* Debug.Log(e.message);*/ });
+            // if (CanBeModified == true)
+            // {
+            //     Operations.UpdateVSGraph(this, ConfigurationSingleton.SingleInstance.CurrentUser, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) => {/* Debug.Log(e.message);*/ });
+            // }
+            // Operations.CheckinVSGraph(Id, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) =>
+            // {
+            //     // On successful checkin
+            //     if (e.message.WasSuccessful == true)
+            //     {
+            //         _canBeModified = false;
+            //     }
+            // });
+
+            _isUpdated = false;
         }
 
         private void UpdateFlowVSGraphLocally(FlowVSGraph newValues)
         {
             // if (idToVSGraphMapping[newValues.Id].CanBeModified == false)
             // {
-                bool tempCanBeModified = this.CanBeModified;
+                // bool tempCanBeModified = this.CanBeModified;
                 GraphPropertyCopier<FlowVSGraph, FlowVSGraph>.Copy(newValues, this);
-                this.CanBeModified = tempCanBeModified;
+                // this.CanBeModified = tempCanBeModified;
             // }
         }
 
@@ -413,35 +446,35 @@ namespace RealityFlow.Plugin.Scripts
             FlowVSGraph.idToVSGraphMapping = new SerializableDictionary<string, FlowVSGraph>();
         }
 
-        public void CheckIn()
-        {
-            if (CanBeModified == true)
-            {
-                Operations.CheckinVSGraph(Id, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) =>
-                {
-                    // On successful checkin
-                    if (e.message.WasSuccessful == true)
-                    {
-                        _canBeModified = false;
-                    }
-                });
-            }
-        }
+        // public void CheckIn()
+        // {
+        //     if (CanBeModified == true)
+        //     {
+        //         Operations.CheckinVSGraph(Id, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) =>
+        //         {
+        //             // On successful checkin
+        //             if (e.message.WasSuccessful == true)
+        //             {
+        //                 _canBeModified = false;
+        //             }
+        //         });
+        //     }
+        // }
 
-        public void CheckOut()
-        {
-            if (CanBeModified == false)
-            {
-                Operations.CheckoutVSGraph(Id, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) =>
-                    {
-                        // On successful checkout
-                        if (e.message.WasSuccessful == true)
-                        {
-                            _canBeModified = true;
-                        }
-                    });
-            }
-        }
+        // public void CheckOut()
+        // {
+        //     if (CanBeModified == false)
+        //     {
+        //         Operations.CheckoutVSGraph(Id, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) =>
+        //         {
+        //             // On successful checkout
+        //             if (e.message.WasSuccessful == true)
+        //             {
+        //                 _canBeModified = true;
+        //             }
+        //         });
+        //     }
+        // }
 
         // Deprecated function
         public void CopyFromOtherGraph(FlowVSGraph input){

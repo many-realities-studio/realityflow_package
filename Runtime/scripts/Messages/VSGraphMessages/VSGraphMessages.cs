@@ -75,7 +75,7 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.VSGraphMessages
     /// </summary>
     public class FinalizedUpdateVSGraph_SendToServer : BaseMessage
     {
-        [JsonProperty("flowVSGraph")]
+        [JsonProperty("FlowVSGraph")]
         public FlowVSGraph flowVSGraph { get; set; }
 
         [JsonProperty("projectId")]

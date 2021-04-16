@@ -28,6 +28,8 @@ using System.Globalization;
 namespace Packages.realityflow_package.Runtime.scripts
 {
     public delegate void NotifyGraphUpdate();
+
+    public delegate void RunGraphHandler(string vsGraphId);
     
     /// <summary>
     /// The purpose of this class is to provide a wrapper for the UnityPlugin,
@@ -36,6 +38,10 @@ namespace Packages.realityflow_package.Runtime.scripts
     public static class Operations
     {
         public static FlowWebsocket _FlowWebsocket { get; private set; }
+
+        public static event NotifyGraphUpdate updateRFGV;
+
+        public static event RunGraphHandler runVSGraph;
 
         static Operations()
         {
@@ -72,6 +78,9 @@ namespace Packages.realityflow_package.Runtime.scripts
             ReceivedMessage.AddEventHandler(typeof(CreateVSGraph_Received), false, _CreateVSGraph);
             ReceivedMessage.AddEventHandler(typeof(DeleteVSGraph_Received), false, _DeleteVSGraph);
             ReceivedMessage.AddEventHandler(typeof(UpdateVSGraph_Received), false, _UpdateVSGraph);
+            ReceivedMessage.AddEventHandler(typeof(FinalizedUpdateVSGraph_Received), false, _FinalizedUpdateVSGraph);
+            ReceivedMessage.AddEventHandler(typeof(RunVSGraph_Received), false, _RunVSGraph);
+            // ReceivedMessage.AddEventHandler(typeof(UpdateNodeView_Received), false, _UpdateNodeView);
         }
 
         #region UserOperations
@@ -207,8 +216,6 @@ namespace Packages.realityflow_package.Runtime.scripts
 
         #region VSGraphOperations
 
-        public static event NotifyGraphUpdate updateRFGV;
-
         // Temporary debugging function
         // public static void CreateVSGraph(string msg)
         // {
@@ -242,6 +249,16 @@ namespace Packages.realityflow_package.Runtime.scripts
             ReceivedMessage.AddEventHandler(typeof(UpdateVSGraph_Received), true, callbackFunction);
         }
 
+        public static void FinalizedUpdateVSGraph(FlowVSGraph flowVSGraph, FlowUser flowUser, string projectId, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
+        {
+            //UpdateVSGraph_SendToServer updateVSGraph = new UpdateVSGraph_SendToServer(flowVSGraph, /*flowUser,*/ projectId); // TODO: format string msg
+            Debug.Log(JsonUtility.ToJson(flowVSGraph.edges));
+            string message = ("{\"FlowVSGraph\":" + JsonUtility.ToJson(flowVSGraph) + ",\"ProjectId\":\"" + projectId + "\",\"MessageType\":\"FinalizedUpdateVSGraph\"}");
+            FlowWebsocket.SendGraphMessage(message);
+
+            ReceivedMessage.AddEventHandler(typeof(FinalizedUpdateVSGraph_Received), true, callbackFunction);
+        }
+
         public static void DeleteVSGraph(string idOfVSGraphToDelete, string projectId, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
         {
             //DeleteVSGraph_SendToServer deleteVSGraph = new DeleteVSGraph_SendToServer(projectId, idOfVSGraphToDelete); // TODO: format string msg
@@ -249,6 +266,24 @@ namespace Packages.realityflow_package.Runtime.scripts
             FlowWebsocket.SendGraphMessage(message);
 
             ReceivedMessage.AddEventHandler(typeof(DeleteVSGraph_Received), true, callbackFunction);
+        }
+
+        public static void UpdateNodeView(NodeView nodeView, FlowUser flowUser, string projectId, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
+        {
+            //UpdateVSGraph_SendToServer updateVSGraph = new UpdateVSGraph_SendToServer(flowVSGraph, /*flowUser,*/ projectId); // TODO: format string msg
+            string boolValue = (nodeView.CanBeModified ? "true" : "false");
+            string message = ("{\"FlowNodeView\": {\"CanBeModified\":" + boolValue + ",\"LocalPos\":" + JsonUtility.ToJson(nodeView.localPos) + ",\"NodeGUID\":\"" + nodeView.nodeGUID + "\"},\"ProjectId\":\"" + projectId + "\",\"MessageType\":\"UpdateNodeView\"}");
+            FlowWebsocket.SendGraphMessage(message);
+
+            ReceivedMessage.AddEventHandler(typeof(UpdateVSGraph_Received), true, callbackFunction);
+        }
+
+        public static void RunVSGraph(string idOfVSGraphToRun, string projectId, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
+        {
+            string message = ("{\"VSGraphId\":\"" + idOfVSGraphToRun + "\",\"ProjectId\":\"" + projectId + "\",\"MessageType\":\"RunVSGraph\"}");
+            FlowWebsocket.SendGraphMessage(message);
+
+            ReceivedMessage.AddEventHandler(typeof(RunVSGraph_Received), true, callbackFunction);
         }
 
         #endregion VSGraphOperations
@@ -398,6 +433,27 @@ namespace Packages.realityflow_package.Runtime.scripts
             ReceivedMessage.AddEventHandler(typeof(CheckinVSGraph_Received), true, callbackFunction);
         }
 
+        public static void CheckoutNodeView(NodeView nodeView, string projectID, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
+        {
+            // CheckoutNodeView_SendToServer checkoutNodeView = new CheckoutNodeView_SendToServer(nodeGUID, projectID);
+            // FlowWebsocket.SendMessage(checkoutNodeView);
+            string boolValue = (nodeView.CanBeModified ? "true" : "false");
+            string message = ("{\"FlowNodeView\": {\"CanBeModified\":" + boolValue + ",\"LocalPos\":" + JsonUtility.ToJson(nodeView.localPos) + ",\"NodeGUID\":\"" + nodeView.nodeGUID + "\"},\"ProjectId\":\"" + projectID + "\",\"MessageType\":\"CheckoutNodeView\"}");
+            FlowWebsocket.SendGraphMessage(message);
+
+            ReceivedMessage.AddEventHandler(typeof(CheckoutNodeView_Received), true, callbackFunction);
+        }
+
+        public static void CheckinNodeView(string nodeGUID, string projectID, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
+        {
+            CheckinNodeView_SendToServer checkinNodeView = new CheckinNodeView_SendToServer(nodeGUID, projectID);
+            FlowWebsocket.SendMessage(checkinNodeView);
+            // string message = ("{\"NodeView\": {\"CanBeModified\":" + nodeView.CanBeModified + ",\"LocalPos\":" + JsonUtility.ToJson(nodeView.localPos) + ",\"NodeGUID\":\"" + nodeView.nodeGUID + "\"},\"ProjectId\":\"" + projectID + "\",\"MessageType\":\"CheckinNodeView\"}");
+            // FlowWebsocket.SendGraphMessage(message);
+
+            ReceivedMessage.AddEventHandler(typeof(CheckinNodeView_Received), true, callbackFunction);
+        }
+
         #endregion Checkout system messages
 
         /// <summary>
@@ -516,6 +572,16 @@ namespace Packages.realityflow_package.Runtime.scripts
         private static void _UpdateVSGraph(object sender, BaseReceivedEventArgs eventArgs)
         {
             updateRFGV?.Invoke();
+        }
+
+        private static void _FinalizedUpdateVSGraph(object sender, BaseReceivedEventArgs eventArgs)
+        {
+            updateRFGV?.Invoke();
+        }
+
+        private static void _RunVSGraph(object sender, BaseReceivedEventArgs eventArgs)
+        {
+            runVSGraph?.Invoke(eventArgs.message.VSGraphId);
         }
 
         #endregion VSGraph messages received

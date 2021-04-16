@@ -65,4 +65,36 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.CheckoutMessages
             this.MessageType = "CheckinVSGraph";
         }
     }
+
+    public class CheckoutNodeView_SendToServer : BaseMessage
+    {
+        [JsonProperty("NodeGUID")]
+        public string NodeGUID;
+
+        [JsonProperty("ProjectId")]
+        public string ProjectId;
+
+        public CheckoutNodeView_SendToServer(string nodeGUID, string projectId)
+        {
+            NodeGUID = nodeGUID;
+            ProjectId = projectId;
+            this.MessageType = "CheckoutNodeView";
+        }
+    }
+
+    public class CheckinNodeView_SendToServer : BaseMessage
+    {
+        [JsonProperty("NodeGUID")]
+        public string NodeGUID;
+
+        [JsonProperty("ProjectId")]
+        public string ProjectId;
+
+        public CheckinNodeView_SendToServer(string nodeGUID, string projectId)
+        {
+            NodeGUID = nodeGUID;
+            ProjectId = projectId;
+            this.MessageType = "CheckinNodeView";
+        }
+    }
 }
