@@ -148,11 +148,11 @@ namespace Packages.realityflow_package.Runtime.scripts
 
         public static void UpdateObject(FlowTObject flowObject, FlowUser flowUser, string projectId, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
         {
-            // graphqlClient_Editor updateObject = new graphqlClient_Editor();
-            // updateObject.UpdateObject(flowObject, projectId);
+            graphqlClient_Editor updateObject = new graphqlClient_Editor();
+            updateObject.UpdateObject(flowObject, projectId);
 
-            UpdateObject_SendToServer _updateObject = new UpdateObject_SendToServer(flowObject, projectId);
-            FlowWebsocket.SendMessage(_updateObject);
+            // UpdateObject_SendToServer _updateObject = new UpdateObject_SendToServer(flowObject, projectId);
+            // FlowWebsocket.SendMessage(_updateObject);
 
             ReceivedMessage.AddEventHandler(typeof(UpdateObject_Received), true, callbackFunction);
         }
@@ -623,6 +623,7 @@ namespace Packages.realityflow_package.Runtime.scripts
                 }
                 Debug.Log("opened project after create: " + e.message.WasSuccessful); 
                 });
+                
         }
 
         private static void _OpenProject(object sender, BaseReceivedEventArgs eventArgs)

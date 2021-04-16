@@ -904,6 +904,12 @@ public class FlowNetworkManagerEditor : EditorWindow
                 FlowTObject.RemoveAllObjectsFromScene();
                 FlowAvatar.RemoveAllAvatarFromScene();
                 FlowVSGraph.RemoveAllGraphsFromScene();
+                // After Deleting a project, update the user projectList
+                Operations.GetAllUserProjects(ConfigurationSingleton.SingleInstance.CurrentUser, (__, _e) =>
+                {
+                    _ProjectList = _e.message.Projects;
+                    Debug.Log("Project list* = " + _ProjectList);
+                });
             }
             else
             {
@@ -946,6 +952,13 @@ public class FlowNetworkManagerEditor : EditorWindow
                     if (e.message.WasSuccessful == true)
                     {
                         // TODO: overwrite current project with new received project info
+                        // After creating a project, update the user projectList
+                        Operations.GetAllUserProjects(ConfigurationSingleton.SingleInstance.CurrentUser, (__, _e) =>
+                        {
+                            _ProjectList = _e.message.Projects;
+                            Debug.Log("Project list* = " + _ProjectList);
+                        });
+
                         window = EWindowView.PROJECT_HUB;
                         Debug.Log(e.message);
                     }

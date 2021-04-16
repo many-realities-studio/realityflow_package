@@ -432,7 +432,8 @@ MonoBehaviour:
     isComplete: 1
   - name: DeleteObject
     type: 1
-    query: "mutation DeleteObject{\n    deleteObject{\n        Id\n    }\n}"
+    query: "mutation DeleteObject{\n    deleteObject(  Id :\"6779403b-68b4-4abd-bb3e-c9621bd68f6b\",
+      projectId :\"eeb3e894-29fb-4b7b-8ef8-0ded35a1b5b4\" ){\n        Id\n    }\n}"
     queryString: deleteObject
     returnType: db_object
     queryOptions:
@@ -502,8 +503,81 @@ MonoBehaviour:
     isComplete: 1
   - name: CreateObject
     type: 1
-    query: "mutation CreateObject{\n    createObject{\n        Id\n    }\n}"
+    query: "mutation CreateObject{\n    createObject(  Id :\"6779403b-68b4-4abd-bb3e-c9621bd68f6b\",
+      Name :\"yui\", X :0.0, Y :0.0, Z :0.0, Q_x :0.0, Q_y :0.0, Q_z :0.0, Q_w :1.0,
+      S_x :1.0, S_y :1.0, S_z :1.0, R :0.0, G :0.0, B :0.0, A :0.0, Prefab :\"Pig\",
+      projectId :\"eeb3e894-29fb-4b7b-8ef8-0ded35a1b5b4\" ){\n        Id\n    }\n}"
     queryString: createObject
+    returnType: db_object
+    queryOptions:
+    - createBehaviour
+    - updateBehaviour
+    - deleteBehaviour
+    - createUser
+    - updateUser
+    - deleteUser
+    - createProject
+    - updateProject
+    - deleteProject
+    - createObject
+    - updateObject
+    - deleteObject
+    - createVSGraph
+    - updateVSGraph
+    - deleteVSGraph
+    fields:
+    - index: 1
+      name: Id
+      type: String
+      parentIndexes: 
+      hasSubField: 0
+      possibleFields:
+      - name: id
+        type: Int
+      - name: Id
+        type: String
+      - name: Name
+        type: String
+      - name: X
+        type: Float
+      - name: Y
+        type: Float
+      - name: Z
+        type: Float
+      - name: Q_x
+        type: Float
+      - name: Q_y
+        type: Float
+      - name: Q_z
+        type: Float
+      - name: Q_w
+        type: Float
+      - name: S_x
+        type: Float
+      - name: S_y
+        type: Float
+      - name: S_z
+        type: Float
+      - name: R
+        type: Float
+      - name: G
+        type: Float
+      - name: B
+        type: Float
+      - name: A
+        type: Float
+      - name: Prefab
+        type: String
+      - name: project
+        type: project
+      - name: projectId
+        type: String
+      hasChanged: 0
+    isComplete: 1
+  - name: UpdateObject
+    type: 1
+    query: "mutation UpdateObject{\n    updateObject{\n        Id\n    }\n}"
+    queryString: updateObject
     returnType: db_object
     queryOptions:
     - createBehaviour
