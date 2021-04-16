@@ -9,7 +9,11 @@
         "RealityFlowObjectData",
         "com.RealityFlow.Editor",
         "com.RealityFlow.Resources",
-        "com.RealityFlow"
+        "com.RealityFlow",
+        "com.alelievr.NodeGraphProcessor.Editor",
+        "com.alelievr.NodeGraphProcessor.Runtime",
+        "com.RealityFlow.Contrib.MRTK",
+        "com.RealityFlow.Contrib.NGP"
     ],
     "includePlatforms": [
         "Editor"

@@ -8,7 +8,10 @@
         "RealityFlowScripts",
         "Tests",
         "com.RealityFlow.Editor.Tests",
-        "com.RealityFlow"
+        "com.RealityFlow",
+        "com.alelievr.NodeGraphProcessor.Editor",
+        "com.alelievr.NodeGraphProcessor.Runtime",
+        "com.RealityFlow.Contrib.MRTK"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
