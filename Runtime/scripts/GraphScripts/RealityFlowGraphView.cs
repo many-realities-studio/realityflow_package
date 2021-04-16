@@ -70,6 +70,7 @@ public class RealityFlowGraphView : MonoBehaviour {
 	public bool reloadCoroutineStarted;
 
 	private bool nodeRoutineRunning = false;
+	public bool isMobile = false;
 
 
 	private void Start () {
@@ -139,7 +140,10 @@ public class RealityFlowGraphView : MonoBehaviour {
 
 	protected void SoftLoadGraph(BaseGraph graph){
 		ClearWhiteBoard();
-		newNodePosition = new Vector2(-1,-1);
+		if(!isMobile)
+		{
+			newNodePosition = new Vector2(-1,-1);
+		}
 		foreach(ExposedParameter p in graph.exposedParameters){
 			StartCoroutine(AddExposedParameterCoroutine(p));
 		}
@@ -153,7 +157,10 @@ public class RealityFlowGraphView : MonoBehaviour {
 
 	protected void HardLoadGraph(BaseGraph graph){
 		ClearGraph();
-		newNodePosition = new Vector2(-1,-1);
+		if(!isMobile)
+		{
+			newNodePosition = new Vector2(-1,-1);
+		}
 		foreach(ExposedParameter p in graph.exposedParameters){
 			StartCoroutine(AddExposedParameterCoroutine(p));
 		}
@@ -725,4 +732,8 @@ public class RealityFlowGraphView : MonoBehaviour {
         // LayoutRebuilder.MarkLayoutForRebuild ((RectTransform) contentPanel.transform);
     }
 
+	public void SetToMobile()
+	{
+		isMobile = true;
+	}
 }
