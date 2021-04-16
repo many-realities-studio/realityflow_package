@@ -71,6 +71,14 @@ public class FlowNetworkManagerEditor : EditorWindow
 
     public Boolean showAllOptions = false;
 
+    public delegate void PhotonJoinHandler(string vsGraphId);
+
+    public delegate void PhotonLeaveHandler();
+
+    public static event PhotonJoinHandler joinProjectEvent;
+
+    public static event PhotonLeaveHandler leaveProjectEvent;
+
     private enum EWindowView
     {
         LOGIN = 0,
@@ -160,6 +168,7 @@ public class FlowNetworkManagerEditor : EditorWindow
         //         Operations.CheckinVSGraph(graph.Id, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) => { });
         //     }
         // }
+        leaveProjectEvent?.Invoke();
 
         if (userIsGuest)
         {
@@ -416,6 +425,7 @@ public class FlowNetworkManagerEditor : EditorWindow
                     if (e.message.WasSuccessful == true)
                     {
                         ConfigurationSingleton.SingleInstance.CurrentProject = e.message.flowProject;
+                        joinProjectEvent?.Invoke(ConfigurationSingleton.SingleInstance.CurrentProject.Id);
                         window = EWindowView.PROJECT_HUB;
                     }
                 }
@@ -483,6 +493,7 @@ public class FlowNetworkManagerEditor : EditorWindow
                     if (e.message.WasSuccessful == true)
                     {
                         ConfigurationSingleton.SingleInstance.CurrentProject = e.message.flowProject;
+                        joinProjectEvent?.Invoke(ConfigurationSingleton.SingleInstance.CurrentProject.Id);
                         window = EWindowView.GUESTPROJECT_HUB;
                     }
                 }
@@ -792,6 +803,7 @@ public class FlowNetworkManagerEditor : EditorWindow
                         if (e.message.WasSuccessful == true)
                         {
                             ConfigurationSingleton.SingleInstance.CurrentProject = e.message.flowProject;
+                            joinProjectEvent?.Invoke(ConfigurationSingleton.SingleInstance.CurrentProject.Id);
                             // JohnLynch
                             Transform head = GameObject.Find("Main Camera").transform;
                             // Transform lHand = 
@@ -892,6 +904,7 @@ public class FlowNetworkManagerEditor : EditorWindow
             if (e.message.WasSuccessful == true)
             {
                 ConfigurationSingleton.SingleInstance.CurrentProject = null;
+                leaveProjectEvent?.Invoke();
 
                 GameObject[] wbList;
                 wbList = GameObject.FindGameObjectsWithTag("Canvas");
@@ -949,6 +962,7 @@ public class FlowNetworkManagerEditor : EditorWindow
                     if (e.message.WasSuccessful == true)
                     {
                         // TODO: overwrite current project with new received project info
+                        joinProjectEvent?.Invoke(ConfigurationSingleton.SingleInstance.CurrentProject.Id);
                         window = EWindowView.PROJECT_HUB;
                         Debug.Log(e.message);
                     }
@@ -1028,6 +1042,7 @@ public class FlowNetworkManagerEditor : EditorWindow
             if (e.message.WasSuccessful == true)
             {
                 ConfigurationSingleton.SingleInstance.CurrentProject = null;
+                leaveProjectEvent?.Invoke();
 
                 GameObject[] wbList;
                 wbList = GameObject.FindGameObjectsWithTag("Canvas");
