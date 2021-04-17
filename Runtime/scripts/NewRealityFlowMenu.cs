@@ -90,7 +90,8 @@ public class NewRealityFlowMenu : MonoBehaviour
         else
         {
             inputField = (TMP_InputField)FindObjectOfType(typeof(TMP_InputField));
-            openProjectId = inputField.text.ToString();
+            if(input != null)
+                openProjectId = inputField.text.ToString();
         }
 
         if (FlowWebsocket.websocket != null)
