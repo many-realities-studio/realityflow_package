@@ -60,9 +60,8 @@ public class NewRealityFlowMenu : MonoBehaviour
     public GameObject vsGraphDeleteButton;
 
     [Header("TextFields")]
-    public TMP_InputField mrtkTextBox = null;
-
-    [Header("Object Creation")]
+    TMP_InputField inputField = null;
+         
     public GameObject FirstObjectCreationStep;
     public GameObject FinalObjectCreationStep;
     private string ObjectName;
@@ -87,6 +86,11 @@ public class NewRealityFlowMenu : MonoBehaviour
         {
             openProjectId = keyboard.text;
             // Do stuff with keyboardText
+        }
+        else
+        {
+            inputField = (TMP_InputField)FindObjectOfType(typeof(TMP_InputField));
+            openProjectId = inputField.text.ToString();
         }
 
         if (FlowWebsocket.websocket != null)
@@ -218,7 +222,8 @@ public class NewRealityFlowMenu : MonoBehaviour
 
     public void CreateVSGraph()
     {
-        string input = KeyboardManager.Instance.InputField.text.ToString();
+        inputField = (TMP_InputField)FindObjectOfType(typeof(TMP_InputField));
+        string input = inputField.text.ToString();
         if(input == null)
         {
             Debug.Log("Could not find input field");
@@ -296,7 +301,8 @@ public class NewRealityFlowMenu : MonoBehaviour
 
     public void CreateObjectStep1()
     {
-        ObjectName = KeyboardManager.Instance.InputField.text.ToString();
+        inputField = (TMP_InputField)FindObjectOfType(typeof(TMP_InputField));
+        ObjectName = inputField.text.ToString();
         if(ObjectName == null)
         {
             Debug.Log("Could not find input field");
@@ -315,7 +321,8 @@ public class NewRealityFlowMenu : MonoBehaviour
 
     public void CreateObject()
     {
-        ObjectPrefab = KeyboardManager.Instance.InputField.text.ToString();
+        inputField = (TMP_InputField)FindObjectOfType(typeof(TMP_InputField));
+        ObjectPrefab = inputField.text.ToString();
         if(ObjectPrefab == null)
         {
             Debug.Log("Could not find input field");
