@@ -10,6 +10,7 @@ using System.Globalization;
 using System.IO;
 using UnityEngine;
 using UnityEditor;
+using UnityEngine.UI;
 using TMPro;
 
 
@@ -30,8 +31,6 @@ public class NewRealityFlowMenu : MonoBehaviour
     private string userToInvite;
     private bool userIsGuest = false;
 
-    private bool _RefreshProjectList = true;
-    private bool displayProjectCode = false;
     private string openProjectId;
 
     //private Dictionary<EWindowView, ChangeView> _ViewDictionary = new Dictionary<EWindowView, ChangeView>();
@@ -39,68 +38,49 @@ public class NewRealityFlowMenu : MonoBehaviour
     //private delegate void ChangeView();
 
     private IList<FlowProject> _ProjectList = null;
-
-    private string defaultZero = "0";
-    private string positionX;
-    private string positionY;
-    private string positionZ;
-
-    private string rotationX;
-    private string rotationY;
-    private string rotationZ;
-
-    private string scaleX;
-    private string scaleY;
-    private string scaleZ;
-
-    public string[] objectOptions;
-    public ArrayList objectNames = new ArrayList();
-    public ArrayList objectIds = new ArrayList();
-    public Boolean addingChain = false;
-    public int selectedTrigger = 0;
-    public int selectedTarget = 0;
-    public FlowBehaviour headBehaviour = null;
-
-    public Boolean showAllOptions = false;
+    public List<FlowVSGraph> VSGraphList;
+    private string newVSGraphName;
+    public Dropdown vsDeleteGraphDropdown; 
 
     [Header("Panels")]
     public GameObject realityFlowMenuPanel;
     public GameObject guestUserComfirmationPanel;
     public GameObject guestUserHubPanel;
     public GameObject guestUserProjectPanel;
+    public GameObject createVSGraphView;
+    public GameObject deleteVSGraphView;
+    public GameObject createObjectView;
+    public GameObject deleteObjectView;
+    
+    [Header("GameObject Parents")]
+    public GameObject deleteVSGraphButtonCollection;
+
+    [Header("Prefabs")]
+    // Prefabs for instantiation
+    public GameObject vsGraphDeleteButton;
 
     [Header("TextFields")]
     public TMP_InputField mrtkTextBox = null;
 
-    private enum MenuOptions
-    {
-        LOGIN = 0,
-        USER_HUB = 1,
-        PROJECT_HUB = 2,
-        DELETE_OBJECT = 3,
-        LOAD_PROJECT = 4,
-        PROJECT_CREATION = 5,
-        INVITE_USER = 6,
-        PROJECT_IMPORT = 7,
-        CREATE_BEHAVIOUR = 8,
-        CREATE_TELEPORT = 9,
-        CREATE_CLICK = 10,
-        CREATE_SNAPZONE = 11,
-        CREATE_ENABLE = 12,
-        CREATE_DISABLE = 13,
-        DELETE_BEHAVIOUR = 14,
-        DELETE_PROJECT_CONFIRMATION = 15,
-        DELETE_VSGRAPH = 16,
-        GUESTUSER_HUB = 17,
-        GUESTPROJECT_HUB = 18,
-        GUEST_CONFIRM_LOGIN = 19
-    }
+    [Header("Object Creation")]
+    public GameObject FirstObjectCreationStep;
+    public GameObject FinalObjectCreationStep;
+    private string ObjectName;
+    private Vector3 ObjectPosition = new Vector3(0, 0, 0);
+    private Vector3 ObjectScale = new Vector3(1, 1, 1);
+    private Vector4 ObjectRotation = new Vector4(0, 0, 0, 1);
+    private string ObjectPrefab;
+
+    [Header("Object Deletion")]
+    public List<FlowTObject> objectList;
+    public Dropdown deleteObjectDropdown; 
 
     public void OpenSystemKeyboard()
     {
         Debug.Log("Open Keyboard");
         keyboard =  TouchScreenKeyboard.Open("", TouchScreenKeyboardType.Default);
     }
+
     public void Update() 
     {
         if (keyboard != null)
@@ -211,5 +191,174 @@ public class NewRealityFlowMenu : MonoBehaviour
             guestUserProjectPanel.SetActive(!guestUserProjectPanel.activeInHierarchy);
       
         }
+    }
+
+    public void ShowHideCreateVSGraph()
+    {
+        createVSGraphView.SetActive(!createVSGraphView.activeInHierarchy);
+    }
+
+    public void ShowHideDeleteVSGraph()
+    {
+        deleteVSGraphView.SetActive(!deleteVSGraphView.activeInHierarchy);
+        //CreateDeleteVSGraphView();
+    }
+
+    public void ShowHideCreateObject()
+    {
+        createObjectView.SetActive(!createObjectView.activeInHierarchy);
+        FirstObjectCreationStep.SetActive(true);
+    }
+
+    public void ShowHideDeleteObject()
+    {
+        deleteObjectView.SetActive(!deleteObjectView.activeInHierarchy);
+    }
+
+
+    public void CreateVSGraph()
+    {
+        string input = KeyboardManager.Instance.InputField.text.ToString();
+        if(input == null)
+        {
+            Debug.Log("Could not find input field");
+        }
+        else if(input == "")
+        {
+            Debug.Log("Input field empty");
+        }
+        else
+        {
+            FlowVSGraph graph = new FlowVSGraph(input);
+            Debug.Log(graph.Name);
+            graph.Name = input;
+            Debug.Log(graph);
+            Debug.Log(JsonUtility.ToJson(graph));
+            // Debug.Log(graph.Id);
+            // Debug.Log(graph._id);
+
+            Operations.CreateVSGraph(graph, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) => Debug.Log(e.message));   
+            createVSGraphView.SetActive(!createVSGraphView.activeInHierarchy);
+        }
+    }
+
+    // // Delete VSGraph for VR Menu not working due to the created gameobjects not lining up
+    // public void CreateDeleteVSGraphView()
+    // {   
+    //     float column = -0.016f;
+    //     float columnWidth = 0.04f; 
+    //     // Send the user to the Project Hub screen
+    //     // if (userIsGuest)
+    //     // {
+    //     //     Debug.Log("Guest cannot delete VS Graph");
+    //     // }
+    //     // else
+    //     // {
+    //         // TODO: This info is likely incorrect for graphs, needs to be thought about
+    //         foreach (FlowVSGraph currentFlowVSGraph in FlowVSGraph.idToVSGraphMapping.Values)
+    //         {
+    //              GameObject deleteVSGraphButtton = Instantiate(vsGraphDeleteButton, new Vector3(column, 0, 0), Quaternion.identity, deleteVSGraphButtonCollection.transform);
+    //              // Figure out how to tie the id to this gameObject;
+    //              deleteVSGraphButtton.AddComponent<FlowVSGraph_Monobehaviour>().underlyingFlowVSGraph = currentFlowVSGraph;
+    //              deleteVSGraphButtton.name = currentFlowVSGraph.Name;
+    //              column += columnWidth;
+    //         }
+    //     //}
+    // }
+
+    public void LoadGraphsToDelete()
+    {
+        deleteVSGraphView.SetActive(true);
+        List<string> options = new List<string> ();
+        VSGraphList.Clear();
+        foreach (FlowVSGraph graph in FlowVSGraph.idToVSGraphMapping.Values)
+        {
+            options.Add(graph.Name);
+            VSGraphList.Add(graph);
+        }
+        vsDeleteGraphDropdown.ClearOptions ();
+        vsDeleteGraphDropdown.AddOptions(options);
+    }
+
+    public void DeleteGraph()
+    {
+        int index = vsDeleteGraphDropdown.value;
+        Debug.Log(index);
+        DeleteVSGraph(VSGraphList[index]);
+        VSGraphList.Clear();
+        deleteVSGraphView.SetActive(false);
+    }
+
+    private void DeleteVSGraph(FlowVSGraph currentFlowVSGraph)
+    {
+        Operations.DeleteVSGraph(currentFlowVSGraph.Id, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) => { Debug.Log("Deleted VSGraph " + e.message); });
+    }
+
+    public void CreateObjectStep1()
+    {
+        ObjectName = KeyboardManager.Instance.InputField.text.ToString();
+        if(ObjectName == null)
+        {
+            Debug.Log("Could not find input field");
+        }
+        else if(ObjectName == "")
+        {
+            Debug.Log("Input field empty");
+        }
+        else
+        {
+            FirstObjectCreationStep.SetActive(false);
+            FinalObjectCreationStep.SetActive(true);
+        }
+
+    }
+
+    public void CreateObject()
+    {
+        ObjectPrefab = KeyboardManager.Instance.InputField.text.ToString();
+        if(ObjectPrefab == null)
+        {
+            Debug.Log("Could not find input field");
+        }
+        else if(ObjectPrefab == "")
+        {
+            Debug.Log("Input field empty");
+        }
+        else
+        {
+            FinalObjectCreationStep.SetActive(false);
+            createObjectView.SetActive(!createObjectView.activeInHierarchy);
+            FlowTObject createdGameObject = new FlowTObject(ObjectName, ObjectPosition, new Quaternion(ObjectRotation.x, ObjectRotation.y, ObjectRotation.z, ObjectRotation.w), ObjectScale, new Color(), ObjectPrefab);
+
+            Operations.CreateObject(createdGameObject, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) => Debug.Log(e.message));
+        }
+    }
+
+    public void LoadObjectsToDelete()
+    {
+        deleteObjectView.SetActive(true);
+        List<string> options = new List<string> ();
+        objectList.Clear();
+        foreach (FlowTObject flowTObject in FlowTObject.idToGameObjectMapping.Values)
+        {
+            options.Add(flowTObject.Name);
+            objectList.Add(flowTObject);
+        }
+        deleteObjectDropdown.ClearOptions ();
+        deleteObjectDropdown.AddOptions(options);
+    }
+
+    public void DeleteObject()
+    {
+        int index = deleteObjectDropdown.value;
+        Debug.Log(index);
+        DeleteObject(objectList[index]);
+        objectList.Clear();
+        deleteObjectView.SetActive(false);
+    }
+
+    private void DeleteObject(FlowTObject currentFlowObject)
+    {
+        Operations.DeleteObject(currentFlowObject.Id, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) => { Debug.Log("Deleted Object " + e.message); });
     }
 }
