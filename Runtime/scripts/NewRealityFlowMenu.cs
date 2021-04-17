@@ -90,7 +90,7 @@ public class NewRealityFlowMenu : MonoBehaviour
         else
         {
             inputField = (TMP_InputField)FindObjectOfType(typeof(TMP_InputField));
-            if(input != null)
+            if(inputField != null)
                 openProjectId = inputField.text.ToString();
         }
 
