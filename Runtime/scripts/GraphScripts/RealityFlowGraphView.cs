@@ -70,7 +70,6 @@ public class RealityFlowGraphView : MonoBehaviour {
 	public bool reloadCoroutineStarted;
 
 	private bool nodeRoutineRunning = false;
-	public bool isMobile = false;
 
 
 	private void Start () {
@@ -725,10 +724,4 @@ public class RealityFlowGraphView : MonoBehaviour {
         // contentPanel.GetComponent<ContentSizeFitter>().enabled = true;
         // LayoutRebuilder.MarkLayoutForRebuild ((RectTransform) contentPanel.transform);
     }
-
-	public void SetToMobile(Vector2 newCanvasDimensions)
-	{
-		canvasDimensions = newCanvasDimensions;
-		isMobile = true;
-	}
 }
