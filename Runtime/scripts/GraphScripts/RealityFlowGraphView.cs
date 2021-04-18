@@ -98,6 +98,8 @@ public class RealityFlowGraphView : MonoBehaviour {
 		foreach (BaseNode node in graph.nodes ){
 			StartCoroutine (AddNodeCoroutine(node));
 		}
+		Debug.LogError("Nodes Views: "+ nodeViewDict.Count);
+		Debug.LogError("Nodes: "+ graph.nodes.Count);
 		foreach (SerializableEdge edge in graph.edges){
 			StartCoroutine( AddEdgeCoroutine(edge));
 		}
@@ -501,12 +503,15 @@ public class RealityFlowGraphView : MonoBehaviour {
 	// This couroutine is in charge of asynchronously making the EdgeView Prefab
 	public IEnumerator AddEdgeCoroutine (SerializableEdge edge){
 		if(!edgeRoutineRunning)
+		{
+			yield return new WaitUntil(() => !nodeRoutineRunning && !paramRoutineRunning);
 			edgeRoutineRunning = true;
+		}
 		if (nodeViewDict.Count != graph.nodes.Count){
 			yield return new WaitUntil(() => nodeViewDict.Count == graph.nodes.Count);
 		}
 		else{
-			yield return new WaitForSeconds (.01f);
+		 	yield return new WaitForSeconds (.01f);
 		}
 		EdgeView newEdge = Instantiate( edgeView, new Vector3(), Quaternion.identity).GetComponent<EdgeView>();
 		newEdge.gameObject.transform.SetParent (contentPanel.transform, false);
