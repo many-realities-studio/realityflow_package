@@ -5,7 +5,6 @@ using RealityFlow.Plugin.Editor;
 using RealityFlow.Plugin.Scripts;
 using System;
 using System.Linq;
-//using System.Web.Security;
 using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
@@ -13,7 +12,7 @@ using System.IO;
 using UnityEditor;
 using UnityEngine;
 
-using Newtonsoft.Json; // TODO: TEMPORARY
+using Newtonsoft.Json;
 using GraphProcessor;
 
 [CustomEditor(typeof(FlowWebsocket))]
@@ -129,7 +128,7 @@ public class FlowNetworkManagerEditor : EditorWindow
         _ViewDictionary.Add(EWindowView.LOAD_PROJECT, _CreateLoadProjectView);
         _ViewDictionary.Add(EWindowView.DELETE_PROJECT_CONFIRMATION, _CreateDeleteProjectConfirmationView);
         _ViewDictionary.Add(EWindowView.PROJECT_CREATION, _CreateProjectCreationView);
-        _ViewDictionary.Add(EWindowView.INVITE_USER, _CreateInviteUserView); // not implementec
+        _ViewDictionary.Add(EWindowView.INVITE_USER, _CreateInviteUserView); // not implemented
         _ViewDictionary.Add(EWindowView.PROJECT_IMPORT, _CreateProjectImportView);
         _ViewDictionary.Add(EWindowView.CREATE_BEHAVIOUR, _CreateBehaviourView);
         _ViewDictionary.Add(EWindowView.CREATE_TELEPORT, _CreateTeleportView);
@@ -160,14 +159,6 @@ public class FlowNetworkManagerEditor : EditorWindow
             }
         }
 
-        // Check in all graphs
-        // foreach (FlowVSGraph graph in FlowVSGraph.idToVSGraphMapping.Values)
-        // {
-        //     if (graph.CanBeModified == true)
-        //     {
-        //         Operations.CheckinVSGraph(graph.Id, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) => { });
-        //     }
-        // }
         leaveProjectEvent?.Invoke();
 
         if (userIsGuest)
@@ -184,7 +175,6 @@ public class FlowNetworkManagerEditor : EditorWindow
 
         foreach (GameObject wb in wbList)
         {
-            // wb.transform.GetChild(2).gameObject.GetComponent<RealityFlowGraphView>().ClearGraph;
             GameObject runeTimeGraphObject = GameObject.FindGameObjectWithTag("Canvas").transform.GetChild(2).gameObject;
             RealityFlowGraphView rfgv = runeTimeGraphObject.GetComponent<RealityFlowGraphView>();
             rfgv.ClearWhiteBoard();
@@ -232,17 +222,6 @@ public class FlowNetworkManagerEditor : EditorWindow
                     Operations.CheckinObject(obj.Id, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) => { });
                 }
             }
-
-            //Ask Owen...
-
-            // Check in all graphs
-            // foreach (FlowVSGraph graph in FlowVSGraph.idToVSGraphMapping.Values)
-            // {
-            //     if (graph.CanBeModified == true)
-            //     {
-            //         Operations.CheckinVSGraph(graph.Id, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) => { });
-            //     }
-            // }
 
             Operations.Logout(ConfigurationSingleton.SingleInstance.CurrentUser);
         }
@@ -360,7 +339,6 @@ public class FlowNetworkManagerEditor : EditorWindow
 
             tempUName = ("Guest-" + new string(uNameString));
             tempPWord = (new string(pWordString));
-            //tempPWord = GeneratePassword(8, 0);
 
             Debug.Log("Generated username: " + tempUName);
             Debug.Log("Generated password: " + tempPWord);
@@ -397,13 +375,6 @@ public class FlowNetworkManagerEditor : EditorWindow
             window = EWindowView.LOAD_PROJECT;
             
         }
-
-        // // Create "Delete Project" Button and define onClick action
-        // if (GUILayout.Button("Delete Project", GUILayout.Height(40)))
-        // {
-        //     // Send the user to the load project screen
-        //     window = EWindowView.DELETE_PROJECT;
-        // }
 
         EditorGUILayout.BeginHorizontal();
 
@@ -508,8 +479,6 @@ public class FlowNetworkManagerEditor : EditorWindow
             // Send logout event to the server
             if (ConfigurationSingleton.SingleInstance.CurrentUser != null)
             {
-                // TODO: Logic for deleting user after logout
-                //FlowUser toDelete = ConfigurationSingleton.SingleInstance.CurrentUser;
                 Operations.DeleteUser(ConfigurationSingleton.SingleInstance.CurrentUser);
 
                 userIsGuest = false;
@@ -585,7 +554,6 @@ public class FlowNetworkManagerEditor : EditorWindow
         // Create "Delete Visual Scripting Graph" Button and define onClick action
         if (GUILayout.Button("Delete Visual Scripting Graph", GUILayout.Height(40)))
         {
-            // TODO: Send user to screen that displays all graphs in the project for them to delete from.
             window = EWindowView.DELETE_VSGRAPH;
         }
 
@@ -600,63 +568,57 @@ public class FlowNetworkManagerEditor : EditorWindow
             window = EWindowView.DELETE_PROJECT_CONFIRMATION;
         }
 
-        // Button to print graphs for debug
-        if (GUILayout.Button("Print all graphs in the idToVSGraphMapping dictionary", GUILayout.Height(40)))
-        {
-            foreach (FlowVSGraph graph in FlowVSGraph.idToVSGraphMapping.Values)
-            {
-                Debug.Log("Using JsonUtility: " + JsonUtility.ToJson(graph));
-                try
-                {
-                    string NewtonGraph = JsonConvert.SerializeObject(graph, new JsonSerializerSettings()
-                    {
-                        PreserveReferencesHandling = PreserveReferencesHandling.Objects,
-                        ReferenceLoopHandling = ReferenceLoopHandling.Ignore
-                    });
-                    Debug.Log("Using NewtonSoft: " + NewtonGraph);
-                }
-                catch (Exception e)
-                {
-                    Debug.LogWarning(e);
-                }
+        // Button to print all graphs in the dictionary for debugging purposes
+        // if (GUILayout.Button("Print all graphs in the idToVSGraphMapping dictionary", GUILayout.Height(40)))
+        // {
+        //     foreach (FlowVSGraph graph in FlowVSGraph.idToVSGraphMapping.Values)
+        //     {
+        //         Debug.Log("Using JsonUtility: " + JsonUtility.ToJson(graph));
+        //         try
+        //         {
+        //             string NewtonGraph = JsonConvert.SerializeObject(graph, new JsonSerializerSettings()
+        //             {
+        //                 PreserveReferencesHandling = PreserveReferencesHandling.Objects,
+        //                 ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+        //             });
+        //             Debug.Log("Using NewtonSoft: " + NewtonGraph);
+        //         }
+        //         catch (Exception e)
+        //         {
+        //             Debug.LogWarning(e);
+        //         }
 
-                Debug.Log("serializedNodes as list:");
-                foreach (var serializedNode in graph.serializedNodes.ToList())
-                {
-                    Debug.Log(serializedNode);
-                }
-                Debug.Log("Edges as list:");
-                foreach (var edge in graph.edges.ToList())
-			    {
-                    Debug.Log(edge);
-                }
-                Debug.Log("ExposedParameters list:");
-                foreach (var exparam in graph.exposedParameters.ToList())
-			    {
-                    Debug.Log(exparam);
-                }
+        //         Debug.Log("serializedNodes as list:");
+        //         foreach (var serializedNode in graph.serializedNodes.ToList())
+        //         {
+        //             Debug.Log(serializedNode);
+        //         }
+        //         Debug.Log("Edges as list:");
+        //         foreach (var edge in graph.edges.ToList())
+		// 	    {
+        //             Debug.Log(edge);
+        //         }
+        //         Debug.Log("ExposedParameters list:");
+        //         foreach (var exparam in graph.exposedParameters.ToList())
+		// 	    {
+        //             Debug.Log(exparam);
+        //         }
 
-                Debug.Log("ExposedParameters as themselves serialized");
-                foreach (ExposedParameter exparam in graph.exposedParameters)
-                {
-                    Debug.Log("serialized value of exposed parameter: " + exparam.serializedValue.value.ToString());
-                    try
-                    {
-                        // string NewtonExparam = JsonConvert.SerializeObject(exparam, new JsonSerializerSettings()
-                        // {
-                        //     PreserveReferencesHandling = PreserveReferencesHandling.Objects,
-                        //     ReferenceLoopHandling = ReferenceLoopHandling.Ignore
-                        // });
-                        // Debug.Log("Newton serialized exposed parameter: " + NewtonExparam);
-                        Debug.Log("JsonUtility serialized version of exposed parameter: " + JsonUtility.ToJson(exparam));
-                    }
-                    catch (Exception e)
-                    {
-                        Debug.LogWarning(e);
-                    }
-                }
-            }
-        }
+        //         Debug.Log("ExposedParameters as themselves serialized");
+        //         foreach (ExposedParameter exparam in graph.exposedParameters)
+        //         {
+        //             Debug.Log("serialized value of exposed parameter: " + exparam.serializedValue.value.ToString());
+        //             try
+        //             {
+        //                 Debug.Log("JsonUtility serialized version of exposed parameter: " + JsonUtility.ToJson(exparam));
+        //             }
+        //             catch (Exception e)
+        //             {
+        //                 Debug.LogWarning(e);
+        //             }
+        //         }
+        //     }
+        // }
     }
 
     private void _CreateGuestProjectHubView()
@@ -733,21 +695,6 @@ public class FlowNetworkManagerEditor : EditorWindow
         EditorGUILayout.EndHorizontal();
 
         // As user is a guest, I feel like they shouldn't be able to get a code to invite other users without owner's consent
-        // EditorGUILayout.TextArea("Project code: " + ConfigurationSingleton.SingleInstance.CurrentProject.Id);
-
-        // Create "Delete This Project" Button and define onClick action
-        // if (GUILayout.Button("Delete This Project", GUILayout.Height(40)))
-        // {
-        //     // Send user to Delete Project screen
-        //     window = EWindowView.DELETE_PROJECT_CONFIRMATION;
-        // }
-
-        // Graph Message testing button to open testing window
-        if (GUILayout.Button("GRAPH MESSAGE TESTING", GUILayout.Height(40)))
-        {
-            // Opens a new window/unity utility tab to create an object
-            GraphMessageTesting.OpenWindow();
-        }
     }
 
     private void _CreateDeleteObjectView()
@@ -823,37 +770,6 @@ public class FlowNetworkManagerEditor : EditorWindow
         }
     }
 
-    // Currently not used
-    private void _CreateDeleteProjectView()
-    {
-        // Create "Back" Button and define onClick action
-        EditorGUILayout.BeginHorizontal();
-        if (GUILayout.Button("Back", GUILayout.Height(20)))
-        {
-            // Send the user to the User Hub screen
-            window = EWindowView.USER_HUB;
-        }
-        EditorGUILayout.EndHorizontal();
-
-        if (_ProjectList != null)
-        {
-            foreach (FlowProject project in _ProjectList)
-            {
-                if (GUILayout.Button(project.ProjectName, GUILayout.Height(30)))
-                {
-                    Operations.DeleteProject(project, ConfigurationSingleton.SingleInstance.CurrentUser, (_, e) =>
-                    {
-                        Debug.Log(e.message);
-                        if (e.message.WasSuccessful == true)
-                        {
-                            window = EWindowView.USER_HUB;
-                        }
-                    });
-                }
-            }
-        }
-    }
-
     private void _CreateDeleteVSGraphView()
     {
         // Create "Back" Button and define onClick action
@@ -912,7 +828,6 @@ public class FlowNetworkManagerEditor : EditorWindow
 
                 foreach (GameObject wb in wbList)
                 {
-                    // wb.transform.GetChild(2).gameObject.GetComponent<RealityFlowGraphView>().ClearGraph;
                     GameObject runeTimeGraphObject = GameObject.FindGameObjectWithTag("Canvas").transform.GetChild(2).gameObject;
                     RealityFlowGraphView rfgv = runeTimeGraphObject.GetComponent<RealityFlowGraphView>();
                     rfgv.ClearWhiteBoard();
@@ -921,6 +836,7 @@ public class FlowNetworkManagerEditor : EditorWindow
                 FlowTObject.RemoveAllObjectsFromScene();
                 FlowAvatar.RemoveAllAvatarFromScene();
                 FlowVSGraph.RemoveAllGraphsFromScene();
+
                 // After Deleting a project, update the user projectList
                 Operations.GetAllUserProjects(ConfigurationSingleton.SingleInstance.CurrentUser, (__, _e) =>
                 {
@@ -968,7 +884,6 @@ public class FlowNetworkManagerEditor : EditorWindow
                 {
                     if (e.message.WasSuccessful == true)
                     {
-                        // TODO: overwrite current project with new received project info
                         // After creating a project, update the user projectList
                         Operations.GetAllUserProjects(ConfigurationSingleton.SingleInstance.CurrentUser, (__, _e) =>
                         {
@@ -1033,15 +948,6 @@ public class FlowNetworkManagerEditor : EditorWindow
             }
         }
 
-        // Check in all graphs
-        // foreach (FlowVSGraph graph in FlowVSGraph.idToVSGraphMapping.Values)
-        // {
-        //     if (graph.CanBeModified == true)
-        //     {
-        //         Operations.CheckinVSGraph(graph.Id, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) => { });
-        //     }
-        // }
-
         foreach (FlowAvatar avatar in FlowAvatar.idToAvatarMapping.Values)
         {
             if (avatar.currentAvatarIsMe == true)
@@ -1063,7 +969,6 @@ public class FlowNetworkManagerEditor : EditorWindow
 
                 foreach (GameObject wb in wbList)
                 {
-                    // wb.transform.GetChild(2).gameObject.GetComponent<RealityFlowGraphView>().ClearGraph;
                     GameObject runeTimeGraphObject = GameObject.FindGameObjectWithTag("Canvas").transform.GetChild(2).gameObject;
                     RealityFlowGraphView rfgv = runeTimeGraphObject.GetComponent<RealityFlowGraphView>();
                     rfgv.ClearWhiteBoard();
@@ -1247,7 +1152,6 @@ public class FlowNetworkManagerEditor : EditorWindow
 
         EditorGUILayout.EndHorizontal();
 
-        //if (/*addingChain*/)
         if (addingChain)
         {
             EditorGUILayout.BeginHorizontal();
