@@ -89,29 +89,7 @@ public class RealityFlowGraphView : MonoBehaviour {
 		HardLoadGraph(graph);
 	}
 
-	// protected void SoftLoadGraph(BaseGraph graph){
-	// 	ClearWhiteBoard();
-	// 	newNodePosition = new Vector2(-1,-1);
-	// 	foreach(ExposedParameter p in graph.exposedParameters){
-	// 		StartCoroutine(AddExposedParameterCoroutine(p));
-	// 	}
-	// 	foreach (BaseNode node in graph.nodes ){
-	// 		StartCoroutine (AddNodeCoroutine(node));
-	// 	}
-	// 	Debug.LogError("Nodes Views: "+ nodeViewDict.Count);
-	// 	Debug.LogError("Nodes: "+ graph.nodes.Count);
-	// 	foreach (SerializableEdge edge in graph.edges){
-	// 		StartCoroutine( AddEdgeCoroutine(edge));
-	// 	}
-
-	// 	foreach(KeyValuePair<string,NodeView> nv in nodeViewDict){
-	// 		if (nv.Value.CanBeModified){
-	// 			nv.Value.CheckIn();
-	// 		}
-	// 	}
-	// }
-
-	protected IEnumerable SoftLoadGraphCoroutine(BaseGraph graph){
+	protected void SoftLoadGraph(BaseGraph graph){
 		ClearWhiteBoard();
 		newNodePosition = new Vector2(-1,-1);
 		foreach(ExposedParameter p in graph.exposedParameters){
@@ -122,7 +100,6 @@ public class RealityFlowGraphView : MonoBehaviour {
 		}
 		Debug.LogError("Nodes Views: "+ nodeViewDict.Count);
 		Debug.LogError("Nodes: "+ graph.nodes.Count);
-		yield return new WaitUntil(() => nodeViewDict.Count == graph.nodes.Count);
 		foreach (SerializableEdge edge in graph.edges){
 			StartCoroutine( AddEdgeCoroutine(edge));
 		}
@@ -133,6 +110,27 @@ public class RealityFlowGraphView : MonoBehaviour {
 			}
 		}
 	}
+
+	// protected IEnumerable SoftLoadGraphCoroutine(BaseGraph graph){
+	// 	ClearWhiteBoard();
+	// 	newNodePosition = new Vector2(-1,-1);
+	// 	foreach(ExposedParameter p in graph.exposedParameters){
+	// 		StartCoroutine(AddExposedParameterCoroutine(p));
+	// 	}
+	// 	foreach (BaseNode node in graph.nodes ){
+	// 		StartCoroutine (AddNodeCoroutine(node));
+	// 	}
+	// 	yield return new WaitUntil(() => nodeViewDict.Count == graph.nodes.Count);
+	// 	foreach (SerializableEdge edge in graph.edges){
+	// 		StartCoroutine( AddEdgeCoroutine(edge));
+	// 	}
+
+	// 	foreach(KeyValuePair<string,NodeView> nv in nodeViewDict){
+	// 		if (nv.Value.CanBeModified){
+	// 			nv.Value.CheckIn();
+	// 		}
+	// 	}
+	// }
 
 	protected void HardLoadGraph(BaseGraph graph){
 		ClearGraph();
@@ -181,7 +179,7 @@ public class RealityFlowGraphView : MonoBehaviour {
 	// frame, and if we do not, then call the reload
 	public IEnumerator CallSoftReloadCoroutine() {
 		yield return new WaitUntil(() => updateTimer > maxUpdateTime && !nodeRoutineRunning && !edgeRoutineRunning && !paramRoutineRunning);
-		SoftLoadGraphCoroutine(graph);
+		SoftLoadGraph(graph);
 		updateTimer = 0f;
 		reloadCoroutineStarted = false;
 	}
@@ -549,9 +547,6 @@ public class RealityFlowGraphView : MonoBehaviour {
 			if (npv.port == edge.outputPort){ newEdge.output = npv; break; }
 		}
 		newEdge.input.edges.Add(newEdge);
-		Debug.LogError("Newedge: "+newEdge);
-		Debug.LogError(" input: "+newEdge.input);
-		Debug.LogError(" edges: "+newEdge.input.edges);
 		newEdge.output.edges.Add(newEdge);
 		// Set the positions of the linerenderer
 		newEdge.edge = edge;
