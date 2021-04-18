@@ -34,7 +34,6 @@ public class NodeView : MonoBehaviour
     public static NodeView instance;
     
     // TODO: Make sure this is the best way to do this. I think this is really hacky -John
-    // public BaseGraph graph;
     [JsonConstructor]
     public NodeView(Vector3 LocalPos, string NodeGUID)
     {
@@ -50,41 +49,18 @@ public class NodeView : MonoBehaviour
             Debug.LogWarning("Nodeview with specified GUID does not exist in the scene. Failed to update NodeView.");
             return;
         }
-        // Find the nodeview with the GUID we need to update that one specifically
-
-        // var baseNodeType = Type.GetType(serializedNode.type);
-
-        // if (serializedNode.jsonDatas == null)
-		// 	return;
-
-        // var newNode = Activator.CreateInstance(baseNodeType) as BaseNode;
-
-        // JsonUtility.FromJsonOverwrite(serializedNode.jsonDatas, newNode);
-
-        // if(!rfgv.graph.nodesPerGUID.ContainsKey(newNode.GUID))
-        // {
-        //     rfgv.graph.AddNode(newNode);
-        // }  
-        // rfgv.graph.nodesPerGUID[newNode.GUID] = newNode;
-
-        // node = rfgv.graph.nodesPerGUID[newNode.GUID];
-        //BaseNode newNode = JsonUtility.FromJson<BaseNode>(serializedNode.jsonDatas);
-
-
     }
     private void UpdateNodeViewLocally(NodeView newValues)
     {
         if(RealityFlowGraphView.nodeViewtoRFGVDict[nodeGUID].nodeViewDict[nodeGUID].CanBeModified == false)
         {
             bool tempCanBeModified = this.CanBeModified;
-            //PropertyCopier<FlowTObject, FlowTObject>.Copy(newValues, this);
             this.transform.localPosition = newValues.localPos;
             this.CanBeModified = tempCanBeModified;
         }
     }
     private void UpdateNodeViewGlobally(NodeView newValues)
     {
-        //TODO: Fill in
         if (transform.hasChanged == true)
         {
             bool tempCanBeModified = this.CanBeModified;
@@ -95,7 +71,6 @@ public class NodeView : MonoBehaviour
             {
                 Operations.UpdateNodeView(this, ConfigurationSingleton.SingleInstance.CurrentUser, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) => {/* Debug.Log(e.message);*/ });
             }
-
             transform.hasChanged = false;
         }
     }
@@ -124,9 +99,6 @@ public class NodeView : MonoBehaviour
     void Update(){
         transform.rotation = Quaternion.identity;
         localPos = transform.localPosition;
-
-        // Debug.Log("NV CanBeModified state: " + this.CanBeModified + ", constraintsFrozen state: " + constraintsFrozen);
-
         UpdateNodeViewGlobally(this);
 
         if (this.CanBeModified && constraintsFrozen)
@@ -144,13 +116,11 @@ public class NodeView : MonoBehaviour
 
 
     public void DeleteSelf(){
-        //rfgv.CheckOutGraph();
         rfgv.DeleteSelection(this);
         this.Delete();
     }
 
     public void Delete(){
-        //rfgv.CheckOutGraph();
         foreach(NodePortView inputPort in inputPortViews){
             inputPort.Delete();
         }
@@ -160,7 +130,6 @@ public class NodeView : MonoBehaviour
         rfgv.graph.RemoveNode(this.node);
         if(this.gameObject != null)
             Destroy(this.gameObject);
-        //rfgv.CheckInGraph();
     }
 
     public void DeleteFromWhiteBoard()
@@ -176,10 +145,8 @@ public class NodeView : MonoBehaviour
     }
 
     public void Select(){
-       //rfgv.CheckOutGraph();
        rfgv.AddToSelectionNV(this);
        this.GetComponent<CanvasRenderer>().SetColor(Color.green);
-       //rfgv.CheckInGraph();
     }
 
     public void ResetOrientation(){

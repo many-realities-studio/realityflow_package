@@ -30,47 +30,9 @@ public class CommandPalette : MonoBehaviour
     public List<Command> GetCommandStack(){
         return commandStack;
     }
-    // Undo Functions
-    /*
-    public void UndoTesting()
-    {
-        // Get the graph state from the command.
-
-        Debug.Log(" which is tied to the command "+commandStack[0].PrintCommand());
-        //Undo.PerformUndo();
-        //Undo.ClearAll();
-        commandStack[0].UndoCommand();
-    }
-    */
-    /*void OverallUndo(int indexToRemove){
-        if (commandStack.Count <= 0 ){
-            // Do nothing because the stack is empty
-        } else {
-            Command c = commandStack[indexToRemove];
-            if(c.action == "Add Node")
-            {
-                // RealityFlowGraphView.instance.graph.RemoveNode(c.node);
-                //graph.SetDirty();
-                // Destroy(c.o);
-            }
-            else if(c.action == "Remove Node")
-            {
-            commandStack.RemoveAt(indexToRemove);
-            //BaseNode n = RealityFlowGraphView.instance.AddNodenoStack();  // MARK FOR DELETE
-            BaseGraph g = GameObject.Find("RuntimeGraph").GetComponent<RealityFlowGraphView>().graph;
-            BaseNode n = g.add;
-            // n.GUID = c.objectGUID;
-            }
-        }
-        //commandStack.RemoveAt(indexToRemove);
-    }
-    */
     public void UndoLastChange(){
         // Pops the most recent change from the stack.
         int indexToRemove = commandStack.Count - 1;
-        //OverallUndo(indexToRemove);
-
-
     }
 
     // Takes userID as argument

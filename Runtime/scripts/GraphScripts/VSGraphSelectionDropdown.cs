@@ -43,7 +43,6 @@ public class VSGraphSelectionDropdown : MonoBehaviour
         if (selectionDropdown.options.Count > 0)
         {
             int index = selectionDropdown.value;
-            Debug.Log(index);
             rfgv.InitializeGraph(VSGraphList[index]);
             VSGraphList.Clear();
             this.gameObject.SetActive(false);

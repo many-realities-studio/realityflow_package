@@ -1,5 +1,4 @@
-﻿//using Packages.realityflow_package.Runtime.scripts.Managers;
-using Behaviours;
+﻿using Behaviours;
 using Packages.realityflow_package.Runtime.scripts.Messages;
 using Packages.realityflow_package.Runtime.scripts.Messages.BehaviourMessages;
 using Packages.realityflow_package.Runtime.scripts.Messages.CheckoutMessages;
@@ -12,7 +11,7 @@ using Packages.realityflow_package.Runtime.scripts.Messages.VSGraphMessages;
 using RealityFlow.Plugin.Scripts;
 using GraphProcessor;
 using System.Threading.Tasks;
-using RealityFlow.Plugin.Contrib; // TODO: Fix reference
+using RealityFlow.Plugin.Contrib;
 
 // Unity/GraphQL libraries
 using System.Collections;
@@ -84,7 +83,6 @@ namespace Packages.realityflow_package.Runtime.scripts
             ReceivedMessage.AddEventHandler(typeof(UpdateVSGraph_Received), false, _UpdateVSGraph);
             ReceivedMessage.AddEventHandler(typeof(FinalizedUpdateVSGraph_Received), false, _FinalizedUpdateVSGraph);
             ReceivedMessage.AddEventHandler(typeof(RunVSGraph_Received), false, _RunVSGraph);
-            // ReceivedMessage.AddEventHandler(typeof(UpdateNodeView_Received), false, _UpdateNodeView);
         }
 
         #region UserOperations
@@ -112,14 +110,6 @@ namespace Packages.realityflow_package.Runtime.scripts
             _FlowWebsocket.Disconnect();
         }
 
-        // public static void LogoutGuest(FlowUser flowUser)
-        // {
-        //     LogoutGuest_SendToServer logoutGuestMessage = new LogoutGuest_SendToServer(flowUser);
-        //     FlowWebsocket.SendMessage(logoutGuestMessage);
-
-        //     _FlowWebsocket.Disconnect();
-        // }
-
         public static void Register(string username, string password, string url, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
         {
              bool connectionSuccssfull = ConnectToServer(url);
@@ -140,8 +130,6 @@ namespace Packages.realityflow_package.Runtime.scripts
         {
             DeleteUser_SendToServer deleteUserMessage = new DeleteUser_SendToServer(flowUser);
             FlowWebsocket.SendMessage(deleteUserMessage);
-
-            //_FlowWebsocket.Disconnect();
         }
 
         #endregion UserOperations
@@ -220,23 +208,9 @@ namespace Packages.realityflow_package.Runtime.scripts
 
         #region VSGraphOperations
 
-        // Temporary debugging function
-        // public static void CreateVSGraph(string msg)
-        // {
-        //     FlowWebsocket.SendStringMessage(msg);
-
-        //     //ReceivedMessage.AddEventHandler(typeof(CreateObject_Received), true, callbackFunction);
-        // }
-
         public static void CreateVSGraph(FlowVSGraph flowVSGraph, /*FlowUser flowUser,*/ string projectId, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
         {
-            // CreateVSGraph_SendToServer createVSGraph =
-            //     new CreateVSGraph_SendToServer(flowVSGraph, /*flowUser,*/ projectId);
             string message = ("{\"FlowVSGraph\":" + JsonUtility.ToJson(flowVSGraph) + ",\"ProjectId\":\"" + projectId + "\",\"MessageType\":\"CreateVSGraph\"}");
-            // json.FlowVSGraph = flowVSGraph;
-            // json.MessageType = "CreateVSGraph";
-            // json.ProjectId = projectId;
-            Debug.Log(message);
 
             FlowWebsocket.SendGraphMessage(message);
 
@@ -245,8 +219,6 @@ namespace Packages.realityflow_package.Runtime.scripts
 
         public static void UpdateVSGraph(FlowVSGraph flowVSGraph, FlowUser flowUser, string projectId, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
         {
-            //UpdateVSGraph_SendToServer updateVSGraph = new UpdateVSGraph_SendToServer(flowVSGraph, /*flowUser,*/ projectId); // TODO: format string msg
-            Debug.Log(JsonUtility.ToJson(flowVSGraph.edges));
             string message = ("{\"FlowVSGraph\":" + JsonUtility.ToJson(flowVSGraph) + ",\"ProjectId\":\"" + projectId + "\",\"MessageType\":\"UpdateVSGraph\"}");
             FlowWebsocket.SendGraphMessage(message);
 
@@ -255,8 +227,6 @@ namespace Packages.realityflow_package.Runtime.scripts
 
         public static void FinalizedUpdateVSGraph(FlowVSGraph flowVSGraph, FlowUser flowUser, string projectId, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
         {
-            //UpdateVSGraph_SendToServer updateVSGraph = new UpdateVSGraph_SendToServer(flowVSGraph, /*flowUser,*/ projectId); // TODO: format string msg
-            Debug.Log(JsonUtility.ToJson(flowVSGraph.edges));
             string message = ("{\"FlowVSGraph\":" + JsonUtility.ToJson(flowVSGraph) + ",\"ProjectId\":\"" + projectId + "\",\"MessageType\":\"FinalizedUpdateVSGraph\"}");
             FlowWebsocket.SendGraphMessage(message);
 
@@ -265,7 +235,6 @@ namespace Packages.realityflow_package.Runtime.scripts
 
         public static void DeleteVSGraph(string idOfVSGraphToDelete, string projectId, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
         {
-            //DeleteVSGraph_SendToServer deleteVSGraph = new DeleteVSGraph_SendToServer(projectId, idOfVSGraphToDelete); // TODO: format string msg
             string message = ("{\"VSGraphId\":\"" + idOfVSGraphToDelete + "\",\"ProjectId\":\"" + projectId + "\",\"MessageType\":\"DeleteVSGraph\"}");
             FlowWebsocket.SendGraphMessage(message);
 
@@ -274,7 +243,6 @@ namespace Packages.realityflow_package.Runtime.scripts
 
         public static void UpdateNodeView(NodeView nodeView, FlowUser flowUser, string projectId, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
         {
-            //UpdateVSGraph_SendToServer updateVSGraph = new UpdateVSGraph_SendToServer(flowVSGraph, /*flowUser,*/ projectId); // TODO: format string msg
             string boolValue = (nodeView.CanBeModified ? "true" : "false");
             string message = ("{\"FlowNodeView\": {\"CanBeModified\":" + boolValue + ",\"LocalPos\":" + JsonUtility.ToJson(nodeView.localPos) + ",\"NodeGUID\":\"" + nodeView.nodeGUID + "\"},\"ProjectId\":\"" + projectId + "\",\"MessageType\":\"UpdateNodeView\"}");
             FlowWebsocket.SendGraphMessage(message);
@@ -358,19 +326,10 @@ namespace Packages.realityflow_package.Runtime.scripts
 
         public static void OpenProject(string projectId, FlowUser flowUser, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
         {
-            //if(GameObject.FindObjectsOfType<GameObject>().Length != 0)
-            //{
-            //    Debug.LogError("Cannot load project if there are game objects already in scene. Delete all game objects and try again");
-            //}
-            //else
-            //{
-            // GameObject.Find()
-            // Create Avatar HERE
             OpenProject_SendToServer openProject = new OpenProject_SendToServer(projectId, flowUser);
             FlowWebsocket.SendMessage(openProject);
 
             ReceivedMessage.AddEventHandler(typeof(OpenProject_Received), true, callbackFunction);
-            //}
         }
 
         public static void LeaveProject(string projectId, FlowUser flowUser, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
@@ -439,8 +398,6 @@ namespace Packages.realityflow_package.Runtime.scripts
 
         public static void CheckoutNodeView(NodeView nodeView, string projectID, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
         {
-            // CheckoutNodeView_SendToServer checkoutNodeView = new CheckoutNodeView_SendToServer(nodeGUID, projectID);
-            // FlowWebsocket.SendMessage(checkoutNodeView);
             string boolValue = (nodeView.CanBeModified ? "true" : "false");
             string message = ("{\"FlowNodeView\": {\"CanBeModified\":" + boolValue + ",\"LocalPos\":" + JsonUtility.ToJson(nodeView.localPos) + ",\"NodeGUID\":\"" + nodeView.nodeGUID + "\"},\"ProjectId\":\"" + projectID + "\",\"MessageType\":\"CheckoutNodeView\"}");
             FlowWebsocket.SendGraphMessage(message);
@@ -452,8 +409,6 @@ namespace Packages.realityflow_package.Runtime.scripts
         {
             CheckinNodeView_SendToServer checkinNodeView = new CheckinNodeView_SendToServer(nodeGUID, projectID);
             FlowWebsocket.SendMessage(checkinNodeView);
-            // string message = ("{\"NodeView\": {\"CanBeModified\":" + nodeView.CanBeModified + ",\"LocalPos\":" + JsonUtility.ToJson(nodeView.localPos) + ",\"NodeGUID\":\"" + nodeView.nodeGUID + "\"},\"ProjectId\":\"" + projectID + "\",\"MessageType\":\"CheckinNodeView\"}");
-            // FlowWebsocket.SendGraphMessage(message);
 
             ReceivedMessage.AddEventHandler(typeof(CheckinNodeView_Received), true, callbackFunction);
         }
@@ -475,13 +430,6 @@ namespace Packages.realityflow_package.Runtime.scripts
             return _FlowWebsocket.IsConnected;
         }
 
-        //public delegate void functionCalledOnUpdate();
-        //public static void OnUpdate(functionCalledOnUpdate functionCalledOnUpdate)
-        //{
-        //    // Handle what the GUI needs to update on every frame
-        //    functionCalledOnUpdate();
-        //}
-
         // TODO: Fill out default behavior
 
         #region Default actions taken after receiving messages (These happen no matter what the user does)
@@ -490,10 +438,6 @@ namespace Packages.realityflow_package.Runtime.scripts
 
         private static void _CreateObject(object sender, BaseReceivedEventArgs eventArgs)
         {
-            if (eventArgs.message.WasSuccessful == true)
-            {
-                Debug.Log("I guess we made it back from the server...");
-            }
         }
 
         private static void _DeleteObject(object sender, BaseReceivedEventArgs eventArgs)
@@ -560,7 +504,6 @@ namespace Packages.realityflow_package.Runtime.scripts
 
         private static void _DeleteVSGraph(object sender, BaseReceivedEventArgs eventArgs)
         {
-            // TODO: Stuff to delete the graph in Unity goes here.
             if (eventArgs.message.WasSuccessful == true)
             {
                 deleteVSGraph?.Invoke(eventArgs.message.DeletedVSGraphId);
@@ -721,11 +664,11 @@ namespace Packages.realityflow_package.Runtime.scripts
 
                 if (eventArgs.message.flowProject.behaviourList == null)
                 {
-                    Debug.Log("It's null huh");
+                    Debug.Log("Behaviourlist in this project is null.");
                 }
                 else
                 {
-                    Debug.Log("ya yeet");
+                    // Debug.Log("ya yeet");
                 }
 
                 foreach (FlowBehaviour fb in eventArgs.message.flowProject.behaviourList)

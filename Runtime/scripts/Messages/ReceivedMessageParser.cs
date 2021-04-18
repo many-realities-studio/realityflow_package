@@ -89,18 +89,8 @@ namespace Packages.realityflow_package.Runtime.scripts
             string messageType = GetMessageType(message);
             if (messageRouter.ContainsKey(messageType))
             {
-                // if (messageType.Equals("CreateVSGraph"))
-                // {
-                //     dynamic graphobj = JsonUtility.FromJson<dynamic>(message);
-                //     Debug.Log("Received graph message converted: " + Convert.ToString(graphobj));
-                //     // write your raiseevent here
-                // }
-                // else
-                // {
                 dynamic obj = MessageSerializer.DesearializeObject(message, messageRouter[messageType]);
-                // Debug.Log("Received message converted: " + Convert.ToString(obj));
                 obj.RaiseEvent();
-                // }
             }
             else
             {
