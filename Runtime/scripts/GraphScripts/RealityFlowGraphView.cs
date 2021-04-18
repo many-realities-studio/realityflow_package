@@ -132,6 +132,7 @@ public class RealityFlowGraphView : MonoBehaviour {
 		graph.onExposedParameterModified += ParamChangesModifiedCallBack;
 		Operations.updateRFGV += ReloadRFGV;
 		Operations.runVSGraph += ReceiveRunVSGraph;
+		Operations.deleteVSGraph += ReceiveDeleteVSGraph;
 		savePoint = JsonSerializer.Serialize(graph);
 		
 		// selected =
@@ -188,6 +189,16 @@ public class RealityFlowGraphView : MonoBehaviour {
 		}
 	}
 
+	void ReceiveDeleteVSGraph(string receivedVSGraphId)
+	{
+		if (vsGraph.Id == receivedVSGraphId)
+		{
+			ClearGraph();
+			vsGraph = null;
+			graph = null;
+		}
+	}
+
 	public IEnumerator CallSoftReloadCoroutine() {
 		Debug.Log("Inside reload coroutine, we will now wait");
 		yield return new WaitUntil(() => updateTimer > maxUpdateTime && !nodeRoutineRunning && !edgeRoutineRunning && !paramRoutineRunning);
@@ -210,6 +221,7 @@ public class RealityFlowGraphView : MonoBehaviour {
 		graph.onExposedParameterListChanged -= ParamChangesListChangeCallBack;
 		graph.onExposedParameterModified -= ParamChangesModifiedCallBack;
 		graph.onGraphChanges -= GraphChangesCallback;
+		Operations.deleteVSGraph -= ReceiveDeleteVSGraph;
 	}
 
 	void ParamChangesListChangeCallBack()

@@ -30,6 +30,8 @@ namespace Packages.realityflow_package.Runtime.scripts
     public delegate void NotifyGraphUpdate();
 
     public delegate void RunGraphHandler(string vsGraphId);
+
+    public delegate void DeleteGraphHandler(string vsGraphId);
     
     /// <summary>
     /// The purpose of this class is to provide a wrapper for the UnityPlugin,
@@ -42,6 +44,8 @@ namespace Packages.realityflow_package.Runtime.scripts
         public static event NotifyGraphUpdate updateRFGV;
 
         public static event RunGraphHandler runVSGraph;
+
+        public static event DeleteGraphHandler deleteVSGraph;
 
         static Operations()
         {
@@ -559,6 +563,8 @@ namespace Packages.realityflow_package.Runtime.scripts
             // TODO: Stuff to delete the graph in Unity goes here.
             if (eventArgs.message.WasSuccessful == true)
             {
+                deleteVSGraph?.Invoke(eventArgs.message.DeletedVSGraphId);
+
                 GameObject gameObject = FlowVSGraph.idToVSGraphMapping[eventArgs.message.DeletedVSGraphId].AttachedGameObject;
 
                 FlowVSGraph.idToVSGraphMapping.Remove(eventArgs.message.DeletedVSGraphId);
