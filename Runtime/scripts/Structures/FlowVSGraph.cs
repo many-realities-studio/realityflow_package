@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using Packages.realityflow_package.Runtime.scripts;
 using RealityFlow.Plugin.Contrib;
 using System.Linq;
-//using Packages.realityflow_package.Runtime.scripts.Managers;
 using System;
 using System.Runtime.Serialization;
 using UnityEngine;
@@ -363,10 +362,8 @@ namespace RealityFlow.Plugin.Scripts
         {
             if (IsUpdated == true)
             {
-                Debug.LogError("Update VSGraph flag successfully set!!!!");
                 // Debug.LogError("this Nodes before copy: " + JsonUtility.ToJson(this.serializedNodes));
                 // bool tempCanBeModified = this.CanBeModified;
-                Debug.LogError(JsonUtility.ToJson(newValues));
                 GraphPropertyCopier<FlowVSGraph, FlowVSGraph>.Copy(newValues, this);
                 // Debug.LogError("this Nodes after copy: " + JsonUtility.ToJson(this.serializedNodes));
                 // this.CanBeModified = tempCanBeModified;
@@ -380,7 +377,6 @@ namespace RealityFlow.Plugin.Scripts
 
         public void ManipulationEndGlobalUpdate(FlowVSGraph newValues)
         {
-            Debug.LogError("Updating graph after node manipulation");
             // Debug.LogError("this Nodes before copy: " + JsonUtility.ToJson(this.serializedNodes));
             // bool tempCanBeModified = this.CanBeModified;
             GraphPropertyCopier<FlowVSGraph, FlowVSGraph>.Copy(newValues, this);

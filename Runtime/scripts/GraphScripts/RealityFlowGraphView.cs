@@ -152,6 +152,12 @@ public class RealityFlowGraphView : MonoBehaviour {
 		foreach (SerializableEdge edge in graph.edges){
 			StartCoroutine( AddEdgeCoroutine(edge));
 		}
+
+		foreach(KeyValuePair<string,NodeView> nv in nodeViewDict){
+			if (nv.Value.CanBeModified){
+				nv.Value.CheckIn();
+			}
+		}
 	}
 
 	protected void HardLoadGraph(BaseGraph graph){
@@ -726,6 +732,9 @@ public class RealityFlowGraphView : MonoBehaviour {
 		{
 			nodeViewtoRFGVDict.Add(node.GUID,this);
 		}
+
+		Operations.CheckinNodeView(newView.nodeGUID, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) => {});
+
         // LayoutRebuilder.MarkLayoutForRebuild ((RectTransform) newView.transform);
 		// RectTransform rect = newView.gameObject.transform.GetChild(0).GetComponent<RectTransform> ();
 		RectTransform rect = newView.gameObject.GetComponent<RectTransform> ();
