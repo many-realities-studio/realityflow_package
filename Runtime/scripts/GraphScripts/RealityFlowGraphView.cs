@@ -70,6 +70,8 @@ public class RealityFlowGraphView : MonoBehaviour {
 	public bool reloadCoroutineStarted;
 
 	private bool nodeRoutineRunning = false;
+	private bool edgeRoutineRunning = false;
+	private bool paramRoutineRunning = false;
 
 
 	private void Start () {
@@ -188,7 +190,7 @@ public class RealityFlowGraphView : MonoBehaviour {
 
 	public IEnumerator CallSoftReloadCoroutine() {
 		Debug.Log("Inside reload coroutine, we will now wait");
-		yield return new WaitUntil(() => updateTimer > maxUpdateTime && !nodeRoutineRunning);
+		yield return new WaitUntil(() => updateTimer > maxUpdateTime && !nodeRoutineRunning && !edgeRoutineRunning && !paramRoutineRunning);
 		Debug.Log("Inside reload coroutine, we ARE DONE WAITING!");
 		Debug.Log("The timer is at "+updateTimer);
 		SoftLoadGraph(graph);
@@ -459,6 +461,8 @@ public class RealityFlowGraphView : MonoBehaviour {
 	}
 
 	public IEnumerator AddExposedParameterCoroutine (ExposedParameter epn){
+		if(!paramRoutineRunning)
+			paramRoutineRunning = true;
 		ParameterView newParamView = Instantiate(paramView,new Vector3(),Quaternion.identity).GetComponent<ParameterView> ();
 		newParamView.gameObject.transform.SetParent (parameterContent.transform, false);
 		newParamView.title.text = epn.name;
@@ -482,6 +486,7 @@ public class RealityFlowGraphView : MonoBehaviour {
 		}
 		//vsGraph.IsUpdated = true;
 		// paramList.Add(epn);
+		paramRoutineRunning = false;
 		yield return new WaitForSeconds (.01f);
 	}
 
@@ -610,6 +615,8 @@ public class RealityFlowGraphView : MonoBehaviour {
 	// This couroutine is in charge of asynchronously making the EdgeView Prefab
 	// public IEnumerator AddEdgeCoroutine (NodePortView input, NodePortView output){
 	public IEnumerator AddEdgeCoroutine (SerializableEdge edge){
+		if(!edgeRoutineRunning)
+			edgeRoutineRunning = true;
 		Debug.Log("Dictionary CT: " + nodeViewDict.Count);
 		Debug.Log("graph node count CT: " + graph.nodes.Count);
 		if (nodeViewDict.Count != graph.nodes.Count){
@@ -645,6 +652,7 @@ public class RealityFlowGraphView : MonoBehaviour {
 		// Debug.Log("Should have created a line now");
 		// Debug.Log(lr);
 		// lr.SetPositions(edgePoints);
+		edgeRoutineRunning = false;
 		yield return new WaitForSeconds (.01f);
 	}
 

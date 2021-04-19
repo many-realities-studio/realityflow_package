@@ -10,10 +10,14 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.CheckoutMessages
         [JsonProperty("ProjectId")]
         public string ProjectId;
 
-        public CheckoutObject_SendToServer(string objectId, string projectId)
+        [JsonProperty("UserId")]
+        public string UserId;
+
+        public CheckoutObject_SendToServer(string objectId, string projectId, string userId)
         {
             ObjectId = objectId;
             ProjectId = projectId;
+            UserId = userId;
             this.MessageType = "CheckoutObject";
         }
     }
@@ -26,10 +30,14 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.CheckoutMessages
         [JsonProperty("ProjectId")]
         public string ProjectId;
 
-        public CheckinObject_SendToServer(string objectId, string projectId)
+        [JsonProperty("UserId")]
+        public string UserId;
+
+        public CheckinObject_SendToServer(string objectId, string projectId, string userId)
         {
             ObjectId = objectId;
             ProjectId = projectId;
+            UserId = userId;
             this.MessageType = "CheckinObject";
         }
     }
