@@ -45,7 +45,6 @@ public class EdgeView : MonoBehaviour
 		lr.SetPositions(edgePoints);
     }
 
-    // TODO: rewrite to take 2 nodePortView arguments and assign them to input/output
     public void Init(){
         inputLoc = input.GetComponent<RectTransform>().transform.GetChild(0);
         outputLoc = output.GetComponent<RectTransform>().transform.GetChild(0);

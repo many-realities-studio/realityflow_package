@@ -111,27 +111,26 @@ public class RealityFlowGraphView : MonoBehaviour {
 		}
 	}
 
-	protected IEnumerator SoftLoadGraphCoroutine(BaseGraph graph){
-		ClearWhiteBoard();
-		newNodePosition = new Vector2(-1,-1);
-		foreach(ExposedParameter p in graph.exposedParameters){
-			StartCoroutine(AddExposedParameterCoroutine(p));
-		}
-		foreach (BaseNode node in graph.nodes ){
-			StartCoroutine (AddNodeCoroutine(node));
-		}
-		yield return new WaitUntil(() => nodeViewDict.Count == graph.nodes.Count);
-		Debug.LogError("Finished Initializing the NodeViews");
-		foreach (SerializableEdge edge in graph.edges){
-			StartCoroutine( AddEdgeCoroutine(edge));
-		}
+	// protected IEnumerable SoftLoadGraphCoroutine(BaseGraph graph){
+	// 	ClearWhiteBoard();
+	// 	newNodePosition = new Vector2(-1,-1);
+	// 	foreach(ExposedParameter p in graph.exposedParameters){
+	// 		StartCoroutine(AddExposedParameterCoroutine(p));
+	// 	}
+	// 	foreach (BaseNode node in graph.nodes ){
+	// 		StartCoroutine (AddNodeCoroutine(node));
+	// 	}
+	// 	yield return new WaitUntil(() => nodeViewDict.Count == graph.nodes.Count);
+	// 	foreach (SerializableEdge edge in graph.edges){
+	// 		StartCoroutine( AddEdgeCoroutine(edge));
+	// 	}
 
-		foreach(KeyValuePair<string,NodeView> nv in nodeViewDict){
-			if (nv.Value.CanBeModified){
-				nv.Value.CheckIn();
-			}
-		}
-	}
+	// 	foreach(KeyValuePair<string,NodeView> nv in nodeViewDict){
+	// 		if (nv.Value.CanBeModified){
+	// 			nv.Value.CheckIn();
+	// 		}
+	// 	}
+	// }
 
 	protected void HardLoadGraph(BaseGraph graph){
 		ClearGraph();
@@ -180,8 +179,7 @@ public class RealityFlowGraphView : MonoBehaviour {
 	// frame, and if we do not, then call the reload
 	public IEnumerator CallSoftReloadCoroutine() {
 		yield return new WaitUntil(() => updateTimer > maxUpdateTime && !nodeRoutineRunning && !edgeRoutineRunning && !paramRoutineRunning);
-		// SoftLoadGraph(graph);
-		StartCoroutine( SoftLoadGraphCoroutine(graph) );
+		SoftLoadGraph(graph);
 		updateTimer = 0f;
 		reloadCoroutineStarted = false;
 	}
@@ -536,25 +534,12 @@ public class RealityFlowGraphView : MonoBehaviour {
 		NodeView inputView = nodeViewDict[edge.inputNodeGUID];
 		NodeView outputView = nodeViewDict[edge.outputNodeGUID];
 
-
-
 		foreach (NodePortView npv in inputView.inputPortViews){
-			if (npv.port == edge.inputPort){
-				newEdge.input = npv;
-				break;
-			}
+			if (npv.port == edge.inputPort){ newEdge.input = npv; break; }
 		}
 		foreach (NodePortView npv in outputView.outputPortViews){
-			if (npv.port == edge.outputPort){
-				newEdge.output = npv;
-				break;
-			}
+			if (npv.port == edge.outputPort){ newEdge.output = npv; break; }
 		}
-		Debug.LogError(newEdge);
-		Debug.LogError(newEdge.input);
-		Debug.LogError(newEdge.output);
-
-		// TODO: Make sure these are assigned with an Init() function in EdgeView
 		newEdge.input.edges.Add(newEdge);
 		newEdge.output.edges.Add(newEdge);
 		// Set the positions of the linerenderer
@@ -597,9 +582,7 @@ public class RealityFlowGraphView : MonoBehaviour {
             npv.Init (output);
 			newView.outputPortViews.Add(npv);
         }
-		yield return new WaitUntil( () => node.inputPorts.Count == newView.inputPortViews.Count && node.outputPorts.Count == newView.outputPortViews.Count );
-        Debug.LogError("Finished Initializing NodeViewPorts");
-		nodeViewDict.Add (node.GUID,newView);
+        nodeViewDict.Add (node.GUID,newView);
 
 		if(nodeViewtoRFGVDict.ContainsKey(node.GUID))
 		{
@@ -619,13 +602,8 @@ public class RealityFlowGraphView : MonoBehaviour {
 		} else {
 			rect.anchoredPosition = canvasDimensions*newNodePosition;
 		}
-		// if(nodeViewDict.Count == graph.nodes.Count && node.inputPorts.Count == newView.inputPortViews.Count && node.outputPorts.Count == newView.outputPortViews.Count)
-			// nodeRoutineRunning = false;
-
-		/*
-		 check if nodeports are done initializing
-			- adding to dictionary
-		*/
-        // yield return new WaitForSeconds (.01f);
+		if(nodeViewDict.Count == graph.nodes.Count)
+			nodeRoutineRunning = false;
+        yield return new WaitForSeconds (.01f);
     }
 }
