@@ -227,18 +227,18 @@ namespace Packages.realityflow_package.Runtime.scripts
             // var vsGraph = JsonConvert.DeserializeObject<FlowVSGraph>(vsJson);
             //dynamic vsGraph = JsonUtility.FromJson(vsJson);
 
-            graphqlClient_Editor createVSGraph = ScriptableObject.CreateInstance<graphqlClient_Editor>();
-            createVSGraph.CreateVSGraph(flowVSGraph, projectId);
+            // graphqlClient_Editor createVSGraph = ScriptableObject.CreateInstance<graphqlClient_Editor>();
+            // createVSGraph.CreateVSGraph(flowVSGraph, projectId);
             
-            // // CreateVSGraph_SendToServer createVSGraph =
-            // //     new CreateVSGraph_SendToServer(flowVSGraph, /*flowUser,*/ projectId);
-            // string message = ("{\"FlowVSGraph\":" + JsonUtility.ToJson(flowVSGraph) + ",\"ProjectId\":\"" + projectId + "\",\"MessageType\":\"CreateVSGraph\"}");
-            // // json.FlowVSGraph = flowVSGraph;
-            // // json.MessageType = "CreateVSGraph";
-            // // json.ProjectId = projectId;
-            //Debug.Log(message);
+            // CreateVSGraph_SendToServer createVSGraph =
+            //     new CreateVSGraph_SendToServer(flowVSGraph, /*flowUser,*/ projectId);
+            string message = ("{\"FlowVSGraph\":" + JsonUtility.ToJson(flowVSGraph) + ",\"ProjectId\":\"" + projectId + "\",\"MessageType\":\"CreateVSGraph\"}");
+            // json.FlowVSGraph = flowVSGraph;
+            // json.MessageType = "CreateVSGraph";
+            // json.ProjectId = projectId;
+            Debug.Log(message);
 
-           // FlowWebsocket.SendGraphMessage(message);
+           FlowWebsocket.SendGraphMessage(message);
 
             ReceivedMessage.AddEventHandler(typeof(CreateVSGraph_Received), true, callbackFunction);
         }
