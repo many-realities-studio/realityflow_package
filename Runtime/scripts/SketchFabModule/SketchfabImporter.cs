@@ -17,8 +17,8 @@ public class SketchfabImporter
 
     GameObject ActiveObject;
     // Settings
-    string _unzipDirectory = Application.temporaryCachePath + "/unzip";
-    string _importDirectory = Application.dataPath + "/Import";
+    string _unzipDirectory = "Assets/Import/unzip";
+    string _importDirectory = "Assets/Import/Imported";
     string _currentSampleName = "Imported";
     bool _addToCurrentScene = false;
     string _gltfInput;
@@ -118,7 +118,7 @@ public class SketchfabImporter
 
     private string stripProjectDirectory(string directory)
     {
-        return directory.Replace(Application.dataPath, "Assets");
+        return directory.Replace(Application.persistentDataPath, "Assets");
     }
 
     public void loadFromBuffer(byte[] data)
@@ -144,6 +144,8 @@ public class SketchfabImporter
         gltfComponent.AppendStreamingAssets = false;
         gltfComponent.GLTFUri = _gltfInput;
         gltfComponent.name = _currentSampleName;
+
+        SaveSketchfabModelToAssets();
     }
 
     private bool isSupportedFile(string filepath)
@@ -173,6 +175,20 @@ public class SketchfabImporter
 
         // _importer.setupForPath(_gltfInput, _importDirectory, _currentSampleName, _addToCurrentScene);
         // _importer.Load();
+    }
+
+    public void SaveSketchfabModelToAssets()
+    {
+        // Set the path as within the Assets folder,
+            // and name it as the GameObject's name with the .Prefab format
+            string localPath = "Assets/resources/prefabs/" + _currentSampleName + ".prefab";
+
+            // Make sure the file name is unique, in case an existing Prefab has the same name.
+            localPath = AssetDatabase.GenerateUniqueAssetPath(localPath);
+
+            // Create the new Prefab.
+            PrefabUtility.SaveAsPrefabAssetAndConnect(ActiveObject, localPath, InteractionMode.UserAction);
+
     }
 
     // public void cleanArtifacts()
