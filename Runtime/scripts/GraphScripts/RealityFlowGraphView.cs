@@ -98,8 +98,6 @@ public class RealityFlowGraphView : MonoBehaviour {
 		foreach (BaseNode node in graph.nodes ){
 			StartCoroutine (AddNodeCoroutine(node));
 		}
-		Debug.LogError("Nodes Views: "+ nodeViewDict.Count);
-		Debug.LogError("Nodes: "+ graph.nodes.Count);
 		foreach (SerializableEdge edge in graph.edges){
 			StartCoroutine( AddEdgeCoroutine(edge));
 		}
