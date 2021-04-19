@@ -435,36 +435,6 @@ namespace RealityFlow.Plugin.Scripts
             }
         }
 
-        public void CheckIn()
-        {
-            if (CanBeModified == true)
-            {
-                Operations.CheckinObject(Id, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) =>
-                {
-                    // On successful checkin
-                    if (e.message.WasSuccessful == true)
-                    {
-                        _canBeModified = false;
-                    }
-                });
-            }
-        }
-
-        public void CheckOut()
-        {
-            if (CanBeModified == false)
-            {
-                Operations.CheckoutObject(Id, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) =>
-                    {
-                        // On successful checkout
-                        if (e.message.WasSuccessful == true)
-                        {
-                            _canBeModified = true;
-                        }
-                    });
-            }
-        }
-
         public static void RemoveAllAvatarFromScene()
         {
             // TODO: Remove the FlowAvatar_Monobehavior component from the main camera to avoid stacking
