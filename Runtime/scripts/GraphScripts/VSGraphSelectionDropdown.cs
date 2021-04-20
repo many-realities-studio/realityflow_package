@@ -41,10 +41,17 @@ public class VSGraphSelectionDropdown : MonoBehaviour
     {
         // this function should simply confirm the user's choice
         // the dropdown value is: selectionDropdown.options[selectionDropdown.value].text
-        int index = selectionDropdown.value;
-        Debug.Log(index);
-        rfgv.InitializeGraph(VSGraphList[index]);
-        VSGraphList.Clear();
-        this.gameObject.SetActive(false);
+        if (selectionDropdown.options.Count > 0)
+        {
+            int index = selectionDropdown.value;
+            rfgv.InitializeGraph(VSGraphList[index]);
+            VSGraphList.Clear();
+            this.gameObject.SetActive(false);
+        }
+        else
+        {
+            VSGraphList.Clear();
+            this.gameObject.SetActive(false);
+        }
     }
 }

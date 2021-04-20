@@ -1,6 +1,5 @@
 ﻿using Packages.realityflow_package.Runtime.scripts.Messages;
 using RealityFlow.Plugin.Scripts;
-using GraphProcessor;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -133,28 +132,6 @@ namespace Packages.realityflow_package.Runtime.scripts
             ReceivedMessages.RemoveAll((o) => true); // Remove everything from the list
 
             yield return null;
-        }
-
-        /// <summary>
-        /// Send a graph message. FOR TESTING/DEBUGGING
-        /// </summary>
-        /// <param name="message">The message string that should be sent</param>
-        public static void SendGraphMessageTest<T>(T message) where T : FlowVSGraph
-        {
-            string sentMessage = JsonUtility.ToJson(message);
-            //string sentMessage = MessageSerializer.SerializeMessage(message);
-            //Debug.Log("Just the graph part of message: " + MessageSerializer.SerializeMessage(message.FlowVSGraph));
-
-            try
-            {
-                Debug.Log("Sending message: " + sentMessage);
-
-                websocket.Send(sentMessage);
-            }
-            catch (Exception e)
-            {
-                Debug.LogError("Failed to send message: " + sentMessage + " " + e);
-            }
         }
 
         /// <summary>

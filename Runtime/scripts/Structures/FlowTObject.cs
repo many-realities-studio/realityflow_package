@@ -312,13 +312,10 @@ namespace RealityFlow.Plugin.Scripts
 
         private void ManipulationStart(ManipulationEventData eventData)
         {
-            //_pointer = eventData.Pointer;
-            Debug.Log("Manipulation start");
             this.CheckOut();
         }
         private void ManipulationEnd(ManipulationEventData eventData)
         {
-            Debug.Log("Manipulation end");
             this.CheckIn();
         }
 

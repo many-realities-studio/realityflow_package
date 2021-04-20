@@ -3,23 +3,20 @@ using RealityFlow.Plugin.Scripts;
 namespace Packages.realityflow_package.Runtime.scripts
 {
     /// <summary>
-    /// The purpose of this class is to copy the properties of one object into another
+    /// The purpose of this class is to copy the properties of one graph into another
     /// </summary>
-    /// <typeparam name="TParent">The type of the parent object (The source information)</typeparam>
-    /// <typeparam name="TChild">The type of the child object (The destination, these properties will get overwritten with those values that are in the parent)</typeparam>
+    /// <typeparam name="TParent">The type of the parent class (The source information)</typeparam>
+    /// <typeparam name="TChild">The type of the child class (The destination, these properties will get overwritten with those values that are in the parent)</typeparam>
     public class GraphPropertyCopier<TParent, TChild> where TParent : class
                                             where TChild : class
     {
         /// <summary>
-        /// Copy the properties of a parent object into the corresponsing Field of the child
+        /// Copy the properties of a parent graph into the corresponsing Field of the child
         /// </summary>
-        /// <param name="parent">Source information object</param>
-        /// <param name="child">Destination object (These properties get overwritten)</param>
+        /// <param name="parent">Source information graph</param>
+        /// <param name="child">Destination graph (These properties get overwritten)</param>
         public static void Copy(TParent parent, TChild child)
         {
-            // var parentFields = parent.GetType().GetFields();
-            // var childFields = child.GetType().GetFields();
-
             var childName = child.GetType().GetField("Name");
             var childSerializedNodes = child.GetType().GetField("serializedNodes");
             var childEdges = child.GetType().GetField("edges");
@@ -58,29 +55,6 @@ namespace Packages.realityflow_package.Runtime.scripts
             childScale.SetValue(child, parentScale.GetValue(parent));
             childNodes.SetValue(child, parentNodes.GetValue(parent));
             childParamIdToObjId.SetValue(child, parentParamIdToObjId.GetValue(parent));
-
-            // childProperties. = input.name;
-            // serializedNodes = input.serializedNodes;
-            // edges = input.edges;
-            // groups = input.groups;
-            // stackNodes = input.stackNodes;
-            // pinnedElements = input.pinnedElements;
-            // exposedParameters = input.exposedParameters;
-            // stickyNotes = input.stickyNotes;
-            // position = input.position;
-            // scale= input.scale;
-
-            // foreach (var parentField in parentProperties)
-            // {
-            //     foreach (var childField in childProperties)
-            //     {
-            //         if (parentField.Name == childField.Name && parentField.FieldType == childField.FieldType)
-            //         {
-            //             childField.SetValue(child, parentField.GetValue(parent));
-            //             break;
-            //         }
-            //     }
-            // }
         }
     }
 }

@@ -10,8 +10,6 @@ public class EdgeListener : MonoBehaviour
 {
     public RealityFlowGraphView graphView;
 
-    // TODO: add dictionary or list to create edges
-    // Save the NodePortViews instead of just the NodePort(s), so we can access the NodeViews for drawing the edges
     public NodePortView inputView, outputView;
     [SerializeField]
     public NodePort input, output;
@@ -28,14 +26,11 @@ public class EdgeListener : MonoBehaviour
 
     public void SelectInputPort(NodePortView input){
         this.inputView = input;
-        // this.input = input.port;
-        Debug.Log(input.port.portData);
         CheckForConnection();
     }
 
     public void SelectOutputPort(NodePortView output){
-        this.outputView = output;        
-        // this.output = output.port;        
+        this.outputView = output;
         CheckForConnection();
     }
 
@@ -43,15 +38,7 @@ public class EdgeListener : MonoBehaviour
         // TODO: We need to make sure this is a valid connection (get the port types and make sure they can be connected)
         // TODO: make sure we don't allow edges to be connected if they are trying to use a port that already has an edge
         if ( inputView != null && outputView != null){ // use the NodePortViews instead
-        // if ( input != null && output != null){
-            
-            Debug.Log("Both ports are filled");
-            // TODO: Update this, this only takes in the type of the node and not necessarily a type that can be cast to this node
-            // if (this.input.owner.name == this.output.owner.name)
-            if ((this.inputView.port.portData.displayType == this.outputView.port.portData.displayType) || (this.inputView.port.portData.displayType == typeof(object) || this.outputView.port.portData.displayType == typeof(object))) // using NodePortViews instead
-            //Debug.Log("Input field type: "+this.inputView.port.inputField.FieldType+" Output field type: "+this.outputField.FieldType);
-            //if(this.inputField.FieldType == this.outputField.FieldType)
-                // graphView.ConnectEdges(input, output);
+            if ((this.inputView.port.portData.displayType == this.outputView.port.portData.displayType) || (this.inputView.port.portData.displayType == typeof(object) || this.outputView.port.portData.displayType == typeof(object)))
                 graphView.ConnectEdges(inputView, outputView);
             else
                 Debug.Log("The types of ports are not connectable");
@@ -60,5 +47,4 @@ public class EdgeListener : MonoBehaviour
         }
         // Set the views to be null so we don't keep drawing lines between the previously clicked nodes
     }
-
 }

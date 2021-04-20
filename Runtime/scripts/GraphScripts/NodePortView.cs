@@ -15,8 +15,6 @@ public class NodePortView : MonoBehaviour
 
     public List<EdgeView> edges = new List< EdgeView >();
 
-    // public NodeView parentNodeView; // Allows the NodePortView to have a ref to the NodeView, which can help us later draw edges between nodes
-
     public void SignalRedrawOnUpdate(bool flag){
         foreach(EdgeView e in edges){ e.ToggleUpdates(flag); }
     }
@@ -45,7 +43,6 @@ public class NodePortView : MonoBehaviour
     }
 
     public void SelectEdge(){
-        Debug.Log("Selected port of type " + this.port.portData.displayType);
         switch (type)
         {
             case "input":
@@ -60,42 +57,21 @@ public class NodePortView : MonoBehaviour
 
     public void DeleteEdge(EdgeView edge){
         edges.Remove(edge); // Remove the edge from the list of tracked edges
-        // edge.Delete(); // activate the deletion of the edge.
     }
 
     public void Delete(){
-        // while (edges.Any()){
-        //     edges[0].Delete();
-        //     edges.RemoveAt(0);
-        // }
-        // if (!list.Any()){
-
-        // } else {
-        // edges.RemoveAll(e => e == null);
         foreach (EdgeView e in edges){
-            // edges.Remove(e);
             e.Delete(this); 
         }
         edges.Clear();
-        // }
         Destroy(this.gameObject);
     }
 
     public void DeleteFromWhiteBoard(){
-        // while (edges.Any()){
-        //     edges[0].Delete();
-        //     edges.RemoveAt(0);
-        // }
-        // if (!list.Any()){
-
-        // } else {
-        // edges.RemoveAll(e => e == null);
         foreach (EdgeView e in edges){
-            // edges.Remove(e);
             e.DeleteFromWhiteBoard(this); 
         }
         edges.Clear();
-        // }
         Destroy(this.gameObject);
     }
 
