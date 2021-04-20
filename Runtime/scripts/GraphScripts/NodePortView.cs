@@ -5,6 +5,8 @@ using GraphProcessor;
 using UnityEngine;
 using UnityEngine.UI;
 
+// This class takes care of all methods relating to nodeports,
+// which is where edges are connected from
 public class NodePortView : MonoBehaviour
 {
     public Text fieldName;
@@ -59,6 +61,8 @@ public class NodePortView : MonoBehaviour
         edges.Remove(edge); // Remove the edge from the list of tracked edges
     }
 
+    // This method deletes the edges from the basegraph (hard), 
+    // while the one below only deletes them from the whiteboard (soft)
     public void Delete(){
         foreach (EdgeView e in edges){
             e.Delete(this); 

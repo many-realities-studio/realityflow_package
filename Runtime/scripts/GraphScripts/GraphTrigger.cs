@@ -2,9 +2,9 @@ using System;
 using System.Collections;
 using UnityEngine;
 
+// This class is used in the demo to run the graph when the pig enters the pen
 public class GraphTrigger : MonoBehaviour
 {
-
     public GameObject whiteBoard;
     public GameObject triggerObj;
 

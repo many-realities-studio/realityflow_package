@@ -11,31 +11,39 @@ using RealityFlow.Plugin.Contrib;
 using RealityFlow.Plugin.Scripts;
 using NodeGraphProcessor.Examples;
 using Packages.realityflow_package.Runtime.scripts;
+
+// This class is the core functionality of whiteboards
+// Everything related to whiteboards refers to and utilizes this class
 public class RealityFlowGraphView : MonoBehaviour {
+	// each whiteboard has a basegraph and an extension of BaseGraph, FlowVSGraph
 	public BaseGraph graph;
 	public FlowVSGraph vsGraph;
 
+	// used to save the graph
 	private JsonElement savePoint; 
+
+	// used to run the graph
 	public ProcessGraphProcessor processor;
 
 	public EdgeListener connectorListener;
 
 	public CommandPalette commandPalette;
 
+	// Panels that are on the whiteboard prefab that are enabled and disabled at specific times
 	public GameObject Labeled;
 	public GameObject contentPanel;
-
 	public GameObject parameterContent;
-	
 	public GameObject parameterCreationCanvas;
 	public GameObject SelectComparisonCanvas;
 	public GameObject VSGraphDropdownCanvas;
 
+	// These are the views we are using, which extend base functionality (edit mode) into play mode
 	public GameObject nodePortView;
 	public GameObject nodeView;
 	public GameObject paramView;
 	public GameObject edgeView;
 
+	// Dictionaries to keep track of values of interest
 	public Dictionary<string,NodeView> nodeViewDict = new Dictionary<string,NodeView>();
 	public static Dictionary<string,RealityFlowGraphView> nodeViewtoRFGVDict = new Dictionary<string,RealityFlowGraphView>();
 	public Dictionary<string,NodeView> selectedNVDict = new Dictionary<string,NodeView>();
@@ -46,10 +54,10 @@ public class RealityFlowGraphView : MonoBehaviour {
 	Vector2 nullChecker = new Vector2(-1,-1);
 	public Vector2 canvasDimensions = new Vector2(2560, 1080); // FOR NOW, dont have these hardcoded in final demo
 
+	// Coroutine handling variables. The coroutines are not as stable as they should be, for now
 	public float updateTimer;
 	public float maxUpdateTime;
 	public bool reloadCoroutineStarted;
-
 	private bool nodeRoutineRunning = false;
 	private bool edgeRoutineRunning = false;
 	private bool paramRoutineRunning = false;
@@ -67,12 +75,15 @@ public class RealityFlowGraphView : MonoBehaviour {
 	private void Update(){
 		updateTimer += Time.deltaTime;
 	}
-
+	
+	// Step 1: Figure out which graph to load onto the whiteboard
 	public void InitializeGraphStep1()
 	{
 		VSGraphDropdownCanvas.SetActive(true);
 		VSGraphDropdownCanvas.GetComponent<VSGraphSelectionDropdown>().LoadGraphs();
 	}
+
+	// Step 2: load it, give it a relevant name, attach a commandpalette, subscribe events, and set a save point
 	public void InitializeGraph(FlowVSGraph VSGraph){
 		vsGraph = VSGraph;
 		graph = (BaseGraph)VSGraph;
@@ -85,13 +96,18 @@ public class RealityFlowGraphView : MonoBehaviour {
 		Operations.runVSGraph += ReceiveRunVSGraph;
 		Operations.deleteVSGraph += ReceiveDeleteVSGraph;
 		savePoint = JsonSerializer.Serialize(graph);
-
+		// This is a hardload, since loading the graph should delete anything already on the whiteboard
 		HardLoadGraph(graph);
 	}
 
+	// This method softloads the graph, therefore not deleting anything on the basegraph
 	protected void SoftLoadGraph(BaseGraph graph){
 		ClearWhiteBoard();
-		newNodePosition = new Vector2(-1,-1);
+		newNodePosition = new Vector2(-1,-1); // top left of whiteboard, default position
+
+		// Upon load, after whiteboard is cleared, everything needs to be added back onto it
+		// this is done via separate coroutines for parameters, nodes, and edges
+		// these execute mostly concurrently, which could cause problems
 		foreach(ExposedParameter p in graph.exposedParameters){
 			StartCoroutine(AddExposedParameterCoroutine(p));
 		}
@@ -101,14 +117,15 @@ public class RealityFlowGraphView : MonoBehaviour {
 		foreach (SerializableEdge edge in graph.edges){
 			StartCoroutine( AddEdgeCoroutine(edge));
 		}
-
+		// This also needs to checkin the nodeviews
 		foreach(KeyValuePair<string,NodeView> nv in nodeViewDict){
 			if (nv.Value.CanBeModified){
 				nv.Value.CheckIn();
 			}
 		}
 	}
-
+	// A coroutine implementation of softloadgraph that does not currently work
+	// but may be useful later on
 	// protected IEnumerable SoftLoadGraphCoroutine(BaseGraph graph){
 	// 	ClearWhiteBoard();
 	// 	newNodePosition = new Vector2(-1,-1);
@@ -130,6 +147,7 @@ public class RealityFlowGraphView : MonoBehaviour {
 	// 	}
 	// }
 
+	// Unlike softloadgraph, this method also affects the basegraph
 	protected void HardLoadGraph(BaseGraph graph){
 		ClearGraph();
 		newNodePosition = new Vector2(-1,-1);
@@ -144,6 +162,7 @@ public class RealityFlowGraphView : MonoBehaviour {
 		}
 	}
 	
+	// When a change is made to the graph, this event will trigger
 	void ReloadRFGV()
 	{
 		updateTimer = 0f;
@@ -154,6 +173,7 @@ public class RealityFlowGraphView : MonoBehaviour {
 		}
 	}
 
+	// When processGraph is called by another user in the project, this event will trigger
 	void ReceiveRunVSGraph(string receivedVSGraphId)
 	{
 		if (vsGraph.Id == receivedVSGraphId)
@@ -163,6 +183,7 @@ public class RealityFlowGraphView : MonoBehaviour {
 		}
 	}
 
+	// When a graph is deleted, this event will trigger to fix the whiteboard
 	void ReceiveDeleteVSGraph(string receivedVSGraphId)
 	{
 		if (vsGraph.Id == receivedVSGraphId)
@@ -206,7 +227,7 @@ public class RealityFlowGraphView : MonoBehaviour {
 	}
 
 	// these trigger when specific events happen on the basegraph
-	// they then set the update flad to true so they can happen on the whiteboard
+	// they then set the update flag to true in VSGraph so they can happen on the whiteboard
     void GraphChangesCallback(GraphChanges changes)
     {
         if(changes.addedNode != null)
@@ -232,8 +253,8 @@ public class RealityFlowGraphView : MonoBehaviour {
     }
 
 	// TODO: implement user-based undo and set up undo to be able to undo more than the last thing
+	// This method currently undoes the last thing done in the project, but it is very unstable
 	public void UndoLastCommand(){
-		// get the command itself
 		Command cmd;
 		cmd = commandPalette.GetCommandStack()[0];
 		JsonUtility.FromJsonOverwrite(cmd.GetGraphState(), graph);
@@ -242,8 +263,8 @@ public class RealityFlowGraphView : MonoBehaviour {
 		HardLoadGraph(graph);
 	}
 
+	// this will delete a selection of nodes, as defined by NodeView.Select()
 	public void DeleteSelection(){
-		// serialize the current version of the graph
 		string tmp;
 		tmp = JsonUtility.ToJson(graph);
 
@@ -257,9 +278,8 @@ public class RealityFlowGraphView : MonoBehaviour {
 		selectedNVDict.Clear();
 	}
 
-	// Overload of single node deletion
+	// Overload of previous method for single node deletion
 	public void DeleteSelection(NodeView nv){
-		// serialize the current version of the graph
 		string tmp;
 		tmp = JsonUtility.ToJson(graph);
 
@@ -270,18 +290,18 @@ public class RealityFlowGraphView : MonoBehaviour {
 
 	}
 
+	// This method sets the location of the new node on the whiteboard as defined by NodeManipulation
 	public void SetNewNodeLocation(Vector2 pos2D){
 		newNodePosition = pos2D;
 	}
- 
-	public void AddNodeCommand(string nodeTag){
-		// serialize the current version of the graph
-		string tmp = JsonUtility.ToJson(graph);
 
-		// send this to the command palette
+	// This method determines the type of node being added to the whiteboard
+	// and then launches the AddNodeCoroutine with the proper parameters
+	public void AddNodeCommand(string nodeTag){
+		string tmp = JsonUtility.ToJson(graph);
 		commandPalette.AddCommandToStack(new AddNodeCommand("Add Node", tmp));
 
-		// perform the actual command action
+		// The type of node is determined by the tag on the corresponding nodebrush version
 		switch(nodeTag)
 		{
 			case "TextNode":
@@ -312,6 +332,7 @@ public class RealityFlowGraphView : MonoBehaviour {
 				StartCoroutine (AddNodeCoroutine(intn));
 				break;
 			case "BoolNode":
+				// This case requires input, so it is split into 2 steps
 				SelectComparisonCanvas.SetActive(true);
 				break;
 			case "ConditionalNode":
@@ -338,10 +359,9 @@ public class RealityFlowGraphView : MonoBehaviour {
 		}		
 	}
 
+	// This method adds an exposedParameter to a graph as a node
 	public void AddParameterNodeToGraph(string epnGUID){
 		string tmp = JsonUtility.ToJson(graph);
-
-		// send this to the command palette
 		commandPalette.AddCommandToStack(new AddNodeCommand("Add Parameter to Graph", tmp));
 
 		ParameterNode pn = BaseNode.CreateFromType<ParameterNode> (new Vector2 ());
@@ -352,6 +372,7 @@ public class RealityFlowGraphView : MonoBehaviour {
 		StartCoroutine(AddNodeCoroutine(pn));
 	}
 
+	// Step 2 of defining a boolNode; where the coroutine is called from
 	public void BoolNodeStep2(string comparisonFunction)
 	{
 		BoolNode bn = BaseNode.CreateFromType<BoolNode> (new Vector2 ());
@@ -363,21 +384,22 @@ public class RealityFlowGraphView : MonoBehaviour {
 		StartCoroutine (AddNodeCoroutine(bn));
 	}
 
+	// Debug function to print the stack of commands. Useful to visualize undo
 	public void PrintCommandStack(){
 		commandPalette.PrintStack();
 	}
 
-	public void AddToSelection(BaseNode n){
-		selected.Add(n);
-	}
-
+	// This method is called by Select() in NodeView and simply adds it to the dictionary
 	public void AddToSelectionNV(NodeView n){
             selectedNVDict.Add (n.node.GUID,n);
 	}
 
+	// Gets user input to define the parameters of AddParameterStep2
 	public void AddParameter(){
 		parameterCreationCanvas.SetActive(true);
 	}
+
+	// How an exposedParameter is created
 	public void AddParameterStep2(string parameterType, string parameterName)
 	{
 		string tmp = JsonUtility.ToJson(graph);
@@ -385,6 +407,7 @@ public class RealityFlowGraphView : MonoBehaviour {
 		// send this to the command palette
 		commandPalette.AddCommandToStack(new AddExposedParameterCommand("Add Exposed Parameter", tmp));
 
+		// The string from the dropdown determines the parameter type
 		Type type;
 		switch(parameterType)
 		{
@@ -398,10 +421,13 @@ public class RealityFlowGraphView : MonoBehaviour {
 		}
 		graph.AddExposedParameter (parameterName, type, null);
 		ExposedParameter epn = graph.GetExposedParameter (parameterName);
+		// After the parameter is added to the basegraph, a coroutine is launched
+		// to add it to the whiteboard
 		StartCoroutine(AddExposedParameterCoroutine(epn));
 	}
 
 	public IEnumerator AddExposedParameterCoroutine (ExposedParameter epn){
+		// prevents coroutine from running if it is already running
 		if(!paramRoutineRunning)
 			paramRoutineRunning = true;
 		ParameterView newParamView = Instantiate(paramView,new Vector3(),Quaternion.identity).GetComponent<ParameterView> ();
@@ -412,6 +438,8 @@ public class RealityFlowGraphView : MonoBehaviour {
 		newParamView.rfgv = this;
 		newParamView.pn = epn;
 		paramDict.Add (epn.guid,newParamView);
+		// if it is not a gameobject, it must immediately be assigned a value
+		// This fixes serialization errors that may occur
 		if(newParamView.pn.serializedValue.value == null && newParamView.pn.type != "UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null")
 		{
 			newParamView.ModifyParameterValue();
@@ -421,6 +449,8 @@ public class RealityFlowGraphView : MonoBehaviour {
 		yield return new WaitForSeconds (.01f);
 	}
 
+	// Function to add a parameter modification to the command palette,
+	// called by ModifyParameterValue in ParameterView
 	public void ModifyExposedParameterValue()
 	{
 		string tmp = JsonUtility.ToJson(graph);
@@ -506,6 +536,7 @@ public class RealityFlowGraphView : MonoBehaviour {
 		nodeViewDict.Clear();
 	}
 
+	// Debug function to count the amount of nodes in the graph
     public List <BaseNode> GetNodes()
     {
         Debug.Log("There are "+graph.nodes.Count+" inside runtimegraph");
@@ -519,8 +550,7 @@ public class RealityFlowGraphView : MonoBehaviour {
 		processor.Run ();
 	}
 
-	public float padding = 0.1f;
-	// This couroutine is in charge of asynchronously making the EdgeView Prefab
+	// This coroutine is in charge of asynchronously making the EdgeView Prefab
 	public IEnumerator AddEdgeCoroutine (SerializableEdge edge){
 		if(!edgeRoutineRunning)
 			edgeRoutineRunning = true;
@@ -548,6 +578,7 @@ public class RealityFlowGraphView : MonoBehaviour {
 		yield return new WaitForSeconds (.01f);
 	}
 
+	// This coroutine adds a NodeView to the whiteboard with a corresponding node
 	public IEnumerator AddNodeCoroutine (BaseNode node) {
 		if(!nodeRoutineRunning)
 			nodeRoutineRunning = true;
@@ -600,6 +631,8 @@ public class RealityFlowGraphView : MonoBehaviour {
 		} else {
 			rect.anchoredPosition = canvasDimensions*newNodePosition;
 		}
+		// This check determines if the coroutine should be done running
+		// by seeing if the amount of nodeviews matches the amount of nodes
 		if(nodeViewDict.Count == graph.nodes.Count)
 			nodeRoutineRunning = false;
         yield return new WaitForSeconds (.01f);

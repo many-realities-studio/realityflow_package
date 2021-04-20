@@ -2,6 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+
+// This class is a dropdown to select a boolean node's behavior. It currently only compares
+// 0 and 0 (hardcoded in rfgv)
 public class SelectComparison : MonoBehaviour
 {
     public RealityFlowGraphView rfgv;

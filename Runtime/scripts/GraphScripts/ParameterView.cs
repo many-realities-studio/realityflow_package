@@ -9,6 +9,7 @@ using RealityFlow.Plugin.Scripts;
 using Microsoft.MixedReality.Toolkit.Input;
 using Microsoft.MixedReality.Toolkit.UI;
 
+// This class is on all exposed parameters and handles value modification, deletion, and graph addition
 public class ParameterView : MonoBehaviour
 {
     UnityEvent m_ParamDrag;
@@ -23,6 +24,8 @@ public class ParameterView : MonoBehaviour
     public Text title;
     public Text type;
     public Text guid;
+
+    // at the start, there is no gameobject parameter to modify, so a modification sphere is not needed
     void start()
     {
         s = null;
@@ -32,6 +35,8 @@ public class ParameterView : MonoBehaviour
         rfgv.AddParameterNodeToGraph(pn.guid);
     }
 
+    // DeleteParam removes the parameter without removing the gameobject,
+    // which is handled by Delete
     public void DeleteParam()
     {
         rfgv.RemoveParameter(this);
@@ -44,6 +49,7 @@ public class ParameterView : MonoBehaviour
             Destroy(this.gameObject);
     }
 
+    // Delete from whiteboard removes only the gameobject from the whiteboard (soft)
     public void DeleteFromWhiteBoard(){
         if(this.gameObject != null)
             Destroy(this.gameObject);
@@ -56,10 +62,13 @@ public class ParameterView : MonoBehaviour
         transform.localScale = Vector3.one;
     }
 
+    // After ParameterModificationConfirm, this method is called with the new value
+    // and simply sets that value, unless it is a gameobject
     public void SetParameterValue(object setValue){
         pn.serializedValue = new SerializableObject(setValue,typeof(object),null);
         s = null;
 
+        // If it is a gameobject, the object to parameter mapping gets tracked in a dictionary
         if (pn.type == "UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null")
         {
             GameObject valueObject = (GameObject)setValue;
@@ -78,12 +87,17 @@ public class ParameterView : MonoBehaviour
         rfgv.vsGraph.IsUpdated = true;
     }
 
+    // This method initialized the setting of parameter values
     public void ModifyParameterValue()
     {
+        // the call to rfgv is simply used to track this as a command
         rfgv.ModifyExposedParameterValue();
+        // IF YOU MODIFY THE ORDER OF THESE GAMEOBJECTS ON THE WHITEBOARD PREFAB,
+        // BE SURE TO MODIFY THESE CHILD REFERENCES ACCORDINGLY
+        // OR PARAMETERS WILL NOT WORK AS INTENDED
         modificationInput = rfgv.gameObject.transform.parent.transform.GetChild(8).gameObject;
-        modificationDropdown = rfgv.gameObject.transform.parent.transform.GetChild(10).gameObject;
         modificationColor = rfgv.gameObject.transform.parent.transform.GetChild(9).gameObject;
+        modificationDropdown = rfgv.gameObject.transform.parent.transform.GetChild(10).gameObject;
         if(pn.type == "UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null")
         {
             if(s == null)
