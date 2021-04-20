@@ -6,7 +6,6 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.VSGraphMessages
 {
     public class RunVSGraph_Received : ConfirmationMessage_Received
     {
-        // base(typeof(RunVSGraph_Received))
         [JsonProperty("vsGraphId")]
         public string VSGraphId { get; set; }
 

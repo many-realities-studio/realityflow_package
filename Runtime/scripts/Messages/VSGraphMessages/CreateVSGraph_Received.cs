@@ -8,7 +8,6 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.VSGraphMessages
     {
         [JsonProperty("flowVSGraph")]
         public FlowVSGraph flowVSGraph { get; set; }
-        // public FlowTObject flowObject { get; set; }
 
         public CreateVSGraph_Received(FlowVSGraph flowVSGraph) : base(typeof(CreateVSGraph_Received))
         {

@@ -17,9 +17,6 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.VSGraphMessages
         [JsonProperty("FlowVSGraph")]
         public FlowVSGraph flowVSGraph { get; set; }
 
-        //[JsonProperty("")]
-        //public FlowUser flowUser { get; set; }
-
         [JsonProperty("ProjectId")]
         public string projectId { get; set; }
 

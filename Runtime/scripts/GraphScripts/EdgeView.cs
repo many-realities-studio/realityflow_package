@@ -17,14 +17,9 @@ public class EdgeView : MonoBehaviour
     public bool UpdateEdgesPerFrame; // flag that is toggled by when the user grabs/lets go of the node view
     public float padding = 0.1f;
 
-
-    // TODO: when we delete a node and the edge gets deleted, we need to make sure the remaining node has that edge removed from it's references as well
-    // public void Delete(){
     public void Delete(NodePortView portBeingDeleted){
         if (input != null && portBeingDeleted != input) { input.DeleteEdge(this);}
         if (output != null && portBeingDeleted != output) { output.DeleteEdge(this);}
-        // input?.DeleteEdge(this);
-        // output?.DeleteEdge(this);
         rfgv.graph.Disconnect(edge);
         Destroy(this?.gameObject);
     }
@@ -41,7 +36,6 @@ public class EdgeView : MonoBehaviour
         // set small buffer positions:
         Vector3 outputBuffer = outputLoc.position + Vector3.right * padding;
         Vector3 inputBuffer = inputLoc.position + Vector3.left * padding;
-        // Vector3 inputBuffer = inputLoc.right * padding * -1.0f;
 		Vector3 [] edgePoints = new [] {
 			outputLoc.position,
             outputBuffer,
@@ -52,7 +46,6 @@ public class EdgeView : MonoBehaviour
     }
 
     public void Init(){
-        Debug.Log("Edge Created, drawing edge now");
         inputLoc = input.GetComponent<RectTransform>().transform.GetChild(0);
         outputLoc = output.GetComponent<RectTransform>().transform.GetChild(0);
         lr = this.gameObject.GetComponent<LineRenderer>();
@@ -67,6 +60,4 @@ public class EdgeView : MonoBehaviour
     void Update(){
         if (UpdateEdgesPerFrame) { RedrawEdge(); }
     }
-    // recursive deletion strategy for edges: takes 
-
 }
