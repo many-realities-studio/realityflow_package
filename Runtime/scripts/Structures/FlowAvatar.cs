@@ -308,6 +308,8 @@ namespace RealityFlow.Plugin.Scripts
             // Not sure if it should be idToGameObjectMapping ...
             idToAvatarMapping.Add(Id, this);
             AttachedGameObject.transform.hasChanged = false;
+            // To tell players apart.
+            //AttachedGameObject.GetComponent<MeshRenderer>().material.color = UnityEngine.Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f);
             MeshRenderer renderer = AttachedGameObject.GetComponent<MeshRenderer>();
             renderer.enabled = false;
             AttachedGameObject.AddComponent<FlowAvatar_Monobehaviour>();
@@ -430,36 +432,6 @@ namespace RealityFlow.Plugin.Scripts
                 //PropertyCopier<FlowAvatar, FlowAvatar>.Copy(newValues, this);
                 //newValues.Position = Vector3.zero;
                 //newValues.Rotation = new Quaternion(0, 0, 0, 0);
-            }
-        }
-
-        public void CheckIn()
-        {
-            if (CanBeModified == true)
-            {
-                Operations.CheckinObject(Id, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) =>
-                {
-                    // On successful checkin
-                    if (e.message.WasSuccessful == true)
-                    {
-                        _canBeModified = false;
-                    }
-                });
-            }
-        }
-
-        public void CheckOut()
-        {
-            if (CanBeModified == false)
-            {
-                Operations.CheckoutObject(Id, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) =>
-                    {
-                        // On successful checkout
-                        if (e.message.WasSuccessful == true)
-                        {
-                            _canBeModified = true;
-                        }
-                    });
             }
         }
 
