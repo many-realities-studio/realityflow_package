@@ -115,6 +115,11 @@ namespace RealityFlow.Plugin.Scripts
 
             groups = Groups;
             stackNodes = StackNodes;
+
+            // Our graph system does not currently allow users to create pinned Elements. The only way a pinned element will be created is through opening a graph
+            // with exposed parameters in the NodeGraphProcessor Window itself, after which you can no longer open the project as NewtonSoft does not know how
+            // to instantiate pinned Elements using the serialized data. To prevent projects from breaking like this, refrain from opening graphs with parameters
+            // in NGP and then sending updates to that graph.
             pinnedElements = PinnedElements;
 
             var definition = new[] { new { name = "", guid = "", serializedValue = new { serializedType = "", serializedName = "", serializedValue = "" }, type = "" } };
