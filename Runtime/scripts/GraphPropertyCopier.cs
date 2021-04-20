@@ -17,6 +17,7 @@ namespace Packages.realityflow_package.Runtime.scripts
         /// <param name="child">Destination graph (These properties get overwritten)</param>
         public static void Copy(TParent parent, TChild child)
         {
+            // First get all of the child graph fields
             var childName = child.GetType().GetField("Name");
             var childSerializedNodes = child.GetType().GetField("serializedNodes");
             var childEdges = child.GetType().GetField("edges");
@@ -30,6 +31,7 @@ namespace Packages.realityflow_package.Runtime.scripts
             var childNodes = child.GetType().GetField("nodes");
             var childParamIdToObjId = child.GetType().GetField("paramIdToObjId");
 
+            // Then get all of the parent graph fields
             var parentName = parent.GetType().GetField("Name");
             var parentSerializedNodes = parent.GetType().GetField("serializedNodes");
             var parentEdges = parent.GetType().GetField("edges");
@@ -43,6 +45,7 @@ namespace Packages.realityflow_package.Runtime.scripts
             var parentNodes = parent.GetType().GetField("nodes");
             var parentParamIdToObjId = parent.GetType().GetField("paramIdToObjId");
 
+            // Finally, set child field values to parent's field values
             childName.SetValue(child, parentName.GetValue(parent));
             childSerializedNodes.SetValue(child, parentSerializedNodes.GetValue(parent));
             childEdges.SetValue(child, parentEdges.GetValue(parent));

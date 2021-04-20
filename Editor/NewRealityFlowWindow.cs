@@ -70,6 +70,8 @@ public class FlowNetworkManagerEditor : EditorWindow
 
     public Boolean showAllOptions = false;
 
+    // The below delegates and events handle letting Photon know when to connect and disconnect users from rooms, as well as what room to connect to.
+
     public delegate void PhotonJoinHandler(string vsGraphId);
 
     public delegate void PhotonLeaveHandler();
@@ -160,8 +162,10 @@ public class FlowNetworkManagerEditor : EditorWindow
             }
         }
 
+        // Invoke event to tell Photon to disconnect from the room.
         leaveProjectEvent?.Invoke();
 
+        // Guest users are deleted when they log out.
         if (userIsGuest)
         {
             Operations.DeleteUser(new FlowUser(tempUName, tempPWord));
@@ -174,6 +178,7 @@ public class FlowNetworkManagerEditor : EditorWindow
         GameObject[] wbList;
         wbList = GameObject.FindGameObjectsWithTag("Canvas");
 
+        // Clear all whiteboards in the scene when a user closes the RF window.
         foreach (GameObject wb in wbList)
         {
             GameObject runeTimeGraphObject = GameObject.FindGameObjectWithTag("Canvas").transform.GetChild(2).gameObject;
@@ -181,6 +186,7 @@ public class FlowNetworkManagerEditor : EditorWindow
             rfgv.ClearWhiteBoard();
         }
 
+        // Clear the entire scene.
         FlowTObject.RemoveAllObjectsFromScene();
         FlowAvatar.RemoveAllAvatarFromScene();
         FlowVSGraph.RemoveAllGraphsFromScene();
@@ -416,6 +422,7 @@ public class FlowNetworkManagerEditor : EditorWindow
         }
     }
 
+    // This additional window exists to allow the register operation to finish first before having the user login for stability.
     private void _CreateGuestConfirmLoginView()
     {
         GUILayout.Label("A guest account has been generated. Please proceed to the guest hub.");
@@ -447,6 +454,7 @@ public class FlowNetworkManagerEditor : EditorWindow
         EditorGUILayout.EndHorizontal();
     }
 
+    // A guest user can only join a project, not create one, as their account will be deleted when they log out.
     private void _CreateGuestUserHubView()
     {
         EditorGUILayout.BeginHorizontal();
@@ -570,7 +578,8 @@ public class FlowNetworkManagerEditor : EditorWindow
             window = EWindowView.DELETE_PROJECT_CONFIRMATION;
         }
 
-        // Button to print all graphs in the dictionary for debugging purposes
+        // Button to print all graphs in the dictionary for debugging purposes. This button will attempt to print graph nodes, edges, exposed parameters,
+        // and the serialized graph itself, which is useful if you want to see information about graphs that currently exist in a scene.
         // if (GUILayout.Button("Print all graphs in the idToVSGraphMapping dictionary", GUILayout.Height(40)))
         // {
         //     foreach (FlowVSGraph graph in FlowVSGraph.idToVSGraphMapping.Values)
@@ -623,6 +632,7 @@ public class FlowNetworkManagerEditor : EditorWindow
         // }
     }
 
+    // Guest users cannot delete a project or share an invite code as they are temporary users, but all other functionality is like normal users.
     private void _CreateGuestProjectHubView()
     {
         // Create "Exit Project" Button and define onClick action
@@ -690,7 +700,6 @@ public class FlowNetworkManagerEditor : EditorWindow
         // Create "Delete Visual Scripting Graph" Button and define onClick action
         if (GUILayout.Button("Delete Visual Scripting Graph", GUILayout.Height(40)))
         {
-            // TODO: Send user to screen that displays all graphs in the project for them to delete from.
             window = EWindowView.DELETE_VSGRAPH;
         }
 
@@ -965,11 +974,13 @@ public class FlowNetworkManagerEditor : EditorWindow
             if (e.message.WasSuccessful == true)
             {
                 ConfigurationSingleton.SingleInstance.CurrentProject = null;
+                // Tell Photon to disconnect from the room the user is in.
                 leaveProjectEvent?.Invoke();
 
                 GameObject[] wbList;
                 wbList = GameObject.FindGameObjectsWithTag("Canvas");
 
+                // Clear all whiteboards in the scene.
                 foreach (GameObject wb in wbList)
                 {
                     GameObject runeTimeGraphObject = GameObject.FindGameObjectWithTag("Canvas").transform.GetChild(2).gameObject;
