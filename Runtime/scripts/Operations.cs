@@ -255,25 +255,25 @@ namespace Packages.realityflow_package.Runtime.scripts
 
         public static void FinalizedUpdateVSGraph(FlowVSGraph flowVSGraph, FlowUser flowUser, string projectId, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
         {
-            graphqlClient_Editor finalizedUpdateVSGraph = ScriptableObject.CreateInstance<graphqlClient_Editor>();
-            finalizedUpdateVSGraph.FinalizedUpdateVSGraph(flowVSGraph, projectId);
+            // graphqlClient_Editor finalizedUpdateVSGraph = ScriptableObject.CreateInstance<graphqlClient_Editor>();
+            // finalizedUpdateVSGraph.FinalizedUpdateVSGraph(flowVSGraph, projectId);
 
             //UpdateVSGraph_SendToServer updateVSGraph = new UpdateVSGraph_SendToServer(flowVSGraph, /*flowUser,*/ projectId); // TODO: format string msg
             // Debug.Log(JsonUtility.ToJson(flowVSGraph.edges));
-            // string message = ("{\"FlowVSGraph\":" + JsonUtility.ToJson(flowVSGraph) + ",\"ProjectId\":\"" + projectId + "\",\"MessageType\":\"FinalizedUpdateVSGraph\"}");
-            // FlowWebsocket.SendGraphMessage(message);
+            string message = ("{\"FlowVSGraph\":" + JsonUtility.ToJson(flowVSGraph) + ",\"ProjectId\":\"" + projectId + "\",\"MessageType\":\"FinalizedUpdateVSGraph\"}");
+            FlowWebsocket.SendGraphMessage(message);
 
             ReceivedMessage.AddEventHandler(typeof(FinalizedUpdateVSGraph_Received), true, callbackFunction);
         }
 
         public static void DeleteVSGraph(string idOfVSGraphToDelete, string projectId, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
         {
-            graphqlClient_Editor deleteVSGraph = ScriptableObject.CreateInstance<graphqlClient_Editor>();
-            deleteVSGraph.DeleteVSGraph(idOfVSGraphToDelete, projectId);
+            // graphqlClient_Editor deleteVSGraph = ScriptableObject.CreateInstance<graphqlClient_Editor>();
+            // deleteVSGraph.DeleteVSGraph(idOfVSGraphToDelete, projectId);
 
             //DeleteVSGraph_SendToServer deleteVSGraph = new DeleteVSGraph_SendToServer(projectId, idOfVSGraphToDelete); // TODO: format string msg
-            // string message = ("{\"VSGraphId\":\"" + idOfVSGraphToDelete + "\",\"ProjectId\":\"" + projectId + "\",\"MessageType\":\"DeleteVSGraph\"}");
-            // FlowWebsocket.SendGraphMessage(message);
+            string message = ("{\"VSGraphId\":\"" + idOfVSGraphToDelete + "\",\"ProjectId\":\"" + projectId + "\",\"MessageType\":\"DeleteVSGraph\"}");
+            FlowWebsocket.SendGraphMessage(message);
 
             ReceivedMessage.AddEventHandler(typeof(DeleteVSGraph_Received), true, callbackFunction);
         }
@@ -422,15 +422,16 @@ namespace Packages.realityflow_package.Runtime.scripts
         public static async void CheckinObject(string objectID, string projectID, string username, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
         {
             //CheckIn will be called updateObject for GraphQL operations
-            graphqlClient_Editor updateObject = ScriptableObject.CreateInstance<graphqlClient_Editor>();
-            string checkedIn = await updateObject.UpdateObject(objectID, projectID, username);
-            if(checkedIn != null){
-                Debug.Log("Getting message type: CheckinObject from GraphQL");
-                FlowTObject.idToGameObjectMapping[objectID].CanBeModified = false;
-            }
+            // I had to check this out as it was not working properly and we needed to merge, be sure to fix this functionality.
+            // graphqlClient_Editor updateObject = ScriptableObject.CreateInstance<graphqlClient_Editor>();
+            // string checkedIn = await updateObject.UpdateObject(objectID, projectID, username);
+            // if(checkedIn != null){
+            //     Debug.Log("Getting message type: CheckinObject from GraphQL");
+            //     FlowTObject.idToGameObjectMapping[objectID].CanBeModified = false;
+            // }
 
-            // CheckinObject_SendToServer checkinObject = new CheckinObject_SendToServer(objectID, projectID, ConfigurationSingleton.SingleInstance.CurrentUser.Username);
-            // FlowWebsocket.SendMessage(checkinObject);
+            CheckinObject_SendToServer checkinObject = new CheckinObject_SendToServer(objectID, projectID, ConfigurationSingleton.SingleInstance.CurrentUser.Username);
+            FlowWebsocket.SendMessage(checkinObject);
 
             ReceivedMessage.AddEventHandler(typeof(CheckinObject_Received), true, callbackFunction);
         }
