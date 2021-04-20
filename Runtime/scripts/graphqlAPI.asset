@@ -138,7 +138,11 @@ MonoBehaviour:
     isComplete: 1
   - name: CreateVSGraph
     type: 1
-    query: "mutation CreateVSGraph{\n    createVSGraph{\n        Id\n        Name\n   
+    query: "mutation CreateVSGraph{\n    createVSGraph(  Id :\"d3d22401-c4b8-436c-b798-c3a4c6a321fb\",
+      Name :\"kkp\", serializedNodes :{ serializedNodes :[]}, edges :[], groups :[],
+      stackNodes :[], pinnedElements :[], exposedParameters :[], stickyNotes :[],
+      position :{ x :0.0, y :0.0, z :0.0}, scale :{ x :1.0, y :1.0, z :1.0}, projectId
+      :\"8d107e8e-b13c-436b-b6be-9630069f6963\" ){\n        Id\n        Name\n   
       }\n}"
     queryString: createVSGraph
     returnType: vs_graph
@@ -334,8 +338,8 @@ MonoBehaviour:
     isComplete: 1
   - name: DeleteVSGraph
     type: 1
-    query: "mutation DeleteVSGraph{\n    deleteVSGraph{\n        Id\n        Name\n   
-      }\n}"
+    query: "mutation DeleteVSGraph{\n    deleteVSGraph(  Id :\"4ac4ed86-f7e0-4173-b499-4713638721ff\"
+      ){\n        Id\n        Name\n    }\n}"
     queryString: deleteVSGraph
     returnType: vs_graph
     queryOptions:
@@ -432,8 +436,8 @@ MonoBehaviour:
     isComplete: 1
   - name: DeleteObject
     type: 1
-    query: "mutation DeleteObject{\n    deleteObject(  Id :\"6779403b-68b4-4abd-bb3e-c9621bd68f6b\",
-      projectId :\"eeb3e894-29fb-4b7b-8ef8-0ded35a1b5b4\" ){\n        Id\n    }\n}"
+    query: "mutation DeleteObject{\n    deleteObject(  Id :\"3a353be5-90e7-4ce0-8c77-cc8cdc55f286\",
+      projectId :\"f1dd1fb0-932b-4379-b45d-ca567cecfd07\" ){\n        Id\n    }\n}"
     queryString: deleteObject
     returnType: db_object
     queryOptions:
@@ -503,10 +507,10 @@ MonoBehaviour:
     isComplete: 1
   - name: CreateObject
     type: 1
-    query: "mutation CreateObject{\n    createObject(  Id :\"6779403b-68b4-4abd-bb3e-c9621bd68f6b\",
-      Name :\"yui\", X :0.0, Y :0.0, Z :0.0, Q_x :0.0, Q_y :0.0, Q_z :0.0, Q_w :1.0,
+    query: "mutation CreateObject{\n    createObject(  Id :\"3a353be5-90e7-4ce0-8c77-cc8cdc55f286\",
+      Name :\"rt\", X :0.0, Y :0.0, Z :0.0, Q_x :0.0, Q_y :0.0, Q_z :0.0, Q_w :1.0,
       S_x :1.0, S_y :1.0, S_z :1.0, R :0.0, G :0.0, B :0.0, A :0.0, Prefab :\"Pig\",
-      projectId :\"eeb3e894-29fb-4b7b-8ef8-0ded35a1b5b4\" ){\n        Id\n    }\n}"
+      projectId :\"f1dd1fb0-932b-4379-b45d-ca567cecfd07\" ){\n        Id\n    }\n}"
     queryString: createObject
     returnType: db_object
     queryOptions:
@@ -576,7 +580,9 @@ MonoBehaviour:
     isComplete: 1
   - name: UpdateObject
     type: 1
-    query: "mutation UpdateObject{\n    updateObject{\n        Id\n    }\n}"
+    query: "mutation UpdateObject{\n    updateObject(  Id :\"3a353be5-90e7-4ce0-8c77-cc8cdc55f286\",
+      projectId :\"f1dd1fb0-932b-4379-b45d-ca567cecfd07\", username :\"f\" ){\n       
+      Id\n    }\n}"
     queryString: updateObject
     returnType: db_object
     queryOptions:
@@ -642,6 +648,67 @@ MonoBehaviour:
         type: project
       - name: projectId
         type: String
+      hasChanged: 0
+    isComplete: 1
+  - name: FinalizedUpdateVSGraph
+    type: 1
+    query: "mutation FinalizedUpdateVSGraph{\n    updateVSGraph{\n        Id\n   
+      }\n}"
+    queryString: updateVSGraph
+    returnType: vs_graph
+    queryOptions:
+    - createBehaviour
+    - updateBehaviour
+    - deleteBehaviour
+    - createUser
+    - updateUser
+    - deleteUser
+    - createProject
+    - updateProject
+    - deleteProject
+    - createObject
+    - updateObject
+    - deleteObject
+    - createVSGraph
+    - updateVSGraph
+    - deleteVSGraph
+    fields:
+    - index: 1
+      name: Id
+      type: String
+      parentIndexes: 
+      hasSubField: 0
+      possibleFields:
+      - name: id
+        type: Int
+      - name: Id
+        type: String
+      - name: Name
+        type: String
+      - name: serializedNodes
+        type: String
+      - name: edges
+        type: String
+      - name: groups
+        type: String
+      - name: stackNodes
+        type: String
+      - name: pinnedElements
+        type: String
+      - name: exposedParameters
+        type: String
+      - name: stickyNotes
+        type: String
+      - name: position
+        type: String
+      - name: scale
+        type: String
+      - name: references
+        type: String
+      - name: projectId
+        type: String
+      - name: project
+        type: project
       hasChanged: 0
     isComplete: 1
   subscriptions: []
