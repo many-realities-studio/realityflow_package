@@ -8,6 +8,8 @@ namespace Packages.realityflow_package.Runtime.scripts
     [Serializable]
     public class FlowVSGraph_Monobehaviour : MonoBehaviour
     {
+        // This MonoBehaviour handles attempting to update a FlowVSGraph every frame through its representative GameObject in the scene, but 
+        // will only succeed once a graph's IsUpdated flag gets set through a graph change.
         public FlowVSGraph underlyingFlowVSGraph;
 
         private void OnEnable()

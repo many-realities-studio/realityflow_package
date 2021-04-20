@@ -13,6 +13,8 @@ namespace RealityFlow.Plugin.Scripts
     [System.Serializable]
     public class FlowVSGraph : BaseGraph
     {
+        // FlowVSGraphs are NodeGraphProcessor BaseGraphs with additional information necessary for handling graphs with Reality Flow.
+
         [SerializeField]
         public static SerializableDictionary<string, FlowVSGraph> idToVSGraphMapping = new SerializableDictionary<string, FlowVSGraph>();
 
@@ -33,6 +35,8 @@ namespace RealityFlow.Plugin.Scripts
         [JsonIgnore]
         private GameObject _AttachedGameObject = null;
 
+        // The AttachedGameObject is the GameObject in the scene that represents the FlowVSGraph, which exists to allow for the attaching of
+        // a monobehaviour script that attempts to send graph updates to the server + database. 
         [JsonIgnore]
         public GameObject AttachedGameObject
         {
@@ -75,7 +79,7 @@ namespace RealityFlow.Plugin.Scripts
             set { _AttachedGameObject = value; }
         }
 
-        
+        // This prefab property is not currently being used as we always use the same FlowVSGraph prefab.
         [JsonIgnore]
         private string _Prefab;
 
@@ -85,6 +89,8 @@ namespace RealityFlow.Plugin.Scripts
             set { _Prefab = value; }
         }
 
+        // The normal constructor is only ever called when a user creates a FlowVSGraph, and only for the creator's instance. All graph
+        // updates are handled by the JsonConstructor.
         public FlowVSGraph(string n){
             this.Name = n;
 
@@ -99,6 +105,8 @@ namespace RealityFlow.Plugin.Scripts
             this.name = (this.Name + " - " + this.Id);
         }
 
+        // The JsonConstructor is used upon deserialization of any message containing a FlowVSGraph. This allows for the creation of a new instance
+        // that gets used to either instantiate a FlowVSGraph on a receiving client's side, or to update an existing graph with new data from the server.
         [JsonConstructor]
         public FlowVSGraph(string id, string name, List<JsonElement> SerializedNodes, List<SerializableEdge> Edges, 
                           List<Group> Groups, List<BaseStackNode> StackNodes, List<PinnedElement> PinnedElements, 
@@ -117,7 +125,7 @@ namespace RealityFlow.Plugin.Scripts
             stackNodes = StackNodes;
 
             // Our graph system does not currently allow users to create pinned Elements. The only way a pinned element will be created is through opening a graph
-            // with exposed parameters in the NodeGraphProcessor Window itself, after which you can no longer open the project as NewtonSoft does not know how
+            // with exposed parameters in the NodeGraphProcessor window itself, after which you can no longer open the project as NewtonSoft does not know how
             // to instantiate pinned Elements using the serialized data. To prevent projects from breaking like this, refrain from opening graphs with parameters
             // in NGP and then sending updates to that graph.
             pinnedElements = PinnedElements;
@@ -188,6 +196,8 @@ namespace RealityFlow.Plugin.Scripts
                         }
                         else
                         {
+                            // The GameObject parameter is not linked to any FlowTObjects (yet). Setting the parameter GameObject to null prevents 
+                            // the parameter from attempting to use an object instance ID that may not exist.
                             Debug.LogWarning("Cannot create GameObject Exposed Parameter from nonexistent object. Setting parameter GameObject to null instead.");
                             exposedParameters.Add(new ExposedParameter{
                                 guid = param.guid,
@@ -200,6 +210,9 @@ namespace RealityFlow.Plugin.Scripts
                     }
                     else
                     {
+                        // For all exposed parameters that are not of type GameObject, create an uninitialized SerializableObject from scratch to avoid using
+                        // the SerializableObject constructor, which causes deserialization of graph messages to throw exceptions as some required values
+                        // are null.
                         SerializableObject emptyObj = (SerializableObject)FormatterServices.GetUninitializedObject(typeof(SerializableObject));
                         emptyObj.serializedType = param.serializedValue.serializedType;
                         emptyObj.serializedName = param.serializedValue.serializedName;
@@ -217,6 +230,8 @@ namespace RealityFlow.Plugin.Scripts
                 }
             }
             
+            // Users are currently not allowed to modify these NGP graph values through Reality Flow's graph editing system, but I will keep these fields here
+            // in case they ever get used.
             stickyNotes = StickyNotes;
             position = Position;
             scale = Scale;
@@ -247,6 +262,7 @@ namespace RealityFlow.Plugin.Scripts
             // }
         }
 
+        // This function sends graph updates to the server only after the IsUpdated flag gets set.
         public void UpdateFlowVSGraphGlobally(FlowVSGraph newValues)
         {
             if (IsUpdated == true)
@@ -260,6 +276,8 @@ namespace RealityFlow.Plugin.Scripts
             }
         }
 
+        // This function is called in NodeView.cs after a user finishes dragging a node around the Whiteboard. This is necessary because ending such a manipulation
+        // does not trigger the IsUpdated flag to be set.
         public void ManipulationEndGlobalUpdate(FlowVSGraph newValues)
         {
             GraphPropertyCopier<FlowVSGraph, FlowVSGraph>.Copy(newValues, this);
@@ -269,6 +287,7 @@ namespace RealityFlow.Plugin.Scripts
             _isUpdated = false;
         }
 
+        // Upon receiving a graph update, this function will copy the values of the updated graph onto an existing, outdated graph.
         private void UpdateFlowVSGraphLocally(FlowVSGraph newValues)
         {
             GraphPropertyCopier<FlowVSGraph, FlowVSGraph>.Copy(newValues, this);
@@ -288,6 +307,7 @@ namespace RealityFlow.Plugin.Scripts
             }
         }
 
+        // Remove all FlowVSGraph objects from a scene and empty the idToVSGraphMapping dictionary.
         public static void RemoveAllGraphsFromScene()
         {
             foreach (FlowVSGraph flowVSGraph in idToVSGraphMapping.Values)
@@ -297,7 +317,7 @@ namespace RealityFlow.Plugin.Scripts
             FlowVSGraph.idToVSGraphMapping = new SerializableDictionary<string, FlowVSGraph>();
         }
 
-        // Deprecated function
+        // Deprecated function, currently using the GraphPropertyCopier
         public void CopyFromOtherGraph(FlowVSGraph input){
             Name = input.name;
             serializedNodes = input.serializedNodes;
