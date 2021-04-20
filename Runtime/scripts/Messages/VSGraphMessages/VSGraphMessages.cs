@@ -4,8 +4,8 @@ using GraphProcessor;
 using UnityEngine;
 
 // This file is currently not being used anywhere as graph message strings are manually formatted in Operations.cs.
-// This is because JsonConvert used to serialize and deserialize other messages does not properly
-// serialize and deserialize graph objects.
+// This is because JsonConvert, which is used to serialize and deserialize other messages, does not properly
+// serialize and deserialize graph objects as NGP's developer intended.
 
 namespace Packages.realityflow_package.Runtime.scripts.Messages.VSGraphMessages
 {

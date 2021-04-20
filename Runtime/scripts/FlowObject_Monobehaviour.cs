@@ -28,6 +28,8 @@ namespace Packages.realityflow_package.Runtime.scripts
         {
         }
 
+        // In update, objects are frozen locally if a user is not allowed to modify them. As soon as an object is checked out,
+        // the object will be unfrozen, and frozen again after being checked in.
         public void Update()
         {
             if (underlyingFlowObject != null)
