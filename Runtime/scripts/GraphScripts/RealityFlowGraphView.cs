@@ -732,5 +732,4 @@ public class RealityFlowGraphView : MonoBehaviour {
         // contentPanel.GetComponent<ContentSizeFitter>().enabled = true;
         // LayoutRebuilder.MarkLayoutForRebuild ((RectTransform) contentPanel.transform);
     }
-
 }
