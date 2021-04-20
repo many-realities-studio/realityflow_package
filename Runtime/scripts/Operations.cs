@@ -391,17 +391,17 @@ namespace Packages.realityflow_package.Runtime.scripts
         {
             //CheckIn will be called updateObject for GraphQL operations
             // I had to check this out as it was not working properly and we needed to merge, be sure to fix this functionality.
-            // graphqlClient_Editor updateObject = ScriptableObject.CreateInstance<graphqlClient_Editor>();
-            // string checkedIn = await updateObject.UpdateObject(objectID, projectID, username);
-            // if(checkedIn != null){
-            //     Debug.Log("Getting message type: CheckinObject from GraphQL");
-            //     FlowTObject.idToGameObjectMapping[objectID].CanBeModified = false;
-            // }
+            graphqlClient_Editor updateObject = ScriptableObject.CreateInstance<graphqlClient_Editor>();
+            string checkedIn = await updateObject.UpdateObject(objectID, projectID, username);
+            if(checkedIn != null){
+                Debug.Log("Getting message type: CheckinObject from GraphQL");
+                FlowTObject.idToGameObjectMapping[objectID].CanBeModified = false;
+            }
 
-            CheckinObject_SendToServer checkinObject = new CheckinObject_SendToServer(objectID, projectID, ConfigurationSingleton.SingleInstance.CurrentUser.Username);
-            FlowWebsocket.SendMessage(checkinObject);
+            // CheckinObject_SendToServer checkinObject = new CheckinObject_SendToServer(objectID, projectID, ConfigurationSingleton.SingleInstance.CurrentUser.Username);
+            // FlowWebsocket.SendMessage(checkinObject);
 
-            ReceivedMessage.AddEventHandler(typeof(CheckinObject_Received), true, callbackFunction);
+            // ReceivedMessage.AddEventHandler(typeof(CheckinObject_Received), true, callbackFunction);
         }
 
         public static void CheckoutVSGraph(string vsGraphID, string projectID, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
