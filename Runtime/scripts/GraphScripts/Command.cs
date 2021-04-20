@@ -27,6 +27,8 @@ using UnityEngine;
 using System;
 using GraphProcessor;
 
+// This is an abstract class containing all of the command types
+// Each time a given operation is performed, one of these commands is added to the commandpalette
 public abstract class Command : MonoBehaviour
 {   
     public string action;
@@ -37,11 +39,13 @@ public abstract class Command : MonoBehaviour
         // this.graph = graph;
         this.graphState = sp;
     }
-
+    
+    // Debug function that returns json string serialized version of graph
     public string GetGraphState(){
         return graphState;
     }
 
+    // debug function that prints each command when executed. This would be useful for displaying undo stack
     public virtual string PrintCommand(){
         return String.Format("{0}", this.action);
     }

@@ -4,6 +4,9 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using RealityFlow.Plugin.Scripts;
+
+// Upon clicking load graph, this class will ask which graph you want loaded
+// and send the information to rfgv
 public class VSGraphSelectionDropdown : MonoBehaviour
 {
     public RealityFlowGraphView rfgv;
@@ -24,6 +27,7 @@ public class VSGraphSelectionDropdown : MonoBehaviour
         string dropDownText = target.options[target.value].text;
     }
 
+    // This method populates the dropdown at runtime, basd on the idToVSGraphMapping dictionary
     public void LoadGraphs()
     {
         List<string> options = new List<string> ();

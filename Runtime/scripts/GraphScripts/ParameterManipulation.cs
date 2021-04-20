@@ -6,6 +6,8 @@ using UnityEngine.EventSystems;
 using Microsoft.MixedReality.Toolkit;
 using Microsoft.MixedReality.Toolkit.Input;
 
+
+// Used to assign a gameobject value to a parameter, works very similarly to NodeManipulation
 public class ParameterManipulation : MonoBehaviour
 {
     Vector3 position;
@@ -61,9 +63,4 @@ public class ParameterManipulation : MonoBehaviour
             Destroy(spherePoint);
         }
     }
-
-    // public void RefreshPalette()
-    // {
-    //     GameObject o = Instantiate(this.gameObject,this.transform.position,this.transform.rotation,this.transform.parent);
-    // }
 }

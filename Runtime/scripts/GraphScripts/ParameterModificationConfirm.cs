@@ -4,6 +4,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
+// This class is used upon clicking Modify on an exposed parameter to change its value
+// based on its type, works in conjunction with parameterView
 public class ParameterModificationConfirm : MonoBehaviour
 {
     public TMP_InputField input;
@@ -27,6 +29,7 @@ public class ParameterModificationConfirm : MonoBehaviour
         string dropDownText = target.options[target.value].text;
     }
 
+    // This method is called for strings, ints, and floats
     public void inputConfirm()
     {
         switch(pv.pn.type)
@@ -44,6 +47,8 @@ public class ParameterModificationConfirm : MonoBehaviour
 		}
         this.gameObject.SetActive(false);
     }
+
+    // This method is caled for bools
     public void dropdownConfirm()
     {
         if(dropdown.options[dropdown.value].text == "True")
@@ -57,6 +62,8 @@ public class ParameterModificationConfirm : MonoBehaviour
 
         this.gameObject.SetActive(false);
     }
+
+    // This method is called for colors
     public void colorConfirm()
     {
         if(dropdown.options[dropdown.value].text == "Red")
