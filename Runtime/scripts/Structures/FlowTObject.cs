@@ -393,7 +393,8 @@ namespace RealityFlow.Plugin.Scripts
 
                 if (CanBeModified == true)
                 {
-                    Operations.UpdateObject(this, ConfigurationSingleton.SingleInstance.CurrentUser, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) => {/* Debug.Log(e.message);*/ });
+                    Operations.UpdateObject(this, ConfigurationSingleton.SingleInstance.CurrentUser, ConfigurationSingleton.SingleInstance.CurrentProject.Id, 
+                                            ConfigurationSingleton.SingleInstance.CurrentUser.Username, (_, e) => {/* Debug.Log(e.message);*/ });
                 }
 
                 AttachedGameObject.transform.hasChanged = false;
@@ -414,9 +415,11 @@ namespace RealityFlow.Plugin.Scripts
         {
             if (CanBeModified == true)
             {
-                Operations.CheckinObject(Id, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) =>
+                // TODAY!-want to add graphql functionality.
+                Operations.CheckinObject(Id, ConfigurationSingleton.SingleInstance.CurrentProject.Id, 
+                                        ConfigurationSingleton.SingleInstance.CurrentUser.Username, (_, e) =>
                 {
-                    // On successful checkin
+                    // On successful checkin (with GQL solution we dont set the flag here.)
                     if (e.message.WasSuccessful == true)
                     {
                         _canBeModified = false;

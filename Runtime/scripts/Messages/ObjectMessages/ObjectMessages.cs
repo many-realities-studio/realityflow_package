@@ -37,10 +37,14 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.ObjectMessages
         [JsonProperty("ProjectId")]
         public string projectId { get; set; }
 
-        public UpdateObject_SendToServer(FlowTObject flowObject, /*FlowUser flowUser,*/ string projectId)
+        [JsonProperty("UserId")]
+        public string username { get; set; }
+
+        public UpdateObject_SendToServer(FlowTObject flowObject, string projectId, string username)
         {
             this.flowObject = flowObject;
             this.projectId = projectId;
+            this.username = username;
 
             this.MessageType = "UpdateObject";
         }

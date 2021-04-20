@@ -10,6 +10,7 @@ public class VSGraphSelectionDropdown : MonoBehaviour
     public Dropdown selectionDropdown;
 
     public List<FlowVSGraph> VSGraphList;
+
     void Start() {
         selectionDropdown.onValueChanged.AddListener(delegate {
             selectionDropdownValueChangedHandler(selectionDropdown);

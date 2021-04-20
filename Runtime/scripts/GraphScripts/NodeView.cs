@@ -21,6 +21,7 @@ public class NodeView : MonoBehaviour
 
     public Rigidbody nodeViewRigidbody;
 
+    public bool isMobile = false;
     private bool constraintsFrozen;
 
     public bool CanBeModified { get => _canBeModified; set => _canBeModified = value; }
@@ -160,7 +161,14 @@ public class NodeView : MonoBehaviour
     public void UpdateNodeValues()
     {
         Vector3 [] cornerPos = new Vector3[4];
-        GameObject.Find("VRWhiteBoard").GetComponent<RectTransform>().GetWorldCorners(cornerPos);
+        if(isMobile)
+        {
+            GameObject.Find("GraphView Canvas").GetComponent<RectTransform>().GetWorldCorners(cornerPos);
+        }
+        else
+        {
+            GameObject.Find("VRWhiteBoard").GetComponent<RectTransform>().GetWorldCorners(cornerPos);
+        }
         Vector3 worldNode = this.transform.position;
         Vector2 newPos;
         newPos = (worldNode - cornerPos[1]);

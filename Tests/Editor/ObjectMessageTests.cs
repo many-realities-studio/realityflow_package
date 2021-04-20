@@ -74,7 +74,7 @@ namespace RealityFlow.Plugin.Tests
 
             // Act (and assert)
             UpdateObject_Received actual = null;
-            Operations.UpdateObject(testObject, testUser, "projectId", (sender, e) =>
+            Operations.UpdateObject(testObject, testUser, "projectId", "username",(sender, e) =>
             {
                 Debug.Log("Received message: " + e.message.ToString());
                 actual = e.message;

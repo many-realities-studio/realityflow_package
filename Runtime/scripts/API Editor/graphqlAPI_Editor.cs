@@ -171,13 +171,12 @@ namespace Contrib.APIeditor
             UnityWebRequest request = await graphql_Var.graphql_api.Post(CreateObject);  
         }
 
-        public async void UpdateObject(FlowTObject flowObject, string _projectId)
+        public async Task<string> UpdateObject(string objectId, string _projectId, string _username)
         {
             GraphApi.Query UpdateObject = graphql_Var.graphql_api.GetQueryByName("UpdateObject", GraphApi.Query.Type.Mutation);
-            UpdateObject.SetArgs(new{Id = flowObject.Id, Name = flowObject.Name, X = flowObject.X, Y = flowObject.Y, Z = flowObject.Z, Q_x = flowObject.Q_x,
-                                    Q_y = flowObject.Q_y, Q_z = flowObject.Q_z, Q_w = flowObject.Q_w, S_x = flowObject.S_x, S_y = flowObject.S_y,
-                                    S_z = flowObject.S_z, R = flowObject.R, G = flowObject.G, B = flowObject.B, A = flowObject.A, Prefab = flowObject.Prefab, projectId = _projectId});
+            UpdateObject.SetArgs(new{Id = objectId, projectId = _projectId, username = _username});
             UnityWebRequest request = await graphql_Var.graphql_api.Post(UpdateObject);
+            return request.downloadHandler.text;
         }
 
         public async void DeleteObject(string objectId, string projectID){
@@ -196,25 +195,73 @@ namespace Contrib.APIeditor
     /// VSGRAPH
         public async void CreateVSGraph(FlowVSGraph flowVSGraph, string ProjectId) // what about isUpdated?
         {
+            var SerializedNodes = JsonUtility.ToJson(flowVSGraph.serializedNodes);
+            var Edges = JsonUtility.ToJson(flowVSGraph.edges);
+            var Groups = JsonUtility.ToJson(flowVSGraph.groups);
+            var StackNodes = JsonUtility.ToJson(flowVSGraph.stackNodes);
+            var PinnedElements = JsonUtility.ToJson(flowVSGraph.pinnedElements);
+            var ExposedParameters = JsonUtility.ToJson(flowVSGraph.exposedParameters);
+            var StickyNotes = JsonUtility.ToJson(flowVSGraph.stickyNotes);
+            var Position = JsonUtility.ToJson(flowVSGraph.position);
+            var Scale = JsonUtility.ToJson(flowVSGraph.scale);
+            //var references = JsonUtility.ToJson(flowVSGraph.references);
+
+             //var hmm = JsonUtility.ToJson(flowVSGraph.position);
+             var pos = new{x = string.Empty, y = string.Empty, z = string.Empty};
+             var scl = new{x = string.Empty, y = string.Empty, z = string.Empty};
+             var list = new[]{new{string.Empty}};
+             //var obj = new {Id = string.Empty, Name = string.Empty, serializedNodes = new[]{""} };
+            // var obj = new {Id = string.Empty, Name = string.Empty, serializedNodes = new[]{string.Empty}, edges = new[]{string.Empty}, groups = new[]{string.Empty}, stackNodes = new[]{string.Empty},
+            //                 pinnedElements = new[]{string.Empty}, exposedParameters = new[]{string.Empty}, stickyNotes = new[]{string.Empty}, position = new{ new{x = ""}, new{y = ""}, new{z = ""}}, scale = new{ new{x = ""}, new{y = ""}, new{z = ""}},
+                            /*references = string.Empty, paramIdToObjId = new{ keys = new[]{string.Empty}, values = new[]{string.Empty}}, projectId = string.Empty};*/
+            // string p = Position.ToString();
+            // string s = Scale.ToString();
+            // JObject o = JObject.Parse(Position);
+            // var _Position = JsonConvert.DeserializeAnonymousType(Position, pos);
+            // var _Scale = JsonConvert.DeserializeAnonymousType(Scale, scl);
+            // var _ser = JsonConvert.DeserializeAnonymousType(SerializedNodes, list);
+            // Debug.Log("Parse---->: "+o.ToString());
+            // Debug.Log("position.ToString() --->: "+p);
+            // Debug.Log("Json: "+vsJson);
+            // Debug.Log("Hi There: "+vsGraph);
+             //var vsJson = JsonUtility.ToJson(flowVSGraph);
+            // var vsGraph = JsonUtility.FromJson(vsJson);
+            //var test = JsonUtility.FromJson<FlowVSGraph>(vsJson);
+
             GraphApi.Query CreateVSGraph = graphql_Var.graphql_api.GetQueryByName("CreateVSGraph", GraphApi.Query.Type.Mutation);
-            CreateVSGraph.SetArgs(new{Id = flowVSGraph.Id, Name = flowVSGraph.Name, serializedNodes = new{flowVSGraph.serializedNodes/**/}, edges= flowVSGraph.edges/**/, groups = flowVSGraph.groups/**/,
-                stackNodes = flowVSGraph.stackNodes/**/, pinnedElements = flowVSGraph.pinnedElements/**/, exposedParameters = flowVSGraph.exposedParameters/**/, stickyNotes = flowVSGraph.stickyNotes/**/,
-                position = new{flowVSGraph.position.x, flowVSGraph.position.y, flowVSGraph.position.z}, scale = new{flowVSGraph.scale.x, flowVSGraph.scale.y, flowVSGraph.scale.z}, /*references = hm  ??? */ projectId = ProjectId});
+            CreateVSGraph.SetArgs(new{Id = flowVSGraph.Id, 
+            Name = flowVSGraph.Name, 
+            serializedNodes = SerializedNodes, 
+            edges = Edges, 
+            groups = Groups,
+            stackNodes = StackNodes, 
+            pinnedElements = PinnedElements, 
+            exposedParameters = ExposedParameters, 
+            stickyNotes = StickyNotes,
+            position = Position,
+            scale = Scale,
+            references = "References",
+            projectId = ProjectId});
+
             UnityWebRequest request = await graphql_Var.graphql_api.Post(CreateVSGraph);  
+
+            
         }
 
-        // public async void UpdateVSGraph(int objectId, string Name, int X, int Y, int Z, int Q_x, int Q_y, int Q_z, int Q_w,
-        //                                 int S_x, int S_y, int S_z, int R, int G, int B, int A, string Prefab, string projectId)
-        // {
-        //     GraphApi.Query UpdateVSGraph = graphql_Var.graphql_api.GetQueryByName("UpdateVSGraph", GraphApi.Query.Type.Mutation);
-        //     UpdateVSGraph.SetArgs(new{id = objectId, Name = _Name, X = _X, Y = _Y, Z = _Z, Q_x = _Q_x, Q_y = _Q_y, Q_z = _Q_z, Q_w = _Q_w,
-        //                             S_x = _S_x, S_y =_S_y, S_z =_S_z, R = _R, G =_G, B = _B, A = _A, Prefab = _Prefab, projectId = _projectID});
-        //     UnityWebRequest request = await graphql_Var.graphql_api.Post(UpdateVSGraph);
-        // }
+        public async void FinalizedUpdateVSGraph(FlowVSGraph flowVSGraph, string ProjectId) // what about isUpdated?
+        {
+            
+            
+            GraphApi.Query FinalizedUpdateVSGraph = graphql_Var.graphql_api.GetQueryByName("FinalizedUpdateVSGraph", GraphApi.Query.Type.Mutation);
+            FinalizedUpdateVSGraph.SetArgs(new{Id = flowVSGraph.Id, Name = flowVSGraph.Name, serializedNodes = new{flowVSGraph.serializedNodes/**/}, edges= flowVSGraph.edges/**/, groups = flowVSGraph.groups/**/,
+                stackNodes = flowVSGraph.stackNodes/**/, pinnedElements = flowVSGraph.pinnedElements/**/, exposedParameters = flowVSGraph.exposedParameters/**/, stickyNotes = flowVSGraph.stickyNotes/**/,
+                position = new{flowVSGraph.position.x, flowVSGraph.position.y, flowVSGraph.position.z}, scale = new{flowVSGraph.scale.x, flowVSGraph.scale.y, flowVSGraph.scale.z}, /*references = hm  ??? */ projectId = ProjectId});
+            UnityWebRequest request = await graphql_Var.graphql_api.Post(FinalizedUpdateVSGraph);  
+        }
 
-        public async void DeleteVSGraph(string objectId){
+        public async void DeleteVSGraph(string idOfVSGraphToDelete, string projectId){
             GraphApi.Query DeleteVSGraph = graphql_Var.graphql_api.GetQueryByName("DeleteVSGraph", GraphApi.Query.Type.Mutation);
-            DeleteVSGraph.SetArgs(new{Id = objectId});
+            DeleteVSGraph.SetArgs(new{Id = idOfVSGraphToDelete});
             UnityWebRequest request = await graphql_Var.graphql_api.Post(DeleteVSGraph);
         }
 

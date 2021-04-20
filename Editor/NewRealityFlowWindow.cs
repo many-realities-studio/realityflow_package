@@ -155,7 +155,8 @@ public class FlowNetworkManagerEditor : EditorWindow
         {
             if (obj.CanBeModified == true)
             {
-                Operations.CheckinObject(obj.Id, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) => { });
+                Operations.CheckinObject(obj.Id, ConfigurationSingleton.SingleInstance.CurrentProject.Id, 
+                                        ConfigurationSingleton.SingleInstance.CurrentUser.Username, (_, e) => { });
             }
         }
 
@@ -219,7 +220,8 @@ public class FlowNetworkManagerEditor : EditorWindow
             {
                 if (obj.CanBeModified == true)
                 {
-                    Operations.CheckinObject(obj.Id, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) => { });
+                    Operations.CheckinObject(obj.Id, ConfigurationSingleton.SingleInstance.CurrentProject.Id, 
+                                             ConfigurationSingleton.SingleInstance.CurrentUser.Username, (_, e) => { });
                 }
             }
 
@@ -944,7 +946,8 @@ public class FlowNetworkManagerEditor : EditorWindow
         {
             if (obj.CanBeModified == true)
             {
-                Operations.CheckinObject(obj.Id, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) => { });
+                Operations.CheckinObject(obj.Id, ConfigurationSingleton.SingleInstance.CurrentProject.Id, 
+                                        ConfigurationSingleton.SingleInstance.CurrentUser.Username, (_, e) => { });
             }
         }
 

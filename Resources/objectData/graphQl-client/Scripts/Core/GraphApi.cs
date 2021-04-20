@@ -104,7 +104,7 @@ namespace GraphQlClient.Core
                 if (jsonChar[i] == ':'){
                     jsonChar[indexes[0]] = ' ';
                     jsonChar[indexes[1]] = ' ';
-                }
+                } // "{\"x\":0.0,\"y\":0.0,\"z\":0.0}"
             }
 
             string result = new string(jsonChar);
