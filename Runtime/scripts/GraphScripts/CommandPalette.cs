@@ -5,9 +5,9 @@ using UnityEditor;
 using UnityEngine.UIElements;
 using GraphProcessor;
 
+// This class keeps track of the state of the graph and a stack of the last executed commands
 public class CommandPalette : MonoBehaviour
 {
-
     const int MAX_NUMBER_OF_COMMANDS = 10;
     static List<Command> commandStack;
 
@@ -27,6 +27,7 @@ public class CommandPalette : MonoBehaviour
         }        
     }
 
+    // Used by undolastcommand
     public List<Command> GetCommandStack(){
         return commandStack;
     }
@@ -35,6 +36,7 @@ public class CommandPalette : MonoBehaviour
         int indexToRemove = commandStack.Count - 1;
     }
 
+    // The following are UNIMPLEMENTED
     // Takes userID as argument
     void UndoLastChangeByUserID(string userID){
         // Searches stack until it finds the first command matching the id of the user and pops it from stack
@@ -57,6 +59,8 @@ public class CommandPalette : MonoBehaviour
     // FUnctions that send info to server (maybe)
     // Debug functions
     // TODO: Find a new way to display the stack (GUI elements in VR)
+
+    // Debug function that prints the command stack. Could be useful for showing undo stack in VR
     public void PrintStack(){
         for (int i = 0; i < commandStack.Count; i++){
             Debug.Log(i + ": " + commandStack[i].PrintCommand());

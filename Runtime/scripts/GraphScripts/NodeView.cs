@@ -8,6 +8,7 @@ using RealityFlow.Plugin.Contrib;
 using Newtonsoft.Json;
 using Packages.realityflow_package.Runtime.scripts;
 
+// This is the class used to display nodes on the whiteboard and modify them in play mode
 public class NodeView : MonoBehaviour
 {
     public Text title;
@@ -34,7 +35,9 @@ public class NodeView : MonoBehaviour
     public List<NodePortView> outputPortViews = new List<NodePortView>();
     public static NodeView instance;
     
-    // TODO: Make sure this is the best way to do this. I think this is really hacky -John
+    // NodeViews can be created server-side, and so require a JsonConstructor
+    // This is so they can be checked out and then back in to prevent multiple people
+    // from moving them at once
     [JsonConstructor]
     public NodeView(Vector3 LocalPos, string NodeGUID)
     {
@@ -42,8 +45,8 @@ public class NodeView : MonoBehaviour
         nodeGUID = NodeGUID;
         if(RealityFlowGraphView.nodeViewtoRFGVDict.ContainsKey(NodeGUID))
         {
+            // Dictionary in rfgv which keeps track of what nodeviews are attached to what whiteboard
             RealityFlowGraphView.nodeViewtoRFGVDict[NodeGUID].nodeViewDict[NodeGUID].UpdateNodeViewLocally(this);
-            
         }
         else
         {
@@ -84,6 +87,7 @@ public class NodeView : MonoBehaviour
         transform.hasChanged = false;
         localPos = transform.localPosition;
         nodeViewRigidbody = this.gameObject.GetComponent<Rigidbody>();
+        // Rigidbody is required for mrtk manipulation
 
         nodeViewRigidbody.constraints = RigidbodyConstraints.FreezeAll;
         constraintsFrozen = true;
@@ -115,7 +119,8 @@ public class NodeView : MonoBehaviour
         }
     }
 
-
+    // This method is called before delete when doing single node deletion so the node can be
+    // removed from the dictionary
     public void DeleteSelf(){
         rfgv.DeleteSelection(this);
         this.Delete();
@@ -133,6 +138,7 @@ public class NodeView : MonoBehaviour
             Destroy(this.gameObject);
     }
 
+    // Soft node deletion; does not remove the node from the graph
     public void DeleteFromWhiteBoard()
     {
         foreach(NodePortView inputPort in inputPortViews){
@@ -150,6 +156,7 @@ public class NodeView : MonoBehaviour
        this.GetComponent<CanvasRenderer>().SetColor(Color.green);
     }
 
+    // Called after every manipulation to maintain z position and scale
     public void ResetOrientation(){
         Vector3 localPos = transform.localPosition;
         localPos.z = 0.0f;

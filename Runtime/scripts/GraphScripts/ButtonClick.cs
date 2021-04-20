@@ -8,6 +8,8 @@ public class ButtonClick : MonoBehaviour
 {
 	public GameObject Canvas;
 	public static GameObject[] WhiteBoards;
+
+	// This function can be used to instantiate whiteboards into the scene rather than using the one that is currently there
 	public void CreateCanvas()
 	{
 		GameObject WhiteBoard = Instantiate(Canvas, Canvas.transform.position, Canvas.transform.rotation);
