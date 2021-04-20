@@ -71,6 +71,14 @@ public class FlowNetworkManagerEditor : EditorWindow
 
     public Boolean showAllOptions = false;
 
+    public delegate void PhotonJoinHandler(string vsGraphId);
+
+    public delegate void PhotonLeaveHandler();
+
+    public static event PhotonJoinHandler joinProjectEvent;
+
+    public static event PhotonLeaveHandler leaveProjectEvent;
+
     private enum EWindowView
     {
         LOGIN = 0,
@@ -148,7 +156,8 @@ public class FlowNetworkManagerEditor : EditorWindow
         {
             if (obj.CanBeModified == true)
             {
-                Operations.CheckinObject(obj.Id, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) => { });
+                Operations.CheckinObject(obj.Id, ConfigurationSingleton.SingleInstance.CurrentProject.Id, 
+                                        ConfigurationSingleton.SingleInstance.CurrentUser.Username, (_, e) => { });
             }
         }
 
@@ -160,6 +169,7 @@ public class FlowNetworkManagerEditor : EditorWindow
         //         Operations.CheckinVSGraph(graph.Id, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) => { });
         //     }
         // }
+        leaveProjectEvent?.Invoke();
 
         if (userIsGuest)
         {
@@ -220,7 +230,8 @@ public class FlowNetworkManagerEditor : EditorWindow
             {
                 if (obj.CanBeModified == true)
                 {
-                    Operations.CheckinObject(obj.Id, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) => { });
+                    Operations.CheckinObject(obj.Id, ConfigurationSingleton.SingleInstance.CurrentProject.Id, 
+                                             ConfigurationSingleton.SingleInstance.CurrentUser.Username, (_, e) => { });
                 }
             }
 
@@ -405,17 +416,14 @@ public class FlowNetworkManagerEditor : EditorWindow
             {
                 if (e.message.WasSuccessful == true)
                 {
-                    // JohnLynch
-                    Transform head = GameObject.Find("Main Camera").transform;
-                    // Transform lHand = 
-                    // Transform rHand = 
-                    FlowAvatar createAvatar = new FlowAvatar(head);
-                    // Operations.CreateAvatar(createAvatar, eventArgs.message.flowProject.Id);
-                    Operations.CreateAvatar(createAvatar, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, f) => { Debug.Log(f.message); });
                     Debug.Log(e.message);
                     if (e.message.WasSuccessful == true)
                     {
                         ConfigurationSingleton.SingleInstance.CurrentProject = e.message.flowProject;
+                        Transform head = GameObject.Find("Main Camera").transform;
+                        FlowAvatar createAvatar = new FlowAvatar(head);
+                        Operations.CreateAvatar(createAvatar, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, f) => { Debug.Log(f.message); });
+                        joinProjectEvent?.Invoke(ConfigurationSingleton.SingleInstance.CurrentProject.Id);
                         window = EWindowView.PROJECT_HUB;
                     }
                 }
@@ -475,14 +483,20 @@ public class FlowNetworkManagerEditor : EditorWindow
         openProjectId = EditorGUILayout.TextField(openProjectId);
         if (GUILayout.Button("Join project"))
         {
+            
             Operations.OpenProject(openProjectId, ConfigurationSingleton.SingleInstance.CurrentUser, (_, e) =>
             {
                 if (e.message.WasSuccessful == true)
                 {
+                    ConfigurationSingleton.SingleInstance.CurrentProject = e.message.flowProject;
+                    Transform head = GameObject.Find("Main Camera").transform;
+                    FlowAvatar createAvatar = new FlowAvatar(head);
+                    Operations.CreateAvatar(createAvatar, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, f) => { Debug.Log(f.message); });
                     Debug.Log(e.message);
                     if (e.message.WasSuccessful == true)
                     {
-                        ConfigurationSingleton.SingleInstance.CurrentProject = e.message.flowProject;
+                        // ConfigurationSingleton.SingleInstance.CurrentProject = e.message.flowProject;
+                        joinProjectEvent?.Invoke(ConfigurationSingleton.SingleInstance.CurrentProject.Id);
                         window = EWindowView.GUESTPROJECT_HUB;
                     }
                 }
@@ -792,6 +806,7 @@ public class FlowNetworkManagerEditor : EditorWindow
                         if (e.message.WasSuccessful == true)
                         {
                             ConfigurationSingleton.SingleInstance.CurrentProject = e.message.flowProject;
+                            joinProjectEvent?.Invoke(ConfigurationSingleton.SingleInstance.CurrentProject.Id);
                             // JohnLynch
                             Transform head = GameObject.Find("Main Camera").transform;
                             // Transform lHand = 
@@ -892,6 +907,7 @@ public class FlowNetworkManagerEditor : EditorWindow
             if (e.message.WasSuccessful == true)
             {
                 ConfigurationSingleton.SingleInstance.CurrentProject = null;
+                leaveProjectEvent?.Invoke();
 
                 GameObject[] wbList;
                 wbList = GameObject.FindGameObjectsWithTag("Canvas");
@@ -907,6 +923,12 @@ public class FlowNetworkManagerEditor : EditorWindow
                 FlowTObject.RemoveAllObjectsFromScene();
                 FlowAvatar.RemoveAllAvatarFromScene();
                 FlowVSGraph.RemoveAllGraphsFromScene();
+                // After Deleting a project, update the user projectList
+                Operations.GetAllUserProjects(ConfigurationSingleton.SingleInstance.CurrentUser, (__, _e) =>
+                {
+                    _ProjectList = _e.message.Projects;
+                    Debug.Log("Project list* = " + _ProjectList);
+                });
             }
             else
             {
@@ -949,6 +971,14 @@ public class FlowNetworkManagerEditor : EditorWindow
                     if (e.message.WasSuccessful == true)
                     {
                         // TODO: overwrite current project with new received project info
+                        // After creating a project, update the user projectList
+                        Operations.GetAllUserProjects(ConfigurationSingleton.SingleInstance.CurrentUser, (__, _e) =>
+                        {
+                            _ProjectList = _e.message.Projects;
+                            Debug.Log("Project list* = " + _ProjectList);
+                        });
+
+                        joinProjectEvent?.Invoke(ConfigurationSingleton.SingleInstance.CurrentProject.Id);
                         window = EWindowView.PROJECT_HUB;
                         Debug.Log(e.message);
                     }
@@ -1001,7 +1031,8 @@ public class FlowNetworkManagerEditor : EditorWindow
         {
             if (obj.CanBeModified == true)
             {
-                Operations.CheckinObject(obj.Id, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) => { });
+                Operations.CheckinObject(obj.Id, ConfigurationSingleton.SingleInstance.CurrentProject.Id, 
+                                        ConfigurationSingleton.SingleInstance.CurrentUser.Username, (_, e) => { });
             }
         }
 
@@ -1028,6 +1059,7 @@ public class FlowNetworkManagerEditor : EditorWindow
             if (e.message.WasSuccessful == true)
             {
                 ConfigurationSingleton.SingleInstance.CurrentProject = null;
+                leaveProjectEvent?.Invoke();
 
                 GameObject[] wbList;
                 wbList = GameObject.FindGameObjectsWithTag("Canvas");
