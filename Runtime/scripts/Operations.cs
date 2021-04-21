@@ -31,6 +31,8 @@ namespace Packages.realityflow_package.Runtime.scripts
     public delegate void RunGraphHandler(string vsGraphId);
 
     public delegate void DeleteGraphHandler(string vsGraphId);
+
+    public delegate void MobileCheckInHandler(string mobileObjectID);
     
     /// <summary>
     /// The purpose of this class is to provide a wrapper for the UnityPlugin,
@@ -45,6 +47,8 @@ namespace Packages.realityflow_package.Runtime.scripts
         public static event RunGraphHandler runVSGraph;
 
         public static event DeleteGraphHandler deleteVSGraph;
+
+        public static event MobileCheckInHandler mobileObjectCheckIn;
 
         static Operations()
         {
@@ -396,6 +400,7 @@ namespace Packages.realityflow_package.Runtime.scripts
             if(checkedIn != null){
                 Debug.Log("Getting message type: CheckinObject from GraphQL");
                 FlowTObject.idToGameObjectMapping[objectID].CanBeModified = false;
+                mobileObjectCheckIn?.Invoke(objectID);
             }
 
             // CheckinObject_SendToServer checkinObject = new CheckinObject_SendToServer(objectID, projectID, ConfigurationSingleton.SingleInstance.CurrentUser.Username);
