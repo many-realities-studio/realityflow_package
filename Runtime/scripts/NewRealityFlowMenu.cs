@@ -100,6 +100,7 @@ public class NewRealityFlowMenu : MonoBehaviour
         }
     }
 
+    // This function setups the guest user account by creating random information for it.
     public void SetupGuest()
     {
         var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
