@@ -19,7 +19,7 @@ using GraphProcessor;
 public class FlowNetworkManagerEditor : EditorWindow
 {
     //private string _Url = "ws://plato.mrl.ai:8999";
-    private string _Url = "ws://localhost:8999";
+    private string _Url = "wss://api.realityflow.io";
     private const string Url = "ws://a73c9fa8.ngrok.io";
 
     // View parameters
