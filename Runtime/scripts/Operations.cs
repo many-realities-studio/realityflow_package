@@ -218,11 +218,9 @@ namespace Packages.realityflow_package.Runtime.scripts
             // graphqlClient_Editor createVSGraph = ScriptableObject.CreateInstance<graphqlClient_Editor>();
             // createVSGraph.CreateVSGraph(flowVSGraph, projectId);
             
-            // CreateVSGraph_SendToServer createVSGraph =
-            //     new CreateVSGraph_SendToServer(flowVSGraph, /*flowUser,*/ projectId);
             string message = ("{\"FlowVSGraph\":" + JsonUtility.ToJson(flowVSGraph) + ",\"ProjectId\":\"" + projectId + "\",\"MessageType\":\"CreateVSGraph\"}");
 
-           FlowWebsocket.SendGraphMessage(message);
+            FlowWebsocket.SendGraphMessage(message);
 
             ReceivedMessage.AddEventHandler(typeof(CreateVSGraph_Received), true, callbackFunction);
         }
