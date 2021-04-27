@@ -237,17 +237,6 @@ namespace RealityFlow.Plugin.Scripts
             }
         }
 
-        // [JsonIgnore]
-        // public Vector3 Scale
-        // {
-        //     get => new Vector3(S_x, S_y, S_z);
-        //     set
-        //     {
-        //         S_x = value.x;
-        //         S_y = value.y;
-        //         S_z = value.z;
-        //     }
-        // }
 
         [JsonIgnore]
         public Quaternion Rotation
@@ -263,15 +252,6 @@ namespace RealityFlow.Plugin.Scripts
         }
 
         [SerializeField]
-        /* private string _Prefab;
-
-        public string Prefab
-        {
-            get { return _Prefab; }
-            set { _Prefab = value; }
-        } */
-
-        // public static void DestroyObject(string idOfObjectToDestroy)
         public static void DestroyAvatar(string idOfAvatarToDestroy)
         {
             try
@@ -286,26 +266,12 @@ namespace RealityFlow.Plugin.Scripts
             }
         }
 
-        // public FlowAvatar(string name, Vector3 position, Quaternion rotation, Color color, string ObjectPrefab)
-        public FlowAvatar(/*string name,*/ Transform head /*, Transform lHand, Transform rHand */)
+        public FlowAvatar(Transform head )
         {
-            // Debug.Log("prefab is " + Prefab);
-            // this.Name = name;
             currentAvatarIsMe = true;
             this.Position = head.position; 
             this.Rotation = head.rotation;
-            
-            // head.gameObject.AddComponent<FlowAvatar_Monobehaviour>();
-            // FlowAvatar_Monobehaviour monoBehaviour = head.gameObject.GetComponent<FlowAvatar_Monobehaviour>(); /* TBD */
-
-            
-            // this.Scale = head.scale;
-            // this.Position = position;
-            // this.Rotation = rotation;
-            //this.Scale = scale;
-            // this.ObjectColor = color;
-
-            // Not sure if it should be idToGameObjectMapping ...
+        
             idToAvatarMapping.Add(Id, this);
             AttachedGameObject.transform.hasChanged = false;
             // To tell players apart.
@@ -316,33 +282,16 @@ namespace RealityFlow.Plugin.Scripts
 
             FlowAvatar_Monobehaviour monoBehaviour = AttachedGameObject.GetComponent<FlowAvatar_Monobehaviour>();
             monoBehaviour.underlyingFlowAvatar = this;
-            monoBehaviour.head = head.gameObject; // Cannot implicitly convert type 'UnityEngine.Transform' to 'UnityEngine.GameObject'
-            // AttachedGameObject.name = name;
-            // AttachedGameObject.layer = 9;
+            monoBehaviour.head = head.gameObject;
             idToAvatarMapping[Id]._AttachedGameObject.transform.SetParent(GameObject.Find("Main Camera").transform);
             
-
-            //monoBehav (John)
-
-            // AttachedGameObject.AddComponent<FlowAvatar_Monobehaviour>();
-            //ObjectManipulator om = AttachedGameObject.AddComponent<ObjectManipulator>();
-            // om.OnManipulationEnded += SendGORefToParam;
-            //AttachedGameObject.AddComponent<NearInteractionGrabbable>();
-            //Rigidbody ObjectRigidBody = AttachedGameObject.AddComponent<Rigidbody>();
-            // ObjectRigidBody.useGravity = false;
-            // ObjectRigidBody.isKinematic = true;
-            
-            
-
-            // monoBehaviour.underlyingFlowObject = this;
         } 
 
         [JsonConstructor]
-        // public FlowAvatar(string id, float x, float y, float z, float q_x, float q_y, float q_z, float q_w, float s_x, float s_y, float s_z, float r, float g, float b, float a, string name, string prefab)
-        public FlowAvatar(string id, float x, float y, float z, float q_x, float q_y, float q_z, float q_w/* , float s_x, float s_y, float s_z, float r, float g, float b, float a, string name *//* , string prefab */)
+        
+        public FlowAvatar(string id, float x, float y, float z, float q_x, float q_y, float q_z, float q_w)
         {
             Id = id;
-            // this.Prefab = prefab;
             X = x;
             Y = y;
             Z = z;
@@ -350,22 +299,6 @@ namespace RealityFlow.Plugin.Scripts
             Q_y = q_y;
             Q_z = q_z;
             Q_w = q_w;
-            // S_x = s_x;
-            // S_y = s_y;
-            // S_z = s_z;
-            // R = r;
-            // G = g;
-            // B = b;
-            // A = a;
-            // Name = name;
-            /*
-            
-            "MessageType":"CreateAvatar","FlowAvatar":{"Id":"86920863-828b-4fb0-8007-bdd27db167ad","Name":null,"X":0,"Y":0,"Z":0,"Q_x":0,"Q_y":0,"Q_z":0,"Q_w":1,"S_x":1,"S_y":1,"S_z":1,"R":0,"G":0,"B":0,"A":0},"WasSuccessful":true,
-            "AvatarList":[{"Id":"edcce338-e8d7-4f29-8e8c-587b29b0d4a1","Name":null,"X":0,"Y":0,"Z":0,"Q_x":0,"Q_y":0,"Q_z":0,"Q_w":1,"S_x":1,"S_y":1,"S_z":1,"R":0,"G":0,"B":0,"A":0},
-            {"Id":"119f0875-47d9-424d-856c-658b1a45e7ee","Name":null,"X":0,"Y":0,"Z":0,"Q_x":0,"Q_y":0,"Q_z":0,"Q_w":1,"S_x":1,"S_y":1,"S_z":1,"R":0,"G":0,"B":0,"A":0},
-            {"Id":"86920863-828b-4fb0-8007-bdd27db167ad","Name":null,"X":0,"Y":0,"Z":0,"Q_x":0,"Q_y":0,"Q_z":0,"Q_w":1,"S_x":1,"S_y":1,"S_z":1,"R":0,"G":0,"B":0,"A":0}]}
-            
-            */
 
             if (idToAvatarMapping.ContainsKey(id))
             {
@@ -374,19 +307,7 @@ namespace RealityFlow.Plugin.Scripts
             else // Create game object if it doesn't exist
             {
                 idToAvatarMapping.Add(Id, this);
-                //AttachedGameObject.name = name;
-                // AttachedGameObject.AddComponent<FlowAvatar_Monobehaviour>();
-                // AttachedGameObject.AddComponent<ObjectManipulator>();
-                // AttachedGameObject.AddComponent<NearInteractionGrabbable>();
                 AttachedGameObject.transform.hasChanged = false;
-                
-                //AttachedGameObject.layer = 9;
-
-                //var monoBehaviour = AttachedGameObject.GetComponent<FlowAvatar_Monobehaviour>();
-                //monoBehaviour.underlyingFlowObject = this;
-                //var ObjectRigidBody = AttachedGameObject.AddComponent<Rigidbody>();
-                //ObjectRigidBody.useGravity = false;
-                //ObjectRigidBody.isKinematic = true;
             }
         }
 
@@ -396,10 +317,8 @@ namespace RealityFlow.Plugin.Scripts
         /// <param name="gameObject">GameObject that the information is to be saved to</param>
         public void SavePropertiesToGameObject(GameObject gameObject)
         {
-            // TODO: add all properties to the conversion
             gameObject.gameObject.transform.position = new Vector3(X, Y, Z);
             gameObject.gameObject.transform.rotation = new Quaternion(Q_x, Q_y, Q_z, Q_w);
-            //gameObject.gameObject.transform.localScale = new Vector3(S_x, S_y, S_z);
         }
 
         /// <summary>
@@ -412,7 +331,6 @@ namespace RealityFlow.Plugin.Scripts
             {
                 newValues.Position = head.transform.position;
                 newValues.Rotation = head.transform.rotation;
-                //PropertyCopier<FlowAvatar, FlowAvatar>.Copy(newValues, this);
                 
                 Operations.UpdateAvatar(newValues, ConfigurationSingleton.SingleInstance.CurrentUser, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) => {/* Debug.Log(e.message);*/ });
                 

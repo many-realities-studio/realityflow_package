@@ -125,9 +125,6 @@ namespace Packages.realityflow_package.Runtime.scripts
 
                 ReceivedMessage.AddEventHandler(typeof(RegisterUser_Received), true, callbackFunction);
             }
-
-            // graphqlClient_Editor createUser = new graphqlClient_Editor();
-            // createUser.CreateUser(username, password); 
         }
 
         public static void DeleteUser(FlowUser flowUser)
@@ -145,6 +142,8 @@ namespace Packages.realityflow_package.Runtime.scripts
             graphqlClient_Editor createObject = ScriptableObject.CreateInstance<graphqlClient_Editor>();
             createObject.CreateObject(flowObject, projectId);
 
+
+            // This was how it used to be done before GRaphQL
             // CreateObject_SendToServer createObject = new CreateObject_SendToServer(flowObject, projectId);
             // FlowWebsocket.SendMessage(createObject);
 
@@ -162,14 +161,9 @@ namespace Packages.realityflow_package.Runtime.scripts
         public static void DeleteObject(string idOfObjectToDelete, string projectId, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
         {
             graphqlClient_Editor deleteObject = ScriptableObject.CreateInstance<graphqlClient_Editor>();
-            /*string deletedObjectId = await */deleteObject.DeleteObject(idOfObjectToDelete, projectId);
+            deleteObject.DeleteObject(idOfObjectToDelete, projectId);
 
-            // if(deletedObjectId != null){ // meaning that the requets went through.
-            //     __DeleteObject(deletedObjectId);
-            // }
-            // else
-            //     Debug.Log("Error, didn't delete object.");
-
+            // This was how it used to be done before GRaphQL Implementation
             // DeleteObject_SendToServer _deleteObject = new DeleteObject_SendToServer(projectId, idOfObjectToDelete);
             // FlowWebsocket.SendMessage(_deleteObject);
 
@@ -182,8 +176,7 @@ namespace Packages.realityflow_package.Runtime.scripts
 
         public static void CreateAvatar(FlowAvatar flowAvatar, string projectId , ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
         {
-            CreateAvatar_SendToServer createAvatar =
-                new CreateAvatar_SendToServer(flowAvatar, projectId);
+            CreateAvatar_SendToServer createAvatar = new CreateAvatar_SendToServer(flowAvatar, projectId);
             FlowWebsocket.SendMessage(createAvatar);
 
             ReceivedMessage.AddEventHandler(typeof(CreateAvatar_Received), true, callbackFunction);
@@ -210,10 +203,8 @@ namespace Packages.realityflow_package.Runtime.scripts
         #region VSGraphOperations
 
         public static void CreateVSGraph(FlowVSGraph flowVSGraph, /*FlowUser flowUser,*/ string projectId, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
-        {
-            // string vsJson = JsonConvert.SerializeObject(flowVSGraph);
-            // var vsGraph = JsonConvert.DeserializeObject<FlowVSGraph>(vsJson);
-            //dynamic vsGraph = JsonUtility.FromJson(vsJson);
+        {   // All of this branch's vsGraph logic is untouched. We didnt get it work 100%,
+            // so check Demo-packageUnstable branch for code changes that we tried to get it to work with
 
             // graphqlClient_Editor createVSGraph = ScriptableObject.CreateInstance<graphqlClient_Editor>();
             // createVSGraph.CreateVSGraph(flowVSGraph, projectId);
@@ -281,23 +272,23 @@ namespace Packages.realityflow_package.Runtime.scripts
 
         public static async void CreateBehaviour(FlowBehaviour behaviour, string projectId, List<string> behavioursToLinkTo, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
         {
-            // GraphQL
-             graphqlClient_Editor createBehaviour = new graphqlClient_Editor();
+            // GraphQL -- Not finished
+             //graphqlClient_Editor createBehaviour = new graphqlClient_Editor();
              //createBehaviour.CreateBehaviour(behaviour, projectId, behavioursToLinkTo);
-             string IdToBeLinked = await createBehaviour.CreateBehaviour(behaviour, projectId, behavioursToLinkTo);
+             //string IdToBeLinked = await createBehaviour.CreateBehaviour(behaviour, projectId, behavioursToLinkTo);
     
-            if(IdToBeLinked != null){
-                behaviour.BehaviourName = behaviour.flowAction.ActionType;
-                //behavioursToLinkTo.Add(IdToBeLinked);
-                __CreateBehaviour(behaviour, projectId, behavioursToLinkTo, IdToBeLinked);
+            // if(IdToBeLinked != null){
+            //     behaviour.BehaviourName = behaviour.flowAction.ActionType;
+            //     //behavioursToLinkTo.Add(IdToBeLinked);
+            //     __CreateBehaviour(behaviour, projectId, behavioursToLinkTo, IdToBeLinked);
                 
-            }
+            //}
             
-            // Probz change this name...
-            // CreateBehaviour_SendToServer _createBehaviour = new CreateBehaviour_SendToServer(behaviour, projectId, behavioursToLinkTo);
+            
+            CreateBehaviour_SendToServer _createBehaviour = new CreateBehaviour_SendToServer(behaviour, projectId, behavioursToLinkTo);
 
-            // FlowWebsocket.SendMessage(_createBehaviour);
-            //ReceivedMessage.AddEventHandler(typeof(CreateBehaviour_Received), true, callbackFunction);
+            FlowWebsocket.SendMessage(_createBehaviour);
+            ReceivedMessage.AddEventHandler(typeof(CreateBehaviour_Received), true, callbackFunction);
 
         }
 
@@ -391,7 +382,7 @@ namespace Packages.realityflow_package.Runtime.scripts
 
         public static async void CheckinObject(string objectID, string projectID, string username, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
         {
-            //CheckIn will be called updateObject for GraphQL operations
+            // CheckIn will be called updateObject for GraphQL operations
             // I had to check this out as it was not working properly and we needed to merge, be sure to fix this functionality.
             graphqlClient_Editor updateObject = ScriptableObject.CreateInstance<graphqlClient_Editor>();
             string checkedIn = await updateObject.UpdateObject(objectID, projectID, username);
@@ -399,8 +390,11 @@ namespace Packages.realityflow_package.Runtime.scripts
                 Debug.Log("Getting message type: CheckinObject from GraphQL");
                 FlowTObject.idToGameObjectMapping[objectID].CanBeModified = false;
                 mobileObjectCheckIn?.Invoke(objectID);
+            }else{
+                Debug.Log("Check-In with GraphQL didn't work!");
             }
 
+            // This was how it used to be done.
             // CheckinObject_SendToServer checkinObject = new CheckinObject_SendToServer(objectID, projectID, ConfigurationSingleton.SingleInstance.CurrentUser.Username);
             // FlowWebsocket.SendMessage(checkinObject);
 
@@ -481,17 +475,6 @@ namespace Packages.realityflow_package.Runtime.scripts
             Debug.Log("Delete Object: " + eventArgs.message.WasSuccessful);
         }
 
-        // // GRAPHQL deleteObject
-        // private static void __DeleteObject(string DeletedObjectId)
-        // {
-        //     GameObject gameObject = FlowTObject.idToGameObjectMapping[DeletedObjectId].AttachedGameObject;
-
-        //     FlowTObject.idToGameObjectMapping.Remove(DeletedObjectId);
-
-        //     UnityEngine.Object.DestroyImmediate(gameObject);
-
-        //     Debug.Log("Delete Object was successful!");
-        // }
 
         #endregion Object messages received
 
@@ -499,21 +482,16 @@ namespace Packages.realityflow_package.Runtime.scripts
 
         private static void _CreateAvatar(object sender, BaseReceivedEventArgs eventArgs)
         {
-           
+
         }
 
         private static void _DeleteAvatar(object sender, BaseReceivedEventArgs eventArgs)
         {
-            // Delete object in unity
-            //NewObjectManager.DestroyObject(eventArgs.message.DeletedObject.Id);
-
             if (eventArgs.message.WasSuccessful == true)
             {
 
                 // TODO: Remove Mono
                 GameObject gameObject = FlowAvatar.idToAvatarMapping[eventArgs.message.DeletedAvatarId].AttachedGameObject;
-        
-                // FlowAvatar.idToGameObjectMapping.Remove(eventArgs.message.DeletedAvatarId);
 
                 UnityEngine.Object.DestroyImmediate(gameObject);
             }
@@ -581,24 +559,6 @@ namespace Packages.realityflow_package.Runtime.scripts
             Debug.Log("Number of behaviours in bem = " + BehaviourEventManager.BehaviourList.Count);
         }
 
-        //GraphQL method
-        private static void __CreateBehaviour(FlowBehaviour behaviour, string projectId, List<string> behavioursToLinkTo, string currentBehaviourId)
-        {      // Parent
-            if (currentBehaviourId != null)
-            {
-                Debug.Log("Success creating behaviour with GraphQL " + behaviour.TypeOfTrigger);
-
-                BehaviourEventManager.CreateNewBehaviour(behaviour);
-
-                foreach (string behaviourToLinkId in behavioursToLinkTo)
-                {
-                    BehaviourEventManager.LinkBehaviours(behaviour.Id, behaviourToLinkId);
-                }
-            }
-
-            Debug.Log("Number of behaviours in bem = " + BehaviourEventManager.BehaviourList.Count);
-        }
-
         private static void _DeleteBehaviour(object sender, BaseReceivedEventArgs eventArgs)
         {
             // this is where things happen after a DeleteBehaviour message is deserialized
@@ -615,25 +575,6 @@ namespace Packages.realityflow_package.Runtime.scripts
                 Debug.Log("Number of behaviours in bem = " + BehaviourEventManager.BehaviourList.Count);
             }
         }
-
-        //gql
-        private static void __DeleteBehaviour(List<string> BehaviourIds)
-        {
-            // this is where things happen after a DeleteBehaviour message is deserialized
-            // if (eventArgs.message.WasSuccessful)
-            // {
-                // for each behaviour id in behaviourIds, delete from behaviour list and from each object's interactablevents
-                foreach (string id in BehaviourIds)
-                {
-                    FlowBehaviour fb = BehaviourEventManager.BehaviourList[id];
-
-                    BehaviourEventManager.DeleteFlowBehaviour(fb.TriggerObjectId, fb.TriggerObjectId, fb);
-                }
-                Debug.Log("Successfully delete all behaviours in the chain");
-                Debug.Log("Number of behaviours in bem = " + BehaviourEventManager.BehaviourList.Count);
-            //
-        }
-
         private static void _UpdateBehaviour(object sender, BaseReceivedEventArgs eventArgs)
         {
             if (eventArgs.message.WasSuccessful == true)
@@ -695,7 +636,7 @@ namespace Packages.realityflow_package.Runtime.scripts
                 }
                 else
                 {
-                    // Debug.Log("ya yeet");
+                    Debug.Log("Behaviourlist in this project is not null.");
                 }
 
                 foreach (FlowBehaviour fb in eventArgs.message.flowProject.behaviourList)

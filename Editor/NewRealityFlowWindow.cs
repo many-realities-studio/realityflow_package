@@ -396,6 +396,7 @@ public class FlowNetworkManagerEditor : EditorWindow
                     Debug.Log(e.message);
                     if (e.message.WasSuccessful == true)
                     {
+                        // Creating a users avatar upone opening a project
                         ConfigurationSingleton.SingleInstance.CurrentProject = e.message.flowProject;
                         Transform head = GameObject.Find("Main Camera").transform;
                         FlowAvatar createAvatar = new FlowAvatar(head);
@@ -467,6 +468,7 @@ public class FlowNetworkManagerEditor : EditorWindow
             {
                 if (e.message.WasSuccessful == true)
                 {
+                    // Creating a users avatar upone jining a project
                     ConfigurationSingleton.SingleInstance.CurrentProject = e.message.flowProject;
                     Transform head = GameObject.Find("Main Camera").transform;
                     FlowAvatar createAvatar = new FlowAvatar(head);
