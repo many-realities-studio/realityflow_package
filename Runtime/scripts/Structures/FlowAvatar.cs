@@ -237,6 +237,7 @@ namespace RealityFlow.Plugin.Scripts
             }
         }
 
+
         [JsonIgnore]
         public Quaternion Rotation
         {
@@ -250,6 +251,7 @@ namespace RealityFlow.Plugin.Scripts
             }
         }
 
+        [SerializeField]
         public static void DestroyAvatar(string idOfAvatarToDestroy)
         {
             try
@@ -264,18 +266,16 @@ namespace RealityFlow.Plugin.Scripts
             }
         }
 
-        public FlowAvatar(Transform head /*, Transform lHand, Transform rHand */)
+        public FlowAvatar(Transform head )
         {
             currentAvatarIsMe = true;
             this.Position = head.position; 
             this.Rotation = head.rotation;
-
+        
             idToAvatarMapping.Add(Id, this);
             AttachedGameObject.transform.hasChanged = false;
-
-            // To tell players apart. (We wanted to change Avatar colour. We didnt have time.)
+            // To tell players apart.
             //AttachedGameObject.GetComponent<MeshRenderer>().material.color = UnityEngine.Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f);
-
             MeshRenderer renderer = AttachedGameObject.GetComponent<MeshRenderer>();
             renderer.enabled = false;
             AttachedGameObject.AddComponent<FlowAvatar_Monobehaviour>();
@@ -288,6 +288,7 @@ namespace RealityFlow.Plugin.Scripts
         } 
 
         [JsonConstructor]
+        
         public FlowAvatar(string id, float x, float y, float z, float q_x, float q_y, float q_z, float q_w)
         {
             Id = id;
@@ -306,19 +307,7 @@ namespace RealityFlow.Plugin.Scripts
             else // Create game object if it doesn't exist
             {
                 idToAvatarMapping.Add(Id, this);
-                //AttachedGameObject.name = name;
-                // AttachedGameObject.AddComponent<FlowAvatar_Monobehaviour>();
-                // AttachedGameObject.AddComponent<ObjectManipulator>();
-                // AttachedGameObject.AddComponent<NearInteractionGrabbable>();
                 AttachedGameObject.transform.hasChanged = false;
-                
-                //AttachedGameObject.layer = 9;
-
-                //var monoBehaviour = AttachedGameObject.GetComponent<FlowAvatar_Monobehaviour>();
-                //monoBehaviour.underlyingFlowObject = this;
-                //var ObjectRigidBody = AttachedGameObject.AddComponent<Rigidbody>();
-                //ObjectRigidBody.useGravity = false;
-                //ObjectRigidBody.isKinematic = true;
             }
         }
 
@@ -328,10 +317,8 @@ namespace RealityFlow.Plugin.Scripts
         /// <param name="gameObject">GameObject that the information is to be saved to</param>
         public void SavePropertiesToGameObject(GameObject gameObject)
         {
-            // TODO: add all properties to the conversion
             gameObject.gameObject.transform.position = new Vector3(X, Y, Z);
             gameObject.gameObject.transform.rotation = new Quaternion(Q_x, Q_y, Q_z, Q_w);
-            //gameObject.gameObject.transform.localScale = new Vector3(S_x, S_y, S_z);
         }
 
         /// <summary>
@@ -344,7 +331,6 @@ namespace RealityFlow.Plugin.Scripts
             {
                 newValues.Position = head.transform.position;
                 newValues.Rotation = head.transform.rotation;
-                //PropertyCopier<FlowAvatar, FlowAvatar>.Copy(newValues, this);
                 
                 Operations.UpdateAvatar(newValues, ConfigurationSingleton.SingleInstance.CurrentUser, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) => {/* Debug.Log(e.message);*/ });
                 

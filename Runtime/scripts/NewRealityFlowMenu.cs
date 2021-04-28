@@ -32,6 +32,13 @@ public class NewRealityFlowMenu : MonoBehaviour
     private bool userIsGuest = false;
 
     private string openProjectId;
+    public delegate void VRPhotonJoinHandler(string projectId);
+
+    public delegate void VRPhotonLeaveHandler();
+
+    public static event VRPhotonJoinHandler vrJoinProjectEvent;
+
+    public static event VRPhotonLeaveHandler vrLeaveProjectEvent;
 
     //private Dictionary<EWindowView, ChangeView> _ViewDictionary = new Dictionary<EWindowView, ChangeView>();
 
@@ -174,8 +181,15 @@ public class NewRealityFlowMenu : MonoBehaviour
                     {
                         ConfigurationSingleton.SingleInstance.CurrentProject = e.message.flowProject;
                         // Show GuestProjectHub
+
+
                         
                         guestUserProjectPanel.SetActive(!guestUserProjectPanel.activeInHierarchy);
+                        Transform head = GameObject.Find("Main Camera").transform;
+                        FlowAvatar createAvatar = new FlowAvatar(head);
+                        Operations.CreateAvatar(createAvatar, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, f) => { Debug.Log(f.message); });
+                        vrJoinProjectEvent?.Invoke(ConfigurationSingleton.SingleInstance.CurrentProject.Id);
+                        
                         guestUserHubPanel.SetActive(!guestUserHubPanel.activeInHierarchy);
                     }
                 }
@@ -189,9 +203,43 @@ public class NewRealityFlowMenu : MonoBehaviour
         {
             // TODO: Logic for deleting user after logout
             //FlowUser toDelete = ConfigurationSingleton.SingleInstance.CurrentUser;
+            foreach (FlowTObject obj in FlowTObject.idToGameObjectMapping.Values)
+            {
+                if (obj.CanBeModified == true)
+                {
+                    Operations.CheckinObject(obj.Id, ConfigurationSingleton.SingleInstance.CurrentProject.Id, 
+                                            ConfigurationSingleton.SingleInstance.CurrentUser.Username, (_, e) => { });
+                }
+            }
+            foreach (FlowAvatar avatar in FlowAvatar.idToAvatarMapping.Values)
+            {
+                if (avatar.currentAvatarIsMe == true)
+                {
+                    Operations.DeleteAvatar(avatar.Id,ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) => { });
+                }
+            }
             Operations.DeleteUser(ConfigurationSingleton.SingleInstance.CurrentUser);
 
             userIsGuest = false;
+
+            ConfigurationSingleton.SingleInstance.CurrentProject = null;
+                // Tell Photon to disconnect from the room the user is in.
+                vrLeaveProjectEvent?.Invoke();
+
+                GameObject[] wbList;
+                wbList = GameObject.FindGameObjectsWithTag("Canvas");
+
+                // Clear all whiteboards in the scene.
+                foreach (GameObject wb in wbList)
+                {
+                    GameObject runeTimeGraphObject = GameObject.FindGameObjectWithTag("Canvas").transform.GetChild(2).gameObject;
+                    RealityFlowGraphView rfgv = runeTimeGraphObject.GetComponent<RealityFlowGraphView>();
+                    rfgv.ClearWhiteBoard();
+                }
+
+                FlowTObject.RemoveAllObjectsFromScene();
+                FlowAvatar.RemoveAllAvatarFromScene();
+                FlowVSGraph.RemoveAllGraphsFromScene();
             //window = EWindowView.LOGIN;
             realityFlowMenuPanel.SetActive(!realityFlowMenuPanel.activeInHierarchy);
             guestUserProjectPanel.SetActive(!guestUserProjectPanel.activeInHierarchy);

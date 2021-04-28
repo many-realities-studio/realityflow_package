@@ -136,6 +136,7 @@ namespace Contrib.APIeditor
             var PinnedElements = JsonConvert.SerializeObject(flowVSGraph.pinnedElements, new EnumInputConverter());
 
             // Handeling Self Referencing loop error.
+            // Was never fully implemented
             if(flowVSGraph.exposedParameters.Count == 0){
                 ExposedParameters = JsonConvert.SerializeObject(flowVSGraph.exposedParameters, new EnumInputConverter());
             }else{

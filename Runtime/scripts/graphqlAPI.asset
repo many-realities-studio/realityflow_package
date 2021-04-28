@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1ccf793b7ca1cc645b9cd36d753b8e3c, type: 3}
   m_Name: graphqlAPI
   m_EditorClassIdentifier: 
-  url: https://gql.realityflow.io/
+  url: https://gql.realityflow.io
   queries: []
   mutations:
   - name: CreateBehaviour
@@ -580,8 +580,8 @@ MonoBehaviour:
     isComplete: 1
   - name: UpdateObject
     type: 1
-    query: "mutation UpdateObject{\n    updateObject(  Id :\"3a353be5-90e7-4ce0-8c77-cc8cdc55f286\",
-      projectId :\"f1dd1fb0-932b-4379-b45d-ca567cecfd07\", username :\"f\" ){\n       
+    query: "mutation UpdateObject{\n    updateObject(  Id :\"72f6e682-cdef-48ab-befc-c2eb725be7aa\",
+      projectId :\"cb222668-8e11-404c-b167-b0696834af61\", username :\"owen\" ){\n       
       Id\n    }\n}"
     queryString: updateObject
     returnType: db_object
