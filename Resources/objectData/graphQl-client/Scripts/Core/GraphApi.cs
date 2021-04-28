@@ -95,13 +95,13 @@ namespace GraphQlClient.Core
             jsonChar[0] = ' ';
             jsonChar[jsonChar.Length - 1] = ' ';
             for (int i = 0; i < jsonChar.Length; i++){
-                if (jsonChar[i] == '\"'){
+                if (jsonChar[i] == '\"' && jsonChar[i-1] != '\\'){
                     if (indexes.Count == 2)
                         indexes = new List<int>();
                     indexes.Add(i);
                 }
 
-                if (jsonChar[i] == ':'){
+                if (jsonChar[i] == ':' && indexes.Count == 2){
                     jsonChar[indexes[0]] = ' ';
                     jsonChar[indexes[1]] = ' ';
                 } // "{\"x\":0.0,\"y\":0.0,\"z\":0.0}"
