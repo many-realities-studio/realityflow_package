@@ -6,178 +6,178 @@
 using System.Collections.Generic;
 using UnityEngine;
 using SimpleJSON;
-using Unitym.Collections.Specialized;
+using UnityEngine.Networking;
+using System.Collections.Specialized;
 
 public enum SORT_BY
 {
     RELEVANCE,
-    RELEVANCE,
     LIKES,
     VIEWS,
-    
+    RECENT,
+}
 
 public enum SEARCH_ENDPOINT
 {
     DOWNLOADABLE,
-    DOWNLOADABLE,
     MY_MODELS,
-    
+    STORE_PURCHASES
+}
 
 public class SketchfabModel
 {
     // Model info
-    // Model info
-       public string name;
-       public string author;
-       public string description = "";
-       public int vertexCount = -1;
-       public int faceCount = -1;
-       public string hasAnimation = "";
-       public string hasSkin = null;
-       public JSONNode licenseJson;
-       public string formattedLicenseRequirements;
-       public int archiveSize;
-       public bool isModelAvailable = false;
-    
+    public string uid;
+    public string name;
+    public string author;
+    public string description = "";
+    public int vertexCount = -1;
+    public int faceCount = -1;
+    public string hasAnimation = "";
+    public string hasSkin = null;
+    public JSONNode licenseJson;
+    public string formattedLicenseRequirements;
+    public int archiveSize;
+    public bool isModelAvailable = false;
+
     // Reuse download url while it's still valid
-    // Reuse download url while it's still valid
-       public int urlValidityDuration;
-       public double downloadRequestTime = 0.0f;
-    
-    // Assets
+    public string tempDownloadUrl = "";
+    public int urlValidityDuration;
+    public double downloadRequestTime = 0.0f;
+
     // Assets
     public Texture2D _thumbnail;
     public Texture2D _preview;
-    
+    public string previewUrl;
+
     public bool isFetched = false;
-    
+
     public SketchfabModel(JSONNode node)
-       {
     {
-          }
+        parseFromNode(node);
     }
 
-       {
+    public SketchfabModel(JSONNode node, Texture2D thumbnail = null)
     {
-              if (thumbnail != null)
-              {
+        parseFromNode(node);
+        if (thumbnail != null)
         {
-                     _thumbnail = thumbnail;
+            _thumbnail = thumbnail;
         }
     }
 
-    
+    private void parseFromNode(JSONNode node)
     {
-          {
-              name = node["name"];
-              description = richifyText(node["description"]);
-              author = node["user"]["displayName"];
-              uid = node["uid"];
-              vertexCount = node["vertexCount"].AsInt;
-              faceCount = node["faceCount"].AsInt;
+        name = node["name"];
+        description = richifyText(node["description"]);
+        author = node["user"]["displayName"];
+        uid = node["uid"];
+        vertexCount = node["vertexCount"].AsInt;
+        faceCount = node["faceCount"].AsInt;
+        archiveSize = node["archives"]["gltf"]["size"].AsInt;
     }
 
-    
+    private string richifyText(string text)
     {
-        if {
+        if (text != null)
         {
-                 {
+            text = text.Replace("<br>", "");
         }
 
-        
+        return text;
     }
 
-    
+    public void parseModelData(JSONNode node)
     {
-          {
         isFetched = true;
-        
-              hasAnimation = node["animationCount"].AsInt > 0 ? "Yes" : "No";
+
+        hasAnimation = node["animationCount"].AsInt > 0 ? "Yes" : "No";
         licenseJson = node["license"].AsObject;
-        
+
         formattedLicenseRequirements = licenseJson["requirements"];
-        
+
+        if (formattedLicenseRequirements.Length > 0)
         {
-                 {
-                     formattedLicenseRequirements = licenseJson["requirements"].ToString();
-                     formattedLicenseRequirements = formattedLicenseRequirements.Replace(".", ".\n");
+            formattedLicenseRequirements = licenseJson["requirements"].ToString();
+            formattedLicenseRequirements = formattedLicenseRequirements.Replace(".", ".\n");
+            formattedLicenseRequirements = formattedLicenseRequirements.Replace("\"", " ");
         }
 
-        
-              bool isEditorial = licenseJson["slug"].ToString() == "\"ed\"";
+        bool isEditorial = licenseJson["slug"].ToString() == "\"ed\"";
         bool isStandard = licenseJson["slug"].ToString() == "\"st\"";
+
         // Dirty formatting for Standard/Editorial licenses.
         // There should be a better formatting code if we add more licenses
-              // There should be a better formatting code if we add more licenses
+        if (isEditorial)
         {
-                 {
+            formattedLicenseRequirements = formattedLicenseRequirements.Replace("that", "\n that");
         }
 
-        
+        if (isStandard)
         {
-                 {
-                     formattedLicenseRequirements = formattedLicenseRequirements.Replace(" on ", "\n on ");
+            formattedLicenseRequirements = formattedLicenseRequirements.Replace(" on ", "\n on ");
+            formattedLicenseRequirements = formattedLicenseRequirements.Replace(" and ", "\n and ");
         }
 
-        ;
+        bool isStoreLicense = isStandard || isEditorial;
         // Archive size is not returned by the API on store purchases for now, so in this case we can't
         // rely on it
-              // rely on it;
-           isModelAvailable = archiveSize > 0 || isStoreLicense;
+        isModelAvailable = archiveSize > 0 || isStoreLicense;
     }
 }
 
 public class SketchfabBrowserManager
-    
-    SketchfabImporter _importer;
+{
+    public static string ALL_CATEGORIES = "All";
+    private SketchfabImporter _importer;
     public SketchfabAPI _api;
     private readonly Texture2D _defaultThumbnail;
 
     // _categories
-    Dictionary<string, string> _categories;
+    private Dictionary<string, string> _categories;
 
     // Search
-       // Search
-       private const string INITIAL_SEARCH = "type=models&downloadable=true&staffpicked=true&min_face_count=1&sort_by=-publishedAt";
-       private string _lastQuery;
-       private string _prevCursorUrl = "";
-       private string _nextCursorUrl = "";
+    private const string INITIAL_SEARCH = "type=models&downloadable=true&staffpicked=true&min_face_count=1&sort_by=-publishedAt";
+    private string _lastQuery;
+    private string _prevCursorUrl = "";
+    private string _nextCursorUrl = "";
     public bool _isFetching = false;
+
     //Results
-       //Results
-    readonly int _previewWidth = 512;
-    readonly float _previewRatio = 0.5625f;
-    bool _hasFetchedPreviews = false;
+    private OrderedDictionary _sketchfabModels;
+    private readonly int _previewWidth = 512;
+    private readonly float _previewRatio = 0.5625f;
+    private bool _hasFetchedPreviews = false;
 
     // Callbacks
-    UpdateCallback _refreshCallback.RefreshWindow _importFinish;
+    private UpdateCallback _refreshCallback;
 
     //UnityGLTF.GLTFEditorImporter.ProgressCallback _importProgress;
     //UnityGLTF.GLTFEditorImporter.RefreshWindow _importFinish;
 
-           checkValidity();
+    public SketchfabBrowserManager(UpdateCallback refresh = null, bool initialSearch = true)
     {
-        
-              if (initialSearch)
-              {
-            startInitialSearch();
-              }
+        _defaultThumbnail = Resources.Load<Texture2D>("defaultModel");
+        checkValidity();
+        _refreshCallback = refresh;
+
+        if (initialSearch)
         {
-            
+            startInitialSearch();
         }
     }
 
-    public void setImportProgressCallback(UnityGLTF.GLTFEditorImporter.ProgressCallback callback)
+    public void Update()
     {
-        _importProgress = callback;
-        
+        checkValidity();
+        SketchfabPlugin.Update();
         //_importer.Update();
     }
 
     // Callbacks
-    }
+    public void setRefreshCallback(UpdateCallback callback)
     {
-        
+        _refreshCallback = callback;
     }
 
     /*
@@ -192,163 +192,163 @@ public class SketchfabBrowserManager
 	}
 	*/
 
-           if (_sketchfabModels == null)
+    public void Refresh()
     {
-        _refreshCallback?.Invoke
+        _refreshCallback?.Invoke();
     }
 
     // Manager integrity and reset
-               fetchCategories();
+    private void checkValidity()
     {
-        
-              if (_importer == null)
+        SketchfabPlugin.checkValidity();
+        if (_api == null)
         {
-                     _importer = new SketchfabImporter();
+            _api = SketchfabPlugin.getAPI();
         }
 
-        
+        if (_sketchfabModels == null)
         {
-             {
+            _sketchfabModels = new OrderedDictionary();
         }
 
-        
+        if (_categories == null)
         {
-             private void fetchCategories()
+            fetchCategories();
         }
 
-              SketchfabRequest request = new SketchfabRequest(SketchfabPlugin.Urls.categoryEndpoint);
+        if (_importer == null)
         {
-                 _api.registerRequest(request);
+            _importer = new SketchfabImporter();
         }
     }
 
-       {
+    private void reset()
     {
-              _categories.Clear();
+        _sketchfabModels.Clear();
     }
 
     // Categories
-               _categories.Add(node["name"], node["slug"]);
+    private void fetchCategories()
     {
-              _refreshCallback();
-          }
-        
-          public List<string> getCategories()
+        _categories = new Dictionary<string, string>();
+        SketchfabRequest request = new SketchfabRequest(SketchfabPlugin.Urls.categoryEndpoint);
+        request.setCallback(handleCategories);
+        _api.registerRequest(request);
     }
 
-           foreach (string name in _categories.Keys)
+    private void handleCategories(string result)
     {
-                  categoryNames.Add(name);
-              }
-        
-              return categoryNames;
+        JSONArray _categoriesArray = Utils.JSONParse(result)["results"].AsArray;
+        _categories.Clear();
+        _categories.Add(ALL_CATEGORIES, "");
+        foreach (JSONNode node in _categoriesArray)
         {
-            
+            _categories.Add(node["name"], node["slug"]);
         }
-          public void startInitialSearch()
+        _refreshCallback();
     }
 
-           startSearch();
+    public List<string> getCategories()
     {
-        
-          public string applySearchFilters(string searchQuery, bool staffpicked, bool animated, string categoryName, string licenseSmug, string maxFaceCount, string minFaceCount)
+        List<string> categoryNames = new List<string>();
+        foreach (string name in _categories.Keys)
         {
-                 if (minFaceCount != "")
+            categoryNames.Add(name);
         }
 
         return categoryNames;
     }
 
     //Search
-               searchQuery = searchQuery + "&max_face_count=" + maxFaceCount;
+    public void startInitialSearch()
     {
-        
-              if (staffpicked)
+        _lastQuery = SketchfabPlugin.Urls.searchEndpoint + INITIAL_SEARCH;
+        startSearch();
     }
 
-           if (_categories[categoryName].Length > 0)
+    public string applySearchFilters(string searchQuery, bool staffpicked, bool animated, string categoryName, string licenseSmug, string maxFaceCount, string minFaceCount)
     {
-                  searchQuery = searchQuery + "&categories=" + _categories[categoryName];
+        if (minFaceCount != "")
         {
-            
+            searchQuery = searchQuery + "&min_face_count=" + minFaceCount;
         }
 
-                  searchQuery = searchQuery + "&license=" + licenseSmug;
+        if (maxFaceCount != "")
         {
-            
+            searchQuery = searchQuery + "&max_face_count=" + maxFaceCount;
         }
 
-        
+        if (staffpicked)
         {
             searchQuery += "&staffpicked=true";
         }
-              string searchQuery = "";
+        if (animated)
         {
             searchQuery += "&animated=true";
         }
 
-                      break;
+        if (_categories[categoryName].Length > 0)
         {
             searchQuery = searchQuery + "&categories=" + _categories[categoryName];
         }
 
-                      break;
+        if (licenseSmug.Length > 0)
         {
-                     case SEARCH_ENDPOINT.STORE_PURCHASES:
+            searchQuery = searchQuery + "&license=" + licenseSmug;
         }
 
         return searchQuery;
     }
 
-           }
+    public void search(string query, bool staffpicked, bool animated, string categoryName, string licenseSmug, string maxFaceCount = "", string minFaceCount = "", SEARCH_ENDPOINT endpoint = SEARCH_ENDPOINT.DOWNLOADABLE, SORT_BY sortBy = SORT_BY.RECENT)
     {
-              {
-                  // Apply default filters
-        switch     searchQuery += "type=models&downloadable=true";
+        reset();
+        string searchQuery = "";
+        switch (endpoint)
         {
-            
-                    if (query.Length > 0)
-                    {
-                     if (endpoint != SEARCH_ENDPOINT.STORE_PURCHASES)
-                        {
-                            searchQuery += "&";
-                     }
-                
-                        searchQuery = searchQuery + "q=" + query;
+            case SEARCH_ENDPOINT.DOWNLOADABLE:
+                searchQuery = SketchfabPlugin.Urls.searchEndpoint;
+                break;
+            case SEARCH_ENDPOINT.MY_MODELS:
+                searchQuery = SketchfabPlugin.Urls.ownModelsSearchEndpoint;
+                break;
+            case SEARCH_ENDPOINT.STORE_PURCHASES:
+                searchQuery = SketchfabPlugin.Urls.storePurchasesModelsSearchEndpoint;
+                break;
             default:
                 break;
         }
-        
+        if (endpoint != SEARCH_ENDPOINT.STORE_PURCHASES)
         {
             // Apply default filters
             searchQuery += "type=models&downloadable=true";
         }
 
-                  {
+        if (query.Length > 0)
         {
-                             searchQuery = searchQuery + "&sort_by=" + "-publishedAt";
+            if (endpoint != SEARCH_ENDPOINT.STORE_PURCHASES)
             {
                 searchQuery += "&";
             }
 
-                         case SORT_BY.LIKES:
+            searchQuery = searchQuery + "q=" + query;
         }
 
         // Search filters are not available for store purchases
-                          break;
+        if (endpoint != SEARCH_ENDPOINT.STORE_PURCHASES)
         {
             //searchQuery = applySearchFilters(searchQuery, staffpicked, animated, categoryName, licenseSmug, maxFaceCount, minFaceCount);
-                     }
+            switch (sortBy)
             {
-                
-                       _lastQuery = searchQuery;
-                       Debug.Log(_lastQuery);
-                    startSearch();
-                       _isFetching = true;
-                    
-                
-                    rivate void startSearch(string cursor = "")
-                    
+                case SORT_BY.RECENT:
+                    searchQuery = searchQuery + "&sort_by=" + "-publishedAt";
+                    break;
+                case SORT_BY.VIEWS:
+                    searchQuery = searchQuery + "&sort_by=" + "-viewCount";
+                    break;
+                case SORT_BY.LIKES:
+                    searchQuery = searchQuery + "&sort_by=" + "-likeCount";
+                    break;
                 case SORT_BY.RELEVANCE:
                     break;
                 default:
@@ -356,35 +356,35 @@ public class SketchfabBrowserManager
             }
         }
 
-        _lastQueryoidsearchQuery;
+        _lastQuery = searchQuery;
         Debug.Log(_lastQuery);
         startSearch();
         _isFetching = true;
     }
 
-           SketchfabRequest request = new SketchfabRequest(cursorUrl, SketchfabPlugin.getLogger().getHeader());
+    private void startSearch(string cursor = "")
     {
-              _api.registerRequest(request);
-          }
-        
-          private void handleSearch(string response)
+        _hasFetchedPreviews = false;
+        SketchfabRequest request = new SketchfabRequest(_lastQuery + cursor, SketchfabPlugin.getLogger().getHeader());
+        request.setCallback(handleSearch);
+        _api.registerRequest(request);
     }
 
-           JSONArray array = json["results"].AsArray;
+    private void searchCursor(string cursorUrl)
     {
-              {
-                  return;
-              }
-        
+        _hasFetchedPreviews = false;
+        SketchfabRequest request = new SketchfabRequest(cursorUrl, SketchfabPlugin.getLogger().getHeader());
+        request.setCallback(handleSearch);
+        _api.registerRequest(request);
     }
 
-    
+    private void handleSearch(string response)
     {
-              foreach (JSONNode node in array)
-              {
-                  if (!isInModels(node["uid"]))
+        JSONNode json = Utils.JSONParse(response);
+        JSONArray array = json["results"].AsArray;
+        if (array == null)
         {
-                     {
+            return;
         }
 
         _prevCursorUrl = json["previous"];
@@ -412,92 +412,92 @@ public class SketchfabBrowserManager
         //Refresh();
     }
 
-           if (!hasNextResults())
+    public bool hasNextResults()
     {
-        return   Debug.LogError("No next results");
+        return _nextCursorUrl.Length > 0 && _nextCursorUrl != "null";
     }
 
-           if (_sketchfabModels.Count > 0)
+    public void requestNextResults()
     {
-                  _sketchfabModels.Clear();
+        if (!hasNextResults())
         {
-            
+            Debug.LogError("No next results");
         }
 
-        
+        if (_sketchfabModels.Count > 0)
         {
-            _sketchfabModels.Clean .Length > 0 && _prevCursorUrl != "null";
+            _sketchfabModels.Clear();
         }
 
         searchCursor(_nextCursorUrl);
     }
 
-       public void requestPreviousResults()
+    public bool hasPreviousResults()
     {
-              if (!hasNextResults())
+        return _prevCursorUrl.Length > 0 && _prevCursorUrl != "null";
     }
 
-           }
+    public void requestPreviousResults()
     {
-              if (_sketchfabModels.Count > 0)
+        if (!hasNextResults())
         {
-                     _sketchfabModels.Clear();
+            Debug.LogError("No next results");
         }
 
-              searchCursor(_prevCursorUrl);
+        if (_sketchfabModels.Count > 0)
         {
-            _sketchfabModels.Cleaol
+            _sketchfabModels.Clear();
         }
 
         searchCursor(_prevCursorUrl);
     }
 
-       }
+    public bool hasResults()
     {
-          public OrderedDictionary getResults()
+        return _sketchfabModels.Count > 0;
     }
 
-       }
+    public OrderedDictionary getResults()
     {
         return _sketchfabModels;
     }
 
     // Model data
-           {
+    public void fetchModelPreview()
     {
-                  {
+        if (!_hasFetchedPreviews)
         {
-                         SketchfabRequest request = new SketchfabRequest(model.previewUrl);
+            foreach (SketchfabModel model in _sketchfabModels.Values)
             {
                 // Request model thumbnail
-                        }
-                    }
-                    _hasFetchedPreviews = true;
+                SketchfabRequest request = new SketchfabRequest(model.previewUrl);
+                request.setCallback(handleThumbnail);
+                _api.registerRequest(request);
             }
         }
-          public void fetchModelInfo(string uid)
+        _hasFetchedPreviews = true;
     }
 
-           if (model.licenseJson == null)
+    public void fetchModelInfo(string uid)
     {
-                  SketchfabRequest request = new SketchfabRequest(SketchfabPlugin.Urls.modelEndPoint + "/" + uid);
-                  request.setCallback(handleModelData);
+        SketchfabModel model = _sketchfabModels[uid] as SketchfabModel;
+        if (model.licenseJson == null)
         {
-                 }
-             }
-            
+            SketchfabRequest request = new SketchfabRequest(SketchfabPlugin.Urls.modelEndPoint + "/" + uid);
+            request.setCallback(handleModelData);
+            _api.registerRequest(request);
         }
     }
 
-       }
+    private bool isInModels(string uid)
     {
-          private void handleModelData(string request)
+        return _sketchfabModels.Contains(uid);
     }
 
-           _ = node["uid"];
+    private void handleModelData(string request)
     {
-              {
-        _ = nodea"uid"]l(UnityWebRequest request)
+        JSONNode node = Utils.JSONParse(request);
+        _ = node["uid"];
         if (_sketchfabModels == null || !isInModels(node["uid"]))
         {
             return;
@@ -508,7 +508,7 @@ public class SketchfabBrowserManager
         _sketchfabModels[uid] = model;
     }
 
-    void handleThumbnail(UnityWebRequest request)
+    private void handleThumbnail(UnityWebRequest request)
     {
         bool sRGBBackup = GL.sRGBWrite;
         GL.sRGBWrite = true;
@@ -582,7 +582,7 @@ public class SketchfabBrowserManager
         //Refresh();
     }
 
-    string extractUidFromUrl(string url)
+    private string extractUidFromUrl(string url)
     {
         string[] spl = url.Split('/');
         return spl[4];
@@ -625,7 +625,7 @@ public class SketchfabBrowserManager
 
 
     // Model archive download and import
-       {
+    public void importArchive(byte[] data, string unzipDirectory, string importDirectory, string prefabName, bool addToCurrentScene = false)
     {
         // if (!GLTFUtils.isFolderInProjectDirectory(importDirectory))
         // {
@@ -633,11 +633,12 @@ public class SketchfabBrowserManager
         // 	return;
         // }
 
-              _importer.loadFromBuffer(data);
-          }
+        _importer.configure(importDirectory, prefabName, addToCurrentScene);
+        _importer.loadFromBuffer(data);
     }
 
-    void ImportProgress(UnityGLTF.GLTFEditorImporter.IMPORT_STEP step, int current, int total)
+    /*
+	void ImportProgress(UnityGLTF.GLTFEditorImporter.IMPORT_STEP step, int current, int total)
 	{
 		if (_importProgress != null)
 			_importProgress(step, current, total);

@@ -54,6 +54,8 @@ namespace Packages.realityflow_package.Runtime.scripts
             try
             {
                 websocket = new WebSocketSharp.WebSocket(url);
+                Debug.Log(url);
+                Debug.Log(websocket);
                 //websocket.OnMessage += (sender, e) => Debug.Log("Received message: " + e.Data.ToString());
                 websocket.OnMessage += (sender, e) => ActionOnReceiveMessage(e.Data.ToString());
                 websocket.SetCredentials(username, password, true);
@@ -89,8 +91,12 @@ namespace Packages.realityflow_package.Runtime.scripts
             try
             {
                 Debug.Log("Sending message: " + sentMessage);
+                if(websocket == null) {
+                  Debug.Log("Error: Websocket doesn't exist");
+                } else {
 
                 websocket.Send(sentMessage);
+                }
             }
             catch (Exception e)
             {
