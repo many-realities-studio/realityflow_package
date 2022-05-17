@@ -35,6 +35,9 @@ namespace RealityFlow.Plugin.Scripts
                 if (_AttachedGameObject == null)
                 {
                     // The game object already exists
+                    if(Id == null) {
+                      return null;
+                    }
                     if (idToAvatarMapping.ContainsKey(Id))
                     {
                         if (idToAvatarMapping[Id]._AttachedGameObject == null)
@@ -279,7 +282,7 @@ namespace RealityFlow.Plugin.Scripts
             MeshRenderer renderer = AttachedGameObject.GetComponent<MeshRenderer>();
             renderer.enabled = false;
             AttachedGameObject.AddComponent<FlowAvatar_Monobehaviour>();
-
+            
             FlowAvatar_Monobehaviour monoBehaviour = AttachedGameObject.GetComponent<FlowAvatar_Monobehaviour>();
             monoBehaviour.underlyingFlowAvatar = this;
             monoBehaviour.head = head.gameObject;
