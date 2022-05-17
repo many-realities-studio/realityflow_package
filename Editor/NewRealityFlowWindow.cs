@@ -19,7 +19,8 @@ using GraphProcessor;
 public class FlowNetworkManagerEditor : EditorWindow
 {
     //private string _Url = "ws://plato.mrl.ai:8999";
-    private string _Url = "wss://api.realityflow.io";
+    // private string _Url = "wss://api.realityflow.io";
+    private string _Url = "ws://localhost:8999";
     private const string Url = "ws://a73c9fa8.ngrok.io";
 
     // View parameters
@@ -31,9 +32,9 @@ public class FlowNetworkManagerEditor : EditorWindow
     private GUISkin skin;
     private Color headerSectionColor = new Color(13f / 255f, 32f / 255f, 44f / 255f, 1f);
     private Color bodySectionColor = new Color(150 / 255f, 150 / 255f, 150 / 255f, 1f);
-    private string uName;
+    private string uName = "user";
     private string graphName;
-    private string pWord;
+    private string pWord = "pass";
     private string tempUName;
     private string tempPWord;
     private EWindowView window = EWindowView.LOGIN;
@@ -304,7 +305,7 @@ public class FlowNetworkManagerEditor : EditorWindow
         if (GUILayout.Button("Log in", GUILayout.Height(40)))
         {
             // Send login event to the server
-            ConfigurationSingleton.SingleInstance.CurrentUser = new FlowUser(uName, pWord);
+            ConfigurationSingleton.SetConfigurationSingletonUser(new FlowUser(uName, pWord));
             Operations.Login(ConfigurationSingleton.SingleInstance.CurrentUser, _Url, (_, e) =>
             {
                 Debug.Log("login callback: " + e.message.WasSuccessful.ToString());
@@ -570,8 +571,10 @@ public class FlowNetworkManagerEditor : EditorWindow
         }
 
         EditorGUILayout.EndHorizontal();
+        if(ConfigurationSingleton.SingleInstance.CurrentProject != null) {
 
-        EditorGUILayout.TextArea("Project code: " + ConfigurationSingleton.SingleInstance.CurrentProject.Id);
+            EditorGUILayout.TextArea("Project code: " + ConfigurationSingleton.SingleInstance.CurrentProject.Id);
+        }
 
         // Create "Delete This Project" Button and define onClick action
         if (GUILayout.Button("Delete This Project", GUILayout.Height(40)))

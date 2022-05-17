@@ -22,7 +22,7 @@ namespace RealityFlow.Plugin.Scripts
         private string _description;
 
         [SerializeField]
-        private int _dateModified;
+        private long _dateModified;
 
         [SerializeField]
         private string _projectName;
@@ -40,7 +40,7 @@ namespace RealityFlow.Plugin.Scripts
         public string Description { get => _description; set => _description = value; } // Description of the project
 
         [JsonProperty("DateModified")]
-        public int DateModified { get => _dateModified; set => _dateModified = value; } // The last time this project was modified
+        public long DateModified { get => _dateModified; set => _dateModified = value; } // The last time this project was modified
 
         [JsonProperty("ProjectName")]
         public string ProjectName { get => _projectName; set => _projectName = value; } // Name of the project
@@ -54,7 +54,7 @@ namespace RealityFlow.Plugin.Scripts
         [JsonProperty("_BehaviourList")]
         public List<FlowBehaviour> behaviourList { get; set; }
 
-        public FlowProject(string flowId, string description, int dateModified, string projectName)
+        public FlowProject(string flowId, string description, long dateModified, string projectName)
         {
             Id = flowId;
             Description = description;
