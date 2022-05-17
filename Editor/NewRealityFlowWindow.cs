@@ -305,12 +305,12 @@ public class FlowNetworkManagerEditor : EditorWindow
         if (GUILayout.Button("Log in", GUILayout.Height(40)))
         {
             // Send login event to the server
-            ConfigurationSingleton.SetConfigurationSingletonUser(new FlowUser(uName, pWord));
             Operations.Login(ConfigurationSingleton.SingleInstance.CurrentUser, _Url, (_, e) =>
             {
                 Debug.Log("login callback: " + e.message.WasSuccessful.ToString());
                 if (e.message.WasSuccessful == true)
                 {
+            ConfigurationSingleton.SetConfigurationSingletonUser(new FlowUser(uName, pWord));
                     Operations.GetAllUserProjects(ConfigurationSingleton.SingleInstance.CurrentUser, (__, _e) =>
                     {
                         _ProjectList = _e.message.Projects;
