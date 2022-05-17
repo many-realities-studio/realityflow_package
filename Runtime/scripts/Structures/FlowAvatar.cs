@@ -334,7 +334,7 @@ namespace RealityFlow.Plugin.Scripts
             {
                 newValues.Position = head.transform.position;
                 newValues.Rotation = head.transform.rotation;
-                
+                // Debug.Log(ConfigurationSingleton.SingleInstance.CurrentProject);
                 Operations.UpdateAvatar(newValues, ConfigurationSingleton.SingleInstance.CurrentUser, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) => {/* Debug.Log(e.message);*/ });
                 
                 // newValues.Position = Vector3.zero;
