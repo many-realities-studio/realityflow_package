@@ -1,7 +1,8 @@
-﻿using Microsoft.MixedReality.Toolkit.UI;
+﻿using System;
+using System.Linq;
+using Microsoft.MixedReality.Toolkit.UI;
 using Microsoft.MixedReality.Toolkit.Utilities;
 using RealityFlow.Plugin.Scripts;
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -32,6 +33,12 @@ namespace Behaviours
         public string GetGuid()
         {
             return objectId;
+        }
+        
+        
+        public List<FlowBehaviour> GetAllInteractableEvents()
+        {
+            return interactableEvents.Keys.ToList();
         }
 
         #endregion Monobehaviour Methods
