@@ -59,7 +59,7 @@ namespace Contrib.APIeditor
                                     S_z = flowObject.S_z, R = flowObject.R, G = flowObject.G, B = flowObject.B, A = flowObject.A, Prefab = flowObject.Prefab, projectId = _projectId});
             
             //Performs Post request to Apollo server
-            UnityWebRequest request = await graphql_Var.graphql_api.Post(CreateObject);  
+            UnityWebRequest request = await graphql_Var.graphql_api.Post(CreateObject);
         }
 
         public async Task<string> UpdateObject(string objectId, string _projectId, string _username)

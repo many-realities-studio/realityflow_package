@@ -12,7 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1ccf793b7ca1cc645b9cd36d753b8e3c, type: 3}
   m_Name: graphqlAPI
   m_EditorClassIdentifier: 
-  url: http://localhost:4000
+
+  url: https://gql.realityflow.io
+
   queries: []
   mutations:
   - name: CreateBehaviour

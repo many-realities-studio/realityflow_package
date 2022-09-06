@@ -389,6 +389,7 @@ namespace Packages.realityflow_package.Runtime.scripts
         {
             // CheckIn will be called updateObject for GraphQL operations
             // TODO: I had to check this out as it was not working properly and we needed to merge, be sure to fix this functionality.
+
             graphqlClient_Editor updateObject = ScriptableObject.CreateInstance<graphqlClient_Editor>();
             string checkedIn = await updateObject.UpdateObject(objectID, projectID, username);
             if(checkedIn != null){
