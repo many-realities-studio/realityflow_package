@@ -1,9 +1,11 @@
-﻿using Microsoft.MixedReality.Toolkit.UI;
-using Microsoft.MixedReality.Toolkit.Utilities;
+﻿//using Microsoft.MixedReality.Toolkit.UI;
+//using Microsoft.MixedReality.Toolkit.Utilities;
 using RealityFlow.Plugin.Scripts;
+using GraphProcessor;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using RealityFlow.Plugin.Contrib;
 
 namespace Behaviours
 {
@@ -36,6 +38,7 @@ namespace Behaviours
         {
             // Add the behaviour to the list of behaviours
             BehaviourList[flowBehaviour.Id] = flowBehaviour;
+            PreviousBehaviourId = flowBehaviour.Id;
 
             // Make both objects interactable
             ObjectIsInteractable oIsIFirst = FindAndMakeInteractable(flowBehaviour.TriggerObjectId);

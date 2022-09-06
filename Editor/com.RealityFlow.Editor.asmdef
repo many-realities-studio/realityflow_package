@@ -1,11 +1,11 @@
 {
     "name": "com.RealityFlow.Editor",
+    "rootNamespace": "",
     "references": [
-        "RealityFlowScripts",
-        "RealityFlowObjectData",
         "com.RealityFlow.Resources",
         "com.RealityFlow",
-        "Microsoft.MixedReality.Toolkit.Editor.Utilities"
+        "com.alelievr.NodeGraphProcessor.Runtime",
+        "com.RealityFlow.Contrib.MRTK"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

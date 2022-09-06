@@ -4,6 +4,7 @@ using Packages.realityflow_package.Runtime.scripts.Structures.Actions;
 using RealityFlow.Plugin.Editor;
 using RealityFlow.Plugin.Scripts;
 using System;
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
@@ -11,11 +12,14 @@ using System.IO;
 using UnityEditor;
 using UnityEngine;
 
+using Newtonsoft.Json;
+using GraphProcessor;
+
 [CustomEditor(typeof(FlowWebsocket))]
 public class FlowNetworkManagerEditor : EditorWindow
 {
     //private string _Url = "ws://plato.mrl.ai:8999";
-    private string _Url = "ws://localhost:8999";
+    private string _Url = "wss://api.realityflow.io";
     private const string Url = "ws://a73c9fa8.ngrok.io";
 
     // View parameters
@@ -27,11 +31,15 @@ public class FlowNetworkManagerEditor : EditorWindow
     private GUISkin skin;
     private Color headerSectionColor = new Color(13f / 255f, 32f / 255f, 44f / 255f, 1f);
     private Color bodySectionColor = new Color(150 / 255f, 150 / 255f, 150 / 255f, 1f);
-    private string uName;
-    private string pWord;
+    private string uName = "user";
+    private string graphName;
+    private string pWord = "pass";
+    private string tempUName;
+    private string tempPWord;
     private EWindowView window = EWindowView.LOGIN;
     private string projectName;
     private string userToInvite;
+    private bool userIsGuest = false;
 
     private Dictionary<EWindowView, ChangeView> _ViewDictionary = new Dictionary<EWindowView, ChangeView>();
 
@@ -62,6 +70,16 @@ public class FlowNetworkManagerEditor : EditorWindow
 
     public Boolean showAllOptions = false;
 
+    // The below delegates and events handle letting Photon know when to connect and disconnect users from rooms, as well as what room to connect to.
+
+    public delegate void PhotonJoinHandler(string vsGraphId);
+
+    public delegate void PhotonLeaveHandler();
+
+    public static event PhotonJoinHandler joinProjectEvent;
+
+    public static event PhotonLeaveHandler leaveProjectEvent;
+
     private enum EWindowView
     {
         LOGIN = 0,
@@ -79,7 +97,11 @@ public class FlowNetworkManagerEditor : EditorWindow
         CREATE_ENABLE = 12,
         CREATE_DISABLE = 13,
         DELETE_BEHAVIOUR = 14,
-        DELETE_PROJECT_CONFIRMATION = 15
+        DELETE_PROJECT_CONFIRMATION = 15,
+        DELETE_VSGRAPH = 16,
+        GUESTUSER_HUB = 17,
+        GUESTPROJECT_HUB = 18,
+        GUEST_CONFIRM_LOGIN = 19
     }
 
     // Add menu named "My Window" to the Window menu
@@ -108,7 +130,7 @@ public class FlowNetworkManagerEditor : EditorWindow
         _ViewDictionary.Add(EWindowView.LOAD_PROJECT, _CreateLoadProjectView);
         _ViewDictionary.Add(EWindowView.DELETE_PROJECT_CONFIRMATION, _CreateDeleteProjectConfirmationView);
         _ViewDictionary.Add(EWindowView.PROJECT_CREATION, _CreateProjectCreationView);
-        _ViewDictionary.Add(EWindowView.INVITE_USER, _CreateInviteUserView); // not implementec
+        _ViewDictionary.Add(EWindowView.INVITE_USER, _CreateInviteUserView); // not implemented
         _ViewDictionary.Add(EWindowView.PROJECT_IMPORT, _CreateProjectImportView);
         _ViewDictionary.Add(EWindowView.CREATE_BEHAVIOUR, _CreateBehaviourView);
         _ViewDictionary.Add(EWindowView.CREATE_TELEPORT, _CreateTeleportView);
@@ -117,6 +139,10 @@ public class FlowNetworkManagerEditor : EditorWindow
         _ViewDictionary.Add(EWindowView.CREATE_DISABLE, _CreateDisableView);
         _ViewDictionary.Add(EWindowView.CREATE_SNAPZONE, _CreateSnapZoneView);
         _ViewDictionary.Add(EWindowView.DELETE_BEHAVIOUR, _DeleteBehaviourView);
+        _ViewDictionary.Add(EWindowView.DELETE_VSGRAPH, _CreateDeleteVSGraphView);
+        _ViewDictionary.Add(EWindowView.GUESTUSER_HUB, _CreateGuestUserHubView);
+        _ViewDictionary.Add(EWindowView.GUESTPROJECT_HUB, _CreateGuestProjectHubView);
+        _ViewDictionary.Add(EWindowView.GUEST_CONFIRM_LOGIN, _CreateGuestConfirmLoginView);
     }
 
     public void OnGUI()
@@ -126,9 +152,44 @@ public class FlowNetworkManagerEditor : EditorWindow
 
     private void OnDestroy()
     {
-        Operations.Logout(ConfigurationSingleton.SingleInstance.CurrentUser);
+        // Check in all objects
+        foreach (FlowTObject obj in FlowTObject.idToGameObjectMapping.Values)
+        {
+            if (obj.CanBeModified == true)
+            {
+                Operations.CheckinObject(obj.Id, ConfigurationSingleton.SingleInstance.CurrentProject.Id, 
+                                        ConfigurationSingleton.SingleInstance.CurrentUser.Username, (_, e) => { });
+            }
+        }
 
+        // Invoke event to tell Photon to disconnect from the room.
+        leaveProjectEvent?.Invoke();
+
+        // Guest users are deleted when they log out.
+        if (userIsGuest)
+        {
+            Operations.DeleteUser(new FlowUser(tempUName, tempPWord));
+        }
+        else
+        {
+            Operations.Logout(ConfigurationSingleton.SingleInstance.CurrentUser);
+        }
+
+        GameObject[] wbList;
+        wbList = GameObject.FindGameObjectsWithTag("Canvas");
+
+        // Clear all whiteboards in the scene when a user closes the RF window.
+        foreach (GameObject wb in wbList)
+        {
+            GameObject runeTimeGraphObject = GameObject.FindGameObjectWithTag("Canvas").transform.GetChild(2).gameObject;
+            RealityFlowGraphView rfgv = runeTimeGraphObject.GetComponent<RealityFlowGraphView>();
+            rfgv.ClearWhiteBoard();
+        }
+
+        // Clear the entire scene.
         FlowTObject.RemoveAllObjectsFromScene();
+        FlowAvatar.RemoveAllAvatarFromScene();
+        FlowVSGraph.RemoveAllGraphsFromScene();
         ConfigurationSingleton.SingleInstance.CurrentProject = null;
         ConfigurationSingleton.SingleInstance.CurrentUser = null;
     }
@@ -165,7 +226,8 @@ public class FlowNetworkManagerEditor : EditorWindow
             {
                 if (obj.CanBeModified == true)
                 {
-                    Operations.CheckinObject(obj.Id, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) => { });
+                    Operations.CheckinObject(obj.Id, ConfigurationSingleton.SingleInstance.CurrentProject.Id, 
+                                             ConfigurationSingleton.SingleInstance.CurrentUser.Username, (_, e) => { });
                 }
             }
 
@@ -242,12 +304,12 @@ public class FlowNetworkManagerEditor : EditorWindow
         if (GUILayout.Button("Log in", GUILayout.Height(40)))
         {
             // Send login event to the server
-            ConfigurationSingleton.SingleInstance.CurrentUser = new FlowUser(uName, pWord);
             Operations.Login(ConfigurationSingleton.SingleInstance.CurrentUser, _Url, (_, e) =>
             {
                 Debug.Log("login callback: " + e.message.WasSuccessful.ToString());
                 if (e.message.WasSuccessful == true)
                 {
+            ConfigurationSingleton.SetConfigurationSingletonUser(new FlowUser(uName, pWord));
                     Operations.GetAllUserProjects(ConfigurationSingleton.SingleInstance.CurrentUser, (__, _e) =>
                     {
                         _ProjectList = _e.message.Projects;
@@ -268,6 +330,33 @@ public class FlowNetworkManagerEditor : EditorWindow
             Operations.Register(uName, pWord, _Url, (sender, e) => { Debug.Log(e.message); });
         }
 
+        // Create "Log in as guest user" Button and define onClick action
+        if (GUILayout.Button("Log in as guest user", GUILayout.Height(30)))
+        {
+            var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+            var uNameString = new char[8];
+            var pWordString = new char[8];
+
+            var rand = new System.Random();
+            
+            for (int i = 0; i < uNameString.Length; i++)
+            {
+                uNameString[i] = chars[rand.Next(chars.Length)];
+                pWordString[i] = chars[rand.Next(chars.Length)];
+            }
+
+            tempUName = ("Guest-" + new string(uNameString));
+            tempPWord = (new string(pWordString));
+
+            Debug.Log("Generated username: " + tempUName);
+            Debug.Log("Generated password: " + tempPWord);
+
+            Operations.Register(tempUName, tempPWord, _Url, (sender, e) => { Debug.Log(e.message); });
+
+            userIsGuest = true;
+            window = EWindowView.GUEST_CONFIRM_LOGIN;
+        }
+
         // Create "Import" Button and define onClick action
         if (GUILayout.Button("Import", GUILayout.Height(20)))
         {
@@ -275,6 +364,8 @@ public class FlowNetworkManagerEditor : EditorWindow
             window = EWindowView.PROJECT_IMPORT;
         }
     }
+
+
 
     private void _CreateUserHubView()
     {
@@ -290,14 +381,8 @@ public class FlowNetworkManagerEditor : EditorWindow
         {
             // Send the user to the load project screen
             window = EWindowView.LOAD_PROJECT;
+            
         }
-
-        // // Create "Delete Project" Button and define onClick action
-        // if (GUILayout.Button("Delete Project", GUILayout.Height(40)))
-        // {
-        //     // Send the user to the load project screen
-        //     window = EWindowView.DELETE_PROJECT;
-        // }
 
         EditorGUILayout.BeginHorizontal();
 
@@ -311,8 +396,89 @@ public class FlowNetworkManagerEditor : EditorWindow
                     Debug.Log(e.message);
                     if (e.message.WasSuccessful == true)
                     {
+                        // Creating a users avatar upone opening a project
                         ConfigurationSingleton.SingleInstance.CurrentProject = e.message.flowProject;
+                        Transform head = GameObject.Find("Main Camera").transform;
+                        FlowAvatar createAvatar = new FlowAvatar(head);
+                        Operations.CreateAvatar(createAvatar, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, f) => { Debug.Log(f.message); });
+                        joinProjectEvent?.Invoke(ConfigurationSingleton.SingleInstance.CurrentProject.Id);
                         window = EWindowView.PROJECT_HUB;
+                    }
+                }
+            });
+
+        }
+        EditorGUILayout.EndHorizontal();
+
+        // Create "Logout" Button and define onClick action
+        if (GUILayout.Button("Logout", GUILayout.Height(20)))
+        {
+            
+            // Send logout event to the server
+            if (ConfigurationSingleton.SingleInstance.CurrentUser != null)
+            {
+                Operations.Logout(ConfigurationSingleton.SingleInstance.CurrentUser);
+                window = EWindowView.LOGIN;
+            }
+        }
+    }
+
+    // This additional window exists to allow the register operation to finish first before having the user login for stability.
+    private void _CreateGuestConfirmLoginView()
+    {
+        GUILayout.Label("A guest account has been generated. Please proceed to the guest hub.");
+
+        EditorGUILayout.BeginHorizontal();
+        if (GUILayout.Button("Continue", GUILayout.Height(20)))
+        {
+            // Send the user to the Guest User Hub screen by logging them into their guest account
+            ConfigurationSingleton.SingleInstance.CurrentUser = new FlowUser(tempUName, tempPWord);
+            Operations.Login(ConfigurationSingleton.SingleInstance.CurrentUser, _Url, (_, e) =>
+            {
+                Debug.Log("login callback: " + e.message.WasSuccessful.ToString());
+                if (e.message.WasSuccessful == true)
+                {
+                    Operations.GetAllUserProjects(ConfigurationSingleton.SingleInstance.CurrentUser, (__, _e) =>
+                    {
+                        // Project list should be empty, not sure if this is necessary.
+                        _ProjectList = _e.message.Projects;
+                        window = EWindowView.GUESTUSER_HUB;
+                    });
+                }
+                else
+                {
+                    //Operations.DeleteUser(new FlowUser(tempUName, tempPWord));
+                    ConfigurationSingleton.SingleInstance.CurrentUser = null;
+                }
+            });
+        }
+        EditorGUILayout.EndHorizontal();
+    }
+
+    // A guest user can only join a project, not create one, as their account will be deleted when they log out.
+    private void _CreateGuestUserHubView()
+    {
+        EditorGUILayout.BeginHorizontal();
+
+        openProjectId = EditorGUILayout.TextField(openProjectId);
+        if (GUILayout.Button("Join project"))
+        {
+            
+            Operations.OpenProject(openProjectId, ConfigurationSingleton.SingleInstance.CurrentUser, (_, e) =>
+            {
+                if (e.message.WasSuccessful == true)
+                {
+                    // Creating a users avatar upone jining a project
+                    ConfigurationSingleton.SingleInstance.CurrentProject = e.message.flowProject;
+                    Transform head = GameObject.Find("Main Camera").transform;
+                    FlowAvatar createAvatar = new FlowAvatar(head);
+                    Operations.CreateAvatar(createAvatar, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, f) => { Debug.Log(f.message); });
+                    Debug.Log(e.message);
+                    if (e.message.WasSuccessful == true)
+                    {
+                        // ConfigurationSingleton.SingleInstance.CurrentProject = e.message.flowProject;
+                        joinProjectEvent?.Invoke(ConfigurationSingleton.SingleInstance.CurrentProject.Id);
+                        window = EWindowView.GUESTPROJECT_HUB;
                     }
                 }
             });
@@ -325,7 +491,9 @@ public class FlowNetworkManagerEditor : EditorWindow
             // Send logout event to the server
             if (ConfigurationSingleton.SingleInstance.CurrentUser != null)
             {
-                Operations.Logout(ConfigurationSingleton.SingleInstance.CurrentUser);
+                Operations.DeleteUser(ConfigurationSingleton.SingleInstance.CurrentUser);
+
+                userIsGuest = false;
                 window = EWindowView.LOGIN;
             }
         }
@@ -387,7 +555,25 @@ public class FlowNetworkManagerEditor : EditorWindow
 
         EditorGUILayout.EndHorizontal();
 
-        EditorGUILayout.TextArea("Project code: " + ConfigurationSingleton.SingleInstance.CurrentProject.Id);
+        EditorGUILayout.BeginHorizontal();
+
+        // Create "Create Visual Scripting Graph" Button and define onClick action
+        if (GUILayout.Button("Create Visual Scripting Graph", GUILayout.Height(40)))
+        {
+            VSGraphSettings.OpenWindow();;
+        }
+
+        // Create "Delete Visual Scripting Graph" Button and define onClick action
+        if (GUILayout.Button("Delete Visual Scripting Graph", GUILayout.Height(40)))
+        {
+            window = EWindowView.DELETE_VSGRAPH;
+        }
+
+        EditorGUILayout.EndHorizontal();
+        if(ConfigurationSingleton.SingleInstance.CurrentProject != null) {
+
+            EditorGUILayout.TextArea("Project code: " + ConfigurationSingleton.SingleInstance.CurrentProject.Id);
+        }
 
         // Create "Delete This Project" Button and define onClick action
         if (GUILayout.Button("Delete This Project", GUILayout.Height(40)))
@@ -395,6 +581,135 @@ public class FlowNetworkManagerEditor : EditorWindow
             // Send user to Delete Project screen
             window = EWindowView.DELETE_PROJECT_CONFIRMATION;
         }
+
+        // Button to print all graphs in the dictionary for debugging purposes. This button will attempt to print graph nodes, edges, exposed parameters,
+        // and the serialized graph itself, which is useful if you want to see information about graphs that currently exist in a scene.
+        // if (GUILayout.Button("Print all graphs in the idToVSGraphMapping dictionary", GUILayout.Height(40)))
+        // {
+        //     foreach (FlowVSGraph graph in FlowVSGraph.idToVSGraphMapping.Values)
+        //     {
+        //         Debug.Log("Using JsonUtility: " + JsonUtility.ToJson(graph));
+        //         try
+        //         {
+        //             string NewtonGraph = JsonConvert.SerializeObject(graph, new JsonSerializerSettings()
+        //             {
+        //                 PreserveReferencesHandling = PreserveReferencesHandling.Objects,
+        //                 ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+        //             });
+        //             Debug.Log("Using NewtonSoft: " + NewtonGraph);
+        //         }
+        //         catch (Exception e)
+        //         {
+        //             Debug.LogWarning(e);
+        //         }
+
+        //         Debug.Log("serializedNodes as list:");
+        //         foreach (var serializedNode in graph.serializedNodes.ToList())
+        //         {
+        //             Debug.Log(serializedNode);
+        //         }
+        //         Debug.Log("Edges as list:");
+        //         foreach (var edge in graph.edges.ToList())
+		// 	    {
+        //             Debug.Log(edge);
+        //         }
+        //         Debug.Log("ExposedParameters list:");
+        //         foreach (var exparam in graph.exposedParameters.ToList())
+		// 	    {
+        //             Debug.Log(exparam);
+        //         }
+
+        //         Debug.Log("ExposedParameters as themselves serialized");
+        //         foreach (ExposedParameter exparam in graph.exposedParameters)
+        //         {
+        //             Debug.Log("serialized value of exposed parameter: " + exparam.serializedValue.value.ToString());
+        //             try
+        //             {
+        //                 Debug.Log("JsonUtility serialized version of exposed parameter: " + JsonUtility.ToJson(exparam));
+        //             }
+        //             catch (Exception e)
+        //             {
+        //                 Debug.LogWarning(e);
+        //             }
+        //         }
+        //     }
+        // }
+    }
+
+    // Guest users cannot delete a project or share an invite code as they are temporary users, but all other functionality is like normal users.
+    private void _CreateGuestProjectHubView()
+    {
+        // Create "Exit Project" Button and define onClick action
+        if (GUILayout.Button("Exit Project", GUILayout.Height(20)))
+        {
+            ExitProject(); // Deletes all local instances of the objects and restores the projectID to default value
+
+            // Send the user to the User Hub screen
+            window = EWindowView.GUESTUSER_HUB;
+        }
+
+        // Create "Create new object" Button and define onClick action
+        if (GUILayout.Button("Create new Object", GUILayout.Height(40)))
+        {
+            // Opens a new window/unity utility tab to create an object
+            ObjectSettings.OpenWindow();
+        }
+
+        // Create "Delete an object" Button and define onClick action
+        if (GUILayout.Button("Delete an Object", GUILayout.Height(40)))
+        {
+            // Send user to Delete Object screen
+            window = EWindowView.DELETE_OBJECT;
+        }
+
+        EditorGUILayout.BeginHorizontal();
+
+        if (GUILayout.Button("Add Interaction", GUILayout.Height(40)))
+        {
+            BehaviourEventManager.PreviousBehaviourId = null;
+
+            objectNames.Clear();
+            objectIds.Clear();
+
+            Dictionary<string, FlowTObject>.ValueCollection values = FlowTObject.idToGameObjectMapping.Values;
+
+            foreach (FlowTObject obj in values)
+            {
+                objectNames.Add(obj.Name);
+                objectIds.Add(obj.Id);
+            }
+
+            objectOptions = (string[])objectNames.ToArray(typeof(string));
+
+            // Send user to Create Behaviour Screen
+            addingChain = false;
+            window = EWindowView.CREATE_BEHAVIOUR;
+        }
+
+        if (GUILayout.Button("Delete Interaction", GUILayout.Height(40)))
+        {
+            window = EWindowView.DELETE_BEHAVIOUR;
+        }
+
+        EditorGUILayout.EndHorizontal();
+
+        EditorGUILayout.BeginHorizontal();
+
+        // Create "Create Visual Scripting Graph" Button and define onClick action
+        if (GUILayout.Button("Create Visual Scripting Graph", GUILayout.Height(40)))
+        {
+            VSGraphSettings.OpenWindow();;
+        }
+
+        // Create "Delete Visual Scripting Graph" Button and define onClick action
+        if (GUILayout.Button("Delete Visual Scripting Graph", GUILayout.Height(40)))
+        {
+            window = EWindowView.DELETE_VSGRAPH;
+        }
+
+        EditorGUILayout.EndHorizontal();
+
+        // As user is a guest, I feel like they shouldn't be able to get a code to invite other users without owner's consent
     }
 
     private void _CreateDeleteObjectView()
@@ -404,7 +719,14 @@ public class FlowNetworkManagerEditor : EditorWindow
         if (GUILayout.Button("Back", GUILayout.Height(20)))
         {
             // Send the user to the Project Hub screen
-            window = EWindowView.PROJECT_HUB;
+            if (userIsGuest)
+            {
+                window = EWindowView.GUESTPROJECT_HUB;
+            }
+            else
+            {
+                window = EWindowView.PROJECT_HUB;
+            }
         }
         EditorGUILayout.EndHorizontal();
 
@@ -444,6 +766,17 @@ public class FlowNetworkManagerEditor : EditorWindow
                         if (e.message.WasSuccessful == true)
                         {
                             ConfigurationSingleton.SingleInstance.CurrentProject = e.message.flowProject;
+                            joinProjectEvent?.Invoke(ConfigurationSingleton.SingleInstance.CurrentProject.Id);
+                            // JohnLynch
+                            Transform head = GameObject.Find("Main Camera").transform;
+                            // Transform lHand = 
+                            // Transform rHand = 
+                            FlowAvatar createAvatar = new FlowAvatar(head);
+                            // Operations.CreateAvatar(createAvatar, eventArgs.message.flowProject.Id);
+                            Operations.CreateAvatar(createAvatar, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, f) => { Debug.Log(f.message); });
+                            Debug.Log(e.message);
+                            Debug.Log("Avatar has been seen!");
+                            
                             window = EWindowView.PROJECT_HUB;
                         }
                     });
@@ -452,33 +785,30 @@ public class FlowNetworkManagerEditor : EditorWindow
         }
     }
 
-    // Currently not used
-    private void _CreateDeleteProjectView()
+    private void _CreateDeleteVSGraphView()
     {
         // Create "Back" Button and define onClick action
         EditorGUILayout.BeginHorizontal();
         if (GUILayout.Button("Back", GUILayout.Height(20)))
         {
-            // Send the user to the User Hub screen
-            window = EWindowView.USER_HUB;
+            // Send the user to the Project Hub screen
+            if (userIsGuest)
+            {
+                window = EWindowView.GUESTPROJECT_HUB;
+            }
+            else
+            {
+                window = EWindowView.PROJECT_HUB;
+            }
         }
         EditorGUILayout.EndHorizontal();
 
-        if (_ProjectList != null)
+        // TODO: This info is likely incorrect for graphs, needs to be thought about
+        foreach (FlowVSGraph currentFlowVSGraph in FlowVSGraph.idToVSGraphMapping.Values)
         {
-            foreach (FlowProject project in _ProjectList)
+            if (GUILayout.Button(currentFlowVSGraph.Name, GUILayout.Height(30)))
             {
-                if (GUILayout.Button(project.ProjectName, GUILayout.Height(30)))
-                {
-                    Operations.DeleteProject(project, ConfigurationSingleton.SingleInstance.CurrentUser, (_, e) =>
-                    {
-                        Debug.Log(e.message);
-                        if (e.message.WasSuccessful == true)
-                        {
-                            window = EWindowView.USER_HUB;
-                        }
-                    });
-                }
+                Operations.DeleteVSGraph(currentFlowVSGraph.Id, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) => { Debug.Log("Deleted VSGraph " + e.message); });
             }
         }
     }
@@ -489,20 +819,51 @@ public class FlowNetworkManagerEditor : EditorWindow
         // Create "Confirm Project Deletion" Button and define onClick action
         if (GUILayout.Button("Confirm Project Deletion", GUILayout.Height(40)))
         {
-            Operations.DeleteProject(ConfigurationSingleton.SingleInstance.CurrentProject, ConfigurationSingleton.SingleInstance.CurrentUser, (_, e) =>
-            {
-                Debug.Log(e.message);
-                if (e.message.WasSuccessful == true)
-                {
-                    window = EWindowView.USER_HUB;
-                    ConfigurationSingleton.SingleInstance.CurrentProject = null;
-                }
-            });
+            DeleteProject();
+
+            window = EWindowView.USER_HUB;
         }
         if (GUILayout.Button("Cancel", GUILayout.Height(40)))
         {
             window = EWindowView.PROJECT_HUB;
         }
+    }
+
+    private void DeleteProject()
+    {
+        Operations.DeleteProject(ConfigurationSingleton.SingleInstance.CurrentProject, ConfigurationSingleton.SingleInstance.CurrentUser, (_, e) =>
+        {
+            if (e.message.WasSuccessful == true)
+            {
+                ConfigurationSingleton.SingleInstance.CurrentProject = null;
+                leaveProjectEvent?.Invoke();
+
+                GameObject[] wbList;
+                wbList = GameObject.FindGameObjectsWithTag("Canvas");
+
+                foreach (GameObject wb in wbList)
+                {
+                    GameObject runeTimeGraphObject = GameObject.FindGameObjectWithTag("Canvas").transform.GetChild(2).gameObject;
+                    RealityFlowGraphView rfgv = runeTimeGraphObject.GetComponent<RealityFlowGraphView>();
+                    rfgv.ClearWhiteBoard();
+                }
+
+                FlowTObject.RemoveAllObjectsFromScene();
+                FlowAvatar.RemoveAllAvatarFromScene();
+                FlowVSGraph.RemoveAllGraphsFromScene();
+
+                // After Deleting a project, update the user projectList
+                Operations.GetAllUserProjects(ConfigurationSingleton.SingleInstance.CurrentUser, (__, _e) =>
+                {
+                    _ProjectList = _e.message.Projects;
+                    Debug.Log("Project list* = " + _ProjectList);
+                });
+            }
+            else
+            {
+                Debug.LogWarning("Error deleting project.");
+            }
+        });
     }
 
     private void _CreateProjectCreationView()
@@ -538,7 +899,14 @@ public class FlowNetworkManagerEditor : EditorWindow
                 {
                     if (e.message.WasSuccessful == true)
                     {
-                        // TODO: overwrite current project with new received project info
+                        // After creating a project, update the user projectList
+                        Operations.GetAllUserProjects(ConfigurationSingleton.SingleInstance.CurrentUser, (__, _e) =>
+                        {
+                            _ProjectList = _e.message.Projects;
+                            Debug.Log("Project list* = " + _ProjectList);
+                        });
+
+                        joinProjectEvent?.Invoke(ConfigurationSingleton.SingleInstance.CurrentProject.Id);
                         window = EWindowView.PROJECT_HUB;
                         Debug.Log(e.message);
                     }
@@ -586,12 +954,47 @@ public class FlowNetworkManagerEditor : EditorWindow
 
     private void ExitProject()
     {
+        // Check in all objects
+        foreach (FlowTObject obj in FlowTObject.idToGameObjectMapping.Values)
+        {
+            if (obj.CanBeModified == true)
+            {
+                Operations.CheckinObject(obj.Id, ConfigurationSingleton.SingleInstance.CurrentProject.Id, 
+                                        ConfigurationSingleton.SingleInstance.CurrentUser.Username, (_, e) => { });
+            }
+        }
+
+        foreach (FlowAvatar avatar in FlowAvatar.idToAvatarMapping.Values)
+        {
+            if (avatar.currentAvatarIsMe == true)
+            {
+                Operations.DeleteAvatar(avatar.Id,ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) => { });
+            }
+        }
+
         Operations.LeaveProject(ConfigurationSingleton.SingleInstance.CurrentProject.Id, ConfigurationSingleton.SingleInstance.CurrentUser, (_, e) =>
         {
+            
             if (e.message.WasSuccessful == true)
             {
                 ConfigurationSingleton.SingleInstance.CurrentProject = null;
+                // Tell Photon to disconnect from the room the user is in.
+                leaveProjectEvent?.Invoke();
+
+                GameObject[] wbList;
+                wbList = GameObject.FindGameObjectsWithTag("Canvas");
+
+                // Clear all whiteboards in the scene.
+                foreach (GameObject wb in wbList)
+                {
+                    GameObject runeTimeGraphObject = GameObject.FindGameObjectWithTag("Canvas").transform.GetChild(2).gameObject;
+                    RealityFlowGraphView rfgv = runeTimeGraphObject.GetComponent<RealityFlowGraphView>();
+                    rfgv.ClearWhiteBoard();
+                }
+
                 FlowTObject.RemoveAllObjectsFromScene();
+                FlowAvatar.RemoveAllAvatarFromScene();
+                FlowVSGraph.RemoveAllGraphsFromScene();
             }
             else
             {
@@ -657,7 +1060,14 @@ public class FlowNetworkManagerEditor : EditorWindow
     {
         if (GUILayout.Button("Back", GUILayout.Height(30), GUILayout.Width(40)))
         {
-            window = EWindowView.PROJECT_HUB;
+            if (userIsGuest)
+            {
+                window = EWindowView.GUESTPROJECT_HUB;
+            }
+            else
+            {
+                window = EWindowView.PROJECT_HUB;
+            }
         }
 
         GUILayout.Space(10f);
@@ -714,7 +1124,14 @@ public class FlowNetworkManagerEditor : EditorWindow
                     });
 
                     // Change window back to Project hub
-                    window = EWindowView.PROJECT_HUB;
+                    if (userIsGuest)
+                    {
+                        window = EWindowView.GUESTPROJECT_HUB;
+                    }
+                    else
+                    {
+                        window = EWindowView.PROJECT_HUB;
+                    }
                 }
             }
         }
@@ -727,7 +1144,14 @@ public class FlowNetworkManagerEditor : EditorWindow
             // headBehaviour = null;
             addingChain = false;
             showAllOptions = false;
-            window = EWindowView.PROJECT_HUB;
+            if (userIsGuest)
+            {
+                window = EWindowView.GUESTPROJECT_HUB;
+            }
+            else
+            {
+                window = EWindowView.PROJECT_HUB;
+            }
         }
 
         GUILayout.Space(10f);
@@ -746,7 +1170,6 @@ public class FlowNetworkManagerEditor : EditorWindow
 
         EditorGUILayout.EndHorizontal();
 
-        //if (/*addingChain*/)
         if (addingChain)
         {
             EditorGUILayout.BeginHorizontal();
@@ -816,7 +1239,14 @@ public class FlowNetworkManagerEditor : EditorWindow
 
             addingChain = false;
             showAllOptions = false;
-            window = EWindowView.PROJECT_HUB;
+            if (userIsGuest)
+            {
+                window = EWindowView.GUESTPROJECT_HUB;
+            }
+            else
+            {
+                window = EWindowView.PROJECT_HUB;
+            }
         }
 
         GUILayout.EndHorizontal();
@@ -999,7 +1429,14 @@ public class FlowNetworkManagerEditor : EditorWindow
 
             addingChain = false;
             showAllOptions = false;
-            window = EWindowView.PROJECT_HUB;
+            if (userIsGuest)
+            {
+                window = EWindowView.GUESTPROJECT_HUB;
+            }
+            else
+            {
+                window = EWindowView.PROJECT_HUB;
+            }
         }
 
         GUILayout.EndHorizontal();
@@ -1054,7 +1491,14 @@ public class FlowNetworkManagerEditor : EditorWindow
             AddBehaviour(fb);
 
             addingChain = false;
-            window = EWindowView.PROJECT_HUB;
+            if (userIsGuest)
+            {
+                window = EWindowView.GUESTPROJECT_HUB;
+            }
+            else
+            {
+                window = EWindowView.PROJECT_HUB;
+            }
         }
 
         GUILayout.EndHorizontal();
@@ -1106,7 +1550,14 @@ public class FlowNetworkManagerEditor : EditorWindow
 
             addingChain = false;
             showAllOptions = false;
-            window = EWindowView.PROJECT_HUB;
+            if (userIsGuest)
+            {
+                window = EWindowView.GUESTPROJECT_HUB;
+            }
+            else
+            {
+                window = EWindowView.PROJECT_HUB;
+            }
         }
 
         GUILayout.EndHorizontal();

@@ -50,4 +50,20 @@ namespace Packages.realityflow_package.Runtime.scripts.Messages.UserMessages
             this.MessageType = "CreateUser";
         }
     }
+
+    /// <summary>
+    /// delete user message format
+    /// Response: <see cref="DeleteUser_Received"/>
+    /// </summary>
+    public class DeleteUser_SendToServer : BaseMessage
+    {
+        [JsonProperty("FlowUser")]
+        private FlowUser flowUser { get; set; }
+
+        public DeleteUser_SendToServer(FlowUser flowUser)
+        {
+            this.flowUser = flowUser;
+            this.MessageType = "DeleteUser";
+        }
+    }
 }

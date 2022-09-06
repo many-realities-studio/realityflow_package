@@ -3,9 +3,11 @@ using Packages.realityflow_package.Runtime.scripts.Messages;
 using Packages.realityflow_package.Runtime.scripts.Messages.BehaviourMessages;
 using Packages.realityflow_package.Runtime.scripts.Messages.CheckoutMessages;
 using Packages.realityflow_package.Runtime.scripts.Messages.ObjectMessages;
+using Packages.realityflow_package.Runtime.scripts.Messages.AvatarMessages;
 using Packages.realityflow_package.Runtime.scripts.Messages.ProjectMessages;
 using Packages.realityflow_package.Runtime.scripts.Messages.RoomMessages;
 using Packages.realityflow_package.Runtime.scripts.Messages.UserMessages;
+using Packages.realityflow_package.Runtime.scripts.Messages.VSGraphMessages;
 
 //using RealityFlow.Plugin.Scripts.Events;
 using System;
@@ -33,6 +35,11 @@ namespace Packages.realityflow_package.Runtime.scripts
             messageRouter.Add("DeleteObject", typeof(DeleteObject_Received));
             messageRouter.Add("UpdateObject", typeof(UpdateObject_Received));
 
+            // Avatar Messages
+            messageRouter.Add("CreateAvatar", typeof(CreateAvatar_Received));
+            messageRouter.Add("DeleteAvatar", typeof(DeleteAvatar_Received));
+            messageRouter.Add("UpdateAvatar", typeof(UpdateAvatar_Received));
+
             // Project Messages
             messageRouter.Add("CreateProject", typeof(CreateProject_Received));
             messageRouter.Add("DeleteProject", typeof(DeleteProject_Received));
@@ -49,6 +56,7 @@ namespace Packages.realityflow_package.Runtime.scripts
             messageRouter.Add("LoginUser", typeof(LoginUser_Received));
             messageRouter.Add("LogoutUser", typeof(LogoutUser_Received));
             messageRouter.Add("CreateUser", typeof(RegisterUser_Received));
+            messageRouter.Add("DeleteUser", typeof(DeleteUser_Received));
 
             // Behaviour Messages
             messageRouter.Add("CreateBehaviour", typeof(CreateBehaviour_Received));
@@ -58,6 +66,18 @@ namespace Packages.realityflow_package.Runtime.scripts
             // Checkout system messages
             messageRouter.Add("CheckinObject", typeof(CheckinObject_Received));
             messageRouter.Add("CheckoutObject", typeof(CheckoutObject_Received));
+            messageRouter.Add("CheckinVSGraph", typeof(CheckinVSGraph_Received));
+            messageRouter.Add("CheckoutVSGraph", typeof(CheckoutVSGraph_Received));
+            messageRouter.Add("CheckinNodeView", typeof(CheckinNodeView_Received));
+            messageRouter.Add("CheckoutNodeView", typeof(CheckoutNodeView_Received));
+
+            // Visual Scripting Graph messages
+            messageRouter.Add("CreateVSGraph", typeof(CreateVSGraph_Received));
+            messageRouter.Add("DeleteVSGraph", typeof(DeleteVSGraph_Received));
+            messageRouter.Add("UpdateVSGraph", typeof(UpdateVSGraph_Received));
+            messageRouter.Add("FinalizedUpdateVSGraph", typeof(FinalizedUpdateVSGraph_Received));
+            messageRouter.Add("UpdateNodeView", typeof(UpdateNodeView_Received));
+            messageRouter.Add("RunVSGraph", typeof(RunVSGraph_Received));
         }
 
         /// <summary>

@@ -145,7 +145,9 @@ namespace RealityFlow.Plugin.Tests
 
             // Act (and assert)
             UpdateObject_Received actual = null;
+
             Operations.UpdateObject(ConfigurationSingleton.SingleInstance.CurrentProject._ObjectList.First(), ConfigurationSingleton.SingleInstance.CurrentUser, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (sender, e) =>
+
             {
                 Debug.Log("Received message: " + e.message.ToString());
                 actual = e.message;

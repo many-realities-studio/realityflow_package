@@ -2,6 +2,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using GraphProcessor;
 
 namespace RealityFlow.Plugin.Scripts
 {
@@ -21,13 +22,16 @@ namespace RealityFlow.Plugin.Scripts
         private string _description;
 
         [SerializeField]
-        private int _dateModified;
+        private long _dateModified;
 
         [SerializeField]
         private string _projectName;
 
         [SerializeField]
         private IEnumerable<FlowTObject> _objectList;
+
+        [SerializeField]
+        private IEnumerable<FlowVSGraph> _vsGraphList;
 
         [JsonProperty("Id")]
         public string Id { get => _id; set => _id = value; } // The unique ID of the project
@@ -36,7 +40,7 @@ namespace RealityFlow.Plugin.Scripts
         public string Description { get => _description; set => _description = value; } // Description of the project
 
         [JsonProperty("DateModified")]
-        public int DateModified { get => _dateModified; set => _dateModified = value; } // The last time this project was modified
+        public long DateModified { get => _dateModified; set => _dateModified = value; } // The last time this project was modified
 
         [JsonProperty("ProjectName")]
         public string ProjectName { get => _projectName; set => _projectName = value; } // Name of the project
@@ -44,10 +48,13 @@ namespace RealityFlow.Plugin.Scripts
         [JsonProperty("_ObjectList")]
         public IEnumerable<FlowTObject> _ObjectList { get => _objectList; set => _objectList = value; }
 
+        [JsonProperty("_VSGraphList")]
+        public IEnumerable<FlowVSGraph> _VSGraphList { get => _vsGraphList; set => _vsGraphList = value; }
+
         [JsonProperty("_BehaviourList")]
         public List<FlowBehaviour> behaviourList { get; set; }
 
-        public FlowProject(string flowId, string description, int dateModified, string projectName)
+        public FlowProject(string flowId, string description, long dateModified, string projectName)
         {
             Id = flowId;
             Description = description;
