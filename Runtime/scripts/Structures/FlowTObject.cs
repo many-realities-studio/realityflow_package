@@ -1,11 +1,12 @@
-using Microsoft.MixedReality.Toolkit.Utilities;
+//using Microsoft.MixedReality.Toolkit.Utilities;
 using Newtonsoft.Json;
 using Packages.realityflow_package.Runtime.scripts;
-
+using RealityFlow.Plugin.Contrib;
 //using Packages.realityflow_package.Runtime.scripts.Managers;
 using System;
 using UnityEngine;
-
+using Microsoft.MixedReality.Toolkit.UI;
+using Microsoft.MixedReality.Toolkit.Input;
 namespace RealityFlow.Plugin.Scripts
 {
     [System.Serializable]
@@ -291,11 +292,31 @@ namespace RealityFlow.Plugin.Scripts
             idToGameObjectMapping.Add(Id, this);
             AttachedGameObject.transform.hasChanged = false;
             AttachedGameObject.name = name;
+            AttachedGameObject.layer = 9;
 
             AttachedGameObject.AddComponent<FlowObject_Monobehaviour>();
+            ObjectManipulator om = AttachedGameObject.AddComponent<ObjectManipulator>();
+            AttachedGameObject.AddComponent<NearInteractionGrabbable>();
+            Rigidbody ObjectRigidBody = AttachedGameObject.AddComponent<Rigidbody>();
+            ObjectRigidBody.useGravity = false;
+            ObjectRigidBody.isKinematic = true;
             FlowObject_Monobehaviour monoBehaviour = AttachedGameObject.GetComponent<FlowObject_Monobehaviour>();
 
             monoBehaviour.underlyingFlowObject = this;
+            monoBehaviour.objectRigidbody = ObjectRigidBody;
+            om.OnManipulationStarted.RemoveListener(ManipulationStart);
+            om.OnManipulationEnded.RemoveListener(ManipulationEnd);
+            om.OnManipulationStarted.AddListener(ManipulationStart);
+            om.OnManipulationEnded.AddListener(ManipulationEnd);
+        }
+
+        private void ManipulationStart(ManipulationEventData eventData)
+        {
+            this.CheckOut();
+        }
+        private void ManipulationEnd(ManipulationEventData eventData)
+        {
+            this.CheckIn();
         }
 
         [JsonConstructor]
@@ -328,10 +349,21 @@ namespace RealityFlow.Plugin.Scripts
                 idToGameObjectMapping.Add(Id, this);
                 AttachedGameObject.name = name;
                 AttachedGameObject.AddComponent<FlowObject_Monobehaviour>();
+                ObjectManipulator om = AttachedGameObject.AddComponent<ObjectManipulator>();
+                AttachedGameObject.AddComponent<NearInteractionGrabbable>();
                 AttachedGameObject.transform.hasChanged = false;
+                AttachedGameObject.layer = 9;
 
                 var monoBehaviour = AttachedGameObject.GetComponent<FlowObject_Monobehaviour>();
                 monoBehaviour.underlyingFlowObject = this;
+                var ObjectRigidBody = AttachedGameObject.AddComponent<Rigidbody>();
+                ObjectRigidBody.useGravity = false;
+                ObjectRigidBody.isKinematic = true;
+                monoBehaviour.objectRigidbody = ObjectRigidBody;
+                om.OnManipulationStarted.RemoveListener(ManipulationStart);
+                om.OnManipulationEnded.RemoveListener(ManipulationEnd);
+                om.OnManipulationStarted.AddListener(ManipulationStart);
+                om.OnManipulationEnded.AddListener(ManipulationEnd);
             }
         }
 
@@ -361,7 +393,8 @@ namespace RealityFlow.Plugin.Scripts
 
                 if (CanBeModified == true)
                 {
-                    Operations.UpdateObject(this, ConfigurationSingleton.SingleInstance.CurrentUser, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) => {/* Debug.Log(e.message);*/ });
+                    Operations.UpdateObject(this, ConfigurationSingleton.SingleInstance.CurrentUser, ConfigurationSingleton.SingleInstance.CurrentProject.Id, 
+                                            ConfigurationSingleton.SingleInstance.CurrentUser.Username, (_, e) => {/* Debug.Log(e.message);*/ });
                 }
 
                 AttachedGameObject.transform.hasChanged = false;
@@ -382,9 +415,11 @@ namespace RealityFlow.Plugin.Scripts
         {
             if (CanBeModified == true)
             {
-                Operations.CheckinObject(Id, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) =>
+                // TODAY!-want to add graphql functionality.
+                Operations.CheckinObject(Id, ConfigurationSingleton.SingleInstance.CurrentProject.Id, 
+                                        ConfigurationSingleton.SingleInstance.CurrentUser.Username, (_, e) =>
                 {
-                    // On successful checkin
+                    // On successful checkin (with GQL solution we dont set the flag here.)
                     if (e.message.WasSuccessful == true)
                     {
                         _canBeModified = false;

@@ -1,6 +1,12 @@
 {
     "name": "com.RealityFlow.Resources",
-    "references": [],
+    "rootNamespace": "",
+    "references": [
+        "GUID:a432eb0a70c5c4a37ab50d59671586f8",
+        "GUID:ca937d03ee5dd4d699091438dc0f3ae6",
+        "GUID:412e892127b0dc04b8e024bc970d31d1",
+        "GUID:de813c064d7692345ba09f4609d2ace3"
+    ],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
@@ -8,5 +14,6 @@
     "precompiledReferences": [],
     "autoReferenced": true,
     "defineConstraints": [],
-    "versionDefines": []
+    "versionDefines": [],
+    "noEngineReferences": false
 }

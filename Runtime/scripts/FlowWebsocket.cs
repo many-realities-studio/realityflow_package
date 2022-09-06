@@ -54,6 +54,8 @@ namespace Packages.realityflow_package.Runtime.scripts
             try
             {
                 websocket = new WebSocketSharp.WebSocket(url);
+                Debug.Log(url);
+                Debug.Log(websocket);
                 //websocket.OnMessage += (sender, e) => Debug.Log("Received message: " + e.Data.ToString());
                 websocket.OnMessage += (sender, e) => ActionOnReceiveMessage(e.Data.ToString());
                 websocket.SetCredentials(username, password, true);
@@ -89,8 +91,12 @@ namespace Packages.realityflow_package.Runtime.scripts
             try
             {
                 Debug.Log("Sending message: " + sentMessage);
+                if(websocket == null) {
+                  Debug.Log("Error: Websocket doesn't exist");
+                } else {
 
                 websocket.Send(sentMessage);
+                }
             }
             catch (Exception e)
             {
@@ -132,6 +138,25 @@ namespace Packages.realityflow_package.Runtime.scripts
             ReceivedMessages.RemoveAll((o) => true); // Remove everything from the list
 
             yield return null;
+        }
+
+        /// <summary>
+        /// Send a graph message. 
+        /// Does not use the same message system as the rest of Reality Flow due to graph json serialization/deserialization requirements.
+        /// </summary>
+        /// <param name="message">The message string that should be sent</param>
+        public static void SendGraphMessage(string message)
+        {
+            try
+            {
+                Debug.Log("Sending graph message: " + message);
+
+                websocket.Send(message);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError("Failed to send graph message: " + message + " " + e);
+            }
         }
 
         internal void Disconnect()

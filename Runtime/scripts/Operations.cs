@@ -1,21 +1,39 @@
-﻿//using Packages.realityflow_package.Runtime.scripts.Managers;
-using Behaviours;
+﻿using Behaviours;
 using Packages.realityflow_package.Runtime.scripts.Messages;
 using Packages.realityflow_package.Runtime.scripts.Messages.BehaviourMessages;
 using Packages.realityflow_package.Runtime.scripts.Messages.CheckoutMessages;
 using Packages.realityflow_package.Runtime.scripts.Messages.ObjectMessages;
+using Packages.realityflow_package.Runtime.scripts.Messages.AvatarMessages;
 using Packages.realityflow_package.Runtime.scripts.Messages.ProjectMessages;
 using Packages.realityflow_package.Runtime.scripts.Messages.RoomMessages;
 using Packages.realityflow_package.Runtime.scripts.Messages.UserMessages;
+using Packages.realityflow_package.Runtime.scripts.Messages.VSGraphMessages;
 using RealityFlow.Plugin.Scripts;
+using GraphProcessor;
+using System.Threading.Tasks;
+using RealityFlow.Plugin.Contrib;
 
-//using RealityFlow.Plugin.Scripts.Events;
+// Unity/GraphQL libraries
+using System.Collections;
 using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
+using UnityEditor;
+using UnityEngine.Networking;
+using GraphQlClient.Core; 
+using Contrib.APIeditor;
+using Newtonsoft.Json;
+using System.Globalization;
 
 namespace Packages.realityflow_package.Runtime.scripts
 {
+    public delegate void NotifyGraphUpdate();
+
+    public delegate void RunGraphHandler(string vsGraphId);
+
+    public delegate void DeleteGraphHandler(string vsGraphId);
+
+    public delegate void MobileCheckInHandler(string mobileObjectID);
+    
     /// <summary>
     /// The purpose of this class is to provide a wrapper for the UnityPlugin,
     /// allowing for easy use with the networking tools
@@ -23,6 +41,14 @@ namespace Packages.realityflow_package.Runtime.scripts
     public static class Operations
     {
         public static FlowWebsocket _FlowWebsocket { get; private set; }
+
+        public static event NotifyGraphUpdate updateRFGV;
+
+        public static event RunGraphHandler runVSGraph;
+
+        public static event DeleteGraphHandler deleteVSGraph;
+
+        public static event MobileCheckInHandler mobileObjectCheckIn;
 
         static Operations()
         {
@@ -32,10 +58,15 @@ namespace Packages.realityflow_package.Runtime.scripts
             ReceivedMessage.AddEventHandler(typeof(CreateObject_Received), false, _CreateObject);
             ReceivedMessage.AddEventHandler(typeof(DeleteObject_Received), false, _DeleteObject);
 
+            // Set up Avatar updates
+            ReceivedMessage.AddEventHandler(typeof(CreateAvatar_Received), false, _CreateAvatar);
+            ReceivedMessage.AddEventHandler(typeof(DeleteAvatar_Received), false, _DeleteAvatar);
+
             // Set up Project updates
             ReceivedMessage.AddEventHandler(typeof(CreateProject_Received), false, _CreateProject);
             ReceivedMessage.AddEventHandler(typeof(OpenProject_Received), false, _OpenProject);
             ReceivedMessage.AddEventHandler(typeof(LeaveProject_Received), false, _LeaveProject);
+            ReceivedMessage.AddEventHandler(typeof(DeleteProject_Received), false, _DeleteProject);
 
             // Set up Room updates
             ReceivedMessage.AddEventHandler(typeof(UserLeftRoom_Received), false, _UserLeftRoom);
@@ -43,11 +74,19 @@ namespace Packages.realityflow_package.Runtime.scripts
             // Set up User updates
             ReceivedMessage.AddEventHandler(typeof(LogoutUser_Received), false, _LogoutUser);
             ReceivedMessage.AddEventHandler(typeof(RegisterUser_Received), false, _RegisterUser);
+            ReceivedMessage.AddEventHandler(typeof(DeleteUser_Received), false, _DeleteUser);
 
             // Set up Behaviour updates
             ReceivedMessage.AddEventHandler(typeof(CreateBehaviour_Received), false, _CreateBehaviour);
             ReceivedMessage.AddEventHandler(typeof(DeleteBehaviour_Received), false, _DeleteBehaviour);
             ReceivedMessage.AddEventHandler(typeof(UpdateBehaviour_Received), false, _UpdateBehaviour);
+
+            // Set up Graph updates
+            ReceivedMessage.AddEventHandler(typeof(CreateVSGraph_Received), false, _CreateVSGraph);
+            ReceivedMessage.AddEventHandler(typeof(DeleteVSGraph_Received), false, _DeleteVSGraph);
+            ReceivedMessage.AddEventHandler(typeof(UpdateVSGraph_Received), false, _UpdateVSGraph);
+            ReceivedMessage.AddEventHandler(typeof(FinalizedUpdateVSGraph_Received), false, _FinalizedUpdateVSGraph);
+            ReceivedMessage.AddEventHandler(typeof(RunVSGraph_Received), false, _RunVSGraph);
         }
 
         #region UserOperations
@@ -77,7 +116,7 @@ namespace Packages.realityflow_package.Runtime.scripts
 
         public static void Register(string username, string password, string url, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
         {
-            bool connectionSuccssfull = ConnectToServer(url);
+             bool connectionSuccssfull = ConnectToServer(url);
 
             if (FlowWebsocket.websocket.ReadyState == WebSocketSharp.WebSocketState.Open)
             {
@@ -88,50 +127,182 @@ namespace Packages.realityflow_package.Runtime.scripts
             }
         }
 
+        public static void DeleteUser(FlowUser flowUser)
+        {
+            DeleteUser_SendToServer deleteUserMessage = new DeleteUser_SendToServer(flowUser);
+            FlowWebsocket.SendMessage(deleteUserMessage);
+        }
+
         #endregion UserOperations
 
         #region ObjectOperations
 
-        public static void CreateObject(FlowTObject flowObject, /*FlowUser flowUser,*/ string projectId, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
+
+        /// <summary>
+        /// This is a documentation string. 
+        /// </summary>
+        /// <param name="flowObject">This is the object to be created</param> 
+        public static void CreateObject(FlowTObject flowObject, string projectId, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
         {
-            CreateObject_SendToServer createObject =
-                new CreateObject_SendToServer(flowObject, /*flowUser,*/ projectId);
-            FlowWebsocket.SendMessage(createObject);
+            graphqlClient_Editor createObject = ScriptableObject.CreateInstance<graphqlClient_Editor>();
+            createObject.CreateObject(flowObject, projectId);
+
+
+            // This was how it used to be done before GRaphQL
+            // CreateObject_SendToServer createObject = new CreateObject_SendToServer(flowObject, projectId);
+            // FlowWebsocket.SendMessage(createObject);
 
             ReceivedMessage.AddEventHandler(typeof(CreateObject_Received), true, callbackFunction);
         }
 
-        public static void UpdateObject(FlowTObject flowObject, FlowUser flowUser, string projectId, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
+        public static void UpdateObject(FlowTObject flowObject, FlowUser flowUser, string projectId, string username, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
         {
-            UpdateObject_SendToServer updateObject = new UpdateObject_SendToServer(flowObject, /*flowUser,*/ projectId);
-            FlowWebsocket.SendMessage(updateObject);
+            UpdateObject_SendToServer _updateObject = new UpdateObject_SendToServer(flowObject, projectId, username);
+            FlowWebsocket.SendMessage(_updateObject);
 
             ReceivedMessage.AddEventHandler(typeof(UpdateObject_Received), true, callbackFunction);
         }
 
         public static void DeleteObject(string idOfObjectToDelete, string projectId, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
         {
-            DeleteObject_SendToServer deleteObject = new DeleteObject_SendToServer(projectId, idOfObjectToDelete);
-            FlowWebsocket.SendMessage(deleteObject);
+            graphqlClient_Editor deleteObject = ScriptableObject.CreateInstance<graphqlClient_Editor>();
+            deleteObject.DeleteObject(idOfObjectToDelete, projectId);
+
+            // This was how it used to be done before GRaphQL Implementation
+            // DeleteObject_SendToServer _deleteObject = new DeleteObject_SendToServer(projectId, idOfObjectToDelete);
+            // FlowWebsocket.SendMessage(_deleteObject);
 
             ReceivedMessage.AddEventHandler(typeof(DeleteObject_Received), true, callbackFunction);
-            ;
         }
 
         #endregion ObjectOperations
 
+    #region AvatarOperations
+
+        public static void CreateAvatar(FlowAvatar flowAvatar, string projectId , ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
+        {
+            CreateAvatar_SendToServer createAvatar = new CreateAvatar_SendToServer(flowAvatar, projectId);
+            FlowWebsocket.SendMessage(createAvatar);
+
+            ReceivedMessage.AddEventHandler(typeof(CreateAvatar_Received), true, callbackFunction);
+        }
+
+        public static void UpdateAvatar(FlowAvatar flowAvatar, FlowUser flowUser, string projectId, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
+        {
+            UpdateAvatar_SendToServer updateObject = new UpdateAvatar_SendToServer(flowAvatar, projectId);
+            FlowWebsocket.SendMessage(updateObject);
+
+            ReceivedMessage.AddEventHandler(typeof(UpdateAvatar_Received), true, callbackFunction);
+        }
+
+        public static void DeleteAvatar(string idOfObjectToDelete, string projectId, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
+        {
+            DeleteAvatar_SendToServer deleteObject = new DeleteAvatar_SendToServer(projectId, idOfObjectToDelete);
+            FlowWebsocket.SendMessage(deleteObject);
+
+            ReceivedMessage.AddEventHandler(typeof(DeleteAvatar_Received), true, callbackFunction);
+        }
+
+        #endregion AvatarOperations
+
+        #region VSGraphOperations
+
+        public static void CreateVSGraph(FlowVSGraph flowVSGraph, /*FlowUser flowUser,*/ string projectId, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
+        {   // All of this branch's vsGraph logic is untouched. We didnt get it work 100%,
+            // so check Demo-packageUnstable branch for code changes that we tried to get it to work with
+
+            // graphqlClient_Editor createVSGraph = ScriptableObject.CreateInstance<graphqlClient_Editor>();
+            // createVSGraph.CreateVSGraph(flowVSGraph, projectId);
+            
+            string message = ("{\"FlowVSGraph\":" + JsonUtility.ToJson(flowVSGraph) + ",\"ProjectId\":\"" + projectId + "\",\"MessageType\":\"CreateVSGraph\"}");
+
+            FlowWebsocket.SendGraphMessage(message);
+
+            ReceivedMessage.AddEventHandler(typeof(CreateVSGraph_Received), true, callbackFunction);
+        }
+
+        public static void UpdateVSGraph(FlowVSGraph flowVSGraph, FlowUser flowUser, string projectId, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
+        {
+            string message = ("{\"FlowVSGraph\":" + JsonUtility.ToJson(flowVSGraph) + ",\"ProjectId\":\"" + projectId + "\",\"MessageType\":\"UpdateVSGraph\"}");
+            FlowWebsocket.SendGraphMessage(message);
+
+            ReceivedMessage.AddEventHandler(typeof(UpdateVSGraph_Received), true, callbackFunction);
+        }
+
+        public static void FinalizedUpdateVSGraph(FlowVSGraph flowVSGraph, FlowUser flowUser, string projectId, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
+        {
+            // graphqlClient_Editor finalizedUpdateVSGraph = ScriptableObject.CreateInstance<graphqlClient_Editor>();
+            // finalizedUpdateVSGraph.FinalizedUpdateVSGraph(flowVSGraph, projectId);
+
+            //UpdateVSGraph_SendToServer updateVSGraph = new UpdateVSGraph_SendToServer(flowVSGraph, /*flowUser,*/ projectId); // TODO: format string msg
+            // Debug.Log(JsonUtility.ToJson(flowVSGraph.edges));
+            string message = ("{\"FlowVSGraph\":" + JsonUtility.ToJson(flowVSGraph) + ",\"ProjectId\":\"" + projectId + "\",\"MessageType\":\"FinalizedUpdateVSGraph\"}");
+            FlowWebsocket.SendGraphMessage(message);
+
+            ReceivedMessage.AddEventHandler(typeof(FinalizedUpdateVSGraph_Received), true, callbackFunction);
+        }
+
+        public static void DeleteVSGraph(string idOfVSGraphToDelete, string projectId, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
+        {
+            // graphqlClient_Editor deleteVSGraph = ScriptableObject.CreateInstance<graphqlClient_Editor>();
+            // deleteVSGraph.DeleteVSGraph(idOfVSGraphToDelete, projectId);
+
+            //DeleteVSGraph_SendToServer deleteVSGraph = new DeleteVSGraph_SendToServer(projectId, idOfVSGraphToDelete); // TODO: format string msg
+            string message = ("{\"VSGraphId\":\"" + idOfVSGraphToDelete + "\",\"ProjectId\":\"" + projectId + "\",\"MessageType\":\"DeleteVSGraph\"}");
+            FlowWebsocket.SendGraphMessage(message);
+
+            ReceivedMessage.AddEventHandler(typeof(DeleteVSGraph_Received), true, callbackFunction);
+        }
+
+        public static void UpdateNodeView(NodeView nodeView, FlowUser flowUser, string projectId, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
+        {
+            string boolValue = (nodeView.CanBeModified ? "true" : "false");
+            string message = ("{\"FlowNodeView\": {\"CanBeModified\":" + boolValue + ",\"LocalPos\":" + JsonUtility.ToJson(nodeView.localPos) + ",\"NodeGUID\":\"" + nodeView.nodeGUID + "\"},\"ProjectId\":\"" + projectId + "\",\"MessageType\":\"UpdateNodeView\"}");
+            FlowWebsocket.SendGraphMessage(message);
+
+            ReceivedMessage.AddEventHandler(typeof(UpdateVSGraph_Received), true, callbackFunction);
+        }
+
+        public static void RunVSGraph(string idOfVSGraphToRun, string projectId, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
+        {
+            string message = ("{\"VSGraphId\":\"" + idOfVSGraphToRun + "\",\"ProjectId\":\"" + projectId + "\",\"MessageType\":\"RunVSGraph\"}");
+            FlowWebsocket.SendGraphMessage(message);
+
+            ReceivedMessage.AddEventHandler(typeof(RunVSGraph_Received), true, callbackFunction);
+        }
+
+        #endregion VSGraphOperations
+
         #region BehaviourOperations
 
-        public static void CreateBehaviour(FlowBehaviour behaviour, string projectId, List<string> behavioursToLinkTo, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
+        public static async void CreateBehaviour(FlowBehaviour behaviour, string projectId, List<string> behavioursToLinkTo, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
         {
-            CreateBehaviour_SendToServer createBehaviour = new CreateBehaviour_SendToServer(behaviour, projectId, behavioursToLinkTo);
-            FlowWebsocket.SendMessage(createBehaviour);
+            // GraphQL -- Not finished
+             //graphqlClient_Editor createBehaviour = new graphqlClient_Editor();
+             //createBehaviour.CreateBehaviour(behaviour, projectId, behavioursToLinkTo);
+             //string IdToBeLinked = await createBehaviour.CreateBehaviour(behaviour, projectId, behavioursToLinkTo);
+    
+            // if(IdToBeLinked != null){
+            //     behaviour.BehaviourName = behaviour.flowAction.ActionType;
+            //     //behavioursToLinkTo.Add(IdToBeLinked);
+            //     __CreateBehaviour(behaviour, projectId, behavioursToLinkTo, IdToBeLinked);
+                
+            //}
+            
+            
+            CreateBehaviour_SendToServer _createBehaviour = new CreateBehaviour_SendToServer(behaviour, projectId, behavioursToLinkTo);
 
+            FlowWebsocket.SendMessage(_createBehaviour);
             ReceivedMessage.AddEventHandler(typeof(CreateBehaviour_Received), true, callbackFunction);
+
         }
 
         public static void DeleteBehaviour(List<string> behaviourIds, string projectId, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
         {
+            //GraphQL
+            // graphqlClient_Editor deleteBehaviour = new graphqlClient_Editor();
+            // deleteBehaviour.DeleteBehaviour(behaviourIds, projectId);
+            //__DeleteBehaviour(behaviourIds);
             DeleteBehaviour_SendToServer deleteBehaviour = new DeleteBehaviour_SendToServer(behaviourIds, projectId);
             FlowWebsocket.SendMessage(deleteBehaviour);
 
@@ -168,17 +339,10 @@ namespace Packages.realityflow_package.Runtime.scripts
 
         public static void OpenProject(string projectId, FlowUser flowUser, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
         {
-            //if(GameObject.FindObjectsOfType<GameObject>().Length != 0)
-            //{
-            //    Debug.LogError("Cannot load project if there are game objects already in scene. Delete all game objects and try again");
-            //}
-            //else
-            //{
             OpenProject_SendToServer openProject = new OpenProject_SendToServer(projectId, flowUser);
             FlowWebsocket.SendMessage(openProject);
 
             ReceivedMessage.AddEventHandler(typeof(OpenProject_Received), true, callbackFunction);
-            //}
         }
 
         public static void LeaveProject(string projectId, FlowUser flowUser, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
@@ -215,18 +379,64 @@ namespace Packages.realityflow_package.Runtime.scripts
 
         public static void CheckoutObject(string objectID, string projectID, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
         {
-            CheckoutObject_SendToServer checkoutObject = new CheckoutObject_SendToServer(objectID, projectID);
+            CheckoutObject_SendToServer checkoutObject = new CheckoutObject_SendToServer(objectID, projectID, ConfigurationSingleton.SingleInstance.CurrentUser.Username);
             FlowWebsocket.SendMessage(checkoutObject);
 
             ReceivedMessage.AddEventHandler(typeof(CheckoutObject_Received), true, callbackFunction);
         }
 
-        public static void CheckinObject(string objectID, string projectID, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
+        public static async void CheckinObject(string objectID, string projectID, string username, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
         {
-            CheckinObject_SendToServer checkinObject = new CheckinObject_SendToServer(objectID, projectID);
-            FlowWebsocket.SendMessage(checkinObject);
+            // CheckIn will be called updateObject for GraphQL operations
+            // TODO: I had to check this out as it was not working properly and we needed to merge, be sure to fix this functionality.
+            graphqlClient_Editor updateObject = ScriptableObject.CreateInstance<graphqlClient_Editor>();
+            string checkedIn = await updateObject.UpdateObject(objectID, projectID, username);
+            if(checkedIn != null){
+                Debug.Log("Getting message type: CheckinObject from GraphQL");
+                FlowTObject.idToGameObjectMapping[objectID].CanBeModified = false;
+                mobileObjectCheckIn?.Invoke(objectID);
+            }else{
+                Debug.Log("Check-In with GraphQL didn't work!");
+            }
 
-            ReceivedMessage.AddEventHandler(typeof(CheckinObject_Received), true, callbackFunction);
+            // This was how it used to be done.
+            // CheckinObject_SendToServer checkinObject = new CheckinObject_SendToServer(objectID, projectID, ConfigurationSingleton.SingleInstance.CurrentUser.Username);
+            // FlowWebsocket.SendMessage(checkinObject);
+
+            // ReceivedMessage.AddEventHandler(typeof(CheckinObject_Received), true, callbackFunction);
+        }
+
+        public static void CheckoutVSGraph(string vsGraphID, string projectID, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
+        {
+            CheckoutVSGraph_SendToServer checkoutVSGraph = new CheckoutVSGraph_SendToServer(vsGraphID, projectID);
+            FlowWebsocket.SendMessage(checkoutVSGraph);
+
+            ReceivedMessage.AddEventHandler(typeof(CheckoutVSGraph_Received), true, callbackFunction);
+        }
+
+        public static void CheckinVSGraph(string vsGraphID, string projectID, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
+        {
+            CheckinVSGraph_SendToServer checkinVSGraph = new CheckinVSGraph_SendToServer(vsGraphID, projectID);
+            FlowWebsocket.SendMessage(checkinVSGraph);
+
+            ReceivedMessage.AddEventHandler(typeof(CheckinVSGraph_Received), true, callbackFunction);
+        }
+
+        public static void CheckoutNodeView(NodeView nodeView, string projectID, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
+        {
+            string boolValue = (nodeView.CanBeModified ? "true" : "false");
+            string message = ("{\"FlowNodeView\": {\"CanBeModified\":" + boolValue + ",\"LocalPos\":" + JsonUtility.ToJson(nodeView.localPos) + ",\"NodeGUID\":\"" + nodeView.nodeGUID + "\"},\"ProjectId\":\"" + projectID + "\",\"MessageType\":\"CheckoutNodeView\"}");
+            FlowWebsocket.SendGraphMessage(message);
+
+            ReceivedMessage.AddEventHandler(typeof(CheckoutNodeView_Received), true, callbackFunction);
+        }
+
+        public static void CheckinNodeView(string nodeGUID, string projectID, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
+        {
+            CheckinNodeView_SendToServer checkinNodeView = new CheckinNodeView_SendToServer(nodeGUID, projectID);
+            FlowWebsocket.SendMessage(checkinNodeView);
+
+            ReceivedMessage.AddEventHandler(typeof(CheckinNodeView_Received), true, callbackFunction);
         }
 
         #endregion Checkout system messages
@@ -246,13 +456,6 @@ namespace Packages.realityflow_package.Runtime.scripts
             return _FlowWebsocket.IsConnected;
         }
 
-        //public delegate void functionCalledOnUpdate();
-        //public static void OnUpdate(functionCalledOnUpdate functionCalledOnUpdate)
-        //{
-        //    // Handle what the GUI needs to update on every frame
-        //    functionCalledOnUpdate();
-        //}
-
         // TODO: Fill out default behavior
 
         #region Default actions taken after receiving messages (These happen no matter what the user does)
@@ -265,9 +468,6 @@ namespace Packages.realityflow_package.Runtime.scripts
 
         private static void _DeleteObject(object sender, BaseReceivedEventArgs eventArgs)
         {
-            // Delete object in unity
-            //NewObjectManager.DestroyObject(eventArgs.message.DeletedObject.Id);
-
             if (eventArgs.message.WasSuccessful == true)
             {
                 GameObject gameObject = FlowTObject.idToGameObjectMapping[eventArgs.message.DeletedObjectId].AttachedGameObject;
@@ -280,9 +480,70 @@ namespace Packages.realityflow_package.Runtime.scripts
             Debug.Log("Delete Object: " + eventArgs.message.WasSuccessful);
         }
 
+
         #endregion Object messages received
 
+        #region Avatar messages received
 
+        private static void _CreateAvatar(object sender, BaseReceivedEventArgs eventArgs)
+        {
+
+        }
+
+        private static void _DeleteAvatar(object sender, BaseReceivedEventArgs eventArgs)
+        {
+            if (eventArgs.message.WasSuccessful == true)
+            {
+
+                // TODO: Remove Mono
+                GameObject gameObject = FlowAvatar.idToAvatarMapping[eventArgs.message.DeletedAvatarId].AttachedGameObject;
+
+                UnityEngine.Object.DestroyImmediate(gameObject);
+            }
+
+            Debug.Log("Delete Avatar: " + eventArgs.message.WasSuccessful);
+        }
+
+        #endregion Object messages received
+
+        #region VSGraph messages received
+
+        private static void _CreateVSGraph(object sender, BaseReceivedEventArgs eventArgs)
+        {
+        }
+
+        private static void _DeleteVSGraph(object sender, BaseReceivedEventArgs eventArgs)
+        {
+            if (eventArgs.message.WasSuccessful == true)
+            {
+                deleteVSGraph?.Invoke(eventArgs.message.DeletedVSGraphId);
+
+                GameObject gameObject = FlowVSGraph.idToVSGraphMapping[eventArgs.message.DeletedVSGraphId].AttachedGameObject;
+
+                FlowVSGraph.idToVSGraphMapping.Remove(eventArgs.message.DeletedVSGraphId);
+
+                UnityEngine.Object.DestroyImmediate(gameObject);
+            }
+
+            Debug.Log("Delete VSGraph: " + eventArgs.message.WasSuccessful);
+        }
+
+        private static void _UpdateVSGraph(object sender, BaseReceivedEventArgs eventArgs)
+        {
+            updateRFGV?.Invoke();
+        }
+
+        private static void _FinalizedUpdateVSGraph(object sender, BaseReceivedEventArgs eventArgs)
+        {
+            updateRFGV?.Invoke();
+        }
+
+        private static void _RunVSGraph(object sender, BaseReceivedEventArgs eventArgs)
+        {
+            runVSGraph?.Invoke(eventArgs.message.VSGraphId);
+        }
+
+        #endregion VSGraph messages received
 
         #region Behaviour messages received
 
@@ -319,7 +580,6 @@ namespace Packages.realityflow_package.Runtime.scripts
                 Debug.Log("Number of behaviours in bem = " + BehaviourEventManager.BehaviourList.Count);
             }
         }
-
         private static void _UpdateBehaviour(object sender, BaseReceivedEventArgs eventArgs)
         {
             if (eventArgs.message.WasSuccessful == true)
@@ -338,13 +598,27 @@ namespace Packages.realityflow_package.Runtime.scripts
         {
             ConfigurationSingleton.SingleInstance.CurrentProject = eventArgs.message.flowProject;
 
-            Operations.OpenProject(ConfigurationSingleton.SingleInstance.CurrentProject.Id, ConfigurationSingleton.SingleInstance.CurrentUser, (_, e) => { Debug.Log("opened project after create: " + e.message.WasSuccessful); });
+            Operations.OpenProject(ConfigurationSingleton.SingleInstance.CurrentProject.Id, ConfigurationSingleton.SingleInstance.CurrentUser, (_, e) => 
+            { 
+                // Creating an Avatar Upon entering a newly created project
+                if (e.message.WasSuccessful == true)
+                {
+                    ConfigurationSingleton.SingleInstance.CurrentProject = e.message.flowProject;
+                    Transform head = GameObject.Find("Main Camera").transform;
+                    FlowAvatar createAvatar = new FlowAvatar(head);
+                    Operations.CreateAvatar(createAvatar, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, f) => { Debug.Log(f.message); });
+                    Debug.Log(e.message);
+                }
+                Debug.Log("opened project after create: " + e.message.WasSuccessful); 
+                });
+                
         }
 
         private static void _OpenProject(object sender, BaseReceivedEventArgs eventArgs)
         {
+            Debug.Log("Now in load project");
             ConfigurationSingleton.SingleInstance.CurrentProject = eventArgs.message.flowProject;
-
+            
             ConfigurationSingleton asset = ScriptableObject.CreateInstance<ConfigurationSingleton>();
             asset.CurrentProject = ConfigurationSingleton.SingleInstance.CurrentProject;
             asset.CurrentUser = ConfigurationSingleton.SingleInstance.CurrentUser;
@@ -363,11 +637,11 @@ namespace Packages.realityflow_package.Runtime.scripts
 
                 if (eventArgs.message.flowProject.behaviourList == null)
                 {
-                    Debug.Log("It's null huh");
+                    Debug.Log("Behaviourlist in this project is null.");
                 }
                 else
                 {
-                    Debug.Log("ya yeet");
+                    Debug.Log("Behaviourlist in this project is not null.");
                 }
 
                 foreach (FlowBehaviour fb in eventArgs.message.flowProject.behaviourList)
@@ -395,6 +669,22 @@ namespace Packages.realityflow_package.Runtime.scripts
             }
         }
 
+        private static void _DeleteProject(object sender, BaseReceivedEventArgs eventArgs)
+        {
+            if (eventArgs.message.WasSuccessful == true)
+            {
+                Debug.Log("Successfully deleted project");
+
+                // Clear the behaviour list and BEM
+                BehaviourEventManager.Clear();
+                BehaviourEventManager.Initialize();
+            }
+            else
+            {
+                Debug.LogWarning("Unable to delete project.");
+            }
+        }
+
         #endregion Project messages received
 
         #region Room messages received
@@ -402,6 +692,7 @@ namespace Packages.realityflow_package.Runtime.scripts
         private static void _UserLeftRoom(object sender, BaseReceivedEventArgs eventArgs)
         {
             Debug.Log("Room Alert: " + eventArgs.message.leftRoomMessage);
+
         }
 
         #endregion Room messages received
@@ -412,6 +703,13 @@ namespace Packages.realityflow_package.Runtime.scripts
         {
             ConfigurationSingleton.SingleInstance.CurrentProject = null;
             ConfigurationSingleton.SingleInstance.CurrentUser = null;
+        }
+
+        private static void _DeleteUser(object sender, BaseReceivedEventArgs eventArgs)
+        {
+            ConfigurationSingleton.SingleInstance.CurrentProject = null;
+            ConfigurationSingleton.SingleInstance.CurrentUser = null;
+            _FlowWebsocket.Disconnect();
         }
 
         private static void _RegisterUser(object sender, BaseReceivedEventArgs eventArgs)

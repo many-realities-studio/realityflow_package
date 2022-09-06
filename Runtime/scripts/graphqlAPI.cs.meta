@@ -1,0 +1,12 @@
+fileFormatVersion: 2
+guid: 168f9388296ea704787dbd79309ce340
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - graphql_api: {fileID: 11400000, guid: f29a5231f1cbec34ebf6782c9163fc49, type: 2}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

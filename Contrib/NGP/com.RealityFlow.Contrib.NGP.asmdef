@@ -1,0 +1,17 @@
+{
+    "name": "com.RealityFlow.Contrib.NGP",
+    "rootNamespace": "Realityflow.Plugin.Contrib",
+    "references": [
+        "com.alelievr.NodeGraphProcessor.Editor",
+        "com.alelievr.NodeGraphProcessor.Runtime"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

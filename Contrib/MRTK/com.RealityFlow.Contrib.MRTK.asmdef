@@ -1,0 +1,14 @@
+{
+    "name": "com.RealityFlow.Contrib.MRTK",
+    "rootNamespace": "Realityflow.Plugin.Contrib",
+    "references": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
