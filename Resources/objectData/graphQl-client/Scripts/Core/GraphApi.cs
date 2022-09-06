@@ -92,7 +92,6 @@ namespace GraphQlClient.Core
         private static string JsonToArgument(string jsonInput){
             char[] jsonChar = jsonInput.ToCharArray();
             List<int> indexes = new List<int>();
-            List<int> indexes1 = new List<int>();
             jsonChar[0] = ' ';
             jsonChar[jsonChar.Length - 1] = ' ';
             for (int i = 0; i < jsonChar.Length; i++){
@@ -101,15 +100,6 @@ namespace GraphQlClient.Core
                         indexes = new List<int>();
                     indexes.Add(i);
                 }
-
-                /*
-                if(jsonChar[i] == '\\' || indexes1.Count == 2){
-                    jsonChar[indexes[0]] = '\\';
-                    jsonChar[indexes[1]] = '\\';
-                    indexes = new List<int>();
-
-                }
-                */
 
                 if (jsonChar[i] == ':' && indexes.Count == 2){
                     jsonChar[indexes[0]] = ' ';

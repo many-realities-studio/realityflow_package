@@ -2,8 +2,8 @@
     "name": "com.RealityFlow.Contrib.NGP",
     "rootNamespace": "Realityflow.Plugin.Contrib",
     "references": [
-        "GUID:412e892127b0dc04b8e024bc970d31d1",
-        "GUID:de813c064d7692345ba09f4609d2ace3"
+        "com.alelievr.NodeGraphProcessor.Editor",
+        "com.alelievr.NodeGraphProcessor.Runtime"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

@@ -35,6 +35,9 @@ namespace RealityFlow.Plugin.Scripts
                 if (_AttachedGameObject == null)
                 {
                     // The game object already exists
+                    if(Id == null) {
+                      return null;
+                    }
                     if (idToAvatarMapping.ContainsKey(Id))
                     {
                         if (idToAvatarMapping[Id]._AttachedGameObject == null)
@@ -279,7 +282,7 @@ namespace RealityFlow.Plugin.Scripts
             MeshRenderer renderer = AttachedGameObject.GetComponent<MeshRenderer>();
             renderer.enabled = false;
             AttachedGameObject.AddComponent<FlowAvatar_Monobehaviour>();
-
+            
             FlowAvatar_Monobehaviour monoBehaviour = AttachedGameObject.GetComponent<FlowAvatar_Monobehaviour>();
             monoBehaviour.underlyingFlowAvatar = this;
             monoBehaviour.head = head.gameObject;
@@ -331,7 +334,9 @@ namespace RealityFlow.Plugin.Scripts
             {
                 newValues.Position = head.transform.position;
                 newValues.Rotation = head.transform.rotation;
-                
+
+                // Debug.Log(ConfigurationSingleton.SingleInstance.CurrentProject);
+
                 Operations.UpdateAvatar(newValues, ConfigurationSingleton.SingleInstance.CurrentUser, ConfigurationSingleton.SingleInstance.CurrentProject.Id, (_, e) => {/* Debug.Log(e.message);*/ });
                 
                 // newValues.Position = Vector3.zero;

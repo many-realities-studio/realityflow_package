@@ -2,26 +2,22 @@
  * Copyright(c) 2017-2018 Sketchfab Inc.
  * License: https://github.com/sketchfab/UnityGLTF/blob/master/LICENSE
  */
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
-using UnityGLTF;
 using Ionic.Zip;
-using UnityEditor;
-
 
 public class SketchfabImporter
 {
-    private List<string> _unzippedFiles;
+    private readonly List<string> _unzippedFiles;
+    private GameObject ActiveObject;
 
-    GameObject ActiveObject;
     // Settings
-    string _unzipDirectory = Application.temporaryCachePath + "/unzip";
-    string _importDirectory = Application.dataPath + "/Import";
-    string _currentSampleName = "Imported";
-    bool _addToCurrentScene = false;
-    string _gltfInput;
+    private readonly string _unzipDirectory = Application.temporaryCachePath + "/unzip";
+    private string _importDirectory = Application.dataPath + "/Import";
+    private string _currentSampleName = "Imported";
+    private bool _addToCurrentScene = false;
+    private string _gltfInput;
 
     public SketchfabImporter(/*GLTFEditorImporter.ProgressCallback progressCallback, GLTFEditorImporter.RefreshWindow finishCallback*/)
     {
@@ -46,7 +42,9 @@ public class SketchfabImporter
         }
 
         if (prefabName.Length > 0)
+        {
             _currentSampleName = prefabName;
+        }
 
         _addToCurrentScene = addToScene;
     }
@@ -79,9 +77,13 @@ public class SketchfabImporter
     private string unzipGltfArchive(string zipPath)
     {
         if (!Directory.Exists(_unzipDirectory))
-            Directory.CreateDirectory(_unzipDirectory);
+        {
+            _ = Directory.CreateDirectory(_unzipDirectory);
+        }
         else
+        {
             deleteExistingGLTF();
+        }
 
         // Extract archive
         ZipFile zipfile = ZipFile.Read(zipPath);
@@ -100,9 +102,13 @@ public class SketchfabImporter
     private string unzipGLTFArchiveData(byte[] zipData)
     {
         if (!Directory.Exists(_unzipDirectory))
-            Directory.CreateDirectory(_unzipDirectory);
+        {
+            _ = Directory.CreateDirectory(_unzipDirectory);
+        }
         else
+        {
             deleteExistingGLTF();
+        }
 
         MemoryStream stream = new MemoryStream(zipData);
         ZipFile zipfile = ZipFile.Read(stream);
@@ -131,13 +137,13 @@ public class SketchfabImporter
 
         if (!Directory.Exists(_importDirectory))
         {
-            Directory.CreateDirectory(_importDirectory);
+            _ = Directory.CreateDirectory(_importDirectory);
         }
 
         _gltfInput = unzipGLTFArchiveData(data);
 
         ActiveObject = new GameObject();
-        
+
         UnityGLTF.GLTFComponent gltfComponent = ActiveObject.AddComponent<UnityGLTF.GLTFComponent>();
         gltfComponent.Multithreaded = true;
         gltfComponent.UseStream = true;
@@ -149,7 +155,7 @@ public class SketchfabImporter
     private bool isSupportedFile(string filepath)
     {
         string ext = Path.GetExtension(filepath);
-        return (ext == ".gltf" || ext == ".glb");			
+        return ext == ".gltf" || ext == ".glb";
     }
 
     public void loadFromFile(string filepath)
@@ -160,7 +166,7 @@ public class SketchfabImporter
             _gltfInput = unzipGltfArchive(filepath);
         }
 
-        if(!isSupportedFile(_gltfInput))
+        if (!isSupportedFile(_gltfInput))
         {
             //EditorUtility.DisplayDialog("Import Failed", "No glTF data found", "OK");
             return;
@@ -168,7 +174,7 @@ public class SketchfabImporter
 
         if (!Directory.Exists(_importDirectory))
         {
-            Directory.CreateDirectory(_importDirectory);
+            _ = Directory.CreateDirectory(_importDirectory);
         }
 
         // _importer.setupForPath(_gltfInput, _importDirectory, _currentSampleName, _addToCurrentScene);

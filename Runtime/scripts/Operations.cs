@@ -137,6 +137,11 @@ namespace Packages.realityflow_package.Runtime.scripts
 
         #region ObjectOperations
 
+
+        /// <summary>
+        /// This is a documentation string. 
+        /// </summary>
+        /// <param name="flowObject">This is the object to be created</param> 
         public static void CreateObject(FlowTObject flowObject, string projectId, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
         {
             graphqlClient_Editor createObject = ScriptableObject.CreateInstance<graphqlClient_Editor>();
@@ -383,7 +388,8 @@ namespace Packages.realityflow_package.Runtime.scripts
         public static async void CheckinObject(string objectID, string projectID, string username, ReceivedMessage.ReceivedMessageEventHandler callbackFunction)
         {
             // CheckIn will be called updateObject for GraphQL operations
-            // I had to check this out as it was not working properly and we needed to merge, be sure to fix this functionality.
+            // TODO: I had to check this out as it was not working properly and we needed to merge, be sure to fix this functionality.
+
             graphqlClient_Editor updateObject = ScriptableObject.CreateInstance<graphqlClient_Editor>();
             string checkedIn = await updateObject.UpdateObject(objectID, projectID, username);
             if(checkedIn != null){

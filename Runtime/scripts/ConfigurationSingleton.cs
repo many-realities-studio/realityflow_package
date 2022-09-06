@@ -1,6 +1,8 @@
 ﻿using RealityFlow.Plugin.Scripts;
 using System;
 using UnityEngine;
+using UnityEditor;
+using Newtonsoft.Json;
 
 namespace Packages.realityflow_package.Runtime.scripts
 {
@@ -9,11 +11,25 @@ namespace Packages.realityflow_package.Runtime.scripts
     public class ConfigurationSingleton : ScriptableObject
     {
         private static ConfigurationSingleton _SingleInstance = null;
-
+        public static void SetConfigurationSingletonUser(FlowUser fu) {
+            _SingleInstance = ScriptableObject.CreateInstance<ConfigurationSingleton>();
+            _SingleInstance.s_currentUser = fu;
+        }
         public static ConfigurationSingleton SingleInstance
         {
-            get => _SingleInstance is null ? _SingleInstance = new ConfigurationSingleton() : _SingleInstance;
-            set => _SingleInstance = value;
+            get {
+                if(_SingleInstance is null) {
+                    _SingleInstance = (ConfigurationSingleton)JsonConvert.DeserializeObject(EditorPrefs.GetString("currentProject"), typeof(ConfigurationSingleton));
+                } 
+                return _SingleInstance;
+            } set
+            { 
+                EditorPrefs.SetString("currentProject", 
+                JsonConvert.SerializeObject(value, 
+                    new JsonSerializerSettings(){ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+                }));
+                _SingleInstance = value; 
+            }
         }
 
         [SerializeField]
