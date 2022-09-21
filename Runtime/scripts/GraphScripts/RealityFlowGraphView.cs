@@ -221,7 +221,7 @@ public class RealityFlowGraphView : MonoBehaviour {
 	}
 
 	// triggers when a parameter value is modified
-	void ParamChangesModifiedCallBack(string s)
+	void ParamChangesModifiedCallBack(ExposedParameter s)
 	{
 		vsGraph.IsUpdated = true;
 	}

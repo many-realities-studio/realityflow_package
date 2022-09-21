@@ -7,6 +7,7 @@ using System;
 using System.Runtime.Serialization;
 using UnityEngine;
 using GraphProcessor;
+using NodeGraphProcessor;
 
 namespace RealityFlow.Plugin.Scripts
 {
@@ -171,8 +172,8 @@ namespace RealityFlow.Plugin.Scripts
                     {
                         paramBuilder.serializedValue.serializedType = param.serializedValue.serializedType;
                         paramBuilder.serializedValue.serializedName = param.serializedValue.serializedName;
-                        paramBuilder.serializedValue.serializedValue = param.serializedValue.serializedValue;
-                        paramBuilder.serializedValue.OnAfterDeserialize();
+                        // paramBuilder.serializedValue.serializedValue = param.serializedValue.serializedValue;
+                        // paramBuilder.serializedValue.OnAfterDeserialize();
                     }
                 }
                 else // Exposed parameter does not yet exist, we will have to create it using received data
@@ -190,7 +191,7 @@ namespace RealityFlow.Plugin.Scripts
                                 guid = param.guid,
                                 name = param.name,
                                 type = param.type,
-                                settings = new ExposedParameterSettings(),
+                                settings = new GraphProcessor.ExposedParameter.Settings(),
                                 serializedValue = new SerializableObject(newAttachedGameObj,typeof(GameObject),null)
                             });
                         }
@@ -203,7 +204,7 @@ namespace RealityFlow.Plugin.Scripts
                                 guid = param.guid,
                                 name = param.name,
                                 type = param.type,
-                                settings = new ExposedParameterSettings(),
+                                settings = new ExposedParameter.Settings(),
                                 serializedValue = new SerializableObject(null,typeof(GameObject),null)
                             });
                         }
@@ -217,13 +218,13 @@ namespace RealityFlow.Plugin.Scripts
                         emptyObj.serializedType = param.serializedValue.serializedType;
                         emptyObj.serializedName = param.serializedValue.serializedName;
                         emptyObj.serializedValue = param.serializedValue.serializedValue;
-                        emptyObj.OnAfterDeserialize();
+                        // emptyObj.OnAfterDeserialize();
 
                         exposedParameters.Add(new ExposedParameter{
                             guid = param.guid,
                             name = param.name,
                             type = param.type,
-                            settings = new ExposedParameterSettings(),
+                            settings = new ExposedParameter.Settings(),
                             serializedValue = emptyObj
                         });
                     }
