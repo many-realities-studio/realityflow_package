@@ -176,7 +176,7 @@ namespace RealityFlow.Plugin.Tests
         {
             bool parameterAdded = false;
             FlowVSGraph test = new FlowVSGraph("test");
-            test.AddExposedParameter("testParam",typeof(GameObject),null);
+            test.AddExposedParameter("testParam",typeof(GameObjectParameter),null);
             if (test.exposedParameters.Count == 1){
                 parameterAdded = true;
             }
@@ -188,7 +188,7 @@ namespace RealityFlow.Plugin.Tests
         {
             bool parameterDeleted = false;
             FlowVSGraph test = new FlowVSGraph("test");
-            string epnGUID = test.AddExposedParameter("testParam",typeof(GameObject),null);
+            string epnGUID = test.AddExposedParameter("testParam",typeof(GameObjectParameter),null);
             test.RemoveExposedParameter(epnGUID);
             if (test.exposedParameters.Count == 0){
                 parameterDeleted = true;
@@ -201,11 +201,11 @@ namespace RealityFlow.Plugin.Tests
         {
             bool parameterModified = false;
             FlowVSGraph test = new FlowVSGraph("test");
-            string epnGUID = test.AddExposedParameter("testParam",typeof(string),null);
+            string epnGUID = test.AddExposedParameter("testParam",typeof(StringParameter),null);
             ExposedParameter p = test.GetExposedParameterFromGUID(epnGUID);
-            object newValue = new SerializableObject("Hello world",typeof(object),null);
-            p.serializedValue.value = newValue;
-            if (p.serializedValue.value == newValue){
+            string newValue = "Hello world";
+            p.value = newValue;
+            if (p.value == newValue){
                 parameterModified = true;
             }
             Assert.IsTrue(parameterModified);
