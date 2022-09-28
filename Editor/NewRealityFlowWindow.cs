@@ -19,7 +19,7 @@ using GraphProcessor;
 public class FlowNetworkManagerEditor : EditorWindow
 {
     //private string _Url = "ws://plato.mrl.ai:8999";
-    private string _Url = "wss://api.realityflow.io";
+    private string _Url = "ws://localhost:8999";
     private const string Url = "ws://a73c9fa8.ngrok.io";
 
     // View parameters
@@ -309,7 +309,7 @@ public class FlowNetworkManagerEditor : EditorWindow
                 Debug.Log("login callback: " + e.message.WasSuccessful.ToString());
                 if (e.message.WasSuccessful == true)
                 {
-            ConfigurationSingleton.SetConfigurationSingletonUser(new FlowUser(uName, pWord));
+                    ConfigurationSingleton.SetConfigurationSingletonUser(new FlowUser(uName, pWord));
                     Operations.GetAllUserProjects(ConfigurationSingleton.SingleInstance.CurrentUser, (__, _e) =>
                     {
                         _ProjectList = _e.message.Projects;
